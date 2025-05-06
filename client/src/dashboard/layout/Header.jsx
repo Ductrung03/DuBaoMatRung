@@ -11,19 +11,20 @@ const Header = () => {
     <header className="bg-gradient-to-r from-forest-green-primary from-30% to-forest-green-secondary text-white w-full flex items-center h-16 px-4 shadow-md">
       {/* Logo và icon */}
       <div className="flex items-center gap-2">
-        <a href="/dashboard" className="block">
-          <div className="w-10 h-10 bg-white rounded-md flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-green-700 rounded flex items-center justify-center">
-              <div className="grid grid-cols-2 grid-rows-2 gap-0.5">
-                <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
-                <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
-                <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
-                <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
+        <Link to="/dashboard">
+          <a>
+            <div className="w-10 h-10 bg-white rounded-md flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-green-700 rounded flex items-center justify-center">
+                <div className="grid grid-cols-2 grid-rows-2 gap-0.5">
+                  <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
+                  <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
+                  <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
+                  <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
+                </div>
               </div>
             </div>
-          </div>
-        </a>
-
+          </a>
+        </Link>
         {/* Tiêu đề */}
         <div>
           <h1 className="text-xl font-bold uppercase">

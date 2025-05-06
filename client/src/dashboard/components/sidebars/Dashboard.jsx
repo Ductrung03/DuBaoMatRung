@@ -21,6 +21,14 @@ const Dashboard = () => {
       </div>
 
       <div className="mb-4">
+        <Link to="/dashboard/baocao">
+          <div className="bg-forest-green-primary text-white py-2 px-4 rounded-full text-2xl font-medium uppercase tracking-wide text-left shadow-md w-full cursor-pointer hover:bg-green-800 transition">
+            Báo cáo
+          </div>
+        </Link>
+      </div>
+
+      <div className="mb-4">
         <Link to="/dashboard/phathienmatrung">
           <div className="bg-forest-green-primary text-white py-2 px-4 rounded-full text-2xl font-medium uppercase tracking-wide text-left shadow-md w-full cursor-pointer hover:bg-green-800 transition">
             Phát hiện mất rừng
