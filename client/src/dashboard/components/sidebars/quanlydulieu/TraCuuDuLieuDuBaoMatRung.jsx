@@ -4,6 +4,9 @@ import { useGeoData } from "../../../contexts/GeoDataContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Thêm base URL cho API mới
+const BASE_URL = "https://dubaomatrung-backend.onrender.com";
+
 const TraCuuDuLieuDuBaoMatRung = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -29,9 +32,9 @@ const TraCuuDuLieuDuBaoMatRung = () => {
     // Gọi huyện và khoảnh + chủ rừng lúc load
     const fetchInitialData = async () => {
       const [huyenRes, khoanhRes, churungRes] = await Promise.all([
-        fetch("/api/dropdown/huyen"),
-        fetch("/api/dropdown/khoanh"),
-        fetch("/api/dropdown/churung"),
+        fetch(`${BASE_URL}/api/dropdown/huyen`),
+        fetch(`${BASE_URL}/api/dropdown/khoanh`),
+        fetch(`${BASE_URL}/api/dropdown/churung`),
       ]);
       const huyenData = await huyenRes.json();
       const khoanhData = await khoanhRes.json();
@@ -47,7 +50,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
     const huyen = e.target.value;
     setSelectedHuyen(huyen);
     const xaRes = await fetch(
-      `/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`
+      `${BASE_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`
     );
     const xaData = await xaRes.json();
     setXaList(xaData);
@@ -57,7 +60,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
     const xa = e.target.value;
     setSelectedXa(xa);
     const tkRes = await fetch(
-      `/api/dropdown/tieukhu?xa=${encodeURIComponent(xa)}`
+      `${BASE_URL}/api/dropdown/tieukhu?xa=${encodeURIComponent(xa)}`
     );
     const tkData = await tkRes.json();
     setTieukhuList(tkData.map((item) => item.tk));
@@ -90,7 +93,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
       });
   
       const res = await fetch(
-        `/api/quan-ly-du-lieu/tra-cuu-du-lieu-bao-mat-rung?${queryParams.toString()}`
+        `${BASE_URL}/api/quan-ly-du-lieu/tra-cuu-du-lieu-bao-mat-rung?${queryParams.toString()}`
       );
   
       if (!res.ok) {
@@ -123,9 +126,6 @@ const TraCuuDuLieuDuBaoMatRung = () => {
     }
   };
   
-  
-  
-
   const nguyenNhanList = [
     "Khai thác rừng trái phép",
     "Chuyển đổi mục đích sử dụng đất",
