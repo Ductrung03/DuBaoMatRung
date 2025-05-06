@@ -7,6 +7,8 @@ const controller = require("../controllers/dataDropdown.controller");
  * /dropdown/huyen:
  *   get:
  *     summary: Lấy danh sách huyện
+ *     tags:
+ *       - Dropdown
  *     responses:
  *       200:
  *         description: Danh sách huyện duy nhất
@@ -18,6 +20,8 @@ router.get("/huyen", controller.getHuyen);
  * /dropdown/xa:
  *   get:
  *     summary: Lấy danh sách xã theo huyện
+ *     tags:
+ *       - Dropdown
  *     parameters:
  *       - in: query
  *         name: huyen
@@ -36,6 +40,8 @@ router.get("/xa", controller.getXaByHuyen);
  * /dropdown/tieukhu:
  *   get:
  *     summary: Lấy danh sách tiểu khu theo xã
+ *     tags:
+ *       - Dropdown
  *     parameters:
  *       - in: query
  *         name: xa
@@ -54,6 +60,8 @@ router.get("/tieukhu", controller.getTieuKhuByXa);
  * /dropdown/khoanh:
  *   get:
  *     summary: Lấy danh sách khoảnh (toàn bộ)
+ *     tags:
+ *       - Dropdown
  *     responses:
  *       200:
  *         description: Danh sách khoảnh
@@ -65,6 +73,8 @@ router.get("/khoanh", controller.getAllKhoanh);
  * /dropdown/churung:
  *   get:
  *     summary: Lấy danh sách chủ rừng (toàn bộ)
+ *     tags:
+ *       - Dropdown
  *     responses:
  *       200:
  *         description: Danh sách chủ rừng

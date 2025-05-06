@@ -10,9 +10,10 @@ export const useGeoData = () => useContext(GeoDataContext);
 // Provider để bọc quanh App
 export const GeoDataProvider = ({ children }) => {
   const [geoData, setGeoData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   return (
-    <GeoDataContext.Provider value={{ geoData, setGeoData }}>
+    <GeoDataContext.Provider value={{ geoData, setGeoData, loading, setLoading  }}>
       {children}
     </GeoDataContext.Provider>
   );

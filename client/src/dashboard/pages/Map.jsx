@@ -9,6 +9,7 @@ import { useGeoData } from "../contexts/GeoDataContext";
 const CustomMapControl = ({ setMapType }) => {
   const map = useMap();
 
+
   useEffect(() => {
     const container = L.DomUtil.create("div");
 
@@ -67,7 +68,7 @@ const getQueryParam = (search, key) => {
 };
 
 const Map = () => {
-  const { geoData } = useGeoData();
+  const { geoData, loading } = useGeoData();
   const [mapType, setMapType] = useState("satellite");
   const [mapReady, setMapReady] = useState(false);
   const location = useLocation();
@@ -77,13 +78,14 @@ const Map = () => {
 
   const onEachFeature = (feature, layer) => {
     if (feature.properties) {
-      let popupContent = "<b>Thông tin khu vực:</b><br>";
+      let popupContent = "<b>Thông tin đối tượng:</b><br/>";
       Object.entries(feature.properties).forEach(([key, value]) => {
-        popupContent += `<b>${key}:</b> ${value}<br>`;
+        popupContent += `<b>${key}</b>: ${value ?? "NULL"}<br/>`;
       });
       layer.bindPopup(popupContent);
     }
   };
+  
 
   useEffect(() => {
     const map = window._leaflet_map;
@@ -101,9 +103,11 @@ const Map = () => {
         const layerNodes = xml.querySelectorAll("Layer > Layer");
 
         for (let i = 0; i < layerNodes.length; i++) {
-          const name = layerNodes[i].getElementsByTagName("Name")[0]?.textContent;
+          const name =
+            layerNodes[i].getElementsByTagName("Name")[0]?.textContent;
           if (name === layer) {
-            const bboxEl = layerNodes[i].getElementsByTagName("LatLonBoundingBox")[0];
+            const bboxEl =
+              layerNodes[i].getElementsByTagName("LatLonBoundingBox")[0];
             if (bboxEl) {
               const minx = parseFloat(bboxEl.getAttribute("minx"));
               const miny = parseFloat(bboxEl.getAttribute("miny"));
@@ -129,11 +133,17 @@ const Map = () => {
     <div className="p-5 font-sans">
       <h2 className="text-center text-xl font-bold mb-5">Bản đồ khu vực</h2>
 
-      <div className={`flex justify-center items-center ${isDataPage ? "mb-5" : ""}`}>
+      <div
+        className={`flex justify-center items-center ${
+          isDataPage ? "mb-5" : ""
+        }`}
+      >
         <MapContainer
           center={[21.0285, 105.8542]}
           zoom={8}
-          className={`w-full rounded-xl shadow-lg ${isDataPage ? "h-[50vh]" : "h-[calc(100vh-150px)]"}`}
+          className={`w-full rounded-xl shadow-lg ${
+            isDataPage ? "h-[50vh]" : "h-[calc(100vh-150px)]"
+          }`}
           whenCreated={(mapInstance) => {
             window._leaflet_map = mapInstance;
             setMapReady(true);
@@ -157,18 +167,24 @@ const Map = () => {
               version="1.1.0"
               attribution="GeoServer"
             />
+          ) : loading ? (
+            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-3 rounded shadow-lg text-green-700 font-semibold z-[1000]">
+              ⏳ Đang tải dữ liệu...
+            </div>
           ) : (
-            geoData && (
+            geoData?.type === "FeatureCollection" &&
+            geoData.features?.length > 0 && (
               <GeoJSON
-                key={JSON.stringify(geoData)}
+                key={Date.now()}
                 data={geoData}
                 onEachFeature={onEachFeature}
                 ref={(layerRef) => {
                   if (layerRef && mapReady) {
                     const bounds = layerRef.getBounds();
                     if (bounds.isValid()) {
-                      window._leaflet_map.fitBounds(bounds, { padding: [20, 20] });
-                      console.log("✅ Zoom to GeoJSON bounds");
+                      window._leaflet_map.fitBounds(bounds, {
+                        padding: [20, 20],
+                      });
                     }
                   }
                 }}
@@ -180,9 +196,17 @@ const Map = () => {
         </MapContainer>
       </div>
 
-      {!layerName && isDataPage && geoData?.features?.length > 0 && (
-        <Table data={geoData.features.map((f) => f.properties)} />
-      )}
+      {!layerName &&
+        isDataPage &&
+        (loading ? (
+          <div className="text-center text-green-700 font-semibold p-3">
+            ⏳ Đang tải bảng dữ liệu...
+          </div>
+        ) : (
+          geoData?.features?.length > 0 && (
+            <Table data={geoData.features.map((f) => f.properties)} />
+          )
+        ))}
     </div>
   );
 };

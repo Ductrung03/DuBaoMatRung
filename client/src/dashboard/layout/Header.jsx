@@ -27,7 +27,7 @@ const Header = () => {
         {/* Tiêu đề */}
         <div>
           <h1 className="text-xl font-bold uppercase">
-            Phần mềm dự báo mất rừng tỉnh Tuyên Quang
+            Phần mềm dự báo mất rừng tỉnh Lào Cai
           </h1>
           <div className="flex gap-8 mt-1">
             <a

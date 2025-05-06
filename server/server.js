@@ -6,8 +6,10 @@ const { default: open } = require("open");
 const hanhchinhRoutes = require("./routes/hanhchinh.route");
 const shapefileRoutes = require("./routes/shapefile.route");
 const importGeeUrlRoutes = require("./routes/importGeeUrl.route");
-const matRungRoutes = require("./routes/matrung.route")
-const dataDropdownRoutes = require("./routes/dataDropdown.routes")
+const matRungRoutes = require("./routes/matrung.route");
+const dataDropdownRoutes = require("./routes/dataDropdown.routes");
+const quanlydulieu = require("./routes/quanLyDuLieu.routes");
+const baocao = require("./routes/baocao.routes");
 
 require("dotenv").config();
 
@@ -27,7 +29,9 @@ app.use("/api/import-shapefile", shapefileRoutes);
 app.use("/api/import-gee-url", importGeeUrlRoutes);
 app.use("/api/hanhchinh", hanhchinhRoutes);
 app.use("/api/mat-rung", matRungRoutes);
-app.use("/api/dropdown", dataDropdownRoutes)
+app.use("/api/dropdown", dataDropdownRoutes);
+app.use("/api/quan-ly-du-lieu", quanlydulieu);
+app.use("/api/bao-cao", baocao);
 
 app.get("/", (req, res) => {
   res.send("✅ Backend Geo API đang hoạt động");

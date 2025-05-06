@@ -7,25 +7,28 @@ import Map from "./dashboard/pages/Map";
 import ThongKeBaoCaoMatRung from "./dashboard/pages/ThongKeBaoCaoMatRung";
 import { GeoDataProvider } from "./dashboard/contexts/GeoDataContext";
 import PhatHienMatRung from "./dashboard/pages/PhatHienMatRung";
+import { ReportProvider } from "./dashboard/contexts/ReportContext";
 
 function App() {
   return (
     <GeoDataProvider>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Navigate to="/dashboard" />} />
-        <Route path="/dashboard" element={<MainLayout />}>
-          {/* <Route path="" element={<Navigate to="/dashboard/admin" />}> */}
-            <Route path="" element={<Map/>}/>
-            <Route path="dubaomatrung" element={<Map />} />
-            <Route path="quanlydulieu" element={<QuanLyDuLieu />} />
-            <Route path = "phathienmatrung" element={<PhatHienMatRung/>} />
-            <Route path="baocao" element={<ThongKeBaoCaoMatRung/>}/>
-          </Route>
-        {/* </Route> */}
-      </Routes>
-    </BrowserRouter>
+      <ReportProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+            <Route path="/dashboard" element={<MainLayout />}>
+              {/* <Route path="" element={<Navigate to="/dashboard/admin" />}> */}
+              <Route path="" element={<Map />} />
+              <Route path="dubaomatrung" element={<Map />} />
+              <Route path="quanlydulieu" element={<QuanLyDuLieu />} />
+              <Route path="phathienmatrung" element={<PhatHienMatRung />} />
+              <Route path="baocao" element={<ThongKeBaoCaoMatRung />} />
+            </Route>
+            {/* </Route> */}
+          </Routes>
+        </BrowserRouter>
+      </ReportProvider>
     </GeoDataProvider>
   );
 }

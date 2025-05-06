@@ -14,10 +14,13 @@ const TraCuuDuLieuDuBaoMatRung = () => {
   const [selectedXa, setSelectedXa] = useState("");
 
   const [tieukhuList, setTieukhuList] = useState([]);
-  const [selectedTieukhu, setSelectedTieukhu] = useState([]);
+  const [selectedTieukhu, setSelectedTieukhu] = useState("");
 
   const [khoanhList, setKhoanhList] = useState([]);
+  const [selectedKhoanh, setSelectedKhoanh] = useState("");
+
   const [chuRungList, setChuRungList] = useState([]);
+  const [selectedChuRung, setSelecectedChuRung] = useState("");
 
   useEffect(() => {
     // Gọi huyện và khoảnh + chủ rừng lúc load
@@ -61,26 +64,50 @@ const TraCuuDuLieuDuBaoMatRung = () => {
     setSelectedTieukhu(e.target.value);
   };
 
+  const handleKhoanhChange = (e) => {
+    setSelectedKhoanh(e.target.value);
+  };
+
+  const handleChuRungChange = (e) => {
+    setSelecectedChuRung(e.target.value);
+  };
+
   const handleTraCuu = async () => {
     try {
+      const queryParams = new URLSearchParams({
+        fromDate,
+        toDate,
+        huyen: selectedHuyen,
+        xa: selectedXa,
+        tieukhu: selectedTieukhu,
+        khoanh: selectedKhoanh,
+        churung: selectedChuRung
+      });
+      
+  
       const res = await fetch(
-        `/api/mat-rung?fromDate=${fromDate}&toDate=${toDate}`
+        `/api/quan-ly-du-lieu/tra-cuu-du-lieu-bao-mat-rung?${queryParams.toString()}`
       );
-
+  
       if (!res.ok) {
         throw new Error(`Lỗi ${res.status}: ${res.statusText}`);
       }
-
+  
       const data = await res.json();
       console.log("Dữ liệu:", data);
-
-      // Cập nhật geoData để hiển thị lên Map và Table
-      setGeoData(data.geojson);
+  
+      if (!data.success) {
+        throw new Error(data.message || "Lỗi tra cứu từ backend");
+      }
+  
+      // ✅ Cập nhật map và bảng với dữ liệu trả về
+      setGeoData(data.data);  // data.data = mảng kết quả từ stored procedure
     } catch (err) {
       console.error("Lỗi tra cứu:", err);
       alert(`Lỗi khi tra cứu dữ liệu: ${err.message}`);
     }
   };
+  
 
   const nguyenNhanList = [
     "Khai thác rừng trái phép",
@@ -101,189 +128,6 @@ const TraCuuDuLieuDuBaoMatRung = () => {
   ];
 
   const chucNangRungList = ["Rừng đặc dụng", "Rừng phòng hộ", "Rừng sản xuất"];
-
-  const administrativeUnits = [
-    {
-      district: "Thành phố Lào Cai",
-      communes: [
-        "Xã Vạn Hòa",
-        "Xã Đồng Tuyển",
-        "Xã Cam Đường",
-        "Xã Tả Phời",
-        "Xã Hợp Thành",
-        "Xã Cốc San",
-        "Xã Thống Nhất",
-      ],
-    },
-    {
-      district: "Thị xã Sa Pa",
-      communes: [
-        "Xã Sa Pả",
-        "Xã San Sả Hồ",
-        "Xã Bản Hồ",
-        "Xã Lao Chải",
-        "Xã Thanh Bình",
-        "Xã Nậm Cang",
-        "Xã Nậm Sài",
-        "Xã Nậm Mòn",
-        "Xã Tả Van",
-        "Xã Tả Phìn",
-        "Xã Sử Pán",
-        "Xã Mường Hoa",
-        "Xã Trung Chải",
-        "Xã Hầu Thào",
-      ],
-    },
-    {
-      district: "Huyện Bát Xát",
-      communes: [
-        "Xã A Lù",
-        "Xã A Mú Sung",
-        "Xã Bản Qua",
-        "Xã Bản Vược",
-        "Xã Bản Xèo",
-        "Xã Cốc Mỳ",
-        "Xã Dền Sáng",
-        "Xã Dền Thàng",
-        "Xã Mường Hum",
-        "Xã Mường Vi",
-        "Xã Nậm Chạc",
-        "Xã Nậm Pung",
-        "Xã Pa Cheo",
-        "Xã Phìn Ngan",
-        "Xã Quang Kim",
-        "Xã Sàng Ma Sáo",
-        "Xã Tòng Sành",
-        "Xã Trịnh Tường",
-        "Xã Trung Lèng Hồ",
-        "Xã Y Tý",
-        "Xã Ngải Thầu",
-      ],
-    },
-    {
-      district: "Huyện Bảo Thắng",
-      communes: [
-        "Xã Phố Lu",
-        "Xã Sơn Hà",
-        "Xã Sơn Hải",
-        "Xã Xuân Giao",
-        "Xã Xuân Quang",
-        "Xã Trì Quang",
-        "Xã Gia Phú",
-        "Xã Bản Cầm",
-        "Xã Thái Niên",
-        "Xã Phong Niên",
-        "Xã Bản Phiệt",
-        "Xã Phú Nhuận",
-      ],
-    },
-    {
-      district: "Huyện Bảo Yên",
-      communes: [
-        "Xã Nghĩa Đô",
-        "Xã Xuân Thượng",
-        "Xã Xuân Hòa",
-        "Xã Tân Tiến",
-        "Xã Tân Dương",
-        "Xã Thượng Hà",
-        "Xã Kim Sơn",
-        "Xã Cam Cọn",
-        "Xã Minh Tân",
-        "Xã Việt Tiến",
-        "Xã Yên Sơn",
-        "Xã Bảo Hà",
-        "Xã Lương Sơn",
-        "Xã Điện Quan",
-        "Xã Phúc Khánh",
-        "Xã Vĩnh Yên",
-      ],
-    },
-    {
-      district: "Huyện Bắc Hà",
-      communes: [
-        "Xã Lùng Cải",
-        "Xã Lùng Phình",
-        "Xã Tả Van Chư",
-        "Xã Lầu Thí Ngài",
-        "Xã Thải Giàng Phố",
-        "Xã Hoàng Thu Phố",
-        "Xã Bản Phố",
-        "Xã Bản Liền",
-        "Xã Tà Chải",
-        "Xã Na Hối",
-        "Xã Cốc Ly",
-        "Xã Nậm Mòn",
-        "Xã Nậm Đét",
-        "Xã Nậm Khánh",
-        "Xã Bảo Nhai",
-        "Xã Nậm Lúc",
-        "Xã Cốc Lầu",
-        "Xã Bản Cái",
-      ],
-    },
-    {
-      district: "Huyện Mường Khương",
-      communes: [
-        "Xã Bản Lầu",
-        "Xã Bản Sen",
-        "Xã Cao Sơn",
-        "Xã Dìn Chin",
-        "Xã La Pan Tẩn",
-        "Xã Lùng Khấu Nhin",
-        "Xã Lùng Vai",
-        "Xã Nậm Chảy",
-        "Xã Nấm Lư",
-        "Xã Pha Long",
-        "Xã Tả Gia Khâu",
-        "Xã Tả Ngải Chồ",
-        "Xã Tả Thàng",
-        "Xã Thanh Bình",
-        "Xã Tung Chung Phố",
-      ],
-    },
-    {
-      district: "Huyện Si Ma Cai",
-      communes: [
-        "Xã Bản Mế",
-        "Xã Cán Cấu",
-        "Xã Lùng Thẩn",
-        "Xã Mản Thẩn",
-        "Xã Nàn Sán",
-        "Xã Nàn Sín",
-        "Xã Quan Thần Sán",
-        "Xã Sán Chải",
-        "Xã Sín Chéng",
-        "Xã Thào Chư Phìn",
-        "Xã Cán Hồ",
-        "Xã Lử Thẩn",
-      ],
-    },
-    {
-      district: "Huyện Văn Bàn",
-      communes: [
-        "Xã Chiềng Ken",
-        "Xã Dần Thàng",
-        "Xã Dương Quỳ",
-        "Xã Hòa Mạc",
-        "Xã Khánh Yên Hạ",
-        "Xã Khánh Yên Thượng",
-        "Xã Khánh Yên Trung",
-        "Xã Làng Giàng",
-        "Xã Liêm Phú",
-        "Xã Minh Lương",
-        "Xã Nậm Chày",
-        "Xã Nậm Dạng",
-        "Xã Nậm Mả",
-        "Xã Nậm Tha",
-        "Xã Nậm Xây",
-        "Xã Nậm Xé",
-        "Xã Sơn Thủy",
-        "Xã Tân An",
-        "Xã Tân Thượng",
-        "Xã Thẩm Dương",
-      ],
-    },
-  ];
 
   const [isForecastOpen, setIsForecastOpen] = useState(true);
 
@@ -412,6 +256,8 @@ const TraCuuDuLieuDuBaoMatRung = () => {
               <label className="text-sm font-medium w-40">Khoảnh</label>
               <div className="relative w-36">
                 <select
+                  value={selectedKhoanh}
+                  onChange={handleKhoanhChange}
                   className="w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   onFocus={() => handleDropdownToggle("khoanh", true)}
                   onBlur={() => handleDropdownToggle("khoanh", false)}
@@ -452,6 +298,8 @@ const TraCuuDuLieuDuBaoMatRung = () => {
               <label className="text-sm font-medium w-40">Chủ rừng</label>
               <div className="relative w-36">
                 <select
+                  value={selectedChuRung}
+                  onChange={handleChuRungChange}
                   className="w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   onFocus={() => handleDropdownToggle("churung", true)}
                   onBlur={() => handleDropdownToggle("churung", false)}
@@ -463,6 +311,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
                     </option>
                   ))}
                 </select>
+                <Select isOpen={openDropdown === "churung"} />
               </div>
             </div>
 
