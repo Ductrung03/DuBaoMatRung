@@ -7,9 +7,12 @@ const pool = new Pool({
   user: db.user,
   password: db.password,
   database: db.database,
-  max: 20,            // số kết nối tối đa
+  max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
+  ssl: {
+    rejectUnauthorized: false // Quan trọng để kết nối SSL
+  }
 });
 
 module.exports = pool;
