@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:3000", // cổng backend
+        target: "https://dubaomatrung-backend.onrender.com", // cổng backend
         changeOrigin: true,
         secure: false,
       },
