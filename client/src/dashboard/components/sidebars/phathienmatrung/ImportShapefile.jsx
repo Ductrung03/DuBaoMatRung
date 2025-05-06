@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGeoData } from "../../../contexts/GeoDataContext";
 import axios from "axios";
+import config from "../../../../config";
 
 const ImportShapefile = () => {
   const [zipUrl, setZipUrl] = useState("");
