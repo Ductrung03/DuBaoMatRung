@@ -15,7 +15,9 @@ const pool = new Pool({
   user: db.user,
   password: db.password,
   database: db.database,
-  ssl: db.ssl === "true" ? { rejectUnauthorized: false } : false, // ép kiểu rõ ràng
+  ssl: {
+    rejectUnauthorized: false, // ✅ Bắt buộc với Render PostgreSQL
+  },
 });
 
 
