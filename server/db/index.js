@@ -15,13 +15,9 @@ const pool = new Pool({
   user: db.user,
   password: db.password,
   database: db.database,
-  max: 10,            // giảm xuống để tránh quá nhiều kết nối
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 1000000, // tăng lên 10 giây,
-  ssl: {
-    rejectUnauthorized: false, // ✅ bắt buộc với Render hoặc dịch vụ cloud
-  },
+  ssl: db.ssl === "true" ? { rejectUnauthorized: false } : false, // ép kiểu rõ ràng
 });
+
 
 // Bắt sự kiện lỗi
 pool.on('error', (err, client) => {
