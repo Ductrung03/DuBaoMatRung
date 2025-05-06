@@ -3,6 +3,23 @@ import Select from "../../Select";
 import { useGeoData } from "../../../contexts/GeoDataContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+// import LoadingSpinner from "../../LoadingSpinner";
+// Nếu component LoadingSpinner chưa tồn tại, comment dòng trên và uncomment các dòng dưới đây
+
+const LoadingSpinner = ({ size = "medium" }) => {
+  const sizeClass = {
+    small: "w-4 h-4",
+    medium: "w-6 h-6",
+    large: "w-8 h-8",
+  }[size];
+
+  return (
+    <div className={`inline-block ${sizeClass} animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]`} role="status">
+      <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Đang tải...</span>
+    </div>
+  );
+};
+
 
 // Thêm base URL cho API mới
 const BASE_URL = "https://dubaomatrung-backend.onrender.com";
@@ -12,6 +29,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
   const [toDate, setToDate] = useState("");
   const { setGeoData } = useGeoData();
   const [noDataMessage, setNoDataMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [huyenList, setHuyenList] = useState([]);
   const [selectedHuyen, setSelectedHuyen] = useState("");
@@ -81,6 +99,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
   const handleTraCuu = async () => {
     try {
       setNoDataMessage(""); // reset thông báo cũ nếu có
+      setIsLoading(true); // Bắt đầu loading
   
       const queryParams = new URLSearchParams({
         fromDate,
@@ -100,6 +119,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
         if (res.status === 400) {
           const errData = await res.json();
           toast.error(errData.message || "Thiếu tham số bắt buộc.");
+          setIsLoading(false); // Kết thúc loading khi có lỗi
           return;
         }
         throw new Error(`Lỗi ${res.status}: ${res.statusText}`);
@@ -110,19 +130,23 @@ const TraCuuDuLieuDuBaoMatRung = () => {
       if (!data.success) {
         toast.error(data.message || "Lỗi từ backend.");
         setGeoData({ type: "FeatureCollection", features: [] });
+        setIsLoading(false); // Kết thúc loading khi có lỗi
         return;
       }
   
       if (!data.data || data.data.features.length === 0) {
         toast.warning("Không có dữ liệu phù hợp.");
         setGeoData({ type: "FeatureCollection", features: [] });
+        setIsLoading(false); // Kết thúc loading khi không có dữ liệu
         return;
       }
   
       setGeoData(data.data);
+      setIsLoading(false); // Kết thúc loading khi thành công
     } catch (err) {
       console.error("Lỗi tra cứu:", err);
       toast.error(`Lỗi khi tra cứu dữ liệu: ${err.message}`);
+      setIsLoading(false); // Kết thúc loading khi có lỗi
     }
   };
   
@@ -388,9 +412,17 @@ const TraCuuDuLieuDuBaoMatRung = () => {
 
           <button
             onClick={handleTraCuu}
-            className="w-36 bg-forest-green-gray hover:bg-green-200 text-black-800 font-medium py-0.5 px-3 rounded-full text-center mt-2 self-center"
+            disabled={isLoading}
+            className="w-36 bg-forest-green-gray hover:bg-green-200 text-black-800 font-medium py-0.5 px-3 rounded-full text-center mt-2 self-center flex items-center justify-center"
           >
-            Tra cứu
+            {isLoading ? (
+              <>
+                <LoadingSpinner size="small" /> 
+                <span className="ml-2">Đang tải...</span>
+              </>
+            ) : (
+              "Tra cứu"
+            )}
           </button>
         </div>
       )}

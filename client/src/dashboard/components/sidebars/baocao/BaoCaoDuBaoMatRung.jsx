@@ -22,6 +22,8 @@ ChartJS.register(
   Title
 );
 
+const BASE_URL = "https://dubaomatrung-backend.onrender.com";
+
 const BaoCaoDuBaoMatRung = () => {
   const loaiBaoCaoList = ["Văn bản", "Biểu đồ"];
 
@@ -40,7 +42,9 @@ const BaoCaoDuBaoMatRung = () => {
   const [isForecastOpen, setIsForecastOpen] = useState(true);
 
   const { setReportData } = useReport();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
+
+  
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -55,7 +59,7 @@ const BaoCaoDuBaoMatRung = () => {
     const huyen = e.target.value;
     setSelectedHuyen(huyen);
     const xaRes = await fetch(
-      `/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`
+      `${BASE_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`
     );
     const xaData = await xaRes.json();
     setXaList(xaData);

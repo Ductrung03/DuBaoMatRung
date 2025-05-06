@@ -20,7 +20,7 @@ const ImportShapefile = () => {
     try {
       const tableName = "mat_rung_shape_" + Date.now();
 
-      const res = await fetch("http://localhost:3000/api/import-gee-url", {
+      const res = await fetch("http://localhost:10000/api/import-gee-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ zipUrl, tableName }),

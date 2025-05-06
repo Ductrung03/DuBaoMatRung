@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Header = () => {
   const location = useLocation();
@@ -30,42 +30,48 @@ const Header = () => {
             Phần mềm dự báo mất rừng tỉnh Lào Cai
           </h1>
           <div className="flex gap-8 mt-1">
-            <a
-              href="/dashboard/dubaomatrung"
-              className={`text-base font-semibold hover:underline ${
-                isActive("/dashboard/dubaomatrung")
-                  ? "text-red-600"
-                  : "text-white"
-              }`}
-            >
-              Dự báo mất rừng
-            </a>
-            <a
-              href="/dashboard/quanlydulieu"
-              className={`text-base font-semibold hover:underline ${
-                isActive("/dashboard/quanlydulieu")
-                  ? "text-red-600"
-                  : "text-white"
-              }`}
-            >
-              Quản lý dữ liệu
-            </a>
-            <a
-              href="/dashboard/baocao"
-              className={`text-base font-semibold hover:underline ${
-                isActive("/dashboard/baocao") ? "text-red-600" : "text-white"
-              }`}
-            >
-              Báo cáo
-            </a>
-            <a
-              href="/dashboard/phathienmatrung"
-              className={`text-base font-semibold hover:underline ${
-                isActive("/dashboard/phathienmatrung") ? "text-red-600" : "text-white"
-              }`}
-            >
-              Phát hiện mất rừng
-            </a>
+            <Link to="/dashboard/dubaomatrung">
+              <a
+                className={`text-base font-semibold hover:underline ${
+                  isActive("/dashboard/dubaomatrung")
+                    ? "text-red-600"
+                    : "text-white"
+                }`}
+              >
+                Dự báo mất rừng
+              </a>
+            </Link>
+            <Link to="/dashboard/quanlydulieu">
+              <a
+                className={`text-base font-semibold hover:underline ${
+                  isActive("/dashboard/quanlydulieu")
+                    ? "text-red-600"
+                    : "text-white"
+                }`}
+              >
+                Quản lý dữ liệu
+              </a>
+            </Link>
+            <Link to="/dashboard/baocao">
+              <a
+                className={`text-base font-semibold hover:underline ${
+                  isActive("/dashboard/baocao") ? "text-red-600" : "text-white"
+                }`}
+              >
+                Báo cáo
+              </a>
+            </Link>
+            <Link to="/dashboard/phathienmatrung">
+              <a
+                className={`text-base font-semibold hover:underline ${
+                  isActive("/dashboard/phathienmatrung")
+                    ? "text-red-600"
+                    : "text-white"
+                }`}
+              >
+                Phát hiện mất rừng
+              </a>
+            </Link>
           </div>
         </div>
       </div>
