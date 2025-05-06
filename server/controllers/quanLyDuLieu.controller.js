@@ -1,4 +1,5 @@
 const pool = require("../db");
+const convertTcvn3ToUnicode = require("../utils/convertTcvn3ToUnicode");
 
 exports.traCuuDuLieuBaoMatRung = async (req, res) => {
   const {
@@ -11,7 +12,6 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
     churung
   } = req.query;
 
-  // Kiểm tra bắt buộc
   if (!fromDate || !toDate) {
     return res.status(400).json({
       success: false,
@@ -27,7 +27,7 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
           'features', jsonb_agg(
             jsonb_build_object(
               'type', 'Feature',
-              'geometry', ST_AsGeoJSON(m.geom)::jsonb,
+              'geometry', ST_AsGeoJSON(m.geom, 4326)::jsonb,
               'properties', jsonb_build_object(
                 'start_dau', m.start_dau,
                 'end_sau', m.end_sau,
@@ -65,8 +65,9 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
     ];
 
     const { rows } = await pool.query(sql, values);
-    const geojson = rows[0]?.geojson;
+    let geojson = rows[0]?.geojson;
 
+    // Không có dữ liệu
     if (!geojson || !geojson.features || geojson.features.length === 0) {
       return res.json({
         success: true,
@@ -74,6 +75,20 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
         data: { type: "FeatureCollection", features: [] }
       });
     }
+
+    // Chuyển các trường sang Unicode
+    geojson.features = geojson.features.map((feature) => {
+      const props = feature.properties;
+      return {
+        ...feature,
+        properties: {
+          ...props,
+          huyen: convertTcvn3ToUnicode(props.huyen || ""),
+          xa: convertTcvn3ToUnicode(props.xa || ""),
+          churung: convertTcvn3ToUnicode(props.churung || "")
+        }
+      };
+    });
 
     res.json({ success: true, data: geojson });
   } catch (err) {

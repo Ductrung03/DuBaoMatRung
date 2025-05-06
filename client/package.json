@@ -31,6 +31,7 @@
     "react-multi-carousel": "^2.8.5",
     "react-router-dom": "^7.3.0",
     "react-spinners-components": "^2.0.4",
+    "react-toastify": "^11.0.5",
     "recharts": "^2.15.2"
   },
   "devDependencies": {

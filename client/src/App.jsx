@@ -8,6 +8,8 @@ import ThongKeBaoCaoMatRung from "./dashboard/pages/ThongKeBaoCaoMatRung";
 import { GeoDataProvider } from "./dashboard/contexts/GeoDataContext";
 import PhatHienMatRung from "./dashboard/pages/PhatHienMatRung";
 import { ReportProvider } from "./dashboard/contexts/ReportContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
@@ -29,7 +31,9 @@ function App() {
           </Routes>
         </BrowserRouter>
       </ReportProvider>
+      <ToastContainer position="top-center" autoClose={3000} />
     </GeoDataProvider>
+    
   );
 }
 

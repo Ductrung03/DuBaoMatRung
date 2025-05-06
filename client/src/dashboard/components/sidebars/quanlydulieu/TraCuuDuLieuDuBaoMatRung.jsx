@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import Select from "../../Select";
 import { useGeoData } from "../../../contexts/GeoDataContext";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TraCuuDuLieuDuBaoMatRung = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const { setGeoData } = useGeoData();
+  const [noDataMessage, setNoDataMessage] = useState("");
 
   const [huyenList, setHuyenList] = useState([]);
   const [selectedHuyen, setSelectedHuyen] = useState("");
@@ -74,6 +77,8 @@ const TraCuuDuLieuDuBaoMatRung = () => {
 
   const handleTraCuu = async () => {
     try {
+      setNoDataMessage(""); // reset thông báo cũ nếu có
+  
       const queryParams = new URLSearchParams({
         fromDate,
         toDate,
@@ -83,30 +88,42 @@ const TraCuuDuLieuDuBaoMatRung = () => {
         khoanh: selectedKhoanh,
         churung: selectedChuRung
       });
-      
   
       const res = await fetch(
         `/api/quan-ly-du-lieu/tra-cuu-du-lieu-bao-mat-rung?${queryParams.toString()}`
       );
   
       if (!res.ok) {
+        if (res.status === 400) {
+          const errData = await res.json();
+          toast.error(errData.message || "Thiếu tham số bắt buộc.");
+          return;
+        }
         throw new Error(`Lỗi ${res.status}: ${res.statusText}`);
       }
   
       const data = await res.json();
-      console.log("Dữ liệu:", data);
   
       if (!data.success) {
-        throw new Error(data.message || "Lỗi tra cứu từ backend");
+        toast.error(data.message || "Lỗi từ backend.");
+        setGeoData({ type: "FeatureCollection", features: [] });
+        return;
       }
   
-      // ✅ Cập nhật map và bảng với dữ liệu trả về
-      setGeoData(data.data);  // data.data = mảng kết quả từ stored procedure
+      if (!data.data || data.data.features.length === 0) {
+        toast.warning("Không có dữ liệu phù hợp.");
+        setGeoData({ type: "FeatureCollection", features: [] });
+        return;
+      }
+  
+      setGeoData(data.data);
     } catch (err) {
       console.error("Lỗi tra cứu:", err);
-      alert(`Lỗi khi tra cứu dữ liệu: ${err.message}`);
+      toast.error(`Lỗi khi tra cứu dữ liệu: ${err.message}`);
     }
   };
+  
+  
   
 
   const nguyenNhanList = [
