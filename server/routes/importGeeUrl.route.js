@@ -4,7 +4,7 @@ const axios = require("axios");
 const fs = require("fs");
 const AdmZip = require("adm-zip");
 const path = require("path");
-const ogr2ogr = require("ogr2ogr");
+const ogr2ogr = require("ogr2ogr").default || require("ogr2ogr");
 require("dotenv").config();
 
 const TABLE_NAME = "mat_rung";
