@@ -18,9 +18,7 @@ const pool = new Pool({
   max: 10,            // giảm xuống để tránh quá nhiều kết nối
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 1000000, // tăng lên 10 giây,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ssl: false
 });
 
 // Bắt sự kiện lỗi
