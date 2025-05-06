@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGeoData } from "../../../contexts/GeoDataContext";
+import axios from "axios";
 
 
 const ImportShapefile = () => {
@@ -14,31 +15,31 @@ const ImportShapefile = () => {
       alert("❗ Vui lòng nhập đúng link từ Google Earth Engine.");
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
       const tableName = "mat_rung_shape_" + Date.now();
-
-      const res = await fetch("http://localhost:10000/api/import-gee-url", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ zipUrl, tableName }),
+  
+      const response = await axios.post("http://localhost:3000/api/import-gee-url", {
+        zipUrl,
+        tableName,
       });
-
-      const data = await res.json();
+  
+      const data = response.data;
       alert(data.message);
-
+  
       if (data.geojson) {
         setGeoData(data.geojson);
         navigate("/dashboard/quanlydulieu");
       }
     } catch (err) {
-      alert("❌ Lỗi: " + err.message);
+      alert("❌ Lỗi: " + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div>
