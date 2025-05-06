@@ -37,7 +37,7 @@ const TABLE_NAME = "mat_rung";
 
 async function downloadZip(zipUrl, savePath) {
   const response = await axios.get(zipUrl, {
-    responseType: "arraybuffer"
+    responseType: "arraybuffer",
   });
   fs.writeFileSync(savePath, response.data);
   console.log("✅ Tải ZIP thành công từ GEE.");
@@ -61,21 +61,24 @@ router.post("/", async (req, res) => {
     if (!shpFile) throw new Error("Không tìm thấy file SHP.");
     const fullShpPath = path.join(extractPath, shpFile);
 
-    const checkExist = await pool.query(`
+    const checkExist = await pool.query(
+      `
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
         WHERE table_schema = 'public' 
         AND table_name = $1
       );
-    `, [TABLE_NAME]);
+    `,
+      [TABLE_NAME]
+    );
 
     const tableExists = checkExist.rows[0].exists;
     const shp2pgsqlFlag = tableExists ? "-a -s 4326" : "-c -I -s 4326";
 
     const importCmd =
       process.platform === "win32"
-        ? `set PGPASSWORD=${process.env.PGPASSWORD}&& shp2pgsql ${shp2pgsqlFlag} "${fullShpPath}" ${TABLE_NAME} | psql -h ${process.env.PGHOST} -p ${process.env.PGPORT} -d ${process.env.PGDATABASE} -U ${process.env.PGUSER}`
-        : `PGPASSWORD=${process.env.PGPASSWORD} shp2pgsql ${shp2pgsqlFlag} "${fullShpPath}" ${TABLE_NAME} | psql -h ${process.env.PGHOST} -p ${process.env.PGPORT} -d ${process.env.PGDATABASE} -U ${process.env.PGUSER}`;
+        ? `set PGPASSWORD=${process.env.PGPASSWORD}&& shp2pgsql ${shp2pgsqlFlag} "${fullShpPath}" ${TABLE_NAME} | psql "host=${process.env.PGHOST} port=${process.env.PGPORT} dbname=${process.env.PGDATABASE} user=${process.env.PGUSER} sslmode=require"`
+        : `PGPASSWORD=${process.env.PGPASSWORD} shp2pgsql ${shp2pgsqlFlag} "${fullShpPath}" ${TABLE_NAME} | psql "host=${process.env.PGHOST} port=${process.env.PGPORT} dbname=${process.env.PGDATABASE} user=${process.env.PGUSER} sslmode=require"`;
 
     console.log("📥 Import vào PostgreSQL...");
     await exec(importCmd);
@@ -114,4 +117,3 @@ router.post("/", async (req, res) => {
 });
 
 module.exports = router;
-
