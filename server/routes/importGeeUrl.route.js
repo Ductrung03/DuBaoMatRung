@@ -74,11 +74,11 @@ router.post("/", async (req, res) => {
 
     const tableExists = checkExist.rows[0].exists;
     const shp2pgsqlFlag = tableExists ? "-a -s 4326" : "-c -I -s 4326";
-
+//a
     const importCmd =
-      process.platform === "win32"
-        ? `set PGPASSWORD=${process.env.PGPASSWORD}&& shp2pgsql ${shp2pgsqlFlag} "${fullShpPath}" ${TABLE_NAME} | psql "host=${process.env.PGHOST} port=${process.env.PGPORT} dbname=${process.env.PGDATABASE} user=${process.env.PGUSER} sslmode=require"`
-        : `PGPASSWORD=${process.env.PGPASSWORD} shp2pgsql ${shp2pgsqlFlag} "${fullShpPath}" ${TABLE_NAME} | psql "host=${process.env.PGHOST} port=${process.env.PGPORT} dbname=${process.env.PGDATABASE} user=${process.env.PGUSER} sslmode=require"`;
+  `PGPASSWORD=${process.env.PGPASSWORD} shp2pgsql -a -s 4326 "${fullShpPath}" ${TABLE_NAME} | ` +
+  `psql "host=${process.env.PGHOST} port=${process.env.PGPORT} dbname=${process.env.PGDATABASE} user=${process.env.PGUSER} sslmode=require"`;
+
 
     console.log("📥 Import vào PostgreSQL...");
     await exec(importCmd);

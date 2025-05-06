@@ -21,6 +21,7 @@ ChartJS.register(
   Tooltip,
   Title
 );
+import axios from "axios";
 
 const BASE_URL = "https://dubaomatrung-backend.onrender.com";
 
@@ -48,22 +49,29 @@ const BaoCaoDuBaoMatRung = () => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      const res = await fetch("/api/dropdown/huyen");
-      const data = await res.json();
-      setHuyenList(data);
+      try {
+        const res = await axios.get(`${BASE_URL}/api/dropdown/huyen`);
+        setHuyenList(res.data);
+      } catch (err) {
+        console.error("Lỗi lấy huyện:", err);
+      }
     };
     fetchInitialData();
   }, []);
-
+  
   const handleHuyenChange = async (e) => {
     const huyen = e.target.value;
     setSelectedHuyen(huyen);
-    const xaRes = await fetch(
-      `${BASE_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`
-    );
-    const xaData = await xaRes.json();
-    setXaList(xaData);
+    try {
+      const xaRes = await axios.get(
+        `${BASE_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`
+      );
+      setXaList(xaRes.data);
+    } catch (err) {
+      console.error("Lỗi lấy xã:", err);
+    }
   };
+  
 
   const handleXaChange = (e) => {
     setSelectedXa(e.target.value);
@@ -74,31 +82,26 @@ const BaoCaoDuBaoMatRung = () => {
   };
 
   const handleBaoCao = async () => {
-    const params = new URLSearchParams({
+    const params = {
       fromDate,
       toDate,
       huyen: selectedHuyen,
       xa: selectedXa,
       type: reportType,
-    });
-  
-    const url = `/api/bao-cao/tra-cuu-du-lieu-bao-mat-rung?${params.toString()}`;
+    };
   
     try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Không thể tạo báo cáo");
+      const res = await axios.get(`${BASE_URL}/api/bao-cao/tra-cuu-du-lieu-bao-mat-rung`, { params });
   
       if (reportType === "Văn bản" || reportType === "Biểu đồ") {
-        const json = await res.json();
-        setReportData(json.data); // truyền toàn bộ data bảng hoặc chart vào context
-        
+        setReportData(res.data.data);
       }
-      
     } catch (err) {
       console.error("Lỗi tạo báo cáo:", err);
-      alert("Không thể tạo báo cáo: " + err.message);
+      alert("Không thể tạo báo cáo: " + (err.response?.data?.message || err.message));
     }
   };
+  
   
 
   return (
