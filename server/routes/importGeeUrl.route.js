@@ -35,10 +35,6 @@ const pool = new Pool();
 
 const TABLE_NAME = "mat_rung";
 
-// Hàm kiểm tra sự tồn tại của psql và shp2pgsql
-
-
-
 
 async function downloadZip(zipUrl, savePath) {
   const response = await axios.get(zipUrl, {

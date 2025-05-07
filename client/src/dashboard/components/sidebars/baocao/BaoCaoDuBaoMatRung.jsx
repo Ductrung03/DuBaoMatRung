@@ -25,7 +25,6 @@ ChartJS.register(
 // ✅ Đổi từ axios sang fetch nên dòng này không còn cần:
 // import axios from "axios";
 
-const BASE_URL = "https://dubaomatrung-backend.onrender.com";
 
 const BaoCaoDuBaoMatRung = () => {
   const loaiBaoCaoList = ["Văn bản", "Biểu đồ"];
@@ -46,7 +45,7 @@ const BaoCaoDuBaoMatRung = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/api/dropdown/huyen`);
+        const res = await fetch("http://localhost:3000/api/dropdown/huyen");
         const data = await res.json();
         setHuyenList(data);
       } catch (err) {
