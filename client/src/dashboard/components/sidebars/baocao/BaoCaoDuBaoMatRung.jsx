@@ -113,8 +113,78 @@ const BaoCaoDuBaoMatRung = () => {
       {isForecastOpen && (
         <div className="flex flex-col gap-2 px-1 pt-3">
           <div className="flex flex-col gap-3">
-            {/* Các ô nhập như từ ngày, đến ngày, huyện, xã... giữ nguyên như cũ */}
-            {/* Chỉ thay axios bằng fetch như đã làm ở trên */}
+            {/* Từ ngày */}
+            <div className="flex items-center gap-1">
+              <label className="text-sm font-medium w-40">Từ ngày</label>
+              <input
+                type="date"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+                className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+              />
+            </div>
+
+            {/* Đến ngày */}
+            <div className="flex items-center gap-1">
+              <label className="text-sm font-medium w-40">Đến ngày</label>
+              <input
+                type="date"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+                className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+              />
+            </div>
+
+            {/* Huyện */}
+            <div className="flex items-center gap-1">
+              <label className="text-sm font-medium w-40">Huyện</label>
+              <select
+                value={selectedHuyen}
+                onChange={handleHuyenChange}
+                className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+              >
+                <option value="">Chọn huyện</option>
+                {huyenList.map((item, i) => (
+                  <option key={i} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Xã */}
+            <div className="flex items-center gap-1">
+              <label className="text-sm font-medium w-40">Xã</label>
+              <select
+                value={selectedXa}
+                onChange={handleXaChange}
+                className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+              >
+                <option value="">Chọn xã</option>
+                {xaList.map((item, i) => (
+                  <option key={i} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Loại báo cáo */}
+            <div className="flex items-center gap-1">
+              <label className="text-sm font-medium w-40">Loại báo cáo</label>
+              <select
+                value={reportType}
+                onChange={(e) => setReportType(e.target.value)}
+                className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+              >
+                <option value="">Chọn loại</option>
+                {loaiBaoCaoList.map((type, idx) => (
+                  <option key={idx} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <button
