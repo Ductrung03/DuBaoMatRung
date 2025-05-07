@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: dubaomat rung-backend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    rootDir: .
+    buildCommand: docker build -t app .
+    startCommand: docker run -p 10000:10000 app
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: PGHOST
+        value: dpg-d0cu2mqdbo4c73frn1cg-a.singapore-postgres.render.com
+      - key: PGPORT
+        value: 5432
+      - key: PGUSER
+        value: ductr
+      - key: PGPASSWORD
+        value: nG6D7G1rQcTiuHC7XmUR6MqXBlCjkUsG
+      - key: PGDATABASE
+        value: geodb
+      - key: GEOSERVER_USER
+        value: admin
+      - key: GEOSERVER_PASS
+        value: geoserver
