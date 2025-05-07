@@ -35,6 +35,24 @@ const pool = new Pool();
 
 const TABLE_NAME = "mat_rung";
 
+// Hàm kiểm tra sự tồn tại của psql và shp2pgsql
+async function checkTools() {
+  try {
+    console.log("📋 Kiểm tra psql...");
+    await exec("psql --version");
+    console.log("✅ psql đã được cài đặt.");
+
+    console.log("📋 Kiểm tra shp2pgsql...");
+    await exec("shp2pgsql --version");
+    console.log("✅ shp2pgsql đã được cài đặt.");
+  } catch (err) {
+    console.error("❌ Lỗi khi kiểm tra công cụ:", err.message);
+  }
+}
+
+// Gọi hàm kiểm tra ngay khi file được load
+checkTools();
+
 async function downloadZip(zipUrl, savePath) {
   const response = await axios.get(zipUrl, {
     responseType: "arraybuffer",
