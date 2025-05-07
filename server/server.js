@@ -79,7 +79,7 @@ app.get("/", (req, res) => {
   res.send("✅ Backend Geo API đang hoạt động");
 });
 
-const port = process.env.PORT || 10000;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`🚀 Backend chạy tại http://localhost:${port}`);
   console.log(`📚 API Docs tại http://localhost:${port}/api-docs`);
