@@ -4,7 +4,7 @@ import { useGeoData } from "../../../contexts/GeoDataContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 // import LoadingSpinner from "../../LoadingSpinner";
-// Nếu component LoadingSpinner chưa tồn tại, comment dòng trên và uncomment các dòng dưới đây
+// Nếu component LoadingSpinner chưa tồn tại, comment dòng trên và uncomment các dòng dưới đâysss
 
 const LoadingSpinner = ({ size = "medium" }) => {
   const sizeClass = {
