@@ -1,9 +1,30 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { FaUser, FaSignOutAlt, FaUserCog, FaKey } from "react-icons/fa";
+import ChangePasswordModal from "../components/ChangePasswordModal";
 
 const Header = () => {
   const location = useLocation();
   const currentPath = location.pathname;
+  const { user, logout, isAdmin } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const userMenuRef = useRef(null);
+
+  // Đóng menu khi click ra ngoài
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const isActive = (path) => currentPath === path;
 
@@ -12,18 +33,16 @@ const Header = () => {
       {/* Logo và icon */}
       <div className="flex items-center gap-2">
         <Link to="/dashboard">
-          <a>
-            <div className="w-10 h-10 bg-white rounded-md flex items-center justify-center">
-              <div className="w-8 h-8 border-2 border-green-700 rounded flex items-center justify-center">
-                <div className="grid grid-cols-2 grid-rows-2 gap-0.5">
-                  <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
-                  <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
-                  <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
-                  <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
-                </div>
+          <div className="w-10 h-10 bg-white rounded-md flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-green-700 rounded flex items-center justify-center">
+              <div className="grid grid-cols-2 grid-rows-2 gap-0.5">
+                <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
+                <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
+                <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
+                <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
               </div>
             </div>
-          </a>
+          </div>
         </Link>
         {/* Tiêu đề */}
         <div>
@@ -73,20 +92,87 @@ const Header = () => {
                 Phát hiện mất rừng
               </a>
             </Link>
+            {isAdmin() && (
+              <Link to="/dashboard/quanlynguoidung">
+                <a
+                  className={`text-base font-semibold hover:underline ${
+                    isActive("/dashboard/quanlynguoidung")
+                      ? "text-red-600"
+                      : "text-white"
+                  }`}
+                >
+                  Quản lý người dùng
+                </a>
+              </Link>
+            )}
           </div>
         </div>
       </div>
 
       {/* User Profile */}
-      <div className="ml-auto flex items-center">
-        <div className="w-10 h-10 rounded-full bg-red-100 border-2 border-white overflow-hidden">
-          <img
-            src="/avatar-placeholder.png"
-            alt="User profile"
-            className="w-full h-full object-cover"
-          />
+      <div className="ml-auto relative" ref={userMenuRef}>
+        <div 
+          className="flex items-center cursor-pointer hover:opacity-80"
+          onClick={() => setShowUserMenu(!showUserMenu)}
+        >
+          <div className="w-10 h-10 rounded-full bg-red-100 border-2 border-white overflow-hidden flex items-center justify-center">
+            <FaUser className="text-gray-600 text-lg" />
+          </div>
+          {user && (
+            <div className="ml-2 text-sm">
+              <div className="font-semibold">{user.full_name}</div>
+              <div className="text-xs opacity-80">
+                {user.role === "admin" ? "Quản trị viên" : "Người dùng"}
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* User Menu */}
+        {showUserMenu && (
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+            <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
+              Đăng nhập với <span className="font-semibold">{user?.username}</span>
+            </div>
+            
+            {isAdmin() && (
+              <Link 
+                to="/dashboard/quanlynguoidung"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                onClick={() => setShowUserMenu(false)}
+              >
+                <FaUserCog className="mr-2" />
+                Quản lý người dùng
+              </Link>
+            )}
+            
+            <button
+              onClick={() => {
+                setShowUserMenu(false);
+                setShowPasswordModal(true);
+              }}
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+            >
+              <FaKey className="mr-2" />
+              Đổi mật khẩu
+            </button>
+            
+            <button
+              onClick={logout}
+              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"
+            >
+              <FaSignOutAlt className="mr-2" />
+              Đăng xuất
+            </button>
+          </div>
+        )}
       </div>
+      
+      {/* Modal đổi mật khẩu */}
+      <ChangePasswordModal 
+        isOpen={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+      />
     </header>
   );
 };

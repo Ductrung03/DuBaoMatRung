@@ -59,7 +59,7 @@ const BaoCaoDuBaoMatRung = () => {
     const huyen = e.target.value;
     setSelectedHuyen(huyen);
     try {
-      const res = await fetch(`${BASE_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`);
+      const res = await fetch(`http://localhost:3000/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`);
       const data = await res.json();
       setXaList(data);
     } catch (err) {

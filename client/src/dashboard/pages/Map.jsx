@@ -1,14 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, useMap, WMSTileLayer } from "react-leaflet";
 import { useLocation } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Table from "./Table";
 import { useGeoData } from "../contexts/GeoDataContext";
 
+// Xác định tên bảng từ URL của layer
+const getTableNameFromLayerParam = (layerName) => {
+  if (!layerName) return null;
+  
+  // Ví dụ: "rung:mat_rung" -> "mat_rung"
+  if (layerName.includes(':')) {
+    return layerName.split(':')[1];
+  }
+  
+  return layerName;
+};
+
 const CustomMapControl = ({ setMapType }) => {
   const map = useMap();
-
 
   useEffect(() => {
     const container = L.DomUtil.create("div");
@@ -75,6 +86,7 @@ const Map = () => {
   const isDataPage = location.pathname === "/dashboard/quanlydulieu";
 
   const layerName = getQueryParam(location.search, "layer");
+  const tableName = getTableNameFromLayerParam(layerName) || "mat_rung"; // Mặc định là mat_rung nếu không có
 
   const onEachFeature = (feature, layer) => {
     if (feature.properties) {
@@ -204,7 +216,10 @@ const Map = () => {
           </div>
         ) : (
           geoData?.features?.length > 0 && (
-            <Table data={geoData.features.map((f) => f.properties)} />
+            <Table 
+              data={geoData.features.map((f) => f.properties)} 
+              tableName={tableName}
+            />
           )
         ))}
     </div>

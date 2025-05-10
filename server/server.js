@@ -2,7 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const { default: open } = require("open");
-const pool = require("./db/index"); // Import pool ở đây
+const pool = require("./db/index");
+const cookieParser = require("cookie-parser");
 
 const hanhchinhRoutes = require("./routes/hanhchinh.route");
 const shapefileRoutes = require("./routes/shapefile.route");
@@ -11,6 +12,9 @@ const matRungRoutes = require("./routes/matrung.route");
 const dataDropdownRoutes = require("./routes/dataDropdown.routes");
 const quanlydulieu = require("./routes/quanLyDuLieu.routes");
 const baocao = require("./routes/baocao.routes");
+const authRoutes = require("./routes/auth.routes");
+const userRoutes = require("./routes/user.routes");
+const dataRoutes = require("./routes/data.routes");
 
 require("dotenv").config();
 
@@ -23,6 +27,7 @@ console.log(`- PGPASSWORD: ${process.env.PGPASSWORD ? '***' : 'không có'}`);
 console.log(`- PGDATABASE: ${process.env.PGDATABASE ? '***' : 'không có'}`);
 console.log(`- GEOSERVER_USER: ${process.env.GEOSERVER_USER ? '***' : 'không có'}`);
 console.log(`- GEOSERVER_PASS: ${process.env.GEOSERVER_PASS ? '***' : 'không có'}`);
+console.log(`- JWT_SECRET: ${process.env.JWT_SECRET ? '***' : 'sử dụng secret mặc định'}`);
 
 // Kiểm tra kết nối database ngay khi khởi động
 pool.query('SELECT NOW()')
@@ -43,9 +48,21 @@ const swaggerOptions = require("./swaggerOptions");
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Middleware
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
+// Middleware for debugging routes
+app.use((req, res, next) => {
+  console.log(`📝 ${req.method} ${req.url}`);
+  next();
+});
+
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/data", dataRoutes);
 app.use("/api/import-shapefile", shapefileRoutes);
 app.use("/api/import-gee-url", importGeeUrlRoutes);
 app.use("/api/hanhchinh", hanhchinhRoutes);
@@ -53,6 +70,11 @@ app.use("/api/mat-rung", matRungRoutes);
 app.use("/api/dropdown", dataDropdownRoutes);
 app.use("/api/quan-ly-du-lieu", quanlydulieu);
 app.use("/api/bao-cao", baocao);
+
+// Test route
+app.get("/api/test", (req, res) => {
+  res.json({ message: "API đang hoạt động!" });
+});
 
 app.get('/api/test-db', async (req, res) => {
   try {
@@ -77,6 +99,25 @@ app.get('/api/test-db', async (req, res) => {
 
 app.get("/", (req, res) => {
   res.send("✅ Backend Geo API đang hoạt động");
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error("🔴 Lỗi server:", err);
+  res.status(500).json({
+    success: false,
+    message: "Lỗi server",
+    error: err.message
+  });
+});
+
+// 404 middleware
+app.use((req, res) => {
+  console.log(`❌ 404 Not Found: ${req.method} ${req.url}`);
+  res.status(404).json({
+    success: false,
+    message: "API endpoint không tồn tại"
+  });
 });
 
 const port = process.env.PORT || 3000;

@@ -12,6 +12,15 @@ const options = {
         url: "http://localhost:3000/api",
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
   apis: ["./routes/*.js"], // đường dẫn đến nơi viết swagger comment
 };

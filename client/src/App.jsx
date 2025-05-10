@@ -8,32 +8,50 @@ import ThongKeBaoCaoMatRung from "./dashboard/pages/ThongKeBaoCaoMatRung";
 import { GeoDataProvider } from "./dashboard/contexts/GeoDataContext";
 import PhatHienMatRung from "./dashboard/pages/PhatHienMatRung";
 import { ReportProvider } from "./dashboard/contexts/ReportContext";
+import { AuthProvider } from "./dashboard/contexts/AuthContext";
+import ProtectedRoute from "./dashboard/components/ProtectedRoute";
+import QuanLyNguoiDung from "./dashboard/pages/QuanLyNguoiDung";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
-    <GeoDataProvider>
-      <ReportProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Navigate to="/dashboard" />} />
-            <Route path="/dashboard" element={<MainLayout />}>
-              {/* <Route path="" element={<Navigate to="/dashboard/admin" />}> */}
-              <Route path="" element={<Map />} />
-              <Route path="dubaomatrung" element={<Map />} />
-              <Route path="quanlydulieu" element={<QuanLyDuLieu />} />
-              <Route path="phathienmatrung" element={<PhatHienMatRung />} />
-              <Route path="baocao" element={<ThongKeBaoCaoMatRung />} />
-            </Route>
-            {/* </Route> */}
-          </Routes>
-        </BrowserRouter>
-      </ReportProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <GeoDataProvider>
+          <ReportProvider>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<Navigate to="/dashboard" />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route path="" element={<Map />} />
+                <Route path="dubaomatrung" element={<Map />} />
+                <Route path="quanlydulieu" element={<QuanLyDuLieu />} />
+                <Route path="phathienmatrung" element={<PhatHienMatRung />} />
+                <Route path="baocao" element={<ThongKeBaoCaoMatRung />} />
+                <Route
+                  path="quanlynguoidung"
+                  element={
+                    <ProtectedRoute adminOnly={true}>
+                      <QuanLyNguoiDung />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
+              <Route path="*" element={<Navigate to="/dashboard" />} />
+            </Routes>
+          </ReportProvider>
+        </GeoDataProvider>
+      </AuthProvider>
       <ToastContainer position="top-center" autoClose={3000} />
-    </GeoDataProvider>
-    
+    </BrowserRouter>
   );
 }
 
