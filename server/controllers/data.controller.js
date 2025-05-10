@@ -6,6 +6,8 @@ exports.updateFeature = async (req, res) => {
   const { value } = req.body;
 
   try {
+    console.log(`Updating ${tableName}, ID: ${featureId}, Column: ${columnName}, Value: ${value}`);
+    
     // Kiểm tra xem bảng có tồn tại không
     const tableCheck = await pool.query(
       `SELECT EXISTS (
@@ -41,11 +43,34 @@ exports.updateFeature = async (req, res) => {
       });
     }
 
+    // Kiểm tra xem bảng sử dụng gid hay id làm khóa chính
+    const primaryKeyCheck = await pool.query(
+      `SELECT column_name 
+       FROM information_schema.key_column_usage 
+       WHERE table_schema = 'public' 
+       AND table_name = $1 
+       AND constraint_name IN (
+         SELECT constraint_name 
+         FROM information_schema.table_constraints 
+         WHERE constraint_type = 'PRIMARY KEY' 
+         AND table_schema = 'public' 
+         AND table_name = $1
+       )`,
+      [tableName]
+    );
+
+    let primaryKey = 'gid'; // Mặc định là gid
+    if (primaryKeyCheck.rows.length > 0) {
+      primaryKey = primaryKeyCheck.rows[0].column_name;
+    }
+
+    console.log(`Using primary key: ${primaryKey} for table ${tableName}`);
+
     // Cập nhật dữ liệu
     const query = `
       UPDATE ${tableName} 
       SET ${columnName} = $1 
-      WHERE gid = $2 OR id = $2
+      WHERE ${primaryKey} = $2
       RETURNING *
     `;
 
@@ -67,7 +92,86 @@ exports.updateFeature = async (req, res) => {
     console.error("❌ Lỗi cập nhật dữ liệu:", err);
     res.status(500).json({
       success: false,
-      message: "Lỗi server khi cập nhật dữ liệu"
+      message: "Lỗi server khi cập nhật dữ liệu",
+      error: err.message
+    });
+  }
+};
+
+// Xóa một feature 
+exports.deleteFeature = async (req, res) => {
+  const { tableName, featureId } = req.params;
+
+  try {
+    console.log(`Deleting from ${tableName}, ID: ${featureId}`);
+    
+    // Kiểm tra xem bảng có tồn tại không
+    const tableCheck = await pool.query(
+      `SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = $1
+      )`,
+      [tableName]
+    );
+
+    if (!tableCheck.rows[0].exists) {
+      return res.status(404).json({
+        success: false,
+        message: "Bảng dữ liệu không tồn tại"
+      });
+    }
+
+    // Kiểm tra xem bảng sử dụng gid hay id làm khóa chính
+    const primaryKeyCheck = await pool.query(
+      `SELECT column_name 
+       FROM information_schema.key_column_usage 
+       WHERE table_schema = 'public' 
+       AND table_name = $1 
+       AND constraint_name IN (
+         SELECT constraint_name 
+         FROM information_schema.table_constraints 
+         WHERE constraint_type = 'PRIMARY KEY' 
+         AND table_schema = 'public' 
+         AND table_name = $1
+       )`,
+      [tableName]
+    );
+
+    let primaryKey = 'gid'; // Mặc định là gid
+    if (primaryKeyCheck.rows.length > 0) {
+      primaryKey = primaryKeyCheck.rows[0].column_name;
+    }
+
+    console.log(`Using primary key: ${primaryKey} for table ${tableName}`);
+
+    // Xóa dữ liệu
+    const query = `
+      DELETE FROM ${tableName} 
+      WHERE ${primaryKey} = $1
+      RETURNING ${primaryKey}
+    `;
+
+    const result = await pool.query(query, [featureId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy dữ liệu cần xóa"
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Xóa dữ liệu thành công",
+      id: result.rows[0][primaryKey]
+    });
+  } catch (err) {
+    console.error("❌ Lỗi xóa dữ liệu:", err);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server khi xóa dữ liệu",
+      error: err.message
     });
   }
 };

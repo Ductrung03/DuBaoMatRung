@@ -92,4 +92,34 @@ router.get("/tables/:tableName/structure", dataController.getTableStructure);
  */
 router.put("/:tableName/:featureId/:columnName", dataController.updateFeature);
 
+/**
+ * @swagger
+ * /data/{tableName}/{featureId}:
+ *   delete:
+ *     summary: Xóa một bản ghi từ bảng
+ *     tags:
+ *       - Data
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: tableName
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: featureId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Xóa thành công
+ *       403:
+ *         description: Không có quyền truy cập
+ *       404:
+ *         description: Không tìm thấy bảng hoặc bản ghi
+ */
+router.delete("/:tableName/:featureId", dataController.deleteFeature);
+
 module.exports = router;
