@@ -20,21 +20,28 @@ require("dotenv").config();
 
 // Log biến môi trường khi khởi động (chỉ log dạng **, không log thông tin thật)
 console.log("🔄 Thông tin môi trường:");
-console.log(`- PGHOST: ${process.env.PGHOST ? '***' : 'không có'}`);
-console.log(`- PGPORT: ${process.env.PGPORT ? '***' : 'không có'}`);
-console.log(`- PGUSER: ${process.env.PGUSER ? '***' : 'không có'}`);
-console.log(`- PGPASSWORD: ${process.env.PGPASSWORD ? '***' : 'không có'}`);
-console.log(`- PGDATABASE: ${process.env.PGDATABASE ? '***' : 'không có'}`);
-console.log(`- GEOSERVER_USER: ${process.env.GEOSERVER_USER ? '***' : 'không có'}`);
-console.log(`- GEOSERVER_PASS: ${process.env.GEOSERVER_PASS ? '***' : 'không có'}`);
-console.log(`- JWT_SECRET: ${process.env.JWT_SECRET ? '***' : 'sử dụng secret mặc định'}`);
+console.log(`- PGHOST: ${process.env.PGHOST ? "***" : "không có"}`);
+console.log(`- PGPORT: ${process.env.PGPORT ? "***" : "không có"}`);
+console.log(`- PGUSER: ${process.env.PGUSER ? "***" : "không có"}`);
+console.log(`- PGPASSWORD: ${process.env.PGPASSWORD ? "***" : "không có"}`);
+console.log(`- PGDATABASE: ${process.env.PGDATABASE ? "***" : "không có"}`);
+console.log(
+  `- GEOSERVER_USER: ${process.env.GEOSERVER_USER ? "***" : "không có"}`
+);
+console.log(
+  `- GEOSERVER_PASS: ${process.env.GEOSERVER_PASS ? "***" : "không có"}`
+);
+console.log(
+  `- JWT_SECRET: ${process.env.JWT_SECRET ? "***" : "sử dụng secret mặc định"}`
+);
 
 // Kiểm tra kết nối database ngay khi khởi động
-pool.query('SELECT NOW()')
-  .then(result => {
+pool
+  .query("SELECT NOW()")
+  .then((result) => {
     console.log("✅ Kết nối database thành công:", result.rows[0].now);
   })
-  .catch(err => {
+  .catch((err) => {
     console.error("❌ Lỗi kết nối database:", err.message);
     console.error("Chi tiết lỗi:", err);
   });
@@ -52,6 +59,10 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use((req, res, next) => {
+  console.log(`📝 ${req.method} ${req.url}`);
+  next();
+});
 
 // Middleware for debugging routes
 app.use((req, res, next) => {
@@ -76,15 +87,15 @@ app.get("/api/test", (req, res) => {
   res.json({ message: "API đang hoạt động!" });
 });
 
-app.get('/api/test-db', async (req, res) => {
+app.get("/api/test-db", async (req, res) => {
   try {
     console.log("👉 Đang thực hiện test kết nối database...");
-    const result = await pool.query('SELECT NOW()');
+    const result = await pool.query("SELECT NOW()");
     console.log("✅ Test kết nối thành công:", result.rows[0].now);
     res.json({
       success: true,
       message: "Kết nối database thành công",
-      timestamp: result.rows[0].now
+      timestamp: result.rows[0].now,
     });
   } catch (error) {
     console.error("❌ Test kết nối thất bại:", error.message);
@@ -92,7 +103,7 @@ app.get('/api/test-db', async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Lỗi kết nối database",
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -107,7 +118,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({
     success: false,
     message: "Lỗi server",
-    error: err.message
+    error: err.message,
   });
 });
 
@@ -116,10 +127,9 @@ app.use((req, res) => {
   console.log(`❌ 404 Not Found: ${req.method} ${req.url}`);
   res.status(404).json({
     success: false,
-    message: "API endpoint không tồn tại"
+    message: "API endpoint không tồn tại",
   });
 });
-
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`🚀 Backend chạy tại http://localhost:${port}`);

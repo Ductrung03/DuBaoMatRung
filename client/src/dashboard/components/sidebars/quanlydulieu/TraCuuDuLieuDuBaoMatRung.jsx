@@ -3,9 +3,9 @@ import Select from "../../Select";
 import { useGeoData } from "../../../contexts/GeoDataContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import LoadingSpinner from "../../LoadingSpinner";
-// Nếu component LoadingSpinner chưa tồn tại, comment dòng trên và uncomment các dòng dưới đâysss
+import config from "../../../../config";
 
+// LoadingSpinner component
 const LoadingSpinner = ({ size = "medium" }) => {
   const sizeClass = {
     small: "w-4 h-4",
@@ -19,10 +19,6 @@ const LoadingSpinner = ({ size = "medium" }) => {
     </div>
   );
 };
-
-
-// Thêm base URL cho API mới
-const BASE_URL = "https://dubaomatrung-backend.onrender.com";
 
 const TraCuuDuLieuDuBaoMatRung = () => {
   const [fromDate, setFromDate] = useState("");
@@ -50,9 +46,9 @@ const TraCuuDuLieuDuBaoMatRung = () => {
     // Gọi huyện và khoảnh + chủ rừng lúc load
     const fetchInitialData = async () => {
       const [huyenRes, khoanhRes, churungRes] = await Promise.all([
-        fetch(`${BASE_URL}/api/dropdown/huyen`),
-        fetch(`${BASE_URL}/api/dropdown/khoanh`),
-        fetch(`${BASE_URL}/api/dropdown/churung`),
+        fetch(`${config.API_URL}/api/dropdown/huyen`),
+        fetch(`${config.API_URL}/api/dropdown/khoanh`),
+        fetch(`${config.API_URL}/api/dropdown/churung`),
       ]);
       const huyenData = await huyenRes.json();
       const khoanhData = await khoanhRes.json();
@@ -68,7 +64,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
     const huyen = e.target.value;
     setSelectedHuyen(huyen);
     const xaRes = await fetch(
-      `${BASE_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`
+      `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`
     );
     const xaData = await xaRes.json();
     setXaList(xaData);
@@ -78,7 +74,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
     const xa = e.target.value;
     setSelectedXa(xa);
     const tkRes = await fetch(
-      `${BASE_URL}/api/dropdown/tieukhu?xa=${encodeURIComponent(xa)}`
+      `${config.API_URL}/api/dropdown/tieukhu?xa=${encodeURIComponent(xa)}`
     );
     const tkData = await tkRes.json();
     setTieukhuList(tkData.map((item) => item.tk));
@@ -112,7 +108,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
       });
   
       const res = await fetch(
-        `${BASE_URL}/api/quan-ly-du-lieu/tra-cuu-du-lieu-bao-mat-rung?${queryParams.toString()}`
+        `${config.API_URL}/api/quan-ly-du-lieu/tra-cuu-du-lieu-bao-mat-rung?${queryParams.toString()}`
       );
   
       if (!res.ok) {

@@ -28,7 +28,7 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
     const whereClause = conditions.length > 0 ? `AND ${conditions.join(" AND ")}` : "";
 
     const query = `
-      SELECT 
+      SELECT distinct
         t.*, 
         m.start_dau, m.end_sau, m.area
       FROM tlaocai_tkk_3lr_cru t

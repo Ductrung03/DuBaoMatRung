@@ -12,6 +12,7 @@ import {
 } from "chart.js";
 import { useReport } from "../../../contexts/ReportContext";
 import { useNavigate } from "react-router-dom";
+import config from "../../../../config";
 
 ChartJS.register(
   BarElement,
@@ -21,10 +22,6 @@ ChartJS.register(
   Tooltip,
   Title
 );
-
-// ✅ Đổi từ axios sang fetch nên dòng này không còn cần:
-// import axios from "axios";
-
 
 const BaoCaoDuBaoMatRung = () => {
   const loaiBaoCaoList = ["Văn bản", "Biểu đồ"];
@@ -45,7 +42,7 @@ const BaoCaoDuBaoMatRung = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/dropdown/huyen");
+        const res = await fetch(`${config.API_URL}/api/dropdown/huyen`);
         const data = await res.json();
         setHuyenList(data);
       } catch (err) {
@@ -59,7 +56,7 @@ const BaoCaoDuBaoMatRung = () => {
     const huyen = e.target.value;
     setSelectedHuyen(huyen);
     try {
-      const res = await fetch(`http://localhost:3000/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`);
+      const res = await fetch(`${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`);
       const data = await res.json();
       setXaList(data);
     } catch (err) {
@@ -85,7 +82,7 @@ const BaoCaoDuBaoMatRung = () => {
     });
 
     try {
-      const res = await fetch(`${BASE_URL}/api/bao-cao/tra-cuu-du-lieu-bao-mat-rung?${params.toString()}`);
+      const res = await fetch(`${config.API_URL}/api/bao-cao/tra-cuu-du-lieu-bao-mat-rung?${params.toString()}`);
       if (!res.ok) {
         throw new Error(`Lỗi ${res.status}: ${res.statusText}`);
       }

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Select from "../../Select";
 import axios from "axios";
 import { useGeoData } from "../../../contexts/GeoDataContext";
+import config from "../../../../config";
 
 const CapNhatDuLieu = ({ onGeoDataLoaded }) => {
   const [isForecastOpen, setIsForecastOpen] = useState(true);
@@ -9,7 +10,7 @@ const CapNhatDuLieu = ({ onGeoDataLoaded }) => {
 
   const handleTaiLen = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/api/hanhchinh");
+      const res = await axios.get(`${config.API_URL}/api/hanhchinh`);
       setGeoData(res.data); // ✅ truyền dữ liệu vào context
     } catch (err) {
       console.error("Lỗi gọi API /api/hanhchinh:", err);

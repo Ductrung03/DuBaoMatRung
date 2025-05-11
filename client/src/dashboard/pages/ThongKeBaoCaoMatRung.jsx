@@ -14,12 +14,16 @@ const ThongKeBaoCaoMatRung = () => {
   const { reportData } = useReport();
 
   if (!reportData)
-    return <p className="text-center text-gray-500 mt-8">Chưa có dữ liệu báo cáo...</p>;
+    return (
+      <p className="text-center text-gray-500 mt-8">
+        Chưa có dữ liệu báo cáo...
+      </p>
+    );
 
   // Kiểm tra nếu reportData là mảng => hiển thị bảng văn bản
   if (Array.isArray(reportData)) {
     return (
-      <div className="p-6 font-sans">
+      <div className="p-6 font-sans max-h-[calc(100vh-100px)] overflow-y-auto">
         <h2 className="text-center text-lg font-bold mb-4">
           THỐNG KÊ KẾT QUẢ DỰ BÁO MẤT RỪNG
         </h2>
@@ -53,20 +57,35 @@ const ThongKeBaoCaoMatRung = () => {
                   <td className="border border-black px-2 py-1">{item.huyen}</td>
                   <td className="border border-black px-2 py-1">{item.maxa}</td>
                   <td className="border border-black px-2 py-1">{item.xa}</td>
-                  <td className="border border-black px-2 py-1">{item.x || ""}</td>
-                  <td className="border border-black px-2 py-1">{item.y || ""}</td>
+                  <td className="border border-black px-2 py-1">
+                    {item.x || ""}
+                  </td>
+                  <td className="border border-black px-2 py-1">
+                    {item.y || ""}
+                  </td>
                   <td className="border border-black px-2 py-1">{item.tk}</td>
-                  <td className="border border-black px-2 py-1">{item.khoanh}</td>
-                  <td className="border border-black px-2 py-1">{item.area?.toFixed(2)}</td>
-                  <td className="border border-black px-2 py-1">{item.ghichu || ""}</td>
+                  <td className="border border-black px-2 py-1">
+                    {item.khoanh}
+                  </td>
+                  <td className="border border-black px-2 py-1">
+                    {item.area?.toFixed(2)}
+                  </td>
+                  <td className="border border-black px-2 py-1">
+                    {item.ghichu || ""}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
 
           <div className="flex justify-between mt-6 text-sm px-2">
-            <span><strong>Người tổng hợp</strong></span>
-            <span className="text-right">........., ngày ...... tháng ...... năm ......<br /><strong>Chi cục trưởng</strong></span>
+            <span>
+              <strong>Người tổng hợp</strong>
+            </span>
+            <span className="text-right">
+              ........., ngày ...... tháng ...... năm ......<br />
+              <strong>Chi cục trưởng</strong>
+            </span>
           </div>
         </div>
       </div>
@@ -87,13 +106,13 @@ const ThongKeBaoCaoMatRung = () => {
   }));
 
   return (
-    <div className="p-6 font-sans">
+    <div className="p-6 font-sans max-h-[calc(100vh-100px)] overflow-y-auto">
       <h2 className="text-center text-lg font-bold mb-4">
         THỐNG KÊ KẾT QUẢ DỰ BÁO MẤT RỪNG
       </h2>
 
-      <div className="flex gap-6 h-[calc(100vh-150px)] overflow-hidden">
-        <div className="w-1/2 overflow-auto space-y-8">
+      <div className="flex gap-6">
+        <div className="w-1/2 space-y-8">
           <div>
             <h3 className="text-center font-semibold mb-2">
               Biểu đồ mức độ tin cậy dự báo mất rừng (%)

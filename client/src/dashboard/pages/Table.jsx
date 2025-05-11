@@ -23,15 +23,61 @@ const Table = ({ data, tableName = "unknown" }) => {
     return !skipColumns.includes(col.toLowerCase());
   };
 
-  // Lấy ID của hàng (dùng gid nếu có, nếu không thì dùng id)
-  const getRowId = (row) => {
-    return row.gid || row.id;
+  // Tạo điều kiện WHERE để xác định duy nhất một hàng
+  const createWhereCondition = (row) => {
+    // DEBUG: In ra tất cả thuộc tính của row
+    console.log("Các thuộc tính của row:", Object.keys(row));
+    console.log("Giá trị của row:", row);
+    
+    // Nếu có gid hoặc id, sử dụng trực tiếp
+    if (row.gid !== undefined) return { field: 'gid', value: row.gid, where: `gid = ${row.gid}` };
+    if (row.id !== undefined) return { field: 'id', value: row.id, where: `id = ${row.id}` };
+    
+    // Tạo điều kiện dựa vào dữ liệu hiện có
+    if (tableName === 'mat_rung' || tableName.includes('mat_rung')) {
+      if (row.start_dau && row.end_sau && row.mahuyen) {
+        return {
+          table: 'mat_rung',
+          where: `start_dau = '${row.start_dau}' AND end_sau = '${row.end_sau}' AND mahuyen = '${row.mahuyen}'`
+        };
+      }
+    } 
+    else if (tableName === 'tlaocai_tkk_3lr_cru' || tableName.includes('tkk')) {
+      if (row.tk && row.khoanh && row.xa) {
+        return {
+          table: 'tlaocai_tkk_3lr_cru',
+          where: `tk = '${row.tk}' AND khoanh = '${row.khoanh}' AND xa = '${row.xa}'`
+        };
+      }
+    }
+    
+    // Nếu là kết quả join hoặc không xác định được bảng dữ liệu
+    let joinCondition = {};
+    
+    // Thử tạo điều kiện cho mat_rung
+    if (row.start_dau && row.end_sau) {
+      joinCondition.mat_rung = `start_dau = '${row.start_dau}' AND end_sau = '${row.end_sau}'`;
+      if (row.mahuyen) joinCondition.mat_rung += ` AND mahuyen = '${row.mahuyen}'`;
+    }
+    
+    // Thử tạo điều kiện cho tlaocai_tkk_3lr_cru
+    if (row.tk && row.khoanh) {
+      joinCondition.tlaocai_tkk_3lr_cru = `tk = '${row.tk}' AND khoanh = '${row.khoanh}'`;
+      if (row.xa) joinCondition.tlaocai_tkk_3lr_cru += ` AND xa = '${row.xa}'`;
+    }
+    
+    return joinCondition;
   };
 
   // Bắt đầu chỉnh sửa một hàng
   const startEdit = (rowIndex, rowData) => {
     // Tạo một bản sao của dữ liệu hàng để chỉnh sửa
     const initialEditData = { ...rowData };
+    
+    // Lưu lại điều kiện WHERE
+    initialEditData._whereCondition = createWhereCondition(rowData);
+    initialEditData._originalData = { ...rowData };
+    
     setEditData(initialEditData);
     setEditRowIndex(rowIndex);
   };
@@ -57,47 +103,88 @@ const Table = ({ data, tableName = "unknown" }) => {
       
       // Lấy dữ liệu gốc để so sánh
       const originalRow = data[editRowIndex];
-      const featureId = getRowId(originalRow);
+      const whereCondition = editData._whereCondition || createWhereCondition(originalRow);
       
-      if (!featureId) {
-        toast.error("Không thể xác định ID của bản ghi");
-        cancelEdit();
-        return;
-      }
-
-      // Log for debugging
-      console.log("Feature ID:", featureId);
-      console.log("Original row:", originalRow);
-      console.log("Edit data:", editData);
+      // Debug
+      console.log("WHERE condition:", whereCondition);
+      console.log("Dữ liệu gốc:", originalRow);
+      console.log("Dữ liệu chỉnh sửa:", editData);
       
       // Mảng chứa các promise cập nhật
       const updatePromises = [];
       
       // Kiểm tra từng cột đã thay đổi
       for (const column in editData) {
+        // Bỏ qua các trường meta
+        if (column.startsWith('_')) continue;
+        
         // Chỉ cập nhật các cột được phép chỉnh sửa và có giá trị thay đổi
         if (isEditableColumn(column) && editData[column] !== originalRow[column]) {
-          console.log(`Updating column ${column} from ${originalRow[column]} to ${editData[column]}`);
+          console.log(`Cập nhật cột ${column} từ [${originalRow[column]}] thành [${editData[column]}]`);
           
-          const updatePromise = axios.put(
-            `${config.API_URL}/api/data/${tableName}/${featureId}/${column}`,
-            { value: editData[column] }
-          );
-          updatePromises.push(updatePromise);
+          // Xác định bảng dữ liệu và điều kiện WHERE
+          let targetTable, whereClause;
+          
+          // Trường hợp đơn giản: biết chính xác bảng dữ liệu
+          if (whereCondition.table) {
+            targetTable = whereCondition.table;
+            whereClause = whereCondition.where;
+          } 
+          // Trường hợp phức tạp: dữ liệu join
+          else if (whereCondition.mat_rung || whereCondition.tlaocai_tkk_3lr_cru) {
+            // Xác định bảng dựa vào cột
+            if (['start_dau', 'end_sau', 'mahuyen', 'area'].includes(column)) {
+              targetTable = 'mat_rung';
+              whereClause = whereCondition.mat_rung;
+            } else if (['tk', 'khoanh', 'xa', 'huyen', 'churung'].includes(column)) {
+              targetTable = 'tlaocai_tkk_3lr_cru';
+              whereClause = whereCondition.tlaocai_tkk_3lr_cru;
+            } else {
+              console.warn(`Không thể xác định bảng cho cột ${column}`);
+              continue;
+            }
+          }
+          // Trường hợp đơn giản: có field và value rõ ràng
+          else if (whereCondition.field && whereCondition.value !== undefined) {
+            targetTable = tableName;
+            whereClause = whereCondition.where;
+          }
+          // Không thể xác định bảng và điều kiện
+          else {
+            console.error("Không thể xác định bảng và điều kiện WHERE cho cập nhật");
+            toast.error(`Không thể cập nhật cột ${column}: không xác định được dữ liệu`);
+            continue;
+          }
+          
+          console.log(`✅ User ${isAdmin() ? 'có quyền admin' : 'không có quyền admin'}`);
+          console.log(`Đang cập nhật ${targetTable}, Cột: ${column}, Giá trị: ${editData[column]}`);
+          console.log(`Điều kiện: ${whereClause}`);
+          
+          // API endpoint mới sử dụng cập nhật với WHERE clause
+          try {
+            const response = await axios.post(`${config.API_URL}/api/data/update-with-where`, {
+              table: targetTable,
+              column: column,
+              value: editData[column],
+              whereClause: whereClause
+            });
+            
+            console.log("Kết quả cập nhật:", response.data);
+            
+            if (response.data.success) {
+              toast.success(`Cập nhật cột ${column} thành công!`);
+            } else {
+              toast.error(`Lỗi cập nhật cột ${column}: ${response.data.message}`);
+            }
+          } catch (error) {
+            console.error(`Lỗi khi cập nhật cột ${column}:`, error);
+            toast.error(`Lỗi khi cập nhật cột ${column}: ${error.message}`);
+          }
         }
       }
       
-      // Thực hiện tất cả các request cập nhật
-      if (updatePromises.length > 0) {
-        await Promise.all(updatePromises);
-        toast.success("Cập nhật dữ liệu thành công!");
-        
-        // Cập nhật lại dữ liệu hiển thị
-        window.location.reload();
-      } else {
-        toast.info("Không có thay đổi nào để cập nhật");
-        cancelEdit();
-      }
+      // Cập nhật lại dữ liệu hiển thị
+      window.location.reload();
     } catch (error) {
       console.error("Lỗi khi cập nhật dữ liệu:", error);
       toast.error("Lỗi khi cập nhật dữ liệu: " + (error.response?.data?.message || error.message));
@@ -109,30 +196,71 @@ const Table = ({ data, tableName = "unknown" }) => {
   // Xử lý xóa dữ liệu
   const handleDelete = async (row) => {
     try {
-      const featureId = getRowId(row);
+      const whereCondition = createWhereCondition(row);
       
-      if (!featureId) {
-        toast.error("Không thể xác định ID của bản ghi");
+      if (!whereCondition || Object.keys(whereCondition).length === 0) {
+        console.error("Chi tiết hàng cần xóa:", row);
+        toast.error("Không thể xác định dữ liệu để xóa");
         return;
       }
       
       // Hiển thị xác nhận trước khi xóa
-      if (!window.confirm(`Bạn có chắc chắn muốn xóa bản ghi này không? (ID: ${featureId})`)) {
+      if (!window.confirm(`Bạn có chắc chắn muốn xóa bản ghi này không?`)) {
         return;
       }
       
       setLoading(true);
       
-      // Gọi API xóa dữ liệu
-      await axios.delete(`${config.API_URL}/api/data/${tableName}/${featureId}`);
+      // Xác định bảng dữ liệu và điều kiện WHERE
+      let targetTable, whereClause;
       
-      toast.success("Xóa dữ liệu thành công!");
+      // Trường hợp đơn giản: biết chính xác bảng dữ liệu
+      if (whereCondition.table) {
+        targetTable = whereCondition.table;
+        whereClause = whereCondition.where;
+      } 
+      // Trường hợp phức tạp: dữ liệu join
+      else if (whereCondition.mat_rung || whereCondition.tlaocai_tkk_3lr_cru) {
+        // Ưu tiên xóa từ bảng mat_rung vì dữ liệu joint thường liên kết với mat_rung
+        if (whereCondition.mat_rung) {
+          targetTable = 'mat_rung';
+          whereClause = whereCondition.mat_rung;
+        } else {
+          targetTable = 'tlaocai_tkk_3lr_cru';
+          whereClause = whereCondition.tlaocai_tkk_3lr_cru;
+        }
+      }
+      // Trường hợp đơn giản: có field và value rõ ràng
+      else if (whereCondition.field && whereCondition.value !== undefined) {
+        targetTable = tableName;
+        whereClause = whereCondition.where;
+      }
+      // Không thể xác định bảng và điều kiện
+      else {
+        console.error("Không thể xác định bảng và điều kiện WHERE cho xóa");
+        toast.error("Không thể xóa dữ liệu: không xác định được bản ghi");
+        setLoading(false);
+        return;
+      }
       
-      // Cập nhật lại dữ liệu hiển thị
-      window.location.reload();
-    } catch (error) {
-      console.error("Lỗi khi xóa dữ liệu:", error);
-      toast.error("Lỗi khi xóa dữ liệu: " + (error.response?.data?.message || error.message));
+      try {
+        const response = await axios.post(`${config.API_URL}/api/data/delete-with-where`, {
+          table: targetTable,
+          whereClause: whereClause
+        });
+        
+        console.log("Kết quả xóa:", response.data);
+        
+        if (response.data.success) {
+          toast.success("Xóa dữ liệu thành công!");
+          window.location.reload();
+        } else {
+          toast.error(`Lỗi xóa dữ liệu: ${response.data.message}`);
+        }
+      } catch (error) {
+        console.error("Lỗi khi xóa dữ liệu:", error);
+        toast.error("Lỗi khi xóa dữ liệu: " + (error.response?.data?.message || error.message));
+      }
     } finally {
       setLoading(false);
     }
