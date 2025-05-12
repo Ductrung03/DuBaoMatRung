@@ -5,7 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { FaEdit, FaTrash, FaSave, FaTimes } from "react-icons/fa";
 import config from "../../config";
 
-const Table = ({ data, tableName = "unknown" }) => {
+const Table = ({ data, tableName = "unknown", onRowClick }) => {
   const { isAdmin } = useAuth();
   const [editRowIndex, setEditRowIndex] = useState(-1);
   const [editData, setEditData] = useState({});
@@ -19,10 +19,37 @@ const Table = ({ data, tableName = "unknown" }) => {
       // Chuyển đổi từ m² sang ha và làm tròn đến 1 số thập phân
       return `${(value / 10000).toFixed(1)} ha`;
     }
+
+    // Format date fields
+    if (["start_dau", "end_sau"].includes(columnName) && value) {
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleDateString('vi-VN');
+      }
+    }
+
     return value !== null ? String(value) : "NULL";
   };
 
-  const columns = Object.keys(data[0]);
+  // Lấy tất cả các cột
+  const allColumns = Object.keys(data[0]);
+  
+  // Lọc bỏ các cột tọa độ không cần hiển thị
+  const columnsToHide = ['x', 'y', 'x_vn2000', 'y_vn2000', 'geom', 'geometry', '_whereCondition', '_originalData'];
+  const columns = allColumns.filter(col => !columnsToHide.includes(col));
+
+  // Sắp xếp các cột theo một thứ tự cụ thể (để các cột quan trọng hiển thị trước)
+  const sortedColumns = [
+    'huyen', 'xa', 'mahuyen', 'maxa', 'area', 'start_dau', 'end_sau', 
+    'tk', 'khoanh', 'lo', 'churung', 'detection_status'
+  ].filter(col => columns.includes(col));
+
+  // Thêm các cột còn lại
+  columns.forEach(col => {
+    if (!sortedColumns.includes(col)) {
+      sortedColumns.push(col);
+    }
+  });
 
   // Các cột không được phép chỉnh sửa
   const skipColumns = ["id", "gid", "geom", "geometry"];
@@ -34,10 +61,6 @@ const Table = ({ data, tableName = "unknown" }) => {
 
   // Tạo điều kiện WHERE để xác định duy nhất một hàng
   const createWhereCondition = (row) => {
-    // DEBUG: In ra tất cả thuộc tính của row
-    console.log("Các thuộc tính của row:", Object.keys(row));
-    console.log("Giá trị của row:", row);
-
     // Nếu có gid hoặc id, sử dụng trực tiếp
     if (row.gid !== undefined)
       return { field: "gid", value: row.gid, where: `gid = ${row.gid}` };
@@ -120,18 +143,10 @@ const Table = ({ data, tableName = "unknown" }) => {
       const whereCondition =
         editData._whereCondition || createWhereCondition(originalRow);
 
-      // Debug
-      console.log("WHERE condition:", whereCondition);
-      console.log("Dữ liệu gốc:", originalRow);
-      console.log("Dữ liệu chỉnh sửa:", editData);
-
-      // Mảng chứa các promise cập nhật
-      const updatePromises = [];
-
       // Kiểm tra từng cột đã thay đổi
       for (const column in editData) {
         // Bỏ qua các trường meta
-        if (column.startsWith("_")) continue;
+        if (column.startsWith("_") || columnsToHide.includes(column)) continue;
 
         // Chỉ cập nhật các cột được phép chỉnh sửa và có giá trị thay đổi
         if (
@@ -185,14 +200,6 @@ const Table = ({ data, tableName = "unknown" }) => {
             continue;
           }
 
-          console.log(
-            `✅ User ${isAdmin() ? "có quyền admin" : "không có quyền admin"}`
-          );
-          console.log(
-            `Đang cập nhật ${targetTable}, Cột: ${column}, Giá trị: ${editData[column]}`
-          );
-          console.log(`Điều kiện: ${whereClause}`);
-
           // API endpoint mới sử dụng cập nhật với WHERE clause
           try {
             const response = await axios.post(
@@ -204,8 +211,6 @@ const Table = ({ data, tableName = "unknown" }) => {
                 whereClause: whereClause,
               }
             );
-
-            console.log("Kết quả cập nhật:", response.data);
 
             if (response.data.success) {
               toast.success(`Cập nhật cột ${column} thành công!`);
@@ -293,8 +298,6 @@ const Table = ({ data, tableName = "unknown" }) => {
           }
         );
 
-        console.log("Kết quả xóa:", response.data);
-
         if (response.data.success) {
           toast.success("Xóa dữ liệu thành công!");
           window.location.reload();
@@ -319,6 +322,26 @@ const Table = ({ data, tableName = "unknown" }) => {
     if (onRowClick) {
       onRowClick(row);
     }
+  };
+
+  // Hiển thị tên người dùng thân thiện cho một số cột
+  const getColumnDisplayName = (columnName) => {
+    const columnMap = {
+      'huyen': 'Huyện',
+      'xa': 'Xã',
+      'mahuyen': 'Mã huyện',
+      'maxa': 'Mã xã',
+      'area': 'Diện tích',
+      'start_dau': 'Từ ngày',
+      'end_sau': 'Đến ngày',
+      'tk': 'Tiểu khu',
+      'khoanh': 'Khoảnh',
+      'lo': 'Lô',
+      'churung': 'Chủ rừng',
+      'detection_status': 'Trạng thái'
+    };
+    
+    return columnMap[columnName] || columnName;
   };
 
   return (
@@ -357,12 +380,12 @@ const Table = ({ data, tableName = "unknown" }) => {
             }}
           >
             <tr>
-              {columns.map((col, index) => (
+              {sortedColumns.map((col, index) => (
                 <th
                   key={index}
                   style={{ padding: "10px", border: "1px solid #ddd" }}
                 >
-                  {col}
+                  {getColumnDisplayName(col)}
                 </th>
               ))}
               {isAdmin() && (
@@ -392,7 +415,7 @@ const Table = ({ data, tableName = "unknown" }) => {
                 }}
                 onClick={() => handleRowClick(row, rowIndex)}
               >
-                {columns.map((col, colIndex) => (
+                {sortedColumns.map((col, colIndex) => (
                   <td
                     key={colIndex}
                     style={{ padding: "10px", border: "1px solid #ddd" }}
@@ -470,6 +493,13 @@ const Table = ({ data, tableName = "unknown" }) => {
           </tbody>
         </table>
       </div>
+
+      {/* Debug information */}
+      {data.length > 0 && (
+        <div className="mt-2 text-xs text-gray-500">
+          Số bản ghi: {data.length}
+        </div>
+      )}
     </div>
   );
 };

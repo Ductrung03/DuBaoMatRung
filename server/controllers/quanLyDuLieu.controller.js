@@ -25,6 +25,7 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
       // Nếu người dùng không chỉ định huyện, tự động sử dụng huyện của họ
       const userDistrictId = req.user.district_id;
 
+      // Query không trả về tọa độ x, y
       const sql = `
   SELECT 
     jsonb_build_object(
@@ -32,7 +33,7 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
       'features', jsonb_agg(
         jsonb_build_object(
           'type', 'Feature',
-          'geometry', ST_AsGeoJSON(m.geom, 4326)::jsonb,
+          'geometry', ST_AsGeoJSON(ST_MakeValid(m.geom), 4326)::jsonb,
           'properties', jsonb_build_object(
             'start_dau', m.start_dau,
             'end_sau', m.end_sau,
@@ -42,34 +43,7 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
             'xa', t.xa,
             'tk', t.tk,
             'khoanh', t.khoanh,
-            'churung', t.churung,
-            'x', CASE 
-                  WHEN ST_IsValid(m.geom) THEN 
-                    COALESCE(
-                      ST_X(ST_Transform(
-                        ST_PointOnSurface(
-                          -- Sử dụng buffer để đảm bảo tọa độ hợp lệ
-                          ST_Buffer(m.geom, 0)
-                        ), 
-                        3405
-                      )), 
-                      NULL
-                    )
-                  ELSE NULL
-                END,
-            'y', CASE 
-                  WHEN ST_IsValid(m.geom) THEN 
-                    COALESCE(
-                      ST_Y(ST_Transform(
-                        ST_PointOnSurface(
-                          ST_Buffer(m.geom, 0)
-                        ), 
-                        3405
-                      )), 
-                      NULL
-                    )
-                  ELSE NULL
-                END
+            'churung', t.churung
           )
         )
       )
@@ -77,8 +51,8 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
   FROM mat_rung m
   JOIN tlaocai_tkk_3lr_cru t 
     ON ST_Intersects(
-      ST_Buffer(m.geom, 0), 
-      ST_Transform(ST_Buffer(t.geom, 0), 4326)
+      ST_MakeValid(m.geom), 
+      ST_Transform(ST_MakeValid(t.geom), 4326)
     )
   WHERE m.start_dau::date >= $1
     AND m.end_sau::date <= $2
@@ -87,6 +61,8 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
     AND ($5::text IS NULL OR t.tk = $5)
     AND ($6::text IS NULL OR t.khoanh = $6)
     AND ($7::text IS NULL OR t.churung = $7)
+    AND ST_IsValid(m.geom)
+    AND ST_IsValid(t.geom)
 `;
 
       const values = [
@@ -128,6 +104,7 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
       res.json({ success: true, data: geojson });
     } else {
       // Truy vấn bình thường cho admin hoặc người dùng không bị giới hạn huyện
+      // Query không trả về tọa độ x, y và có xử lý hình học an toàn
       const sql = `
         SELECT 
           jsonb_build_object(
@@ -135,7 +112,7 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
             'features', jsonb_agg(
               jsonb_build_object(
                 'type', 'Feature',
-                'geometry', ST_AsGeoJSON(m.geom, 4326)::jsonb,
+                'geometry', ST_AsGeoJSON(ST_MakeValid(m.geom), 4326)::jsonb,
                 'properties', jsonb_build_object(
                   'start_dau', m.start_dau,
                   'end_sau', m.end_sau,
@@ -145,16 +122,17 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
                   'xa', t.xa,
                   'tk', t.tk,
                   'khoanh', t.khoanh,
-                  'churung', t.churung,
-                  'x', ST_X(ST_Transform(ST_Centroid(m.geom), 3405)),
-                  'y', ST_Y(ST_Transform(ST_Centroid(m.geom), 3405))
+                  'churung', t.churung
                 )
               )
             )
           ) AS geojson
         FROM mat_rung m
         JOIN tlaocai_tkk_3lr_cru t 
-          ON ST_Intersects(m.geom, ST_Transform(t.geom, 4326))
+          ON ST_Intersects(
+            ST_MakeValid(m.geom),
+            ST_Transform(ST_MakeValid(t.geom), 4326)
+          )
         WHERE m.start_dau::date >= $1
           AND m.end_sau::date <= $2
           AND ($3::text IS NULL OR t.huyen = $3)
@@ -162,6 +140,8 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
           AND ($5::text IS NULL OR t.tk = $5)
           AND ($6::text IS NULL OR t.khoanh = $6)
           AND ($7::text IS NULL OR t.churung = $7)
+          AND ST_IsValid(m.geom)
+          AND ST_IsValid(t.geom)
       `;
 
       const values = [
@@ -204,9 +184,18 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
     }
   } catch (err) {
     console.error("❌ Lỗi tra cứu mất rừng:", err.message);
+    
+    // Phân tích chi tiết lỗi để giúp debug
+    let errorMessage = "Lỗi truy vấn dữ liệu";
+    if (err.message.includes("LinearRing")) {
+      errorMessage = "Lỗi hình học: Đa giác không hợp lệ. Vui lòng thử lại với điều kiện tìm kiếm khác";
+    } else if (err.message.includes("transform")) {
+      errorMessage = "Lỗi chuyển đổi hệ tọa độ. Vui lòng thử lại với điều kiện tìm kiếm khác";
+    }
+    
     res.status(500).json({
       success: false,
-      message: "Lỗi truy vấn dữ liệu",
+      message: errorMessage,
       error: err.message,
     });
   }

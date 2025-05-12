@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom"; // Import useLocation từ React Router
+import { useLocation } from "react-router-dom";
 import DuBaoMatRungTuDong from "../components/sidebars/dubaomatrung/DuBaoMatRungTuDong";
 import DuBaoMatRungTuyBien from "../components/sidebars/dubaomatrung/DuBaoMatRungTuyBien";
 import CapNhatDuLieu from "../components/sidebars/quanlydulieu/CapNhatDuLieu";
@@ -11,45 +11,39 @@ import BaoCaoDuBaoMatRung from "../components/sidebars/baocao/BaoCaoDuBaoMatRung
 import ImportShapefile from "../components/sidebars/phathienmatrung/ImportShapefile";
 
 const Sidebar = () => {
-  // Lấy đường dẫn hiện tại từ React Router
   const location = useLocation();
   const currentPath = location.pathname;
-  const [geoData, setGeoData] = useState(null); // ✅
-  // Lấy phần đường dẫn sau "/dashboard"
+  const [geoData, setGeoData] = useState(null);
   
   const pathAfterDashboard = currentPath.replace("/dashboard", "").replace(/^\//, "");
-  console.log("pathAfterDashboard:", pathAfterDashboard); // Debug
 
   // Logic để ánh xạ đường dẫn với component
   const getComponentByPath = () => {
     switch (pathAfterDashboard) {
       case "dubaomatrung":
-        return [<DuBaoMatRungTuDong />, <DuBaoMatRungTuyBien />]; // Trả về mảng hai component
+        return [<DuBaoMatRungTuDong key="tuDong" />, <DuBaoMatRungTuyBien key="tuyBien" />];
       case "quanlydulieu":
         return [
-          <TraCuuDuLieuDuBaoMatRung />,
-          <TraCuuAnhVeTinh />,
-          <XacMinhDuBaoMatRung />,
-          <CapNhatDuLieu onGeoDataLoaded={setGeoData} /> // ✅ truyền dữ liệu
+          <TraCuuDuLieuDuBaoMatRung key="traCuu" />,
+          <TraCuuAnhVeTinh key="anhVeTinh" />,
+          <XacMinhDuBaoMatRung key="xacMinh" />,
+          <CapNhatDuLieu key="capNhat" onGeoDataLoaded={setGeoData} />
         ];
       case "baocao":
-        return [<BaoCaoDuBaoMatRung/>]
+        return [<BaoCaoDuBaoMatRung key="baoCao" />];
       case "phathienmatrung":
-        return [<ImportShapefile/>]
+        return [<ImportShapefile key="importShapefile" />];
       case "":
-        return <Dashboard/>; // Mặc định khi ở "/dashboard"
       default:
-        return <Dashboard/>; // Mặc định nếu không khớp
+        return <Dashboard key="dashboard" />;
     }
   };
 
   return (
-    <div className="h-full w-1/5 bg-gray-50 p-4 flex flex-col gap-4 overflow-y-auto sidebar">
+    <div className="p-4 flex flex-col gap-4 h-full overflow-y-auto">
       {/* Hiển thị tất cả các component trong mảng */}
       {Array.isArray(getComponentByPath()) ? (
-        getComponentByPath().map((component, index) => (
-          <React.Fragment key={index}>{component}</React.Fragment>
-        ))
+        getComponentByPath().map((component) => component)
       ) : (
         getComponentByPath()
       )}

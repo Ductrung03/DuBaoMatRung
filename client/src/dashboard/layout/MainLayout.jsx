@@ -1,4 +1,3 @@
-/* Cập nhật MainLayout.jsx để hỗ trợ responsive */ 
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -33,9 +32,10 @@ const MainLayout = () => {
       </div>
       
       <div className="flex flex-1 overflow-hidden">
-        {/* Responsive sidebar */}
-        <div className={`sidebar w-1/5 bg-gray-50 overflow-y-auto ${showSidebar ? 'block' : 'mobile-hidden'}`}>
-          <Sidebar className="w-full h-full bg-gray-50" />
+        {/* Sidebar với chiều rộng cố định thay vì tỷ lệ phần trăm */}
+        <div className={`sidebar bg-gray-50 overflow-y-auto ${showSidebar ? 'block' : 'mobile-hidden'}`}
+             style={{ width: '280px', flexShrink: 0 }}>
+          <Sidebar />
         </div>
         
         <div className={`flex-1 overflow-hidden ${showSidebar ? 'mobile-hidden' : 'block'}`}>

@@ -5,16 +5,15 @@ import {
   GeoJSON,
   useMap,
   WMSTileLayer,
+  Marker,
+  Popup
 } from "react-leaflet";
 import { useLocation } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Table from "./Table";
 import { useGeoData } from "../contexts/GeoDataContext";
-import {
-  wgs84ToVN2000LaoCai,
-  getFeatureCenter,
-} from "../../utils/coordinateTransform";
+import { formatDate } from "../../utils/formatDate";
 
 // Xác định tên bảng từ URL của layer
 const getTableNameFromLayerParam = (layerName) => {
@@ -26,6 +25,43 @@ const getTableNameFromLayerParam = (layerName) => {
   }
 
   return layerName;
+};
+
+// Thêm component MapUpdater để xử lý flying đến vị trí của feature được chọn
+const MapUpdater = ({ selectedFeature }) => {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (selectedFeature && selectedFeature.geometry) {
+      try {
+        // Tạo geojson chỉ chứa feature được chọn
+        const selectedGeoJson = {
+          type: "FeatureCollection",
+          features: [selectedFeature]
+        };
+        
+        // Tạo một layer tạm thời để lấy bounds
+        const tempLayer = L.geoJSON(selectedGeoJson);
+        
+        // Kiểm tra nếu bounds hợp lệ
+        if (tempLayer.getBounds().isValid()) {
+          console.log("✅ Zoom đến feature được chọn:", selectedFeature);
+          
+          // Thêm timeout nhỏ để đảm bảo map đã render xong
+          setTimeout(() => {
+            map.flyToBounds(tempLayer.getBounds(), {
+              padding: [50, 50],
+              duration: 0.5
+            });
+          }, 100);
+        }
+      } catch (err) {
+        console.error("❌ Lỗi khi zoom đến feature:", err);
+      }
+    }
+  }, [selectedFeature, map]);
+
+  return null;
 };
 
 const CustomMapControl = ({ setMapType }) => {
@@ -126,76 +162,84 @@ const getColorByStatus = (properties) => {
 };
 
 const Map = () => {
-  const { geoData, loading, setGeoData  } = useGeoData();
+  const { geoData, loading, setGeoData } = useGeoData();
   const [mapType, setMapType] = useState("satellite");
   const [mapReady, setMapReady] = useState(false);
   const location = useLocation();
   const isDataPage = location.pathname === "/dashboard/quanlydulieu";
   const geoJsonLayerRef = useRef(null);
   const [selectedFeature, setSelectedFeature] = useState(null);
+  const [selectedRowFeature, setSelectedRowFeature] = useState(null);
 
   const layerName = getQueryParam(location.search, "layer");
   const tableName = getTableNameFromLayerParam(layerName) || "mat_rung"; // Mặc định là mat_rung nếu không có
 
-  // Hàm xử lý khi click vào một hàng trong bảng
+  // Debug geoData để kiểm tra nó nhận được gì từ backend
+  useEffect(() => {
+    if (geoData) {
+      console.log("Dữ liệu GeoJSON nhận được:", geoData);
+      console.log("Số lượng features:", geoData.features?.length || 0);
+      if (geoData.features && geoData.features.length > 0) {
+        console.log("Feature đầu tiên:", geoData.features[0]);
+      }
+    }
+  }, [geoData]);
+
+  // Hàm mới tối ưu hơn để xử lý khi click vào một hàng trong bảng
   const handleRowClick = (rowData) => {
     console.log("Đã click vào hàng:", rowData);
 
-    if (!mapReady || !geoJsonLayerRef.current) {
-      console.log("Map hoặc GeoJSON layer chưa sẵn sàng");
-      return;
-    }
-
-    const map = window._leaflet_map;
-    const layer = geoJsonLayerRef.current;
-
-    // Tìm feature tương ứng với dữ liệu hàng được click
-    let targetFeature = null;
-    let targetLayer = null;
-
-    layer.eachLayer((l) => {
-      const props = l.feature.properties;
-
+    if (!geoData || !geoData.features || !mapReady) return;
+    
+    // Tìm feature trong geoData khớp với dữ liệu hàng
+    const matchedFeature = geoData.features.find(feature => {
+      const props = feature.properties;
+      
       // So sánh các thuộc tính chính để xác định đúng feature
-      const isMatch =
-        props.start_dau === rowData.start_dau &&
-        props.end_sau === rowData.end_sau &&
-        props.area === rowData.area &&
-        props.mahuyen === rowData.mahuyen;
-
-      if (isMatch) {
-        targetFeature = l.feature;
-        targetLayer = l;
-      }
+      const keyMatches = ['start_dau', 'end_sau', 'mahuyen', 'area'].reduce((match, key) => {
+        // Nếu cả hai giá trị đều tồn tại, so sánh chúng
+        if (props[key] !== undefined && rowData[key] !== undefined) {
+          return match && (props[key] === rowData[key]);
+        }
+        // Nếu một trong hai không tồn tại, coi như không ảnh hưởng
+        return match;
+      }, true);
+      
+      return keyMatches;
     });
 
-    if (targetLayer) {
-      console.log("Đã tìm thấy layer tương ứng:", targetLayer);
-
-      // Lưu feature đã chọn
-      setSelectedFeature(targetFeature);
-
-      // Hiển thị popup
-      targetLayer.openPopup();
-
-      // Zoom tới đối tượng được chọn
-      const bounds = targetLayer.getBounds();
-      map.fitBounds(bounds, { padding: [50, 50] });
-
-      // Highlight đối tượng được chọn
-      layer.eachLayer((l) => {
-        l.setStyle({
-          weight: l === targetLayer ? 3 : 1,
-          color: l === targetLayer ? "#ff7800" : "#3388ff",
-          fillOpacity: l === targetLayer ? 0.7 : 0.2,
+    if (matchedFeature) {
+      console.log("Đã tìm thấy feature khớp:", matchedFeature);
+      
+      // Đánh dấu feature đã chọn
+      setSelectedFeature(matchedFeature);
+      setSelectedRowFeature(matchedFeature);
+      
+      // Highlight trong layer GeoJSON
+      if (geoJsonLayerRef.current) {
+        geoJsonLayerRef.current.eachLayer(layer => {
+          if (layer.feature === matchedFeature) {
+            layer.setStyle({
+              weight: 3,
+              color: "#ff7800",
+              fillOpacity: 0.7
+            });
+            layer.bringToFront();
+            // Mở popup nếu có
+            if (layer.getPopup) {
+              layer.openPopup();
+            }
+          } else {
+            layer.setStyle({
+              weight: 1,
+              color: "#ffffff",
+              fillOpacity: 0.5
+            });
+          }
         });
-
-        if (l === targetLayer) {
-          l.bringToFront();
-        }
-      });
+      }
     } else {
-      console.log("Không tìm thấy layer tương ứng với hàng được click");
+      console.log("Không tìm thấy feature khớp với hàng được click");
     }
   };
 
@@ -218,6 +262,7 @@ const Map = () => {
         "tk",
         "khoanh",
         "churung",
+        "mahuyen"
       ];
 
       // Xử lý các trường ưu tiên trước
@@ -244,6 +289,7 @@ const Map = () => {
           if (field === "tk") label = "Tiểu khu";
           if (field === "khoanh") label = "Khoảnh";
           if (field === "churung") label = "Chủ rừng";
+          if (field === "mahuyen") label = "Mã huyện";
 
           popupContent += `
           <tr>
@@ -251,35 +297,8 @@ const Map = () => {
             <td>${value !== null ? value : "Không có"}</td>
           </tr>
         `;
-
-          // Xóa trường đã xử lý để không hiển thị lại
-          delete feature.properties[field];
         }
       });
-
-      // Tọa độ VN-2000
-      const center = getFeatureCenter(feature);
-      if (center) {
-        const vn2000Coords = wgs84ToVN2000LaoCai(
-          center.longitude,
-          center.latitude
-        );
-
-        popupContent += `
-        <tr>
-          <th>X (VN-2000)</th>
-          <td>${vn2000Coords.x}</td>
-        </tr>
-        <tr>
-          <th>Y (VN-2000)</th>
-          <td>${vn2000Coords.y}</td>
-        </tr>
-      `;
-
-        // Lưu tọa độ vào properties để có thể hiển thị trong bảng
-        feature.properties.x_vn2000 = vn2000Coords.x;
-        feature.properties.y_vn2000 = vn2000Coords.y;
-      }
 
       // Trạng thái xác minh nếu có
       if (feature.properties.detection_status) {
@@ -289,19 +308,17 @@ const Map = () => {
           <td>${feature.properties.detection_status}</td>
         </tr>
       `;
-        delete feature.properties.detection_status;
       }
 
       // Thêm các thuộc tính còn lại (bỏ qua các thuộc tính kỹ thuật)
       Object.entries(feature.properties).forEach(([key, value]) => {
-        // Bỏ qua các trường kỹ thuật và tọa độ đã xử lý
+        // Bỏ qua các trường đã xử lý và trường kỹ thuật
         if (
+          !priorityFields.includes(key) &&
+          key !== "detection_status" &&
           !key.includes("geom") &&
           !key.startsWith("_") &&
-          key !== "x" &&
-          key !== "y" &&
-          key !== "x_vn2000" &&
-          key !== "y_vn2000"
+          !['x', 'y', 'x_vn2000', 'y_vn2000'].includes(key)
         ) {
           popupContent += `
           <tr>
@@ -406,41 +423,29 @@ const Map = () => {
       })
       .catch((err) => console.error("❌ Lỗi khi lấy GetCapabilities:", err));
   }, [layerName]);
-  // Thêm effect mới để xử lý dữ liệu khi geoData thay đổi
+
+  // Zoom tới feature khi map và data sẵn sàng
   useEffect(() => {
-    // Chỉ xử lý khi có dữ liệu và không đang loading
-    if (geoData?.features?.length > 0 && !loading) {
-      // Tạo bản sao của geoData để không thay đổi trực tiếp state
-      const updatedGeoData = {
-        ...geoData,
-        features: geoData.features.map((feature) => {
-          // Tạo bản sao của feature
-          const updatedFeature = {
-            ...feature,
-            properties: { ...feature.properties },
-          };
-
-          // Nếu feature có geometry, tính tọa độ tâm
-          if (feature.geometry) {
-            const center = getFeatureCenter(feature);
-            if (center) {
-              const vn2000Coords = wgs84ToVN2000LaoCai(
-                center.longitude,
-                center.latitude
-              );
-              // Thêm tọa độ VN-2000 vào properties
-              updatedFeature.properties.x = vn2000Coords.x;
-              updatedFeature.properties.y = vn2000Coords.y;
-            }
-          }
-          return updatedFeature;
-        }),
-      };
-
-      // Cập nhật dữ liệu
-      setGeoData(updatedGeoData);
+    if (mapReady && geoData?.features?.length > 0 && window._leaflet_map) {
+      try {
+        console.log("Cố gắng zoom đến dữ liệu...");
+        
+        // Sử dụng Leaflet để tạo bounds từ GeoJSON
+        const geoJsonLayer = L.geoJSON(geoData);
+        const bounds = geoJsonLayer.getBounds();
+        
+        if (bounds.isValid()) {
+          console.log("Bounds hợp lệ:", bounds);
+          window._leaflet_map.fitBounds(bounds, { padding: [20, 20] });
+        } else {
+          console.log("Bounds không hợp lệ từ GeoJSON");
+        }
+      } catch (err) {
+        console.error("Lỗi khi zoom đến dữ liệu:", err);
+      }
     }
-  }, [geoData?.features?.length, loading]);
+  }, [mapReady, geoData]);
+  
   return (
     <div className="p-2 md:p-5 font-sans">
       <h2 className="text-center text-lg md:text-xl font-bold mb-2 md:mb-5">
@@ -453,7 +458,7 @@ const Map = () => {
         }`}
       >
         <MapContainer
-          center={[21.0285, 105.8542]}
+          center={[22.1702, 104.1225]} // Center tỉnh Lào Cai
           zoom={8}
           className={`w-full rounded-xl shadow-lg ${
             isDataPage
@@ -473,6 +478,9 @@ const Map = () => {
               <TileLayer url="https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}" />
             </>
           )}
+
+          {/* Thêm component để xử lý việc bay đến feature được chọn từ bảng */}
+          <MapUpdater selectedFeature={selectedRowFeature} />
 
           {layerName ? (
             <WMSTileLayer
@@ -498,12 +506,12 @@ const Map = () => {
                   fillColor: getColorByStatus(feature.properties),
                   weight:
                     selectedFeature && feature === selectedFeature ? 3 : 1,
-                  opacity: 0.7,
+                  opacity: 1, // Tăng độ mờ đường viền
                   color:
                     selectedFeature && feature === selectedFeature
                       ? "#ff7800"
                       : "#ffffff",
-                  fillOpacity: 0.5,
+                  fillOpacity: 0.7, // Tăng độ mờ fill
                 })}
                 ref={(layerRef) => {
                   if (layerRef) {
@@ -515,6 +523,7 @@ const Map = () => {
                         window._leaflet_map.fitBounds(bounds, {
                           padding: [20, 20],
                         });
+                        console.log("✅ Đã zoom đến dữ liệu GeoJSON");
                       }
                     }
                   }
@@ -530,8 +539,9 @@ const Map = () => {
       {!layerName &&
         isDataPage &&
         (loading ? (
-          <div className="text-center text-green-700 font-semibold p-3">
-            ⏳ Đang tải bảng dữ liệu...
+          <div className="text-center text-green-700 font-semibold p-3 bg-white rounded-md shadow">
+            <div className="animate-spin inline-block w-6 h-6 border-4 border-green-500 border-t-transparent rounded-full mr-2"></div>
+            Đang tải dữ liệu... Vui lòng đợi trong giây lát
           </div>
         ) : (
           geoData?.features?.length > 0 && (
@@ -542,6 +552,18 @@ const Map = () => {
             />
           )
         ))}
+
+      {/* Debugging display */}
+      {!loading && (!geoData || !geoData.features || geoData.features.length === 0) && (
+        <div className="text-center text-amber-700 font-semibold p-3 bg-amber-50 rounded-md mt-2">
+          ⚠️ Không có dữ liệu hoặc dữ liệu không đúng định dạng.
+          {geoData && (
+            <div className="text-xs mt-1 text-gray-600">
+              Type: {geoData.type || 'N/A'}, Features: {geoData.features?.length || 0}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
