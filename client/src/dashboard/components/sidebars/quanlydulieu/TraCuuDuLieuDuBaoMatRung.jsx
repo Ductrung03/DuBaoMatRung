@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect  } from "react";
 import Select from "../../Select";
 import { useGeoData } from "../../../contexts/GeoDataContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import config from "../../../../config";
+import { useAuth } from "../../../contexts/AuthContext";
 
 // LoadingSpinner component
 const LoadingSpinner = ({ size = "medium" }) => {
@@ -42,6 +43,8 @@ const TraCuuDuLieuDuBaoMatRung = () => {
   const [chuRungList, setChuRungList] = useState([]);
   const [selectedChuRung, setSelecectedChuRung] = useState("");
 
+   const { user, isAdmin, getUserDistrictId } = useAuth(); // Sử dụng hook useAuth
+
   useEffect(() => {
     // Gọi huyện và khoảnh + chủ rừng lúc load
     const fetchInitialData = async () => {
@@ -50,15 +53,34 @@ const TraCuuDuLieuDuBaoMatRung = () => {
         fetch(`${config.API_URL}/api/dropdown/khoanh`),
         fetch(`${config.API_URL}/api/dropdown/churung`),
       ]);
-      const huyenData = await huyenRes.json();
+      
+      let huyenData = await huyenRes.json();
       const khoanhData = await khoanhRes.json();
       const churungData = await churungRes.json();
+      
+      // Nếu không phải admin, lọc danh sách huyện theo huyện của người dùng
+      if (!isAdmin() && user?.district_id) {
+        huyenData = huyenData.filter(huyen => huyen.value === user.district_id);
+        
+        // Nếu chỉ có một huyện (huyện của người dùng), tự động chọn huyện đó
+        if (huyenData.length === 1) {
+          setSelectedHuyen(huyenData[0].value);
+          // Tự động load danh sách xã của huyện đó
+          const xaRes = await fetch(
+            `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyenData[0].value)}`
+          );
+          const xaData = await xaRes.json();
+          setXaList(xaData);
+        }
+      }
+      
       setHuyenList(huyenData);
       setKhoanhList(khoanhData.map((item) => item.khoanh));
       setChuRungList(churungData.map((item) => item.churung));
     };
+    
     fetchInitialData();
-  }, []);
+  }, [user, isAdmin]); 
 
   const handleHuyenChange = async (e) => {
     const huyen = e.target.value;

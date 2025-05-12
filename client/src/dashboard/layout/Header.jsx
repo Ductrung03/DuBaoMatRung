@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { FaUser, FaSignOutAlt, FaUserCog, FaKey } from "react-icons/fa";
 import ChangePasswordModal from "../components/ChangePasswordModal";
 
+
 const Header = () => {
   const location = useLocation();
   const currentPath = location.pathname;

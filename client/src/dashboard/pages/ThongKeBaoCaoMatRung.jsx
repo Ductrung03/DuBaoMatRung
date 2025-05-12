@@ -54,7 +54,9 @@ const ThongKeBaoCaoMatRung = () => {
               {reportData.map((item, idx) => (
                 <tr key={idx}>
                   <td className="border border-black px-2 py-1">{idx + 1}</td>
-                  <td className="border border-black px-2 py-1">{item.huyen}</td>
+                  <td className="border border-black px-2 py-1">
+                    {item.huyen}
+                  </td>
                   <td className="border border-black px-2 py-1">{item.maxa}</td>
                   <td className="border border-black px-2 py-1">{item.xa}</td>
                   <td className="border border-black px-2 py-1">
@@ -68,7 +70,7 @@ const ThongKeBaoCaoMatRung = () => {
                     {item.khoanh}
                   </td>
                   <td className="border border-black px-2 py-1">
-                    {item.area?.toFixed(2)}
+                    {item.area ? (item.area / 10000).toFixed(1) : ""} ha
                   </td>
                   <td className="border border-black px-2 py-1">
                     {item.ghichu || ""}
@@ -83,7 +85,8 @@ const ThongKeBaoCaoMatRung = () => {
               <strong>Người tổng hợp</strong>
             </span>
             <span className="text-right">
-              ........., ngày ...... tháng ...... năm ......<br />
+              ........., ngày ...... tháng ...... năm ......
+              <br />
               <strong>Chi cục trưởng</strong>
             </span>
           </div>

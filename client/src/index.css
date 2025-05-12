@@ -1,18 +1,263 @@
+
+/* Thêm vào file client/src/index.css */
+
+/* Styles cơ bản */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
 .sidebar::-webkit-scrollbar {
-    width: 8px; /* Độ rộng thanh cuộn */
+  width: 8px; /* Độ rộng thanh cuộn */
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: #027e02; /* Màu xanh lá (green-500) */
+  border-radius: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background-color: #bcffbc; /* Màu xanh lá nhạt (green-200) */
+  border-radius: 4px;
+}
+
+/* Responsive styles cho thiết bị di động */
+@media (max-width: 768px) {
+  /* Header */
+  header h1 {
+    font-size: 1rem !important;
   }
   
-  .sidebar::-webkit-scrollbar-thumb {
-    background-color: #027e02; /* Màu xanh lá (green-500) */
-    border-radius: 4px;
+  header a {
+    font-size: 0.8rem !important;
   }
   
-  .sidebar::-webkit-scrollbar-track {
-    background-color: #bcffbc; /* Màu xanh lá nhạt (green-200) */
-    border-radius: 4px;
+  /* Sidebar */
+  .sidebar {
+    width: 100% !important;
+    min-height: auto !important;
+    max-height: 250px !important;
+    overflow-y: auto !important;
   }
+  
+  /* Main layout */
+  .flex-col {
+    flex-direction: column !important;
+  }
+  
+  /* Map container */
+  .map-container {
+    height: 50vh !important;
+  }
+  
+  /* Table responsive */
+  .table-container {
+    overflow-x: auto !important;
+  }
+  
+  /* Form elements */
+  input, select, button {
+    font-size: 0.9rem !important;
+    padding: 0.3rem 0.5rem !important;
+  }
+  
+  /* Modal responsive */
+  .modal-content {
+    width: 95% !important;
+    max-width: 400px !important;
+  }
+}
+
+/* Thêm classes utility */
+.mobile-hidden {
+  @media (max-width: 768px) {
+    display: none !important;
+  }
+}
+
+.mobile-only {
+  @media (min-width: 769px) {
+    display: none !important;
+  }
+}
+
+.mobile-full-width {
+  @media (max-width: 768px) {
+    width: 100% !important;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .header-nav {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .header-nav a {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .user-profile {
+    margin-top: 0.5rem;
+  }
+  
+  .header-title {
+    font-size: 1rem;
+  }
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .map-page {
+    flex-direction: column;
+  }
+  
+  .leaflet-container {
+    height: 50vh !important;
+  }
+  
+  .map-controls {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 1000;
+  }
+}
+
+.data-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.data-table {
+  min-width: 700px;
+}
+
+@media (max-width: 768px) {
+  .data-table-wrapper {
+    margin-top: 1rem;
+  }
+  
+  .table-actions {
+    position: sticky;
+    right: 0;
+    background: white;
+  }
+}
+
+.form-group {
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    margin-bottom: 0.25rem;
+    width: 100% !important;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group button {
+    width: 100% !important;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    padding: 0.75rem;
+  }
+  
+  .modal-footer {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+  
+  .modal-footer button {
+    width: 100%;
+  }
+}
+
+/* Thêm CSS cho popup trong index.css hoặc một file styles riêng */
+
+.custom-popup-container {
+  padding: 0;
+}
+
+.custom-popup {
+  padding: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.popup-title {
+  margin: 0 0 10px 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ccc;
+  color: #027e02;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.popup-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.popup-table th, .popup-table td {
+  padding: 5px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.popup-table th {
+  width: 40%;
+  color: #555;
+  font-weight: 600;
+}
+
+.popup-table td {
+  width: 60%;
+}
+
+@media (max-width: 768px) {
+  .custom-popup {
+    padding: 8px;
+    max-height: 250px;
+  }
+  
+  .popup-table th, .popup-table td {
+    padding: 3px;
+    font-size: 0.9rem;
+  }
+}

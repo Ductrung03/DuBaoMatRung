@@ -29,7 +29,7 @@ exports.getAllUsers = async (req, res) => {
 
 // Tạo người dùng mới
 exports.createUser = async (req, res) => {
-  const { username, password, full_name, role = "user" } = req.body;
+  const { username, password, full_name, role = "user", district_id = null } = req.body;
 
   // Kiểm tra dữ liệu đầu vào
   if (!username || !password || !full_name) {
@@ -58,8 +58,8 @@ exports.createUser = async (req, res) => {
 
     // Thêm người dùng vào database
     const result = await pool.query(
-      "INSERT INTO users (username, password_hash, full_name, role) VALUES ($1, $2, $3, $4) RETURNING id, username, full_name, role, is_active, created_at",
-      [username, password_hash, full_name, role]
+      "INSERT INTO users (username, password_hash, full_name, role, district_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, username, full_name, role, district_id, is_active, created_at",
+      [username, password_hash, full_name, role, district_id]
     );
 
     res.status(201).json({
@@ -76,10 +76,11 @@ exports.createUser = async (req, res) => {
   }
 };
 
+
 // Cập nhật thông tin người dùng
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
-  const { full_name, role, is_active, password } = req.body;
+  const { full_name, role, is_active, password, district_id } = req.body;
 
   try {
     let query, params;
@@ -89,20 +90,20 @@ exports.updateUser = async (req, res) => {
       const password_hash = await hashPassword(password);
       query = `
         UPDATE users 
-        SET full_name = $1, role = $2, is_active = $3, password_hash = $4
-        WHERE id = $5 
-        RETURNING id, username, full_name, role, is_active, created_at, last_login
+        SET full_name = $1, role = $2, is_active = $3, password_hash = $4, district_id = $5
+        WHERE id = $6 
+        RETURNING id, username, full_name, role, district_id, is_active, created_at, last_login
       `;
-      params = [full_name, role, is_active, password_hash, id];
+      params = [full_name, role, is_active, password_hash, district_id, id];
     } else {
       // Không cập nhật mật khẩu
       query = `
         UPDATE users 
-        SET full_name = $1, role = $2, is_active = $3
-        WHERE id = $4 
-        RETURNING id, username, full_name, role, is_active, created_at, last_login
+        SET full_name = $1, role = $2, is_active = $3, district_id = $4
+        WHERE id = $5 
+        RETURNING id, username, full_name, role, district_id, is_active, created_at, last_login
       `;
-      params = [full_name, role, is_active, id];
+      params = [full_name, role, is_active, district_id, id];
     }
 
     const result = await pool.query(query, params);

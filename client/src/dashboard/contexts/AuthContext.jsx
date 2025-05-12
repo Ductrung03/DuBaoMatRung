@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -106,6 +107,21 @@ export const AuthProvider = ({ children }) => {
 
   // Kiểm tra vai trò
   const isAdmin = () => user && user.role === "admin";
+  
+  // Lấy mã huyện của người dùng
+  const getUserDistrictId = () => user?.district_id || null;
+  
+  // Kiểm tra xem người dùng có quyền truy cập dữ liệu của huyện cụ thể không
+  const canAccessDistrict = (districtId) => {
+    // Admin có thể truy cập tất cả các huyện
+    if (isAdmin()) return true;
+    
+    // Nếu không cung cấp districtId, cho phép truy cập (để hiển thị dữ liệu chung)
+    if (!districtId) return true;
+    
+    // Người dùng bình thường chỉ có thể truy cập dữ liệu của huyện họ được phân công
+    return user?.district_id === districtId;
+  };
 
   return (
     <AuthContext.Provider
@@ -116,6 +132,8 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         isAdmin,
+        getUserDistrictId,
+        canAccessDistrict
       }}
     >
       {children}

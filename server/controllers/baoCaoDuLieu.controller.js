@@ -27,10 +27,13 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
 
     const whereClause = conditions.length > 0 ? `AND ${conditions.join(" AND ")}` : "";
 
+    // Cập nhật query để trả về tọa độ X, Y
     const query = `
       SELECT distinct
         t.*, 
-        m.start_dau, m.end_sau, m.area
+        m.start_dau, m.end_sau, m.area,
+        ST_X(ST_Transform(ST_Centroid(m.geom), 3405)) as x,
+        ST_Y(ST_Transform(ST_Centroid(m.geom), 3405)) as y
       FROM tlaocai_tkk_3lr_cru t
       JOIN mat_rung m ON ST_Intersects(
         ST_Transform(t.geom, 4326),
@@ -49,6 +52,9 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
       huyen: convertTcvn3ToUnicode(row.huyen),
       xa: convertTcvn3ToUnicode(row.xa),
       churung: row.churung ? convertTcvn3ToUnicode(row.churung) : "",
+      // Làm tròn tọa độ đến 2 chữ số thập phân
+      x: row.x ? parseFloat(row.x).toFixed(2) : null,
+      y: row.y ? parseFloat(row.y).toFixed(2) : null
     }));
 
     if (type === "Văn bản") {
