@@ -32,7 +32,7 @@ export default function PhatHienMatRung() {
   };
 
   return (
-    <div className="w-full h-screen bg-black relative">
+    <div className="w-full h-screen bg-black relative overflow-y-auto overflow-y-auto">
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
           <div className="bg-white p-4 rounded-md flex flex-col items-center">
