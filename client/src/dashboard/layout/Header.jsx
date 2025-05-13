@@ -4,7 +4,6 @@ import { useAuth } from "../contexts/AuthContext";
 import { FaUser, FaSignOutAlt, FaUserCog, FaKey } from "react-icons/fa";
 import ChangePasswordModal from "../components/ChangePasswordModal";
 
-
 const Header = () => {
   const location = useLocation();
   const currentPath = location.pathname;
@@ -112,7 +111,7 @@ const Header = () => {
 
       {/* User Profile */}
       <div className="ml-auto relative" ref={userMenuRef}>
-        <div 
+        <div
           className="flex items-center cursor-pointer hover:opacity-80"
           onClick={() => setShowUserMenu(!showUserMenu)}
         >
@@ -131,13 +130,14 @@ const Header = () => {
 
         {/* User Menu - Added z-50 to ensure it appears above all other elements */}
         {showUserMenu && (
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-[9999]">
             <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
-              Đăng nhập với <span className="font-semibold">{user?.username}</span>
+              Đăng nhập với{" "}
+              <span className="font-semibold">{user?.username}</span>
             </div>
-            
+
             {isAdmin() && (
-              <Link 
+              <Link
                 to="/dashboard/quanlynguoidung"
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                 onClick={() => setShowUserMenu(false)}
@@ -146,7 +146,7 @@ const Header = () => {
                 Quản lý người dùng
               </Link>
             )}
-            
+
             <button
               onClick={() => {
                 setShowUserMenu(false);
@@ -157,7 +157,7 @@ const Header = () => {
               <FaKey className="mr-2" />
               Đổi mật khẩu
             </button>
-            
+
             <button
               onClick={logout}
               className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"
@@ -168,9 +168,9 @@ const Header = () => {
           </div>
         )}
       </div>
-      
+
       {/* Modal đổi mật khẩu */}
-      <ChangePasswordModal 
+      <ChangePasswordModal
         isOpen={showPasswordModal}
         onClose={() => setShowPasswordModal(false)}
       />
