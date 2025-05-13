@@ -6,7 +6,7 @@ import {
   useMap,
   WMSTileLayer,
   Marker,
-  Popup
+  Popup,
 } from "react-leaflet";
 import { useLocation } from "react-router-dom";
 import L from "leaflet";
@@ -30,28 +30,28 @@ const getTableNameFromLayerParam = (layerName) => {
 // Thêm component MapUpdater để xử lý flying đến vị trí của feature được chọn
 const MapUpdater = ({ selectedFeature }) => {
   const map = useMap();
-  
+
   useEffect(() => {
     if (selectedFeature && selectedFeature.geometry) {
       try {
         // Tạo geojson chỉ chứa feature được chọn
         const selectedGeoJson = {
           type: "FeatureCollection",
-          features: [selectedFeature]
+          features: [selectedFeature],
         };
-        
+
         // Tạo một layer tạm thời để lấy bounds
         const tempLayer = L.geoJSON(selectedGeoJson);
-        
+
         // Kiểm tra nếu bounds hợp lệ
         if (tempLayer.getBounds().isValid()) {
           console.log("✅ Zoom đến feature được chọn:", selectedFeature);
-          
+
           // Thêm timeout nhỏ để đảm bảo map đã render xong
           setTimeout(() => {
             map.flyToBounds(tempLayer.getBounds(), {
               padding: [50, 50],
-              duration: 0.5
+              duration: 0.5,
             });
           }, 100);
         }
@@ -190,41 +190,66 @@ const Map = () => {
     console.log("Đã click vào hàng:", rowData);
 
     if (!geoData || !geoData.features || !mapReady) return;
-    
+
     // Tìm feature trong geoData khớp với dữ liệu hàng
-    const matchedFeature = geoData.features.find(feature => {
+    const matchedFeature = geoData.features.find((feature) => {
       const props = feature.properties;
-      
-      // So sánh các thuộc tính chính để xác định đúng feature
-      const keyMatches = ['start_dau', 'end_sau', 'mahuyen', 'area'].reduce((match, key) => {
+
+      // Mở rộng các thuộc tính so sánh để tăng độ chính xác
+      const keyMatches = [
+        "start_dau",
+        "end_sau",
+        "mahuyen",
+        "area",
+        "tk",
+        "khoanh",
+        "xa",
+      ].reduce((match, key) => {
         // Nếu cả hai giá trị đều tồn tại, so sánh chúng
         if (props[key] !== undefined && rowData[key] !== undefined) {
-          return match && (props[key] === rowData[key]);
+          // Chuyển đổi thành chuỗi để so sánh an toàn
+          const propVal = String(props[key]);
+          const rowVal = String(rowData[key]);
+          return match && propVal === rowVal;
         }
-        // Nếu một trong hai không tồn tại, coi như không ảnh hưởng
+        // Nếu một trong hai không tồn tại, không ảnh hưởng đến kết quả
         return match;
       }, true);
-      
+
       return keyMatches;
     });
 
     if (matchedFeature) {
       console.log("Đã tìm thấy feature khớp:", matchedFeature);
-      
+
       // Đánh dấu feature đã chọn
       setSelectedFeature(matchedFeature);
       setSelectedRowFeature(matchedFeature);
-      
+
       // Highlight trong layer GeoJSON
       if (geoJsonLayerRef.current) {
-        geoJsonLayerRef.current.eachLayer(layer => {
+        geoJsonLayerRef.current.eachLayer((layer) => {
           if (layer.feature === matchedFeature) {
             layer.setStyle({
               weight: 3,
               color: "#ff7800",
-              fillOpacity: 0.7
+              fillOpacity: 0.7,
             });
             layer.bringToFront();
+
+            // Zoom đến feature
+            try {
+              const bounds = layer.getBounds();
+              if (bounds && bounds.isValid()) {
+                window._leaflet_map.flyToBounds(bounds, {
+                  padding: [50, 50],
+                  duration: 0.5,
+                });
+              }
+            } catch (err) {
+              console.error("Lỗi khi zoom đến feature:", err);
+            }
+
             // Mở popup nếu có
             if (layer.getPopup) {
               layer.openPopup();
@@ -233,13 +258,14 @@ const Map = () => {
             layer.setStyle({
               weight: 1,
               color: "#ffffff",
-              fillOpacity: 0.5
+              fillOpacity: 0.5,
             });
           }
         });
       }
     } else {
       console.log("Không tìm thấy feature khớp với hàng được click");
+      alert("Không thể tìm thấy vị trí trên bản đồ cho dòng dữ liệu này");
     }
   };
 
@@ -262,7 +288,7 @@ const Map = () => {
         "tk",
         "khoanh",
         "churung",
-        "mahuyen"
+        "mahuyen",
       ];
 
       // Xử lý các trường ưu tiên trước
@@ -318,7 +344,7 @@ const Map = () => {
           key !== "detection_status" &&
           !key.includes("geom") &&
           !key.startsWith("_") &&
-          !['x', 'y', 'x_vn2000', 'y_vn2000'].includes(key)
+          !["x", "y", "x_vn2000", "y_vn2000"].includes(key)
         ) {
           popupContent += `
           <tr>
@@ -429,11 +455,11 @@ const Map = () => {
     if (mapReady && geoData?.features?.length > 0 && window._leaflet_map) {
       try {
         console.log("Cố gắng zoom đến dữ liệu...");
-        
+
         // Sử dụng Leaflet để tạo bounds từ GeoJSON
         const geoJsonLayer = L.geoJSON(geoData);
         const bounds = geoJsonLayer.getBounds();
-        
+
         if (bounds.isValid()) {
           console.log("Bounds hợp lệ:", bounds);
           window._leaflet_map.fitBounds(bounds, { padding: [20, 20] });
@@ -445,7 +471,7 @@ const Map = () => {
       }
     }
   }, [mapReady, geoData]);
-  
+
   return (
     <div className="p-2 md:p-5 font-sans">
       <h2 className="text-center text-lg md:text-xl font-bold mb-2 md:mb-5">
@@ -554,16 +580,18 @@ const Map = () => {
         ))}
 
       {/* Debugging display */}
-      {!loading && (!geoData || !geoData.features || geoData.features.length === 0) && (
-        <div className="text-center text-amber-700 font-semibold p-3 bg-amber-50 rounded-md mt-2">
-          ⚠️ Không có dữ liệu hoặc dữ liệu không đúng định dạng.
-          {geoData && (
-            <div className="text-xs mt-1 text-gray-600">
-              Type: {geoData.type || 'N/A'}, Features: {geoData.features?.length || 0}
-            </div>
-          )}
-        </div>
-      )}
+      {!loading &&
+        (!geoData || !geoData.features || geoData.features.length === 0) && (
+          <div className="text-center text-amber-700 font-semibold p-3 bg-amber-50 rounded-md mt-2">
+            ⚠️ Không có dữ liệu hoặc dữ liệu không đúng định dạng.
+            {geoData && (
+              <div className="text-xs mt-1 text-gray-600">
+                Type: {geoData.type || "N/A"}, Features:{" "}
+                {geoData.features?.length || 0}
+              </div>
+            )}
+          </div>
+        )}
     </div>
   );
 };

@@ -26,14 +26,15 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
       const userDistrictId = req.user.district_id;
 
       // Query không trả về tọa độ x, y
-      const sql = `
+      // Truy vấn được tối ưu hóa
+const sql = `
   SELECT 
     jsonb_build_object(
       'type', 'FeatureCollection',
-      'features', jsonb_agg(
+      'features', COALESCE(jsonb_agg(
         jsonb_build_object(
           'type', 'Feature',
-          'geometry', ST_AsGeoJSON(ST_MakeValid(m.geom), 4326)::jsonb,
+          'geometry', ST_AsGeoJSON(m.geom, 4326)::jsonb,
           'properties', jsonb_build_object(
             'start_dau', m.start_dau,
             'end_sau', m.end_sau,
@@ -46,13 +47,13 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
             'churung', t.churung
           )
         )
-      )
+      ), '[]'::json)
     ) AS geojson
   FROM mat_rung m
   JOIN tlaocai_tkk_3lr_cru t 
     ON ST_Intersects(
-      ST_MakeValid(m.geom), 
-      ST_Transform(ST_MakeValid(t.geom), 4326)
+      m.geom,
+      ST_Transform(t.geom, 4326)
     )
   WHERE m.start_dau::date >= $1
     AND m.end_sau::date <= $2
@@ -63,6 +64,11 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
     AND ($7::text IS NULL OR t.churung = $7)
     AND ST_IsValid(m.geom)
     AND ST_IsValid(t.geom)
+  LIMIT CASE 
+    WHEN $3 IS NULL AND $4 IS NULL AND $5 IS NULL AND $6 IS NULL AND $7 IS NULL 
+    THEN 500 
+    ELSE 10000 
+  END
 `;
 
       const values = [
