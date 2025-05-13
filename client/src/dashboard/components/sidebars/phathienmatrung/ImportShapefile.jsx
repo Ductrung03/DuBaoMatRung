@@ -5,7 +5,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 import axios from "axios";
 import config from "../../../../config";
 import { toast } from "react-toastify";
-
+import { ClipLoader } from "react-spinners";
+ 
 const ImportShapefile = () => {
   const [zipUrl, setZipUrl] = useState("");
   const [loading, setLoading] = useState(false);
