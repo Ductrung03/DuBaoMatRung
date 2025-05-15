@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import config from "../../../../config";
 import { toast } from "react-toastify";
 import { ClipLoader } from 'react-spinners';
+import { useAuth } from "../../../contexts/AuthContext";
 
 ChartJS.register(
   BarElement,
@@ -53,13 +54,31 @@ const BaoCaoDuBaoMatRung = () => {
   const [loadingMessage, setLoadingMessage] = useState("");
 
   const { setReportData, setReportLoading } = useReport();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const { user, isAdmin } = useAuth();
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         const res = await fetch(`${config.API_URL}/api/dropdown/huyen`);
-        const data = await res.json();
+        let data = await res.json();
+        
+        // Nếu không phải admin, lọc danh sách huyện theo huyện của người dùng
+        if (!isAdmin() && user?.district_id) {
+          data = data.filter(huyen => huyen.value === user.district_id);
+          
+          // Nếu chỉ có một huyện (huyện của người dùng), tự động chọn huyện đó
+          if (data.length === 1) {
+            setSelectedHuyen(data[0].value);
+            // Tự động load danh sách xã của huyện đó
+            const xaRes = await fetch(
+              `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(data[0].value)}`
+            );
+            const xaData = await xaRes.json();
+            setXaList(xaData);
+          }
+        }
+        
         setHuyenList(data);
       } catch (err) {
         console.error("Lỗi lấy huyện:", err);
@@ -67,7 +86,7 @@ const BaoCaoDuBaoMatRung = () => {
       }
     };
     fetchInitialData();
-  }, []);
+  }, [isAdmin, user]);
   
   const handleHuyenChange = async (e) => {
     const huyen = e.target.value;
@@ -91,7 +110,7 @@ const BaoCaoDuBaoMatRung = () => {
   };
 
   const handleBaoCao = async () => {
-    // Kiểm tra thông tin nhập vào
+    // Kiểm tra thông tin nhập vào - phải điền đầy đủ tất cả các trường
     if (!fromDate || !toDate) {
       toast.warning("Vui lòng chọn ngày bắt đầu và kết thúc");
       return;
@@ -99,6 +118,16 @@ const BaoCaoDuBaoMatRung = () => {
     
     if (!reportType) {
       toast.warning("Vui lòng chọn loại báo cáo");
+      return;
+    }
+    
+    if (!selectedHuyen) {
+      toast.warning("Vui lòng chọn huyện");
+      return;
+    }
+    
+    if (!selectedXa) {
+      toast.warning("Vui lòng chọn xã");
       return;
     }
     
@@ -219,8 +248,8 @@ const BaoCaoDuBaoMatRung = () => {
               <select
                 value={selectedHuyen}
                 onChange={handleHuyenChange}
-                className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
-                disabled={isLoading}
+                className={`w-36 border border-green-400 rounded-md px-2 py-1 ${!isAdmin() && user?.district_id ? "bg-gray-100" : "bg-white"}`}
+                disabled={isLoading || (!isAdmin() && user?.district_id)}
               >
                 <option value="">Chọn huyện</option>
                 {huyenList.map((item, i) => (

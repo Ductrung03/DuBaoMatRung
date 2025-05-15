@@ -1,212 +1,90 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Select from "../../Select";
+import { useAuth } from "../../../contexts/AuthContext";
+import config from "../../../../config";
 
 const DuBaoMatRungTuyBien = () => {
-  const administrativeUnits = [
-    {
-      district: "Thành phố Lào Cai",
-      communes: [
-        "Xã Vạn Hòa",
-        "Xã Đồng Tuyển",
-        "Xã Cam Đường",
-        "Xã Tả Phời",
-        "Xã Hợp Thành",
-        "Xã Cốc San",
-        "Xã Thống Nhất"
-      ]
-    },
-    {
-      district: "Thị xã Sa Pa",
-      communes: [
-        "Xã Sa Pả",
-        "Xã San Sả Hồ",
-        "Xã Bản Hồ",
-        "Xã Lao Chải",
-        "Xã Thanh Bình",
-        "Xã Nậm Cang",
-        "Xã Nậm Sài",
-        "Xã Nậm Mòn",
-        "Xã Tả Van",
-        "Xã Tả Phìn",
-        "Xã Sử Pán",
-        "Xã Mường Hoa",
-        "Xã Trung Chải",
-        "Xã Hầu Thào"
-      ]
-    },
-    {
-      district: "Huyện Bát Xát",
-      communes: [
-        "Xã A Lù",
-        "Xã A Mú Sung",
-        "Xã Bản Qua",
-        "Xã Bản Vược",
-        "Xã Bản Xèo",
-        "Xã Cốc Mỳ",
-        "Xã Dền Sáng",
-        "Xã Dền Thàng",
-        "Xã Mường Hum",
-        "Xã Mường Vi",
-        "Xã Nậm Chạc",
-        "Xã Nậm Pung",
-        "Xã Pa Cheo",
-        "Xã Phìn Ngan",
-        "Xã Quang Kim",
-        "Xã Sàng Ma Sáo",
-        "Xã Tòng Sành",
-        "Xã Trịnh Tường",
-        "Xã Trung Lèng Hồ",
-        "Xã Y Tý",
-        "Xã Ngải Thầu"
-      ]
-    },
-    {
-      district: "Huyện Bảo Thắng",
-      communes: [
-        "Xã Phố Lu",
-        "Xã Sơn Hà",
-        "Xã Sơn Hải",
-        "Xã Xuân Giao",
-        "Xã Xuân Quang",
-        "Xã Trì Quang",
-        "Xã Gia Phú",
-        "Xã Bản Cầm",
-        "Xã Thái Niên",
-        "Xã Phong Niên",
-        "Xã Bản Phiệt",
-        "Xã Phú Nhuận"
-      ]
-    },
-    {
-      district: "Huyện Bảo Yên",
-      communes: [
-        "Xã Nghĩa Đô",
-        "Xã Xuân Thượng",
-        "Xã Xuân Hòa",
-        "Xã Tân Tiến",
-        "Xã Tân Dương",
-        "Xã Thượng Hà",
-        "Xã Kim Sơn",
-        "Xã Cam Cọn",
-        "Xã Minh Tân",
-        "Xã Việt Tiến",
-        "Xã Yên Sơn",
-        "Xã Bảo Hà",
-        "Xã Lương Sơn",
-        "Xã Điện Quan",
-        "Xã Phúc Khánh",
-        "Xã Vĩnh Yên"
-      ]
-    },
-    {
-      district: "Huyện Bắc Hà",
-      communes: [
-        "Xã Lùng Cải",
-        "Xã Lùng Phình",
-        "Xã Tả Van Chư",
-        "Xã Lầu Thí Ngài",
-        "Xã Thải Giàng Phố",
-        "Xã Hoàng Thu Phố",
-        "Xã Bản Phố",
-        "Xã Bản Liền",
-        "Xã Tà Chải",
-        "Xã Na Hối",
-        "Xã Cốc Ly",
-        "Xã Nậm Mòn",
-        "Xã Nậm Đét",
-        "Xã Nậm Khánh",
-        "Xã Bảo Nhai",
-        "Xã Nậm Lúc",
-        "Xã Cốc Lầu",
-        "Xã Bản Cái"
-      ]
-    },
-    {
-      district: "Huyện Mường Khương",
-      communes: [
-        "Xã Bản Lầu",
-        "Xã Bản Sen",
-        "Xã Cao Sơn",
-        "Xã Dìn Chin",
-        "Xã La Pan Tẩn",
-        "Xã Lùng Khấu Nhin",
-        "Xã Lùng Vai",
-        "Xã Nậm Chảy",
-        "Xã Nấm Lư",
-        "Xã Pha Long",
-        "Xã Tả Gia Khâu",
-        "Xã Tả Ngải Chồ",
-        "Xã Tả Thàng",
-        "Xã Thanh Bình",
-        "Xã Tung Chung Phố"
-      ]
-    },
-    {
-      district: "Huyện Si Ma Cai",
-      communes: [
-        "Xã Bản Mế",
-        "Xã Cán Cấu",
-        "Xã Lùng Thẩn",
-        "Xã Mản Thẩn",
-        "Xã Nàn Sán",
-        "Xã Nàn Sín",
-        "Xã Quan Thần Sán",
-        "Xã Sán Chải",
-        "Xã Sín Chéng",
-        "Xã Thào Chư Phìn",
-        "Xã Cán Hồ",
-        "Xã Lử Thẩn"
-      ]
-    },
-    {
-      district: "Huyện Văn Bàn",
-      communes: [
-        "Xã Chiềng Ken",
-        "Xã Dần Thàng",
-        "Xã Dương Quỳ",
-        "Xã Hòa Mạc",
-        "Xã Khánh Yên Hạ",
-        "Xã Khánh Yên Thượng",
-        "Xã Khánh Yên Trung",
-        "Xã Làng Giàng",
-        "Xã Liêm Phú",
-        "Xã Minh Lương",
-        "Xã Nậm Chày",
-        "Xã Nậm Dạng",
-        "Xã Nậm Mả",
-        "Xã Nậm Tha",
-        "Xã Nậm Xây",
-        "Xã Nậm Xé",
-        "Xã Sơn Thủy",
-        "Xã Tân An",
-        "Xã Tân Thượng",
-        "Xã Thẩm Dương"
-      ]
-    }
-  ];
-  
-
+  const { user, isAdmin } = useAuth();
+  const [administrativeUnits, setAdministrativeUnits] = useState([]);
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   const [isInputOpen, setInputOpen] = useState(true);
   const [isDownloadOpen, setDownloadOpen] = useState(true);
   const [selectedHuyen, setSelectedHuyen] = useState("");
   const [xaList, setXaList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // Trạng thái mở cho từng dropdown
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  const handleHuyenChange = (e) => {
+  // Tải danh sách huyện dựa trên quyền người dùng
+  useEffect(() => {
+    const fetchHuyenList = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${config.API_URL}/api/dropdown/huyen`);
+        let huyenData = await response.json();
+        
+        // Nếu không phải admin, lọc theo huyện của người dùng
+        if (!isAdmin() && user?.district_id) {
+          huyenData = huyenData.filter(huyen => huyen.value === user.district_id);
+          
+          // Nếu chỉ có một huyện (huyện của người dùng), tự động chọn huyện đó
+          if (huyenData.length === 1) {
+            setSelectedHuyen(huyenData[0].label);
+            // Tự động load danh sách xã của huyện đó
+            const xaRes = await fetch(
+              `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyenData[0].value)}`
+            );
+            const xaData = await xaRes.json();
+            setXaList(xaData.map(item => item.label));
+          }
+        }
+        
+        // Chuyển đổi dữ liệu thành định dạng phù hợp với component
+        const formattedData = huyenData.map(huyen => ({
+          district: huyen.label,
+          communes: [] // Mặc định là mảng rỗng, sẽ được điền khi chọn huyện
+        }));
+        
+        setAdministrativeUnits(formattedData);
+        setLoading(false);
+      } catch (err) {
+        console.error("Lỗi khi tải danh sách huyện:", err);
+        setLoading(false);
+      }
+    };
+    
+    fetchHuyenList();
+  }, [isAdmin, user]);
+
+  const handleHuyenChange = async (e) => {
     const huyen = e.target.value;
     setSelectedHuyen(huyen);
 
-    const found = administrativeUnits.find((d) => d.district === huyen);
-    setXaList(found ? found.communes : []);
+    try {
+      // Tìm mã huyện dựa trên tên huyện
+      const huyenObject = administrativeUnits.find(item => item.district === huyen);
+      if (huyenObject) {
+        const huyenCode = huyenObject.value || huyen;
+        
+        // Lấy danh sách xã từ API dựa trên mã hoặc tên huyện
+        const res = await fetch(`${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`);
+        const data = await res.json();
+        setXaList(data.map(item => item.label));
+      } else {
+        setXaList([]);
+      }
+    } catch (err) {
+      console.error("Lỗi khi tải danh sách xã:", err);
+      setXaList([]);
+    }
   };
 
   // Hàm xử lý khi dropdown focus hoặc blur
   const handleDropdownToggle = (dropdownName, isOpen) => {
     setOpenDropdown(isOpen ? dropdownName : null);
   };
+  
   return (
     <div>
       <div
@@ -237,7 +115,8 @@ const DuBaoMatRungTuyBien = () => {
                     <select
                       value={selectedHuyen}
                       onChange={handleHuyenChange}
-                      className="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                      disabled={!isAdmin() && user?.district_id}
+                      className={`w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none ${!isAdmin() && user?.district_id ? "bg-gray-100" : "bg-white"} focus:outline-none focus:ring-2 focus:ring-green-400`}
                       onFocus={() => handleDropdownToggle("huyen", true)}
                       onBlur={() => handleDropdownToggle("huyen", false)}
                     >

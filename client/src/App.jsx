@@ -34,7 +34,14 @@ function App() {
                 <Route path="" element={<Map />} />
                 <Route path="dubaomatrung" element={<Map />} />
                 <Route path="quanlydulieu" element={<QuanLyDuLieu />} />
-                <Route path="phathienmatrung" element={<PhatHienMatRung />} />
+                <Route 
+                  path="phathienmatrung" 
+                  element={
+                    <ProtectedRoute adminOnly={true}>
+                      <PhatHienMatRung />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route path="baocao" element={<ThongKeBaoCaoMatRung />} />
                 <Route
                   path="quanlynguoidung"

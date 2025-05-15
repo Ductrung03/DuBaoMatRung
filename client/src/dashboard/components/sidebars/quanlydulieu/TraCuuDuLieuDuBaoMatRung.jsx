@@ -153,6 +153,19 @@ const TraCuuDuLieuDuBaoMatRung = () => {
   const handleTraCuu = async () => {
     try {
       setNoDataMessage(""); // reset thông báo cũ nếu có
+      
+      // Kiểm tra nếu người dùng là admin, bắt buộc phải chọn huyện và nhập từ ngày/đến ngày
+      if (isAdmin() && !selectedHuyen) {
+        toast.warning("Vui lòng chọn huyện trước khi tra cứu");
+        return;
+      }
+      
+      // Kiểm tra từ ngày và đến ngày cho tất cả người dùng
+      if (!fromDate || !toDate) {
+        toast.warning("Vui lòng nhập đầy đủ từ ngày và đến ngày");
+        return;
+      }
+      
       setIsLoading(true); // Bắt đầu loading cho button
       setIsLoadingOverlay(true); // Hiển thị overlay loading
       setLoadingMessage("Đang truy vấn dữ liệu mất rừng...");
@@ -317,8 +330,8 @@ const TraCuuDuLieuDuBaoMatRung = () => {
                 <select
                   value={selectedHuyen}
                   onChange={handleHuyenChange}
-                  disabled={isLoading}
-                  className="w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                  disabled={isLoading || (!isAdmin() && user?.district_id)}
+                  className={`w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none ${!isAdmin() && user?.district_id ? "bg-gray-100" : "bg-white"} focus:outline-none focus:ring-2 focus:ring-green-400`}
                   onFocus={() => handleDropdownToggle("huyen", true)}
                   onBlur={() => handleDropdownToggle("huyen", false)}
                 >
