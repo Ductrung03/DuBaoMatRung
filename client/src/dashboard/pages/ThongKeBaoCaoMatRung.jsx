@@ -9,9 +9,41 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useReport } from "../contexts/ReportContext";
+import { FaFileWord, FaFilePdf, FaDownload } from "react-icons/fa";
+import config from "../../config";
 
 const ThongKeBaoCaoMatRung = () => {
   const { reportData } = useReport();
+
+  // Hàm xử lý xuất file DOCX
+  const handleExportDocx = () => {
+    // Lấy tham số từ URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromDate = urlParams.get('fromDate') || '';
+    const toDate = urlParams.get('toDate') || '';
+    const huyen = urlParams.get('huyen') || '';
+    const xa = urlParams.get('xa') || '';
+    
+    // Tạo URL để tải file
+    const exportUrl = `${config.API_URL}/api/bao-cao/export-docx?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(huyen)}&xa=${encodeURIComponent(xa)}`;
+    
+    // Mở cửa sổ mới để tải file
+    window.open(exportUrl, '_blank');
+  };
+
+  // Hàm xử lý xuất PDF (sử dụng HTML để in)
+  const handleExportPdf = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromDate = urlParams.get('fromDate') || '';
+    const toDate = urlParams.get('toDate') || '';
+    const huyen = urlParams.get('huyen') || '';
+    const xa = urlParams.get('xa') || '';
+    
+    const exportUrl = `${config.API_URL}/api/bao-cao/export-html?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(huyen)}&xa=${encodeURIComponent(xa)}`;
+    
+    // Mở cửa sổ mới để hiển thị HTML (sẽ tự động mở hộp thoại in)
+    window.open(exportUrl, '_blank');
+  };
 
   if (!reportData)
     return (
@@ -24,9 +56,32 @@ const ThongKeBaoCaoMatRung = () => {
   if (Array.isArray(reportData)) {
     return (
       <div className="p-6 font-sans max-h-[calc(100vh-100px)] overflow-y-auto">
-        <h2 className="text-center text-lg font-bold mb-4">
-          THỐNG KÊ KẾT QUẢ DỰ BÁO MẤT RỪNG
-        </h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-center text-lg font-bold">
+            THỐNG KÊ KẾT QUẢ DỰ BÁO MẤT RỪNG
+          </h2>
+          
+          {/* Thêm các nút xuất file */}
+          <div className="flex gap-2">
+            <button 
+              onClick={handleExportDocx}
+              className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm"
+              title="Xuất file Word"
+            >
+              <FaFileWord className="text-lg" />
+              <span>Xuất DOCX</span>
+            </button>
+            <button 
+              onClick={handleExportPdf}
+              className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-sm"
+              title="In thành PDF"
+            >
+              <FaFilePdf className="text-lg" />
+              <span>In PDF</span>
+            </button>
+          </div>
+        </div>
+        
         <div className="overflow-auto border border-gray-300 rounded shadow px-6 pt-2 pb-6">
           <div className="text-sm mb-2">
             <div className="flex justify-between font-semibold">
@@ -95,7 +150,7 @@ const ThongKeBaoCaoMatRung = () => {
     );
   }
 
-  // Nếu reportData là object => biểu đồ
+  // Nếu reportData không phải mảng => hiển thị biểu đồ
   const dataTinCay = Object.entries(reportData).map(([huyen, value]) => ({
     name: huyen,
     "Chưa xác minh": value["Chưa xác minh"] || 0,

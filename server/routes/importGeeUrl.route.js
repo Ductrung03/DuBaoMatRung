@@ -43,6 +43,50 @@ async function downloadZip(zipUrl, savePath) {
   console.log("✅ Tải ZIP thành công từ GEE.");
 }
 
+// Hàm mới: Kiểm tra dữ liệu đã tồn tại trong cơ sở dữ liệu
+async function checkDataExists(geoJsonData) {
+  try {
+    if (!geoJsonData || !geoJsonData.features || geoJsonData.features.length === 0) {
+      return false;
+    }
+
+    // Lấy một số mẫu dữ liệu để kiểm tra
+    const samplesToCheck = Math.min(5, geoJsonData.features.length);
+    let existingCount = 0;
+
+    for (let i = 0; i < samplesToCheck; i++) {
+      const feature = geoJsonData.features[i];
+      const props = feature.properties;
+      
+      // Kiểm tra theo các thuộc tính cơ bản của dữ liệu
+      const query = `
+        SELECT COUNT(*) 
+        FROM mat_rung 
+        WHERE start_dau = $1 
+          AND end_sau = $2 
+          AND mahuyen = $3
+      `;
+      
+      const params = [
+        props.start_dau,
+        props.end_sau,
+        props.mahuyen
+      ];
+      
+      const result = await pool.query(query, params);
+      if (result.rows[0].count > 0) {
+        existingCount++;
+      }
+    }
+
+    // Nếu hầu hết các mẫu đều tồn tại, coi như dữ liệu đã tồn tại
+    return (existingCount / samplesToCheck) > 0.7;
+  } catch (err) {
+    console.error("❌ Lỗi khi kiểm tra dữ liệu tồn tại:", err);
+    return false;
+  }
+}
+
 router.post("/", async (req, res) => {
   const { zipUrl } = req.body;
   const tmpDir = path.join(__dirname, "../tmp");
@@ -50,6 +94,7 @@ router.post("/", async (req, res) => {
   const extractPath = path.join(tmpDir, "unzip");
   const sqlPath = path.join(tmpDir, "import.sql");
   const modifiedSqlPath = path.join(tmpDir, "import_modified.sql");
+  const geoJsonPath = path.join(tmpDir, "data.geojson");
 
   try {
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
@@ -74,6 +119,39 @@ router.post("/", async (req, res) => {
       console.log("⚠️ Không thể kiểm tra cấu trúc shapefile:", err.message);
     }
 
+    // Chuyển shapefile sang GeoJSON để kiểm tra dữ liệu
+    console.log("🔍 Chuyển đổi shapefile sang GeoJSON để kiểm tra...");
+    const ogrCmd = `ogr2ogr -f "GeoJSON" "${geoJsonPath}" "${fullShpPath}"`;
+    await exec(ogrCmd);
+    
+    // Đọc GeoJSON
+    const geoJsonData = JSON.parse(fs.readFileSync(geoJsonPath, 'utf8'));
+    console.log(`📊 Số features trong GeoJSON: ${geoJsonData.features.length}`);
+
+    // Kiểm tra xem dữ liệu đã tồn tại chưa
+    const dataExists = await checkDataExists(geoJsonData);
+    if (dataExists) {
+      console.log("⚠️ Dữ liệu đã tồn tại trong cơ sở dữ liệu!");
+      
+      // Dọn dẹp file tạm
+      try {
+        if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
+        if (fs.existsSync(sqlPath)) fs.unlinkSync(sqlPath);
+        if (fs.existsSync(modifiedSqlPath)) fs.unlinkSync(modifiedSqlPath);
+        if (fs.existsSync(geoJsonPath)) fs.unlinkSync(geoJsonPath);
+        if (fs.existsSync(extractPath)) fs.rmSync(extractPath, { recursive: true });
+      } catch (cleanupErr) {
+        console.error("⚠️ Lỗi khi dọn dẹp file tạm:", cleanupErr);
+      }
+      
+      return res.json({
+        message: "⚠️ Dữ liệu đã tồn tại trong cơ sở dữ liệu!",
+        alreadyExists: true,
+        table: "mat_rung",
+        recordsAdded: 0
+      });
+    }
+
     // Đếm số lượng bản ghi hiện tại trong bảng mat_rung trước khi import
     const countBefore = await pool.query("SELECT COUNT(*) FROM mat_rung");
     console.log(`📊 Số bản ghi hiện tại trong bảng mat_rung: ${countBefore.rows[0].count}`);
@@ -94,15 +172,6 @@ router.post("/", async (req, res) => {
     // Thử phương pháp trực tiếp qua node-postgres trước
     console.log("🔍 Thử phương pháp import trực tiếp qua node-postgres...");
     try {
-      // Đọc dữ liệu từ shapefile sử dụng ogr2ogr để chuyển thành GeoJSON
-      const geoJsonPath = path.join(tmpDir, "data.geojson");
-      const ogrCmd = `ogr2ogr -f "GeoJSON" "${geoJsonPath}" "${fullShpPath}"`;
-      await exec(ogrCmd);
-      
-      // Đọc GeoJSON
-      const geoJsonData = JSON.parse(fs.readFileSync(geoJsonPath, 'utf8'));
-      console.log(`📊 Số features trong GeoJSON: ${geoJsonData.features.length}`);
-      
       // Thực hiện INSERT trực tiếp qua node-postgres
       const client = await pool.connect();
       try {
@@ -267,7 +336,7 @@ router.post("/", async (req, res) => {
       if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
       if (fs.existsSync(sqlPath)) fs.unlinkSync(sqlPath);
       if (fs.existsSync(modifiedSqlPath)) fs.unlinkSync(modifiedSqlPath);
-      if (fs.existsSync(path.join(tmpDir, "data.geojson"))) fs.unlinkSync(path.join(tmpDir, "data.geojson"));
+      if (fs.existsSync(geoJsonPath)) fs.unlinkSync(geoJsonPath);
       if (fs.existsSync(extractPath)) fs.rmSync(extractPath, { recursive: true });
     } catch (cleanupErr) {
       console.error("⚠️ Lỗi khi dọn dẹp file tạm:", cleanupErr);
@@ -298,7 +367,7 @@ router.post("/", async (req, res) => {
       if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
       if (fs.existsSync(sqlPath)) fs.unlinkSync(sqlPath);
       if (fs.existsSync(modifiedSqlPath)) fs.unlinkSync(modifiedSqlPath);
-      if (fs.existsSync(path.join(tmpDir, "data.geojson"))) fs.unlinkSync(path.join(tmpDir, "data.geojson"));
+      if (fs.existsSync(geoJsonPath)) fs.unlinkSync(geoJsonPath);
       if (fs.existsSync(extractPath)) fs.rmSync(extractPath, { recursive: true });
     } catch (cleanupErr) {
       console.error("⚠️ Lỗi khi dọn dẹp file tạm:", cleanupErr);

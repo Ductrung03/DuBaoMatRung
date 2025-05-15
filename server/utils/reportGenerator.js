@@ -4,6 +4,12 @@ const { Document, Packer, Paragraph, Table, TableRow, TableCell, TextRun, Alignm
 const createCell = (text, bold = false, align = AlignmentType.CENTER) =>
   new TableCell({
     children: [new Paragraph({ alignment: align, children: [new TextRun({ text, bold })] })],
+    borders: {
+      top: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+      bottom: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+      left: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+      right: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+    }
   });
 
 // Hàm xuất file Word (.docx)
@@ -34,6 +40,12 @@ async function createReportDocx(data, { fromDate, toDate, huyen, xa }) {
           // Bảng dữ liệu
           new Table({
             width: { size: 100, type: WidthType.PERCENTAGE },
+            borders: {
+              top: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+              bottom: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+              left: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+              right: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+            },
             rows: [
               new TableRow({
                 tableHeader: true,
@@ -61,7 +73,7 @@ async function createReportDocx(data, { fromDate, toDate, huyen, xa }) {
                     createCell(row.y ? row.y.toString() : ""),
                     createCell(row.tk || ""),
                     createCell(row.khoanh || ""),
-                    createCell(row.area ? `${row.area.toFixed(2)} ha` : ""),
+                    createCell(row.area ? `${(row.area / 10000).toFixed(1)} ha` : ""),
                     createCell(row.ghichu || ""),
                   ],
                 })
@@ -80,7 +92,7 @@ async function createReportDocx(data, { fromDate, toDate, huyen, xa }) {
           }),
           new Paragraph({
             alignment: AlignmentType.RIGHT,
-            children: [new TextRun({ text: "Chỉ cục trưởng", bold: true })],
+            children: [new TextRun({ text: "Chi cục trưởng", bold: true })],
           }),
 
           new Paragraph({ text: "" }),
