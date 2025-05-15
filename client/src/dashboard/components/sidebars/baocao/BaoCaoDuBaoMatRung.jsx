@@ -13,6 +13,8 @@ import {
 import { useReport } from "../../../contexts/ReportContext";
 import { useNavigate } from "react-router-dom";
 import config from "../../../../config";
+import { toast } from "react-toastify";
+import { ClipLoader } from 'react-spinners';
 
 ChartJS.register(
   BarElement,
@@ -21,6 +23,16 @@ ChartJS.register(
   Legend,
   Tooltip,
   Title
+);
+
+// Overlay loading component
+const LoadingOverlay = ({ message }) => (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg max-w-md text-center">
+      <ClipLoader color="#027e02" size={50} />
+      <p className="mt-4 text-forest-green-primary font-medium">{message}</p>
+    </div>
+  </div>
 );
 
 const BaoCaoDuBaoMatRung = () => {
@@ -35,8 +47,12 @@ const BaoCaoDuBaoMatRung = () => {
   const [chartData, setChartData] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isForecastOpen, setIsForecastOpen] = useState(true);
+  
+  // Thêm state cho loading
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("");
 
-  const { setReportData } = useReport();
+  const { setReportData, setReportLoading } = useReport();
   const navigate = useNavigate(); 
 
   useEffect(() => {
@@ -47,6 +63,7 @@ const BaoCaoDuBaoMatRung = () => {
         setHuyenList(data);
       } catch (err) {
         console.error("Lỗi lấy huyện:", err);
+        toast.error("Không thể tải danh sách huyện. Vui lòng thử lại sau.");
       }
     };
     fetchInitialData();
@@ -61,6 +78,7 @@ const BaoCaoDuBaoMatRung = () => {
       setXaList(data);
     } catch (err) {
       console.error("Lỗi lấy xã:", err);
+      toast.error("Không thể tải danh sách xã. Vui lòng thử lại sau.");
     }
   };
 
@@ -73,6 +91,23 @@ const BaoCaoDuBaoMatRung = () => {
   };
 
   const handleBaoCao = async () => {
+    // Kiểm tra thông tin nhập vào
+    if (!fromDate || !toDate) {
+      toast.warning("Vui lòng chọn ngày bắt đầu và kết thúc");
+      return;
+    }
+    
+    if (!reportType) {
+      toast.warning("Vui lòng chọn loại báo cáo");
+      return;
+    }
+    
+    setIsLoading(true);
+    setLoadingMessage("Đang tạo báo cáo...");
+    
+    // Cập nhật trạng thái loading cho cả trang Thống kê báo cáo
+    setReportLoading(true);
+
     const params = new URLSearchParams({
       fromDate,
       toDate,
@@ -82,23 +117,68 @@ const BaoCaoDuBaoMatRung = () => {
     });
 
     try {
+      // Giả lập trạng thái loading progress
+      const progressInterval = setInterval(() => {
+        const newMessage = getNextLoadingMessage(loadingMessage);
+        setLoadingMessage(newMessage);
+      }, 800);
+
       const res = await fetch(`${config.API_URL}/api/bao-cao/tra-cuu-du-lieu-bao-mat-rung?${params.toString()}`);
+      
+      clearInterval(progressInterval);
+      
       if (!res.ok) {
         throw new Error(`Lỗi ${res.status}: ${res.statusText}`);
       }
 
       const data = await res.json();
+      
       if (reportType === "Văn bản" || reportType === "Biểu đồ") {
-        setReportData(data.data);
+        if (!data.data || (Array.isArray(data.data) && data.data.length === 0)) {
+          toast.info("Không tìm thấy dữ liệu phù hợp với điều kiện tìm kiếm");
+          setReportLoading(false);
+        } else {
+          setReportData(data.data);
+          
+          // Đợi một chút để trạng thái loading được hiển thị rõ ràng
+          setTimeout(() => {
+            // Lưu các tham số vào URL để sử dụng khi xuất báo cáo
+            navigate({
+              pathname: "/dashboard/baocao",
+              search: `?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(selectedHuyen)}&xa=${encodeURIComponent(selectedXa)}`
+            });
+            
+            toast.success("Đã tạo báo cáo thành công!");
+            setReportLoading(false);
+          }, 1000);
+        }
       }
     } catch (err) {
       console.error("Lỗi tạo báo cáo:", err);
-      alert("Không thể tạo báo cáo: " + err.message);
+      toast.error("Không thể tạo báo cáo: " + err.message);
+      setReportLoading(false);
+    } finally {
+      setIsLoading(false);
     }
+  };
+  
+  // Hàm lấy thông báo loading tiếp theo theo vòng tròn
+  const getNextLoadingMessage = (currentMessage) => {
+    const messages = [
+      "Đang tạo báo cáo...",
+      "Đang truy vấn dữ liệu...",
+      "Đang xử lý kết quả...",
+      "Đang hoàn thiện báo cáo..."
+    ];
+    const currentIndex = messages.indexOf(currentMessage);
+    return messages[(currentIndex + 1) % messages.length];
   };
 
   return (
     <div>
+      {/* Hiển thị overlay loading khi đang xử lý */}
+      {isLoading && <LoadingOverlay message={loadingMessage} />}
+    
       <div
         className="bg-forest-green-primary text-white py-0.2 px-4 rounded-full text-sm font-medium uppercase tracking-wide text-left shadow-md w-full cursor-pointer"
         onClick={() => setIsForecastOpen(!isForecastOpen)}
@@ -117,6 +197,7 @@ const BaoCaoDuBaoMatRung = () => {
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
                 className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+                disabled={isLoading}
               />
             </div>
 
@@ -128,6 +209,7 @@ const BaoCaoDuBaoMatRung = () => {
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
                 className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+                disabled={isLoading}
               />
             </div>
 
@@ -138,6 +220,7 @@ const BaoCaoDuBaoMatRung = () => {
                 value={selectedHuyen}
                 onChange={handleHuyenChange}
                 className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+                disabled={isLoading}
               >
                 <option value="">Chọn huyện</option>
                 {huyenList.map((item, i) => (
@@ -155,6 +238,7 @@ const BaoCaoDuBaoMatRung = () => {
                 value={selectedXa}
                 onChange={handleXaChange}
                 className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+                disabled={isLoading}
               >
                 <option value="">Chọn xã</option>
                 {xaList.map((item, i) => (
@@ -172,6 +256,7 @@ const BaoCaoDuBaoMatRung = () => {
                 value={reportType}
                 onChange={(e) => setReportType(e.target.value)}
                 className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+                disabled={isLoading}
               >
                 <option value="">Chọn loại</option>
                 {loaiBaoCaoList.map((type, idx) => (
@@ -185,9 +270,17 @@ const BaoCaoDuBaoMatRung = () => {
 
           <button
             onClick={handleBaoCao}
-            className="w-36 bg-green-300 hover:bg-green-400 text-black font-medium py-1 px-3 rounded-full text-center mt-2 self-center"
+            disabled={isLoading}
+            className={`w-36 ${isLoading ? 'bg-gray-400' : 'bg-green-300 hover:bg-green-400'} text-black font-medium py-1 px-3 rounded-full text-center mt-2 self-center flex justify-center items-center transition-all`}
           >
-            Báo cáo
+            {isLoading ? (
+              <>
+                <ClipLoader color="#333333" size={16} className="mr-2" />
+                <span>Đang xử lý...</span>
+              </>
+            ) : (
+              "Báo cáo"
+            )}
           </button>
         </div>
       )}
