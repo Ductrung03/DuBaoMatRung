@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -38,6 +37,10 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         try {
           const res = await axios.get(`${config.API_URL}/api/auth/me`);
+          // Log thông tin người dùng từ API
+          console.log("User data from /api/auth/me:", res.data.user);
+          
+          // Lưu dữ liệu user, bao gồm district_id ở dạng TCVN3
           setUser(res.data.user);
         } catch (err) {
           console.error("Token không hợp lệ hoặc đã hết hạn:", err);
@@ -66,6 +69,10 @@ export const AuthProvider = ({ children }) => {
       });
 
       console.log("✅ Kết quả đăng nhập:", res.data);
+      
+      // Lưu token và thông tin user (bao gồm district_id dạng TCVN3)
+      console.log("✅ Thông tin user từ API:", res.data.user);
+      console.log("✅ district_id từ API (TCVN3):", res.data.user.district_id);
       
       setToken(res.data.token);
       setUser(res.data.user);
@@ -108,10 +115,11 @@ export const AuthProvider = ({ children }) => {
   // Kiểm tra vai trò
   const isAdmin = () => user && user.role === "admin";
   
-  // Lấy mã huyện của người dùng
+  // Lấy mã huyện của người dùng (TCVN3)
   const getUserDistrictId = () => user?.district_id || null;
   
   // Kiểm tra xem người dùng có quyền truy cập dữ liệu của huyện cụ thể không
+  // Lưu ý: Cả districtId và user.district_id đều phải ở cùng định dạng (TCVN3)
   const canAccessDistrict = (districtId) => {
     // Admin có thể truy cập tất cả các huyện
     if (isAdmin()) return true;
@@ -119,8 +127,11 @@ export const AuthProvider = ({ children }) => {
     // Nếu không cung cấp districtId, cho phép truy cập (để hiển thị dữ liệu chung)
     if (!districtId) return true;
     
-    // Người dùng bình thường chỉ có thể truy cập dữ liệu của huyện họ được phân công
-    return user?.district_id === districtId;
+    // Nếu người dùng không có district_id, không cho phép truy cập
+    if (!user?.district_id) return false;
+    
+    // So sánh chính xác vì cả hai đều là TCVN3
+    return user.district_id === districtId;
   };
 
   return (

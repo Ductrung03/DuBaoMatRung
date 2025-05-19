@@ -16,6 +16,7 @@ import config from "../../../../config";
 import { toast } from "react-toastify";
 import { ClipLoader } from 'react-spinners';
 import { useAuth } from "../../../contexts/AuthContext";
+import DistrictDropdown from "../../DistrictDropdown";
 
 ChartJS.register(
   BarElement,
@@ -38,7 +39,6 @@ const LoadingOverlay = ({ message }) => (
 
 const BaoCaoDuBaoMatRung = () => {
   const loaiBaoCaoList = ["Văn bản", "Biểu đồ"];
-  const [huyenList, setHuyenList] = useState([]);
   const [selectedHuyen, setSelectedHuyen] = useState("");
   const [xaList, setXaList] = useState([]);
   const [selectedXa, setSelectedXa] = useState("");
@@ -58,47 +58,34 @@ const BaoCaoDuBaoMatRung = () => {
   const { user, isAdmin } = useAuth();
 
   useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const res = await fetch(`${config.API_URL}/api/dropdown/huyen`);
-        let data = await res.json();
-        
-        // Nếu không phải admin, lọc danh sách huyện theo huyện của người dùng
-        if (!isAdmin() && user?.district_id) {
-          data = data.filter(huyen => huyen.value === user.district_id);
-          
-          // Nếu chỉ có một huyện (huyện của người dùng), tự động chọn huyện đó
-          if (data.length === 1) {
-            setSelectedHuyen(data[0].value);
-            // Tự động load danh sách xã của huyện đó
-            const xaRes = await fetch(
-              `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(data[0].value)}`
-            );
-            const xaData = await xaRes.json();
-            setXaList(xaData);
-          }
+    // Hàm này sẽ được thực hiện khi danh sách huyện thay đổi hoặc khi có huyện được chọn
+    const fetchXa = async () => {
+      if (selectedHuyen) {
+        try {
+          setIsLoading(true);
+          const xaRes = await fetch(
+            `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(selectedHuyen)}`
+          );
+          const xaData = await xaRes.json();
+          setXaList(xaData);
+        } catch (err) {
+          console.error("Lỗi lấy xã:", err);
+          toast.error("Không thể tải danh sách xã. Vui lòng thử lại sau.");
+        } finally {
+          setIsLoading(false);
         }
-        
-        setHuyenList(data);
-      } catch (err) {
-        console.error("Lỗi lấy huyện:", err);
-        toast.error("Không thể tải danh sách huyện. Vui lòng thử lại sau.");
+      } else {
+        setXaList([]);
       }
     };
-    fetchInitialData();
-  }, [isAdmin, user]);
+    
+    fetchXa();
+  }, [selectedHuyen]);
   
-  const handleHuyenChange = async (e) => {
+  const handleHuyenChange = (e) => {
     const huyen = e.target.value;
     setSelectedHuyen(huyen);
-    try {
-      const res = await fetch(`${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`);
-      const data = await res.json();
-      setXaList(data);
-    } catch (err) {
-      console.error("Lỗi lấy xã:", err);
-      toast.error("Không thể tải danh sách xã. Vui lòng thử lại sau.");
-    }
+    setSelectedXa(""); // Reset xã khi thay đổi huyện
   };
 
   const handleXaChange = (e) => {
@@ -245,19 +232,15 @@ const BaoCaoDuBaoMatRung = () => {
             {/* Huyện */}
             <div className="flex items-center gap-1">
               <label className="text-sm font-medium w-40">Huyện</label>
-              <select
-                value={selectedHuyen}
-                onChange={handleHuyenChange}
-                className={`w-36 border border-green-400 rounded-md px-2 py-1 ${!isAdmin() && user?.district_id ? "bg-gray-100" : "bg-white"}`}
-                disabled={isLoading || (!isAdmin() && user?.district_id)}
-              >
-                <option value="">Chọn huyện</option>
-                {huyenList.map((item, i) => (
-                  <option key={i} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
+              <div className="w-36">
+                <DistrictDropdown
+                  value={selectedHuyen}
+                  onChange={handleHuyenChange}
+                  isLoading={isLoading}
+                  onFocus={() => handleDropdownToggle("huyen", true)}
+                  onBlur={() => handleDropdownToggle("huyen", false)}
+                />
+              </div>
             </div>
 
             {/* Xã */}

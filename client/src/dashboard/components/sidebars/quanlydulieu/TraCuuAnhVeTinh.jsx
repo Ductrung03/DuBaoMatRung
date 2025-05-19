@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import Select from "../../Select";
 import { useAuth } from "../../../contexts/AuthContext";
 import config from "../../../../config";
+import DistrictDropdown from "../../DistrictDropdown";
 
 const TraCuuAnhVeTinh = () => {
-  const [huyenList, setHuyenList] = useState([]);
-  const [selectedHuyen, setSelectedHuyen] = useState("");
   const [xaList, setXaList] = useState([]);
+  const [selectedHuyen, setSelectedHuyen] = useState("");
   const [selectedXa, setSelectedXa] = useState("");
   const [loading, setLoading] = useState(false);
   const [isForecastOpen, setIsForecastOpen] = useState(true);
@@ -16,54 +16,33 @@ const TraCuuAnhVeTinh = () => {
   
   const { user, isAdmin } = useAuth();
 
-  // Tải danh sách huyện khi component mount
   useEffect(() => {
-    const fetchHuyenList = async () => {
+    // Khi huyện thay đổi, tải danh sách xã tương ứng
+    const fetchXaList = async () => {
+      if (!selectedHuyen) return;
+      
       try {
         setLoading(true);
-        const response = await fetch(`${config.API_URL}/api/dropdown/huyen`);
-        let data = await response.json();
-        
-        // Nếu không phải admin, lọc danh sách huyện theo huyện của người dùng
-        if (!isAdmin() && user?.district_id) {
-          data = data.filter(huyen => huyen.value === user.district_id);
-          
-          // Nếu chỉ có một huyện (huyện của người dùng), tự động chọn huyện đó
-          if (data.length === 1) {
-            setSelectedHuyen(data[0].value);
-            // Tự động load danh sách xã của huyện đó
-            const xaRes = await fetch(
-              `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(data[0].value)}`
-            );
-            const xaData = await xaRes.json();
-            setXaList(xaData);
-          }
-        }
-        
-        setHuyenList(data);
-        setLoading(false);
+        const res = await fetch(
+          `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(selectedHuyen)}`
+        );
+        const data = await res.json();
+        setXaList(data);
       } catch (err) {
-        console.error("Lỗi khi tải danh sách huyện:", err);
+        console.error("Lỗi lấy xã:", err);
+        setLoading(false);
+      } finally {
         setLoading(false);
       }
     };
     
-    fetchHuyenList();
-  }, [isAdmin, user]);
+    fetchXaList();
+  }, [selectedHuyen]);
 
-  const handleHuyenChange = async (e) => {
+  const handleHuyenChange = (e) => {
     const huyen = e.target.value;
     setSelectedHuyen(huyen);
-    try {
-      setLoading(true);
-      const res = await fetch(`${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`);
-      const data = await res.json();
-      setXaList(data);
-      setLoading(false);
-    } catch (err) {
-      console.error("Lỗi lấy xã:", err);
-      setLoading(false);
-    }
+    setSelectedXa(""); // Reset xã khi thay đổi huyện
   };
 
   const handleXaChange = (e) => {
@@ -95,7 +74,7 @@ const TraCuuAnhVeTinh = () => {
               <div className="relative w-36">
                 <input
                   type="date"
-                  className="bw-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                  className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                 />
               </div>
             </div>
@@ -103,23 +82,14 @@ const TraCuuAnhVeTinh = () => {
             {/* Huyện */}
             <div className="flex items-center gap-1">
               <label className="text-sm font-medium w-40">Huyện</label>
-              <div className="relative w-36">
-                <select
+              <div className="w-36">
+                <DistrictDropdown
                   value={selectedHuyen}
                   onChange={handleHuyenChange}
-                  disabled={loading || (!isAdmin() && user?.district_id)}
-                  className={`w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none ${!isAdmin() && user?.district_id ? "bg-gray-100" : "bg-white"} focus:outline-none focus:ring-2 focus:ring-green-400`}
+                  isLoading={loading}
                   onFocus={() => handleDropdownToggle("huyen", true)}
                   onBlur={() => handleDropdownToggle("huyen", false)}
-                >
-                  <option value="">Chọn huyện</option>
-                  {huyenList.map((huyen, index) => (
-                    <option key={index} value={huyen.value}>
-                      {huyen.label}
-                    </option>
-                  ))}
-                </select>
-                <Select isOpen={openDropdown === "huyen"} />
+                />
               </div>
             </div>
 
@@ -151,7 +121,14 @@ const TraCuuAnhVeTinh = () => {
             className="w-36 bg-forest-green-gray hover:bg-green-200 text-black-800 font-medium py-0.5 px-3 rounded-full text-center mt-2 self-center"
             disabled={loading}
           >
-            {loading ? 'Đang tải...' : 'Tra cứu'}
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+                <span>Đang tải...</span>
+              </div>
+            ) : (
+              "Tra cứu"
+            )}
           </button>
         </div>
       )}

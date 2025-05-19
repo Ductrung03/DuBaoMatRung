@@ -113,7 +113,7 @@ exports.getCurrentUser = async (req, res) => {
     console.log(`🔍 Đang lấy thông tin người dùng ID: ${req.user.id}`);
     
     const userResult = await pool.query(
-      "SELECT id, username, full_name, role, is_active, created_at, last_login FROM users WHERE id = $1",
+      "SELECT id, username, full_name, role, is_active, created_at, last_login,district_id FROM users WHERE id = $1",
       [req.user.id]
     );
 

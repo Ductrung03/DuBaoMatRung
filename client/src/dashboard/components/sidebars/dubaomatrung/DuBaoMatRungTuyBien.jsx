@@ -2,82 +2,52 @@ import React, { useState, useEffect } from "react";
 import Select from "../../Select";
 import { useAuth } from "../../../contexts/AuthContext";
 import config from "../../../../config";
+import DistrictDropdown from "../../DistrictDropdown";
 
 const DuBaoMatRungTuyBien = () => {
   const { user, isAdmin } = useAuth();
-  const [administrativeUnits, setAdministrativeUnits] = useState([]);
+  const [xaList, setXaList] = useState([]);
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   const [isInputOpen, setInputOpen] = useState(true);
   const [isDownloadOpen, setDownloadOpen] = useState(true);
   const [selectedHuyen, setSelectedHuyen] = useState("");
-  const [xaList, setXaList] = useState([]);
+  const [selectedXa, setSelectedXa] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Trạng thái mở cho từng dropdown
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  // Tải danh sách huyện dựa trên quyền người dùng
   useEffect(() => {
-    const fetchHuyenList = async () => {
+    // Khi huyện thay đổi, tải danh sách xã tương ứng
+    const fetchXaList = async () => {
+      if (!selectedHuyen) return;
+      
       try {
         setLoading(true);
-        const response = await fetch(`${config.API_URL}/api/dropdown/huyen`);
-        let huyenData = await response.json();
-        
-        // Nếu không phải admin, lọc theo huyện của người dùng
-        if (!isAdmin() && user?.district_id) {
-          huyenData = huyenData.filter(huyen => huyen.value === user.district_id);
-          
-          // Nếu chỉ có một huyện (huyện của người dùng), tự động chọn huyện đó
-          if (huyenData.length === 1) {
-            setSelectedHuyen(huyenData[0].label);
-            // Tự động load danh sách xã của huyện đó
-            const xaRes = await fetch(
-              `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyenData[0].value)}`
-            );
-            const xaData = await xaRes.json();
-            setXaList(xaData.map(item => item.label));
-          }
-        }
-        
-        // Chuyển đổi dữ liệu thành định dạng phù hợp với component
-        const formattedData = huyenData.map(huyen => ({
-          district: huyen.label,
-          communes: [] // Mặc định là mảng rỗng, sẽ được điền khi chọn huyện
-        }));
-        
-        setAdministrativeUnits(formattedData);
-        setLoading(false);
+        const res = await fetch(
+          `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(selectedHuyen)}`
+        );
+        const data = await res.json();
+        setXaList(data);
       } catch (err) {
-        console.error("Lỗi khi tải danh sách huyện:", err);
+        console.error("Lỗi khi tải danh sách xã:", err);
+        setXaList([]);
+      } finally {
         setLoading(false);
       }
     };
     
-    fetchHuyenList();
-  }, [isAdmin, user]);
+    fetchXaList();
+  }, [selectedHuyen]);
 
-  const handleHuyenChange = async (e) => {
+  const handleHuyenChange = (e) => {
     const huyen = e.target.value;
     setSelectedHuyen(huyen);
+    setSelectedXa(""); // Reset xã khi thay đổi huyện
+  };
 
-    try {
-      // Tìm mã huyện dựa trên tên huyện
-      const huyenObject = administrativeUnits.find(item => item.district === huyen);
-      if (huyenObject) {
-        const huyenCode = huyenObject.value || huyen;
-        
-        // Lấy danh sách xã từ API dựa trên mã hoặc tên huyện
-        const res = await fetch(`${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyen)}`);
-        const data = await res.json();
-        setXaList(data.map(item => item.label));
-      } else {
-        setXaList([]);
-      }
-    } catch (err) {
-      console.error("Lỗi khi tải danh sách xã:", err);
-      setXaList([]);
-    }
+  const handleXaChange = (e) => {
+    setSelectedXa(e.target.value);
   };
 
   // Hàm xử lý khi dropdown focus hoặc blur
@@ -111,37 +81,31 @@ const DuBaoMatRungTuyBien = () => {
                 <div className="font-medium text-sm mb-1 ">Khu vực</div>
                 <div className="flex items-center justify-between mb-1 pl-4 ">
                   <label className="text-sm">Huyện</label>
-                  <div className="relative w-36">
-                    <select
+                  <div className="w-36">
+                    <DistrictDropdown
                       value={selectedHuyen}
                       onChange={handleHuyenChange}
-                      disabled={!isAdmin() && user?.district_id}
-                      className={`w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none ${!isAdmin() && user?.district_id ? "bg-gray-100" : "bg-white"} focus:outline-none focus:ring-2 focus:ring-green-400`}
+                      isLoading={loading}
                       onFocus={() => handleDropdownToggle("huyen", true)}
                       onBlur={() => handleDropdownToggle("huyen", false)}
-                    >
-                      <option value="">Chọn huyện</option>
-                      {administrativeUnits.map((item, index) => (
-                        <option key={index} value={item.district}>
-                          {item.district}
-                        </option>
-                      ))}
-                    </select>
-                    <Select isOpen={openDropdown === "huyen"} />
+                    />
                   </div>
                 </div>
                 <div className="flex items-center justify-between mb-2 pl-4">
                   <label className="text-sm">Xã</label>
                   <div className="relative w-36">
                     <select
+                      value={selectedXa}
+                      onChange={handleXaChange}
+                      disabled={loading}
                       className="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                       onFocus={() => handleDropdownToggle("xa", true)}
                       onBlur={() => handleDropdownToggle("xa", false)}
                     >
                       <option value="">Chọn xã</option>
                       {xaList.map((xa, index) => (
-                        <option key={index} value={xa}>
-                          {xa}
+                        <option key={index} value={xa.value}>
+                          {xa.label}
                         </option>
                       ))}
                     </select>
@@ -154,14 +118,14 @@ const DuBaoMatRungTuyBien = () => {
                   <label className="text-sm">Ngày bắt đầu</label>
                   <input
                     type="date"
-                    className="bw-full border border-green-400 rounded-md py-0.2   pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
                 <div className="flex items-center justify-between mb-2 pl-4">
                   <label className="text-sm">Ngày kết thúc</label>
                   <input
                     type="date"
-                    className="bw-full border border-green-400 rounded-md py-0.2   pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
                 <div className="font-medium text-sm mb-1">Kỳ sau:</div>
@@ -169,14 +133,14 @@ const DuBaoMatRungTuyBien = () => {
                   <label className="text-sm">Ngày bắt đầu</label>
                   <input
                     type="date"
-                    className="bw-full border border-green-400 rounded-md py-0.2   pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
                 <div className="flex items-center justify-between mb-2 pl-4">
                   <label className="text-sm">Ngày kết thúc</label>
                   <input
                     type="date"
-                    className="bw-full border border-green-400 rounded-md py-0.2   pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
                 <div className="font-medium text-sm mb-1">

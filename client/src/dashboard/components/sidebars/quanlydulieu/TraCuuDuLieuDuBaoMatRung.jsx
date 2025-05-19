@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Select from "../../Select";
 import { useGeoData } from "../../../contexts/GeoDataContext";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import config from "../../../../config";
 import { useAuth } from "../../../contexts/AuthContext";
+import DistrictDropdown from "../../DistrictDropdown";
 
 // Component hiển thị loading overlay
 const LoadingOverlay = ({ message }) => (
@@ -40,9 +41,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
   const [isLoadingOverlay, setIsLoadingOverlay] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
 
-  const [huyenList, setHuyenList] = useState([]);
   const [selectedHuyen, setSelectedHuyen] = useState("");
-
   const [xaList, setXaList] = useState([]);
   const [selectedXa, setSelectedXa] = useState("");
 
@@ -58,37 +57,18 @@ const TraCuuDuLieuDuBaoMatRung = () => {
   const { user, isAdmin, getUserDistrictId } = useAuth(); // Sử dụng hook useAuth
 
   useEffect(() => {
-    // Gọi huyện và khoảnh + chủ rừng lúc load
+    // Gọi khoảnh + chủ rừng lúc load
     const fetchInitialData = async () => {
       setIsLoading(true);
       try {
-        const [huyenRes, khoanhRes, churungRes] = await Promise.all([
-          fetch(`${config.API_URL}/api/dropdown/huyen`),
+        const [khoanhRes, churungRes] = await Promise.all([
           fetch(`${config.API_URL}/api/dropdown/khoanh`),
           fetch(`${config.API_URL}/api/dropdown/churung`),
         ]);
         
-        let huyenData = await huyenRes.json();
         const khoanhData = await khoanhRes.json();
         const churungData = await churungRes.json();
         
-        // Nếu không phải admin, lọc danh sách huyện theo huyện của người dùng
-        if (!isAdmin() && user?.district_id) {
-          huyenData = huyenData.filter(huyen => huyen.value === user.district_id);
-          
-          // Nếu chỉ có một huyện (huyện của người dùng), tự động chọn huyện đó
-          if (huyenData.length === 1) {
-            setSelectedHuyen(huyenData[0].value);
-            // Tự động load danh sách xã của huyện đó
-            const xaRes = await fetch(
-              `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(huyenData[0].value)}`
-            );
-            const xaData = await xaRes.json();
-            setXaList(xaData);
-          }
-        }
-        
-        setHuyenList(huyenData);
         setKhoanhList(khoanhData.map((item) => item.khoanh));
         setChuRungList(churungData.map((item) => item.churung));
       } catch (error) {
@@ -100,7 +80,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
     };
     
     fetchInitialData();
-  }, [user, isAdmin]); 
+  }, []); 
 
   const handleHuyenChange = async (e) => {
     const huyen = e.target.value;
@@ -327,28 +307,13 @@ const TraCuuDuLieuDuBaoMatRung = () => {
             <div className="flex items-center gap-1">
               <label className="text-sm font-medium w-40">Huyện</label>
               <div className="relative w-36">
-                <select
+                <DistrictDropdown
                   value={selectedHuyen}
                   onChange={handleHuyenChange}
-                  disabled={isLoading || (!isAdmin() && user?.district_id)}
-                  className={`w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none ${!isAdmin() && user?.district_id ? "bg-gray-100" : "bg-white"} focus:outline-none focus:ring-2 focus:ring-green-400`}
+                  isLoading={isLoading}
                   onFocus={() => handleDropdownToggle("huyen", true)}
                   onBlur={() => handleDropdownToggle("huyen", false)}
-                >
-                  <option value="">Chọn huyện</option>
-                  {Array.isArray(huyenList) &&
-                    huyenList
-                      .filter(
-                        (huyen) =>
-                          huyen && typeof huyen === "object" && "value" in huyen
-                      )
-                      .map((huyen, index) => (
-                        <option key={index} value={huyen.value}>
-                          {huyen.label}
-                        </option>
-                      ))}
-                </select>
-                <Select isOpen={openDropdown === "huyen"} />
+                />
               </div>
             </div>
 

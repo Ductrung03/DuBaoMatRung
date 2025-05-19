@@ -81,7 +81,7 @@ const Header = () => {
                 Báo cáo
               </a>
             </Link>
-            <Link to="/dashboard/phathienmatrung">
+            {isAdmin() && (<Link to="/dashboard/phathienmatrung">
               <a
                 className={`text-base font-semibold hover:underline ${
                   isActive("/dashboard/phathienmatrung")
@@ -91,7 +91,8 @@ const Header = () => {
               >
                 Phát hiện mất rừng
               </a>
-            </Link>
+            </Link>)}
+            
             {isAdmin() && (
               <Link to="/dashboard/quanlynguoidung">
                 <a
