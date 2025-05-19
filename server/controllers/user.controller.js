@@ -28,6 +28,8 @@ exports.getAllUsers = async (req, res) => {
 };
 
 // Tạo người dùng mới
+// Sửa hàm createUser trong file server/controllers/user.controller.js
+
 exports.createUser = async (req, res) => {
   const { username, password, full_name, role = "user", district_id = null } = req.body;
 
@@ -38,6 +40,14 @@ exports.createUser = async (req, res) => {
       message: "Vui lòng nhập đầy đủ thông tin người dùng" 
     });
   }
+
+  // In ra thông tin debug
+  console.log("📋 Dữ liệu tạo người dùng:", {
+    username,
+    full_name,
+    role,
+    district_id: district_id || "null"
+  });
 
   try {
     // Kiểm tra xem username đã tồn tại chưa
@@ -57,10 +67,19 @@ exports.createUser = async (req, res) => {
     const password_hash = await hashPassword(password);
 
     // Thêm người dùng vào database
-    const result = await pool.query(
-      "INSERT INTO users (username, password_hash, full_name, role, district_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, username, full_name, role, district_id, is_active, created_at",
-      [username, password_hash, full_name, role, district_id]
-    );
+    // Sử dụng cú pháp SQL chuẩn hơn với tên cột rõ ràng
+    const query = `
+      INSERT INTO users (username, password_hash, full_name, role, district_id) 
+      VALUES ($1, $2, $3, $4, $5) 
+      RETURNING id, username, full_name, role, district_id, is_active, created_at
+    `;
+    
+    console.log("📋 SQL Query:", query);
+    console.log("📋 Parameters:", [username, "***", full_name, role, district_id]);
+
+    const result = await pool.query(query, [username, password_hash, full_name, role, district_id]);
+
+    console.log("✅ Kết quả tạo người dùng:", result.rows[0]);
 
     res.status(201).json({
       success: true,
@@ -71,10 +90,12 @@ exports.createUser = async (req, res) => {
     console.error("❌ Lỗi tạo người dùng:", err);
     res.status(500).json({ 
       success: false, 
-      message: "Lỗi server khi tạo người dùng" 
+      message: "Lỗi server khi tạo người dùng",
+      error: err.message
     });
   }
 };
+
 
 
 // Cập nhật thông tin người dùng
@@ -83,6 +104,16 @@ exports.updateUser = async (req, res) => {
   const { full_name, role, is_active, password, district_id } = req.body;
 
   try {
+    // In ra dữ liệu nhận được để debug
+    console.log("📋 Dữ liệu cập nhật người dùng:", {
+      id,
+      full_name,
+      role,
+      is_active,
+      district_id,
+      password: password ? "***" : undefined
+    });
+
     let query, params;
 
     if (password) {
@@ -106,6 +137,9 @@ exports.updateUser = async (req, res) => {
       params = [full_name, role, is_active, district_id, id];
     }
 
+    console.log("📋 Query cập nhật:", query);
+    console.log("📋 Params:", params);
+
     const result = await pool.query(query, params);
 
     if (result.rows.length === 0) {
@@ -114,6 +148,8 @@ exports.updateUser = async (req, res) => {
         message: "Không tìm thấy người dùng" 
       });
     }
+
+    console.log("✅ Kết quả cập nhật:", result.rows[0]);
 
     res.json({
       success: true,
@@ -124,10 +160,12 @@ exports.updateUser = async (req, res) => {
     console.error("❌ Lỗi cập nhật người dùng:", err);
     res.status(500).json({ 
       success: false, 
-      message: "Lỗi server khi cập nhật người dùng" 
+      message: "Lỗi server khi cập nhật người dùng",
+      error: err.message
     });
   }
 };
+
 
 // Xóa người dùng
 exports.deleteUser = async (req, res) => {
