@@ -1,5 +1,6 @@
 const pool = require("../db");
 const bcrypt = require("bcryptjs");
+const convertTcvn3ToUnicode = require("../utils/convertTcvn3ToUnicode");
 
 // Hàm băm mật khẩu
 const hashPassword = async (password) => {
@@ -11,12 +12,18 @@ const hashPassword = async (password) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, username, full_name, role, is_active, created_at, last_login FROM users ORDER BY created_at DESC"
+      "SELECT id, username, full_name, role, district_id, is_active, created_at, last_login FROM users ORDER BY created_at DESC"
     );
+
+    // Thêm xử lý để hiển thị tên huyện Unicode nếu cần
+    const usersWithDistrictName = result.rows.map(user => ({
+      ...user,
+      district_name: user.district_id ? convertTcvn3ToUnicode(user.district_id) : null
+    }));
 
     res.json({
       success: true,
-      data: result.rows
+      data: usersWithDistrictName
     });
   } catch (err) {
     console.error("❌ Lỗi lấy danh sách người dùng:", err);
@@ -31,13 +38,19 @@ exports.getAllUsers = async (req, res) => {
 // Sửa hàm createUser trong file server/controllers/user.controller.js
 
 exports.createUser = async (req, res) => {
-  const { username, password, full_name, role = "user", district_id = null } = req.body;
+  const {
+    username,
+    password,
+    full_name,
+    role = "user",
+    district_id = null,
+  } = req.body;
 
   // Kiểm tra dữ liệu đầu vào
   if (!username || !password || !full_name) {
-    return res.status(400).json({ 
-      success: false, 
-      message: "Vui lòng nhập đầy đủ thông tin người dùng" 
+    return res.status(400).json({
+      success: false,
+      message: "Vui lòng nhập đầy đủ thông tin người dùng",
     });
   }
 
@@ -46,7 +59,7 @@ exports.createUser = async (req, res) => {
     username,
     full_name,
     role,
-    district_id: district_id || "null"
+    district_id: district_id || "null",
   });
 
   try {
@@ -57,9 +70,9 @@ exports.createUser = async (req, res) => {
     );
 
     if (existingUser.rows.length > 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Tên đăng nhập đã được sử dụng" 
+      return res.status(400).json({
+        success: false,
+        message: "Tên đăng nhập đã được sử dụng",
       });
     }
 
@@ -73,30 +86,40 @@ exports.createUser = async (req, res) => {
       VALUES ($1, $2, $3, $4, $5) 
       RETURNING id, username, full_name, role, district_id, is_active, created_at
     `;
-    
-    console.log("📋 SQL Query:", query);
-    console.log("📋 Parameters:", [username, "***", full_name, role, district_id]);
 
-    const result = await pool.query(query, [username, password_hash, full_name, role, district_id]);
+    console.log("📋 SQL Query:", query);
+    console.log("📋 Parameters:", [
+      username,
+      "***",
+      full_name,
+      role,
+      district_id,
+    ]);
+
+    const result = await pool.query(query, [
+      username,
+      password_hash,
+      full_name,
+      role,
+      district_id,
+    ]);
 
     console.log("✅ Kết quả tạo người dùng:", result.rows[0]);
 
     res.status(201).json({
       success: true,
       message: "Tạo người dùng thành công",
-      data: result.rows[0]
+      data: result.rows[0],
     });
   } catch (err) {
     console.error("❌ Lỗi tạo người dùng:", err);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: "Lỗi server khi tạo người dùng",
-      error: err.message
+      error: err.message,
     });
   }
 };
-
-
 
 // Cập nhật thông tin người dùng
 exports.updateUser = async (req, res) => {
@@ -111,7 +134,7 @@ exports.updateUser = async (req, res) => {
       role,
       is_active,
       district_id,
-      password: password ? "***" : undefined
+      password: password ? "***" : undefined,
     });
 
     let query, params;
@@ -143,9 +166,9 @@ exports.updateUser = async (req, res) => {
     const result = await pool.query(query, params);
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Không tìm thấy người dùng" 
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy người dùng",
       });
     }
 
@@ -154,18 +177,17 @@ exports.updateUser = async (req, res) => {
     res.json({
       success: true,
       message: "Cập nhật người dùng thành công",
-      data: result.rows[0]
+      data: result.rows[0],
     });
   } catch (err) {
     console.error("❌ Lỗi cập nhật người dùng:", err);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: "Lỗi server khi cập nhật người dùng",
-      error: err.message
+      error: err.message,
     });
   }
 };
-
 
 // Xóa người dùng
 exports.deleteUser = async (req, res) => {
@@ -179,21 +201,21 @@ exports.deleteUser = async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Không tìm thấy người dùng" 
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy người dùng",
       });
     }
 
     res.json({
       success: true,
-      message: "Vô hiệu hóa người dùng thành công"
+      message: "Vô hiệu hóa người dùng thành công",
     });
   } catch (err) {
     console.error("❌ Lỗi xóa người dùng:", err);
-    res.status(500).json({ 
-      success: false, 
-      message: "Lỗi server khi xóa người dùng" 
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server khi xóa người dùng",
     });
   }
 };
@@ -209,21 +231,21 @@ exports.activateUser = async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Không tìm thấy người dùng" 
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy người dùng",
       });
     }
 
     res.json({
       success: true,
-      message: "Kích hoạt người dùng thành công"
+      message: "Kích hoạt người dùng thành công",
     });
   } catch (err) {
     console.error("❌ Lỗi kích hoạt người dùng:", err);
-    res.status(500).json({ 
-      success: false, 
-      message: "Lỗi server khi kích hoạt người dùng" 
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server khi kích hoạt người dùng",
     });
   }
 };
@@ -234,34 +256,36 @@ exports.changePassword = async (req, res) => {
   const { old_password, new_password } = req.body;
 
   if (!old_password || !new_password) {
-    return res.status(400).json({ 
-      success: false, 
-      message: "Vui lòng nhập đầy đủ mật khẩu cũ và mới" 
+    return res.status(400).json({
+      success: false,
+      message: "Vui lòng nhập đầy đủ mật khẩu cũ và mới",
     });
   }
 
   try {
     // Kiểm tra xem user có tồn tại không
-    const userResult = await pool.query(
-      "SELECT * FROM users WHERE id = $1",
-      [id]
-    );
+    const userResult = await pool.query("SELECT * FROM users WHERE id = $1", [
+      id,
+    ]);
 
     if (userResult.rows.length === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Không tìm thấy người dùng" 
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy người dùng",
       });
     }
 
     const user = userResult.rows[0];
 
     // Kiểm tra mật khẩu cũ
-    const isPasswordValid = await bcrypt.compare(old_password, user.password_hash);
+    const isPasswordValid = await bcrypt.compare(
+      old_password,
+      user.password_hash
+    );
     if (!isPasswordValid) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Mật khẩu cũ không đúng" 
+      return res.status(400).json({
+        success: false,
+        message: "Mật khẩu cũ không đúng",
       });
     }
 
@@ -269,20 +293,20 @@ exports.changePassword = async (req, res) => {
     const password_hash = await hashPassword(new_password);
 
     // Cập nhật mật khẩu
-    await pool.query(
-      "UPDATE users SET password_hash = $1 WHERE id = $2",
-      [password_hash, id]
-    );
+    await pool.query("UPDATE users SET password_hash = $1 WHERE id = $2", [
+      password_hash,
+      id,
+    ]);
 
     res.json({
       success: true,
-      message: "Đổi mật khẩu thành công"
+      message: "Đổi mật khẩu thành công",
     });
   } catch (err) {
     console.error("❌ Lỗi đổi mật khẩu:", err);
-    res.status(500).json({ 
-      success: false, 
-      message: "Lỗi server khi đổi mật khẩu" 
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server khi đổi mật khẩu",
     });
   }
 };

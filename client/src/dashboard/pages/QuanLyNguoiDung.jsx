@@ -60,6 +60,7 @@ const QuanLyNguoiDung = () => {
 
         setUsers(usersRes.data.data);
         setFilteredUsers(usersRes.data.data);
+        console.log("Danh sách huyện từ API:", huyenRes.data);
         setHuyenList(huyenRes.data);
       } catch (err) {
         console.error("Lỗi lấy dữ liệu ban đầu:", err);
@@ -158,16 +159,27 @@ const QuanLyNguoiDung = () => {
     setShowModal(true);
   };
 
+  // Và khi mở modal chỉnh sửa người dùng
   const openEditModal = (user) => {
+    console.log("User data:", user);
+    console.log("district_id:", user.district_id);
+
     setModalMode("edit");
     setSelectedUser(user);
     setFormData({
       username: user.username,
       full_name: user.full_name,
       role: user.role,
-      district_id: user.district_id, // Ensure district_id is properly set
-      password: "", // Để trống, người dùng có thể nhập mới hoặc không
+      district_id: user.district_id,
+      password: "",
     });
+
+    // Kiểm tra xem district_id có trong danh sách huyện không
+    const matchingDistrict = huyenList.find(
+      (h) => h.value === user.district_id
+    );
+    console.log("Tìm thấy huyện khớp:", matchingDistrict);
+
     setShowModal(true);
   };
 
@@ -253,9 +265,11 @@ const QuanLyNguoiDung = () => {
     return user.id !== currentUser.id;
   };
 
-  // Hiển thị tên huyện theo district_id
+  // Trong file QuanLyNguoiDung.jsx
   const getDistrictName = (districtId) => {
     if (!districtId) return "Không giới hạn";
+
+    // Tìm huyện có value chính xác
     const district = huyenList.find((h) => h.value === districtId);
     return district ? district.label : districtId;
   };
@@ -307,11 +321,23 @@ const QuanLyNguoiDung = () => {
               className="mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-forest-green-primary focus:border-forest-green-primary sm:text-sm"
             >
               <option value="">Không giới hạn (cho admin)</option>
-              {huyenList.map((huyen, idx) => (
-                <option key={idx} value={huyen.value}>
-                  {huyen.label}
-                </option>
-              ))}
+              {huyenList.map((huyen, idx) => {
+                const isSelected = huyen.value === formData.district_id;
+                console.log(
+                  `Option ${idx}: ${huyen.label}, value=${huyen.value}, isSelected=${isSelected}`
+                );
+                return (
+                  <option key={idx} value={huyen.value}>
+                    {huyen.label} {isSelected ? "(selected)" : ""}
+                  </option>
+                );
+              })}
+              {formData.district_id &&
+                !huyenList.some((h) => h.value === formData.district_id) && (
+                  <option value={formData.district_id}>
+                    [{formData.district_id}] (Không tìm thấy trong danh sách)
+                  </option>
+                )}
             </select>
             {formData.role === "admin" && formData.district_id && (
               <p className="text-yellow-600 text-xs mt-1">
