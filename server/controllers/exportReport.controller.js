@@ -131,9 +131,10 @@ exports.exportPdf = async (req, res) => {
       churung: row.churung ? convertTcvn3ToUnicode(row.churung) : "",
       x: row.x ? parseFloat(parseFloat(row.x).toFixed(2)) : null,
       y: row.y ? parseFloat(parseFloat(row.y).toFixed(2)) : null
+      
     }));
 
-    // Thiết lập header đúng - QUAN TRỌNG: Đổi từ application/pdf sang text/html
+    // Thiết lập header đúng
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     
     // Tạo HTML
@@ -144,6 +145,8 @@ exports.exportPdf = async (req, res) => {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Báo cáo mất rừng - ${fromDate} đến ${toDate}</title>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
       <style>
         @page {
           size: A4;
@@ -207,10 +210,21 @@ exports.exportPdf = async (req, res) => {
           font-weight: bold;
         }
         
-        .save-button {
+        .control-panel {
           position: fixed;
           top: 10px;
           right: 10px;
+          background-color: #f9f9f9;
+          padding: 10px;
+          border-radius: 4px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+          z-index: 1000;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        
+        .control-button {
           background-color: #4CAF50;
           color: white;
           padding: 8px 16px;
@@ -218,12 +232,19 @@ exports.exportPdf = async (req, res) => {
           border-radius: 4px;
           cursor: pointer;
           font-weight: bold;
-          z-index: 1000;
+        }
+        
+        .control-button.print {
+          background-color: #2196F3;
+        }
+        
+        .control-button:hover {
+          opacity: 0.8;
         }
         
         .instruction {
           position: fixed;
-          top: 50px;
+          top: 100px;
           right: 10px;
           background-color: #f9f9f9;
           border: 1px solid #ddd;
@@ -234,72 +255,131 @@ exports.exportPdf = async (req, res) => {
           z-index: 1000;
         }
         
+        #report-content {
+          background: white;
+          padding: 20px;
+          margin-bottom: 30px;
+        }
+        
         @media print {
-          .save-button, .instruction {
+          .control-panel, .instruction {
             display: none;
           }
         }
       </style>
     </head>
     <body>
-      <button class="save-button no-print" onclick="window.print()">Lưu PDF</button>
-      
-      <div class="instruction no-print">
-        <p><strong>Hướng dẫn:</strong> Để lưu báo cáo này dưới dạng PDF, hãy:</p>
-        <ol>
-          <li>Nhấn nút "Lưu PDF" màu xanh</li>
-          <li>Hoặc nhấn tổ hợp phím Ctrl+P</li>
-          <li>Trong hộp thoại in, chọn "Lưu dưới dạng PDF"</li>
-        </ol>
+      <div class="control-panel no-print">
+        <button class="control-button" onclick="downloadPDF()">Tải PDF</button>
+        <button class="control-button print" onclick="window.print()">In báo cáo</button>
       </div>
       
-      <h1>THỐNG KÊ KẾT QUẢ DỰ BÁO MẤT RỪNG</h1>
-      
-      <div class="header">
-        <p>Tỉnh: ${huyen || "..........................."}</p>
-        <p>Từ ngày: ${fromDate} Đến ngày: ${toDate}</p>
-      </div>
-      
-      <table>
-        <thead>
-          <tr>
-            <th>TT</th>
-            <th>Huyện</th>
-            <th>Mã xã</th>
-            <th>Xã</th>
-            <th>X</th>
-            <th>Y</th>
-            <th>Tiểu khu</th>
-            <th>Khoảnh</th>
-            <th>Diện tích</th>
-            <th>Ghi chú</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map((item, idx) => `
+      <div id="report-content">
+        <h1>THỐNG KÊ KẾT QUẢ DỰ BÁO MẤT RỪNG</h1>
+        
+        <div class="header">
+          <p>Tỉnh: ${"TP.Lào Cai" || "..........................."}</p>
+          <p>Từ ngày: ${fromDate} Đến ngày: ${toDate}</p>
+        </div>
+        
+        <table>
+          <thead>
             <tr>
-              <td>${idx + 1}</td>
-              <td>${item.huyen || ""}</td>
-              <td>${item.maxa || ""}</td>
-              <td>${item.xa || ""}</td>
-              <td>${item.x || ""}</td>
-              <td>${item.y || ""}</td>
-              <td>${item.tk || ""}</td>
-              <td>${item.khoanh || ""}</td>
-              <td>${item.area ? (item.area / 10000).toFixed(1) + " ha" : ""}</td>
-              <td>${item.ghichu || ""}</td>
+              <th>TT</th>
+              <th>Huyện</th>
+              <th>Mã xã</th>
+              <th>Xã</th>
+              <th>X</th>
+              <th>Y</th>
+              <th>Tiểu khu</th>
+              <th>Khoảnh</th>
+              <th>Diện tích</th>
+              <th>Ghi chú</th>
             </tr>
-          `).join("")}
-        </tbody>
-      </table>
-      
-      <div class="footer">
-        <p>Người tổng hợp</p>
-        <div>
-          <p>........., ngày ...... tháng ...... năm ......</p>
-          <p style="text-align: center;">Chi cục trưởng</p>
+          </thead>
+          <tbody>
+            ${rows.map((item, idx) => `
+              <tr>
+                <td>${idx + 1}</td>
+                <td>${item.huyen || ""}</td>
+                <td>${item.maxa || ""}</td>
+                <td>${item.xa || ""}</td>
+                <td>${item.x || ""}</td>
+                <td>${item.y || ""}</td>
+                <td>${item.tk || ""}</td>
+                <td>${item.khoanh || ""}</td>
+                <td>${item.area ? (item.area / 10000).toFixed(1) + " ha" : ""}</td>
+                <td>${item.ghichu || ""}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+        
+        <div class="footer">
+          <p>Người tổng hợp</p>
+          <div>
+            <p>........., ngày ...... tháng ...... năm ......</p>
+            <p style="text-align: center;">Chi cục trưởng</p>
+          </div>
         </div>
       </div>
+      
+      <script>
+        function downloadPDF() {
+          const { jsPDF } = window.jspdf;
+          
+          // Hiển thị trạng thái đang tải
+          const loadingMessage = document.createElement('div');
+          loadingMessage.style.position = 'fixed';
+          loadingMessage.style.top = '0';
+          loadingMessage.style.left = '0';
+          loadingMessage.style.width = '100%';
+          loadingMessage.style.height = '100%';
+          loadingMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+          loadingMessage.style.display = 'flex';
+          loadingMessage.style.alignItems = 'center';
+          loadingMessage.style.justifyContent = 'center';
+          loadingMessage.style.color = 'white';
+          loadingMessage.style.fontSize = '20px';
+          loadingMessage.style.zIndex = '9999';
+          loadingMessage.textContent = 'Đang tạo file PDF...';
+          document.body.appendChild(loadingMessage);
+          
+          // Lấy phần tử cần chuyển đổi
+          const element = document.getElementById('report-content');
+          
+          // Để đảm bảo tạo PDF đúng, chờ một chút
+          setTimeout(() => {
+            html2canvas(element, {
+              scale: 2, // Tăng scale để cải thiện chất lượng
+              useCORS: true,
+              logging: false
+            }).then(canvas => {
+              const imgData = canvas.toDataURL('image/png');
+              
+              // Xác định kích thước của PDF dựa trên A4
+              const pdf = new jsPDF('p', 'mm', 'a4');
+              const pdfWidth = pdf.internal.pageSize.getWidth();
+              const pdfHeight = pdf.internal.pageSize.getHeight();
+              
+              // Tính toán tỷ lệ để phù hợp với trang A4
+              const imgWidth = canvas.width;
+              const imgHeight = canvas.height;
+              const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+              const imgX = (pdfWidth - imgWidth * ratio) / 2;
+              const imgY = 0;
+              
+              pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+              
+              // Tải PDF
+              pdf.save('bao-cao-mat-rung-${fromDate}-${toDate}.pdf');
+              
+              // Xóa thông báo đang tải
+              document.body.removeChild(loadingMessage);
+            });
+          }, 500);
+        }
+      </script>
     </body>
     </html>
     `;
