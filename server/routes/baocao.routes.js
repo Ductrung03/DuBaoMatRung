@@ -6,5 +6,6 @@ const exportReportController = require("../controllers/exportReport.controller")
 router.get("/tra-cuu-du-lieu-bao-mat-rung", baoCaoController.traCuuDuLieuBaoMatRung);
 router.get("/export-docx", exportReportController.exportDocx);
 router.get("/export-html", exportReportController.exportHtml);
+router.get("/export-pdf", exportReportController.exportPdf); // Thêm endpoint mới
 
 module.exports = router;

@@ -9,9 +9,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useReport } from "../contexts/ReportContext";
-import { FaFileWord, FaFilePdf, FaDownload } from "react-icons/fa";
+import { FaFileWord, FaFilePdf, FaDownload, FaEye } from "react-icons/fa";
 import { ClipLoader } from 'react-spinners';
 import config from "../../config";
+import { toast } from "react-toastify";
 
 // Hiển thị overlay loading khi đang xử lý báo cáo
 const ReportLoadingOverlay = ({ message }) => (
@@ -31,90 +32,72 @@ const ThongKeBaoCaoMatRung = () => {
 
   // Hàm xử lý xuất file DOCX
   const handleExportDocx = () => {
-    // Bật trạng thái loading
-    setIsExportingDocx(true);
-    setLoadingMessage("Đang chuẩn bị xuất file DOCX...");
-    
-    // Lấy tham số từ URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const fromDate = urlParams.get('fromDate') || '';
-    const toDate = urlParams.get('toDate') || '';
-    const huyen = urlParams.get('huyen') || '';
-    const xa = urlParams.get('xa') || '';
-    
-    // Tạo URL để tải file
-    const exportUrl = `${config.API_URL}/api/bao-cao/export-docx?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(huyen)}&xa=${encodeURIComponent(xa)}`;
-    
-    // Tạo iframe ẩn để tải file
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-    
-    // Xử lý sự kiện iframe load xong để tắt trạng thái loading
-    iframe.onload = () => {
+    try {
+      // Lấy tham số từ URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const fromDate = urlParams.get('fromDate') || '';
+      const toDate = urlParams.get('toDate') || '';
+      const huyen = urlParams.get('huyen') || '';
+      const xa = urlParams.get('xa') || '';
+      
+      // Hiển thị loading
+      setIsExportingDocx(true);
+      setLoadingMessage("Đang chuẩn bị tải DOCX...");
+      
+      // Tạo thẻ a để tải file
+      const exportUrl = `${config.API_URL}/api/bao-cao/export-docx?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(huyen)}&xa=${encodeURIComponent(xa)}`;
+      const link = document.createElement('a');
+      link.href = exportUrl;
+      link.setAttribute('download', `bao-cao-mat-rung-${fromDate}-${toDate}.docx`);
+      link.setAttribute('target', '_blank');
+      
+      // Thêm vào DOM, click và xóa
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Thông báo và tắt loading sau 2 giây
+      toast.success("File DOCX đang được tải xuống");
       setTimeout(() => {
         setIsExportingDocx(false);
-        document.body.removeChild(iframe);
-      }, 1000); // Đợi 1 giây để đảm bảo file đã bắt đầu tải xuống
-    };
-    
-    // Xử lý trường hợp lỗi hoặc timeout
-    iframe.onerror = () => {
+      }, 2000);
+    } catch (error) {
+      console.error("Lỗi khi tải DOCX:", error);
+      toast.error("Có lỗi xảy ra khi tải DOCX");
       setIsExportingDocx(false);
-      document.body.removeChild(iframe);
-      alert("Có lỗi xảy ra khi tải xuống file. Vui lòng thử lại sau.");
-    };
-    
-    // Đặt timeout để đảm bảo loading không hiển thị mãi mãi nếu có lỗi
-    setTimeout(() => {
-      if (isExportingDocx) {
-        setIsExportingDocx(false);
-      }
-    }, 10000); // 10 giây timeout
-    
-    // Bắt đầu tải file
-    iframe.src = exportUrl;
+    }
   };
 
-  // Hàm xử lý xuất PDF (sử dụng HTML để in)
+  // Hàm xử lý xuất PDF - sửa thành mở cửa sổ mới hiển thị HTML
   const handleExportPdf = () => {
-    // Bật trạng thái loading
-    setIsExportingPdf(true);
-    setLoadingMessage("Đang chuẩn bị tài liệu PDF...");
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const fromDate = urlParams.get('fromDate') || '';
-    const toDate = urlParams.get('toDate') || '';
-    const huyen = urlParams.get('huyen') || '';
-    const xa = urlParams.get('xa') || '';
-    
-    const exportUrl = `${config.API_URL}/api/bao-cao/export-html?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(huyen)}&xa=${encodeURIComponent(xa)}`;
-    
-    // Mở cửa sổ mới để hiển thị HTML (sẽ tự động mở hộp thoại in)
-    const printWindow = window.open(exportUrl, '_blank');
-    
-    // Xử lý khi cửa sổ đóng hoặc không thể mở
-    if (!printWindow) {
+    try {
+      // Lấy tham số từ URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const fromDate = urlParams.get('fromDate') || '';
+      const toDate = urlParams.get('toDate') || '';
+      const huyen = urlParams.get('huyen') || '';
+      const xa = urlParams.get('xa') || '';
+      
+      // Hiển thị loading
+      setIsExportingPdf(true);
+      setLoadingMessage("Đang chuẩn bị mở trang báo cáo...");
+      
+      // Tạo URL cho trang in PDF
+      const exportUrl = `${config.API_URL}/api/bao-cao/export-pdf?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(huyen)}&xa=${encodeURIComponent(xa)}`;
+      
+      // Mở cửa sổ mới
+      window.open(exportUrl, '_blank');
+      
+      // Thông báo và tắt loading
+      toast.info("Đã mở trang báo cáo. Hãy nhấn nút 'Lưu PDF' ở trang mới để tải về.");
+      setTimeout(() => {
+        setIsExportingPdf(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Lỗi khi mở trang PDF:", error);
+      toast.error("Có lỗi xảy ra khi mở trang báo cáo");
       setIsExportingPdf(false);
-      alert("Trình duyệt đã chặn cửa sổ pop-up. Vui lòng cho phép pop-up và thử lại.");
-      return;
     }
-    
-    // Kiểm tra khi cửa sổ in đã load xong
-    const checkWindowClosed = setInterval(() => {
-      if (printWindow.closed) {
-        clearInterval(checkWindowClosed);
-        setIsExportingPdf(false);
-      }
-    }, 1000);
-    
-    // Đặt timeout để đảm bảo loading không hiển thị mãi mãi
-    setTimeout(() => {
-      clearInterval(checkWindowClosed);
-      if (isExportingPdf) {
-        setIsExportingPdf(false);
-      }
-    }, 30000); // 30 giây timeout
   };
 
   // Trạng thái loading tổng hợp
@@ -166,7 +149,7 @@ const ThongKeBaoCaoMatRung = () => {
               onClick={handleExportPdf}
               disabled={isExportingPdf}
               className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-sm"
-              title="In thành PDF"
+              title="Xem và lưu báo cáo dạng PDF"
             >
               {isExportingPdf ? (
                 <>
@@ -175,8 +158,9 @@ const ThongKeBaoCaoMatRung = () => {
                 </>
               ) : (
                 <>
+                  <FaEye className="text-lg mr-1" />
                   <FaFilePdf className="text-lg" />
-                  <span>In PDF</span>
+                  <span className="ml-1">Xem & Lưu PDF</span>
                 </>
               )}
             </button>
