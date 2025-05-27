@@ -34,7 +34,7 @@ router.get("/info", async (req, res) => {
       try {
         const result = await pool.query(`
           SELECT COUNT(*) as count,
-                 ST_Extent(geom) as bbox
+                 ST_Extent(ST_Transform(geom, 4326)) as bbox
           FROM ${table.name} 
           WHERE ST_IsValid(geom)
         `);
@@ -68,34 +68,58 @@ router.get("/info", async (req, res) => {
  * @swagger
  * /layer-data/administrative:
  *   get:
- *     summary: Lấy dữ liệu lớp ranh giới hành chính
+ *     summary: Lấy dữ liệu lớp ranh giới hành chính đầy đủ với phân cấp rõ ràng
  *     tags:
  *       - Layer Data
  *     responses:
  *       200:
- *         description: Dữ liệu GeoJSON ranh giới hành chính
+ *         description: Dữ liệu GeoJSON ranh giới hành chính với phân cấp
  */
 router.get("/administrative", async (req, res) => {
   try {
+    // SỬA LỖI: Sử dụng subquery để tránh lỗi GROUP BY
     const query = `
       SELECT json_build_object(
         'type', 'FeatureCollection',
-        'features', COALESCE(json_agg(
-          json_build_object(
-            'type', 'Feature',
-            'geometry', ST_AsGeoJSON(geom)::json,
-            'properties', json_build_object(
-              'gid', gid,
-              'huyen', huyen,
-              'xa', xa,
-              'tieukhu', tieukhu,
-              'khoanh', khoanh
-            )
-          )
-        ), '[]'::json)
+        'features', COALESCE(json_agg(feature), '[]'::json)
       ) AS geojson
-      FROM laocai_ranhgioihc
-      WHERE ST_IsValid(geom);
+      FROM (
+        SELECT json_build_object(
+          'type', 'Feature',
+          'geometry', ST_AsGeoJSON(ST_Transform(geom, 4326))::json,
+          'properties', json_build_object(
+            'gid', gid,
+            'huyen', huyen,
+            'xa', xa,
+            'tieukhu', tieukhu,
+            'khoanh', khoanh,
+            'layer_type', 'administrative_boundary',
+            'boundary_level', CASE
+              WHEN khoanh IS NOT NULL AND khoanh != '' THEN 'khoanh'
+              WHEN tieukhu IS NOT NULL AND tieukhu != '' THEN 'tieukhu'
+              WHEN xa IS NOT NULL AND xa != '' THEN 'xa'
+              WHEN huyen IS NOT NULL AND huyen != '' THEN 'huyen'
+              ELSE 'tinh'
+            END,
+            'level_priority', CASE
+              WHEN khoanh IS NOT NULL AND khoanh != '' THEN 5
+              WHEN tieukhu IS NOT NULL AND tieukhu != '' THEN 4
+              WHEN xa IS NOT NULL AND xa != '' THEN 3
+              WHEN huyen IS NOT NULL AND huyen != '' THEN 2
+              ELSE 1
+            END
+          )
+        ) as feature
+        FROM laocai_ranhgioihc
+        WHERE ST_IsValid(geom)
+        ORDER BY CASE
+          WHEN khoanh IS NOT NULL AND khoanh != '' THEN 5
+          WHEN tieukhu IS NOT NULL AND tieukhu != '' THEN 4
+          WHEN xa IS NOT NULL AND xa != '' THEN 3
+          WHEN huyen IS NOT NULL AND huyen != '' THEN 2
+          ELSE 1
+        END, gid
+      ) AS features;
     `;
 
     const result = await pool.query(query);
@@ -116,6 +140,15 @@ router.get("/administrative", async (req, res) => {
     }
 
     console.log(`✅ Loaded ${geojson.features.length} administrative boundary features`);
+    
+    // Log thống kê theo cấp
+    const levelStats = {};
+    geojson.features.forEach(feature => {
+      const level = feature.properties.boundary_level;
+      levelStats[level] = (levelStats[level] || 0) + 1;
+    });
+    console.log("📊 Thống kê ranh giới theo cấp:", levelStats);
+    
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu ranh giới hành chính:", err);
@@ -142,11 +175,12 @@ router.get("/forest-management", async (req, res) => {
         'features', COALESCE(json_agg(
           json_build_object(
             'type', 'Feature',
-            'geometry', ST_AsGeoJSON(geom)::json,
+            'geometry', ST_AsGeoJSON(ST_Transform(geom, 4326))::json,
             'properties', json_build_object(
               'gid', gid,
               'tt', tt,
-              'chuquanly', chuquanly
+              'chuquanly', chuquanly,
+              'layer_type', 'forest_management'
             )
           )
         ), '[]'::json)
@@ -181,12 +215,12 @@ router.get("/forest-management", async (req, res) => {
  * @swagger
  * /layer-data/terrain:
  *   get:
- *     summary: Lấy dữ liệu lớp địa hình
+ *     summary: Lấy dữ liệu lớp địa hình, thủy văn, giao thông đầy đủ
  *     tags:
  *       - Layer Data
  *     responses:
  *       200:
- *         description: Dữ liệu GeoJSON địa hình
+ *         description: Dữ liệu GeoJSON địa hình, thủy văn, giao thông
  */
 router.get("/terrain", async (req, res) => {
   try {
@@ -196,12 +230,19 @@ router.get("/terrain", async (req, res) => {
         'features', COALESCE(json_agg(
           json_build_object(
             'type', 'Feature',
-            'geometry', ST_AsGeoJSON(geom)::json,
+            'geometry', ST_AsGeoJSON(ST_Transform(geom, 4326))::json,
             'properties', json_build_object(
               'gid', gid,
               'id', id,
               'ma', ma,
-              'ten', ten
+              'ten', ten,
+              'layer_type', 'terrain_hydro_transport',
+              'feature_type', CASE
+                WHEN LOWER(ten) LIKE '%sông%' OR LOWER(ten) LIKE '%suối%' OR LOWER(ten) LIKE '%kênh%' THEN 'waterway'
+                WHEN LOWER(ten) LIKE '%thủy%' OR LOWER(ten) LIKE '%cảng%' THEN 'water_transport'
+                WHEN LOWER(ten) LIKE '%đường%' OR LOWER(ten) LIKE '%quốc lộ%' OR LOWER(ten) LIKE '%tỉnh lộ%' THEN 'road'
+                ELSE 'terrain'
+              END
             )
           )
         ), '[]'::json)
@@ -224,7 +265,7 @@ router.get("/terrain", async (req, res) => {
       }));
     }
 
-    console.log(`✅ Loaded ${geojson.features.length} terrain features`);
+    console.log(`✅ Loaded ${geojson.features.length} terrain/hydro/transport features`);
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu địa hình:", err);
@@ -236,7 +277,7 @@ router.get("/terrain", async (req, res) => {
  * @swagger
  * /layer-data/forest-types:
  *   get:
- *     summary: Lấy dữ liệu lớp 3 loại rừng
+ *     summary: Lấy dữ liệu lớp 3 loại rừng (SỬA LỖI GROUP BY)
  *     tags:
  *       - Layer Data
  *     parameters:
@@ -254,40 +295,83 @@ router.get("/forest-types", async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.query.limit) || 1000, 5000);
 
+    // SỬA LỖI: Sử dụng subquery để tránh lỗi GROUP BY
     const query = `
       SELECT json_build_object(
         'type', 'FeatureCollection',
-        'features', COALESCE(json_agg(
-          json_build_object(
-            'type', 'Feature',
-            'geometry', ST_AsGeoJSON(geom)::json,
-            'properties', json_build_object(
-              'gid', gid,
-              'tt', tt,
-              'id', id,
-              'xa', xa,
-              'tk', tk,
-              'khoanh', khoanh,
-              'lo', lo,
-              'diadanh', diadanh,
-              'dtich', dtich,
-              'ldlr', ldlr,
-              'sldlr', sldlr,
-              'namtr', namtr,
-              'captuoi', captuoi,
-              'malr3', malr3,
-              'mdsd', mdsd,
-              'churung', churung,
-              'tinh', tinh,
-              'huyen', huyen
-            )
-          )
-        ), '[]'::json)
+        'features', COALESCE(json_agg(feature), '[]'::json)
       ) AS geojson
-      FROM laocai_rg3lr
-      WHERE ST_IsValid(geom)
-      ORDER BY gid
-      LIMIT $1;
+      FROM (
+        SELECT json_build_object(
+          'type', 'Feature',
+          'geometry', ST_AsGeoJSON(ST_Transform(geom, 4326))::json,
+          'properties', json_build_object(
+            'gid', gid,
+            'tt', tt,
+            'id', id,
+            'matinh', matinh,
+            'mahuyen', mahuyen,
+            'maxa', maxa,
+            'xa', xa,
+            'tk', tk,
+            'khoanh', khoanh,
+            'lo', lo,
+            'thuad', thuad,
+            'tobando', tobando,
+            'diadanh', diadanh,
+            'dtich', dtich,
+            'nggocr', nggocr,
+            'ldlr', ldlr,
+            'maldlr', maldlr,
+            'sldlr', sldlr,
+            'namtr', namtr,
+            'captuoi', captuoi,
+            'ktan', ktan,
+            'nggocrt', nggocrt,
+            'thanhrung', thanhrung,
+            'mgo', mgo,
+            'mtr', mtr,
+            'mgolo', mgolo,
+            'mtnlo', mtnlo,
+            'lapdia', lapdia,
+            'malr3', malr3,
+            'mdsd', mdsd,
+            'mamdsd', mamdsd,
+            'dtuong', dtuong,
+            'churung', churung,
+            'machur', machur,
+            'trchap', trchap,
+            'quyensd', quyensd,
+            'thoihansd', thoihansd,
+            'khoan', khoan,
+            'nqh', nqh,
+            'nguoink', nguoink,
+            'nguoitrch', nguoitrch,
+            'mangnk', mangnk,
+            'mangtrch', mangtrch,
+            'ngsinh', ngsinh,
+            'kd', kd,
+            'vd', vd,
+            'capkd', capkd,
+            'capvd', capvd,
+            'locu', locu,
+            'vitrithua', vitrithua,
+            'tinh', tinh,
+            'huyen', huyen,
+            'layer_type', '3_forest_types',
+            'forest_function', CASE
+              WHEN malr3 = 1 THEN 'Rừng đặc dụng'
+              WHEN malr3 = 2 THEN 'Rừng phòng hộ'
+              WHEN malr3 = 3 THEN 'Rừng sản xuất'
+              ELSE 'Không xác định'
+            END
+          )
+        ) as feature
+        FROM laocai_rg3lr
+        WHERE ST_IsValid(geom)
+        ORDER BY gid
+        LIMIT $1
+      ) AS features;
     `;
 
     const result = await pool.query(query, [limit]);
@@ -323,7 +407,7 @@ router.get("/forest-types", async (req, res) => {
  * @swagger
  * /layer-data/forest-status:
  *   get:
- *     summary: Lấy dữ liệu lớp hiện trạng rừng
+ *     summary: Lấy dữ liệu lớp hiện trạng rừng đầy đủ
  *     tags:
  *       - Layer Data
  *     responses:
@@ -337,18 +421,32 @@ router.get("/forest-status", async (req, res) => {
     const query = `
       SELECT json_build_object(
         'type', 'FeatureCollection',
-        'features', COALESCE(json_agg(
-          json_build_object(
-            'type', 'Feature',
-            'geometry', ST_AsGeoJSON(ST_Transform(ST_SetSRID(geom, 3405), 4326))::json,
-            'properties', to_jsonb(t) - 'geom'
-          )
-        ), '[]'::json)
+        'features', COALESCE(json_agg(feature), '[]'::json)
       ) AS geojson
-      FROM tlaocai_tkk_3lr_cru t
-      WHERE ST_IsValid(geom)
-      ORDER BY gid
-      LIMIT $1;
+      FROM (
+        SELECT json_build_object(
+          'type', 'Feature',
+          'geometry', ST_AsGeoJSON(ST_Transform(ST_SetSRID(geom, 3405), 4326))::json,
+          'properties', json_build_object(
+            'gid', gid,
+            'huyen', huyen,
+            'xa', xa,
+            'tk', tk,
+            'khoanh', khoanh,
+            'lo', lo,
+            'thuad', thuad,
+            'dtich', dtich,
+            'ldlr', ldlr,
+            'churung', churung,
+            'layer_type', 'current_forest_status',
+            'area_ha', ROUND((dtich)::numeric, 2)
+          )
+        ) as feature
+        FROM tlaocai_tkk_3lr_cru
+        WHERE ST_IsValid(geom)
+        ORDER BY gid
+        LIMIT $1
+      ) AS features;
     `;
 
     const result = await pool.query(query, [limit]);
@@ -377,6 +475,72 @@ router.get("/forest-status", async (req, res) => {
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu hiện trạng rừng:", err);
     res.status(500).json({ error: "Lỗi server khi lấy dữ liệu hiện trạng rừng" });
+  }
+});
+
+/**
+ * @swagger
+ * /layer-data/deforestation-alerts:
+ *   get:
+ *     summary: Lấy dữ liệu lớp dự báo mất rừng mới nhất
+ *     tags:
+ *       - Layer Data
+ *     parameters:
+ *       - in: query
+ *         name: days
+ *         schema:
+ *           type: integer
+ *           default: 30
+ *         description: Số ngày gần đây
+ *     responses:
+ *       200:
+ *         description: Dữ liệu GeoJSON dự báo mất rừng mới nhất
+ */
+router.get("/deforestation-alerts", async (req, res) => {
+  try {
+    const days = parseInt(req.query.days) || 30;
+
+    const query = `
+      SELECT json_build_object(
+        'type', 'FeatureCollection',
+        'features', COALESCE(json_agg(feature), '[]'::json)
+      ) AS geojson
+      FROM (
+        SELECT json_build_object(
+          'type', 'Feature',
+          'geometry', ST_AsGeoJSON(geom)::json,
+          'properties', json_build_object(
+            'gid', gid,
+            'start_dau', start_dau,
+            'end_sau', end_sau,
+            'area', area,
+            'area_ha', ROUND((area / 10000)::numeric, 2),
+            'mahuyen', mahuyen,
+            'layer_type', 'deforestation_alert',
+            'alert_level', CASE
+              WHEN CURRENT_DATE - end_sau::date <= 7 THEN 'critical'
+              WHEN CURRENT_DATE - end_sau::date <= 30 THEN 'high'
+              ELSE 'medium'
+            END,
+            'days_since', CURRENT_DATE - end_sau::date
+          )
+        ) as feature
+        FROM mat_rung
+        WHERE ST_IsValid(geom)
+          AND end_sau::date >= CURRENT_DATE - INTERVAL '$1 days'
+        ORDER BY end_sau DESC
+        LIMIT 1000
+      ) AS features;
+    `;
+
+    const result = await pool.query(query, [days]);
+    let geojson = result.rows[0].geojson;
+
+    console.log(`✅ Loaded ${geojson.features.length} deforestation alert features`);
+    res.json(geojson);
+  } catch (err) {
+    console.error("❌ Lỗi lấy dữ liệu dự báo mất rừng:", err);
+    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu dự báo mất rừng" });
   }
 });
 

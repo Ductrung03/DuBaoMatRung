@@ -30,38 +30,102 @@ const getLayerStyle = (feature, layerType, isSelected = false) => {
 
   switch (layerType) {
     case 'administrative':
+      // Phân biệt các cấp ranh giới dựa trên boundary_level
+      const boundaryLevel = feature.properties.boundary_level || 'huyen';
+      
+      const boundaryStyles = {
+        'tinh': {
+          color: '#000000',        // Đen đậm nhất
+          weight: 4,               // Đường dày nhất
+          dashArray: null,         // Đường liền
+          opacity: 1
+        },
+        'huyen': {
+          color: '#2c3e50',        // Xám đậm
+          weight: 3,               // Đường dày
+          dashArray: '12, 8',      // Nét đứt lớn
+          opacity: 0.9
+        },
+        'xa': {
+          color: '#34495e',        // Xám vừa
+          weight: 2,               // Đường vừa
+          dashArray: '8, 6',       // Nét đứt vừa
+          opacity: 0.8
+        },
+        'tieukhu': {
+          color: '#5d6d7e',        // Xám nhạt
+          weight: 1.5,             // Đường nhỏ
+          dashArray: '6, 4',       // Nét đứt nhỏ
+          opacity: 0.7
+        },
+        'khoanh': {
+          color: '#85929e',        // Xám rất nhạt
+          weight: 1,               // Đường mảnh nhất
+          dashArray: '3, 3',       // Nét đứt rất nhỏ
+          opacity: 0.6
+        }
+      };
+      
+      const style = boundaryStyles[boundaryLevel] || boundaryStyles['huyen'];
+      
       return {
         ...baseStyle,
-        color: '#2c3e50',
+        color: style.color,
         fillColor: 'transparent',
-        weight: 2,
-        dashArray: '5, 5',
+        weight: style.weight,
+        dashArray: style.dashArray,
+        opacity: style.opacity,
         fillOpacity: 0,
         ...selectedStyle
       };
 
     case 'forestTypes':
+      // 3 loại rừng với màu sắc khác nhau
+      const forestType = feature.properties.forest_function || feature.properties.malr3;
+      let forestColor = '#2ecc71'; // mặc định
+      
+      if (forestType === 'Rừng đặc dụng' || forestType === 1) {
+        forestColor = '#e74c3c'; // đỏ
+      } else if (forestType === 'Rừng phòng hộ' || forestType === 2) {
+        forestColor = '#f39c12'; // cam
+      } else if (forestType === 'Rừng sản xuất' || forestType === 3) {
+        forestColor = '#27ae60'; // xanh lá
+      }
+      
       return {
         ...baseStyle,
-        color: '#27ae60',
-        fillColor: '#2ecc71',
+        color: forestColor,
+        fillColor: forestColor,
         weight: 1,
-        fillOpacity: 0.3,
+        fillOpacity: 0.4,
         ...selectedStyle
       };
 
     case 'terrain':
+      // Phân loại theo loại địa hình
+      const terrainType = feature.properties.feature_type;
+      let terrainColor = '#34495e'; // mặc định - terrain
+      
+      if (terrainType === 'waterway') {
+        terrainColor = '#3498db'; // xanh dương - sông suối
+      } else if (terrainType === 'water_transport') {
+        terrainColor = '#17a2b8'; // xanh ngọc - thủy vận
+      } else if (terrainType === 'road') {
+        terrainColor = '#8B4513'; // nâu - giao thông
+      }
+      
       return {
         ...baseStyle,
-        color: '#3498db',
-        fillColor: 'transparent',
-        weight: 2,
-        fillOpacity: 0,
+        color: terrainColor,
+        fillColor: terrainType === 'waterway' ? terrainColor : 'transparent',
+        weight: terrainType === 'road' ? 3 : 2,
+        fillOpacity: terrainType === 'waterway' ? 0.3 : 0,
         ...selectedStyle
       };
 
     case 'forestManagement':
-      const colors = ['#9b59b6', '#8e44ad', '#663399', '#552288'];
+      // Màu sắc ngẫu nhiên cho các chủ quản lý khác nhau
+      const colors = ['#9b59b6', '#8e44ad', '#663399', '#552288', '#e67e22', '#d35400'];
       const colorIndex = (feature.properties.gid || 0) % colors.length;
       return {
         ...baseStyle,
@@ -80,6 +144,27 @@ const getLayerStyle = (feature, layerType, isSelected = false) => {
         weight: 1,
         fillOpacity: 0.5,
         ...selectedStyle
+      };
+
+    case 'deforestation':
+      // Màu sắc theo mức độ cảnh báo
+      const alertLevel = feature.properties.alert_level;
+      let alertColor = '#e74c3c'; // đỏ mặc định
+      
+      if (alertLevel === 'critical') {
+        alertColor = '#c0392b'; // đỏ đậm
+      } else if (alertLevel === 'high') {
+        alertColor = '#e74c3c'; // đỏ
+      } else if (alertLevel === 'medium') {
+        alertColor = '#f39c12'; // cam
+      }
+      
+      return {
+        fillColor: alertColor,
+        weight: isSelected ? 3 : 1,
+        opacity: 1,
+        color: isSelected ? "#ff7800" : "#ffffff",
+        fillOpacity: 0.8,
       };
 
     default:
@@ -103,19 +188,36 @@ const buildPopupContent = (feature, layerType) => {
 
   switch (layerType) {
     case 'administrative':
-      popupContent += 'Ranh giới hành chính';
+      const boundaryLevelNames = {
+        'tinh': 'Ranh giới tỉnh',
+        'huyen': 'Ranh giới huyện', 
+        'xa': 'Ranh giới xã',
+        'tieukhu': 'Ranh giới tiểu khu',
+        'khoanh': 'Ranh giới khoảnh'
+      };
+      popupContent += boundaryLevelNames[props.boundary_level] || 'Ranh giới hành chính';
       break;
     case 'forestTypes':
-      popupContent += '3 loại rừng';
+      popupContent += '3 loại rừng - ' + (props.forest_function || 'Không xác định');
       break;
     case 'terrain':
-      popupContent += 'Địa hình - Thủy văn';
+      const terrainTypeNames = {
+        'waterway': 'Đường sông nước',
+        'water_transport': 'Thủy vận',
+        'road': 'Giao thông',
+        'terrain': 'Địa hình'
+      };
+      popupContent += terrainTypeNames[props.feature_type] || 'Địa hình - Thủy văn - Giao thông';
       break;
     case 'forestManagement':
       popupContent += 'Chủ quản lý rừng';
       break;
     case 'forestStatus':
       popupContent += 'Hiện trạng rừng';
+      break;
+    case 'deforestation':
+      popupContent += 'Dự báo mất rừng - ' + (props.alert_level === 'critical' ? 'Nghiêm trọng' : 
+                                              props.alert_level === 'high' ? 'Cao' : 'Trung bình');
       break;
     default:
       popupContent += 'Thông tin đối tượng';
@@ -124,11 +226,12 @@ const buildPopupContent = (feature, layerType) => {
   popupContent += `</h4><table class="popup-table">`;
 
   const priorityFieldsByType = {
-    administrative: ['huyen', 'xa', 'tieukhu', 'khoanh'],
-    forestTypes: ['xa', 'tk', 'khoanh', 'lo', 'dtich', 'ldlr'], 
-    terrain: ['ten', 'ma'],
+    administrative: ['boundary_level', 'huyen', 'xa', 'tieukhu', 'khoanh'],
+    forestTypes: ['xa', 'tk', 'khoanh', 'lo', 'dtich', 'ldlr', 'forest_function', 'churung'], 
+    terrain: ['ten', 'ma', 'feature_type'],
     forestManagement: ['chuquanly', 'tt'],
-    forestStatus: ['huyen', 'xa', 'tk', 'khoanh', 'churung'],
+    forestStatus: ['huyen', 'xa', 'tk', 'khoanh', 'churung', 'area_ha'],
+    deforestation: ['area_ha', 'start_dau', 'end_sau', 'alert_level', 'days_since'],
     default: ['huyen', 'xa', 'area', 'start_dau', 'end_sau', 'tk', 'khoanh', 'churung', 'mahuyen']
   };
 
@@ -144,8 +247,12 @@ const buildPopupContent = (feature, layerType) => {
         label = field === "start_dau" ? "Từ ngày" : "Đến ngày";
       }
 
-      if (field === "area" && value !== null) {
-        value = `${(parseFloat(value) / 10000).toFixed(2)} ha`;
+      if ((field === "area" || field === "area_ha") && value !== null) {
+        if (field === "area") {
+          value = `${(parseFloat(value) / 10000).toFixed(2)} ha`;
+        } else {
+          value = `${parseFloat(value).toFixed(2)} ha`;
+        }
         label = "Diện tích";
       }
 
@@ -154,11 +261,30 @@ const buildPopupContent = (feature, layerType) => {
         label = "Diện tích";
       }
 
+      if (field === "boundary_level") {
+        const levelNames = {
+          'tinh': 'Tỉnh',
+          'huyen': 'Huyện', 
+          'xa': 'Xã',
+          'tieukhu': 'Tiểu khu',
+          'khoanh': 'Khoảnh'
+        };
+        value = levelNames[value] || value;
+      }
+
+      if (field === "days_since") {
+        value = `${value} ngày trước`;
+        label = "Thời gian phát hiện";
+      }
+
       const fieldLabels = {
         huyen: "Huyện", xa: "Xã", tk: "Tiểu khu", khoanh: "Khoảnh",
         churung: "Chủ rừng", mahuyen: "Mã huyện", chuquanly: "Chủ quản lý",
         ten: "Tên", ma: "Mã", tt: "Thứ tự", tieukhu: "Tiểu khu",
-        lo: "Lô", dtich: "Diện tích", ldlr: "Loại đất lâm nghiệp"
+        lo: "Lô", dtich: "Diện tích", ldlr: "Loại đất lâm nghiệp",
+        forest_function: "Chức năng rừng", feature_type: "Loại đối tượng",
+        alert_level: "Mức cảnh báo", area_ha: "Diện tích",
+        boundary_level: "Cấp ranh giới"
       };
 
       label = fieldLabels[field] || label;
@@ -177,7 +303,7 @@ const buildPopupContent = (feature, layerType) => {
       !priorityFields.includes(key) &&
       !key.includes("geom") &&
       !key.startsWith("_") &&
-      !["x", "y", "x_vn2000", "y_vn2000", "gid"].includes(key) &&
+      !["x", "y", "x_vn2000", "y_vn2000", "gid", "layer_type"].includes(key) &&
       value !== null && value !== undefined
     ) {
       popupContent += `
@@ -218,7 +344,7 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
         border: 2px solid #ddd;
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        max-width: 280px;
+        max-width: 300px;
         font-family: Arial, sans-serif;
         font-size: 12px;
       ">
@@ -242,7 +368,7 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
         </div>
 
         <!-- Content -->
-        <div id="legend-content" style="max-height: 400px; overflow-y: auto;">
+        <div id="legend-content" style="max-height: 500px; overflow-y: auto;">
           
           <!-- Chọn loại bản đồ nền -->
           <div class="legend-section" style="padding: 8px 12px; border-bottom: 1px solid #eee;">
@@ -289,9 +415,33 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               </svg>
             </div>
             <div class="section-content" style="padding: 6px 12px; padding-left: 32px;">
+              <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                <div style="width: 24px; height: 4px; background: #000000; margin-right: 8px; border: none;"></div>
+                <span style="font-size: 11px;">Ranh giới tỉnh</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                <svg width="24" height="4" style="margin-right: 8px;">
+                  <line x1="0" y1="2" x2="24" y2="2" stroke="#2c3e50" stroke-width="3" stroke-dasharray="6,3"/>
+                </svg>
+                <span style="font-size: 11px;">Ranh giới huyện</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                <svg width="24" height="4" style="margin-right: 8px;">
+                  <line x1="0" y1="2" x2="24" y2="2" stroke="#34495e" stroke-width="2" stroke-dasharray="4,2"/>
+                </svg>
+                <span style="font-size: 11px;">Ranh giới xã</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                <svg width="24" height="4" style="margin-right: 8px;">
+                  <line x1="0" y1="2" x2="24" y2="2" stroke="#5d6d7e" stroke-width="1.5" stroke-dasharray="3,2"/>
+                </svg>
+                <span style="font-size: 11px;">Ranh giới tiểu khu</span>
+              </div>
               <div style="display: flex; align-items: center; margin-bottom: 3px;">
-                <div style="width: 20px; height: 2px; background: #2c3e50; margin-right: 8px; border-top: 2px dashed #2c3e50;"></div>
-                <span>Ranh giới hành chính</span>
+                <svg width="24" height="4" style="margin-right: 8px;">
+                  <line x1="0" y1="2" x2="24" y2="2" stroke="#85929e" stroke-width="1" stroke-dasharray="2,2"/>
+                </svg>
+                <span style="font-size: 11px;">Ranh giới khoảnh</span>
               </div>
             </div>
           </div>
@@ -308,6 +458,23 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               <input type="checkbox" id="forest-types-checkbox" ${mapLayers.forestTypes?.visible ? 'checked' : ''} style="margin-right: 8px;">
               <span style="color: #27ae60;">🌲</span>
               <span style="margin-left: 6px; font-weight: 500;">Lớp ranh giới 3 loại rừng</span>
+              <svg class="section-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-left: auto; transform: rotate(-90deg); transition: transform 0.3s;">
+                <polyline points="6,9 12,15 18,9"></polyline>
+              </svg>
+            </div>
+            <div class="section-content" style="padding: 6px 12px; padding-left: 32px; display: none;">
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 16px; height: 16px; background: #e74c3c; margin-right: 8px; border-radius: 2px;"></div>
+                <span>Rừng đặc dụng</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 16px; height: 16px; background: #f39c12; margin-right: 8px; border-radius: 2px;"></div>
+                <span>Rừng phòng hộ</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 16px; height: 16px; background: #27ae60; margin-right: 8px; border-radius: 2px;"></div>
+                <span>Rừng sản xuất</span>
+              </div>
             </div>
           </div>
 
@@ -384,11 +551,22 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               <input type="checkbox" checked style="margin-right: 8px;">
               <span style="color: #dc3545;">⚠️</span>
               <span style="margin-left: 6px; font-weight: 500;">Lớp dự báo mất rừng mới nhất</span>
+              <svg class="section-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-left: auto; transform: rotate(-90deg); transition: transform 0.3s;">
+                <polyline points="6,9 12,15 18,9"></polyline>
+              </svg>
             </div>
-            <div class="section-content" style="padding: 6px 12px; padding-left: 32px;">
-              <div style="display: flex; align-items: center;">
-                <div style="width: 16px; height: 16px; background: #dc3545; margin-right: 8px; border-radius: 2px;"></div>
-                <span style="color: #dc3545; font-weight: 500;">Lỗ có khả năng mất rừng</span>
+            <div class="section-content" style="padding: 6px 12px; padding-left: 32px; display: none;">
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 16px; height: 16px; background: #c0392b; margin-right: 8px; border-radius: 2px;"></div>
+                <span style="color: #c0392b; font-weight: 500;">Nghiêm trọng (< 7 ngày)</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 16px; height: 16px; background: #e74c3c; margin-right: 8px; border-radius: 2px;"></div>
+                <span style="color: #e74c3c; font-weight: 500;">Cao (< 30 ngày)</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 16px; height: 16px; background: #f39c12; margin-right: 8px; border-radius: 2px;"></div>
+                <span style="color: #f39c12; font-weight: 500;">Trung bình (> 30 ngày)</span>
               </div>
             </div>
           </div>
@@ -625,7 +803,7 @@ const Map = () => {
             />
           ) : (
             <>
-              {/* Hiển thị các layer theo thứ tự từ dưới lên trên */}
+              {/* Hiển thị các layer theo thứ tự từ dưới lên trên - để ranh giới hành chính hiển thị rõ nhất */}
               
               {/* Layer hiện trạng rừng (dưới cùng) */}
               {mapLayers.forestStatus?.data && mapLayers.forestStatus.visible && (
@@ -667,29 +845,23 @@ const Map = () => {
                 />
               )}
 
-              {/* Layer ranh giới hành chính (trên cùng) */}
+              {/* Layer dự báo mất rừng */}
+              {geoData?.type === "FeatureCollection" && geoData.features?.length > 0 && (
+                <GeoJSON
+                  key={`deforestation-${Date.now()}`}
+                  data={geoData}
+                  onEachFeature={(feature, layer) => onEachFeature(feature, layer, 'deforestation')}
+                  style={(feature) => getLayerStyle(feature, 'deforestation', selectedFeature === feature)}
+                />
+              )}
+
+              {/* Layer ranh giới hành chính (TRÊN CÙNG để hiển thị rõ nhất) */}
               {mapLayers.administrative?.data && mapLayers.administrative.visible && (
                 <GeoJSON
                   key={`administrative-${Date.now()}`}
                   data={mapLayers.administrative.data}
                   onEachFeature={(feature, layer) => onEachFeature(feature, layer, 'administrative')}
                   style={(feature) => getLayerStyle(feature, 'administrative', selectedFeature === feature)}
-                />
-              )}
-
-              {/* Layer dự báo mất rừng (nếu có) */}
-              {geoData?.type === "FeatureCollection" && geoData.features?.length > 0 && (
-                <GeoJSON
-                  key={`deforestation-${Date.now()}`}
-                  data={geoData}
-                  onEachFeature={(feature, layer) => onEachFeature(feature, layer, 'deforestation')}
-                  style={(feature) => ({
-                    fillColor: getColorByStatus(feature.properties),
-                    weight: selectedFeature && feature === selectedFeature ? 3 : 1,
-                    opacity: 1,
-                    color: selectedFeature && feature === selectedFeature ? "#ff7800" : "#ffffff",
-                    fillOpacity: 0.7,
-                  })}
                 />
               )}
             </>
