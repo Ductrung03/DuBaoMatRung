@@ -15,7 +15,7 @@ const baocao = require("./routes/baocao.routes");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const dataRoutes = require("./routes/data.routes");
-
+const layerDataRoutes = require("./routes/layerData.routes");
 require("dotenv").config();
 
 // Log biến môi trường khi khởi động (chỉ log dạng **, không log thông tin thật)
@@ -81,6 +81,7 @@ app.use("/api/mat-rung", matRungRoutes);
 app.use("/api/dropdown", dataDropdownRoutes);
 app.use("/api/quan-ly-du-lieu", quanlydulieu);
 app.use("/api/bao-cao", baocao);
+app.use("/api/layer-data", layerDataRoutes);
 
 // Test route
 app.get("/api/test", (req, res) => {

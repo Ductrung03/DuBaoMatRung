@@ -361,6 +361,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
       <div
         style={{
           overflowX: "auto",
+          overflowY: "auto",
           maxHeight: "400px",
           border: "1px solid #ccc",
           borderRadius: "10px",
@@ -369,7 +370,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
           backgroundColor: "#fff",
         }}
       >
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table  style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead
             style={{
               backgroundColor: "#4CAF50",

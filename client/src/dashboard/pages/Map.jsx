@@ -14,6 +14,185 @@ import { useGeoData } from "../contexts/GeoDataContext";
 import { formatDate } from "../../utils/formatDate";
 import { ClipLoader } from "react-spinners";
 
+// Hàm xác định style cho từng loại layer
+const getLayerStyle = (feature, layerType, isSelected = false) => {
+  const baseStyle = {
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0.6,
+  };
+
+  const selectedStyle = isSelected ? {
+    weight: 4,
+    color: "#ff7800",
+    fillOpacity: 0.8,
+  } : {};
+
+  switch (layerType) {
+    case 'administrative':
+      return {
+        ...baseStyle,
+        color: '#2c3e50',
+        fillColor: 'transparent',
+        weight: 2,
+        dashArray: '5, 5',
+        fillOpacity: 0,
+        ...selectedStyle
+      };
+
+    case 'forestTypes':
+      return {
+        ...baseStyle,
+        color: '#27ae60',
+        fillColor: '#2ecc71',
+        weight: 1,
+        fillOpacity: 0.3,
+        ...selectedStyle
+      };
+
+    case 'terrain':
+      return {
+        ...baseStyle,
+        color: '#3498db',
+        fillColor: 'transparent',
+        weight: 2,
+        fillOpacity: 0,
+        ...selectedStyle
+      };
+
+    case 'forestManagement':
+      const colors = ['#9b59b6', '#8e44ad', '#663399', '#552288'];
+      const colorIndex = (feature.properties.gid || 0) % colors.length;
+      return {
+        ...baseStyle,
+        color: colors[colorIndex],
+        fillColor: colors[colorIndex],
+        weight: 1,
+        fillOpacity: 0.4,
+        ...selectedStyle
+      };
+
+    case 'forestStatus':
+      return {
+        ...baseStyle,
+        color: '#16a085',
+        fillColor: '#1abc9c',
+        weight: 1,
+        fillOpacity: 0.5,
+        ...selectedStyle
+      };
+
+    default:
+      return {
+        fillColor: getColorByStatus(feature.properties),
+        weight: isSelected ? 3 : 1,
+        opacity: 1,
+        color: isSelected ? "#ff7800" : "#ffffff",
+        fillOpacity: 0.7,
+      };
+  }
+};
+
+// Hàm xây dựng popup content dựa trên loại layer
+const buildPopupContent = (feature, layerType) => {
+  const props = feature.properties;
+  
+  let popupContent = `
+    <div class="custom-popup">
+      <h4 class="popup-title">`;
+
+  switch (layerType) {
+    case 'administrative':
+      popupContent += 'Ranh giới hành chính';
+      break;
+    case 'forestTypes':
+      popupContent += '3 loại rừng';
+      break;
+    case 'terrain':
+      popupContent += 'Địa hình - Thủy văn';
+      break;
+    case 'forestManagement':
+      popupContent += 'Chủ quản lý rừng';
+      break;
+    case 'forestStatus':
+      popupContent += 'Hiện trạng rừng';
+      break;
+    default:
+      popupContent += 'Thông tin đối tượng';
+  }
+
+  popupContent += `</h4><table class="popup-table">`;
+
+  const priorityFieldsByType = {
+    administrative: ['huyen', 'xa', 'tieukhu', 'khoanh'],
+    forestTypes: ['xa', 'tk', 'khoanh', 'lo', 'dtich', 'ldlr'], 
+    terrain: ['ten', 'ma'],
+    forestManagement: ['chuquanly', 'tt'],
+    forestStatus: ['huyen', 'xa', 'tk', 'khoanh', 'churung'],
+    default: ['huyen', 'xa', 'area', 'start_dau', 'end_sau', 'tk', 'khoanh', 'churung', 'mahuyen']
+  };
+
+  const priorityFields = priorityFieldsByType[layerType] || priorityFieldsByType.default;
+
+  priorityFields.forEach((field) => {
+    if (props[field] !== undefined && props[field] !== null) {
+      let value = props[field];
+      let label = field;
+
+      if (field === "start_dau" || field === "end_sau") {
+        value = formatDate(value);
+        label = field === "start_dau" ? "Từ ngày" : "Đến ngày";
+      }
+
+      if (field === "area" && value !== null) {
+        value = `${(parseFloat(value) / 10000).toFixed(2)} ha`;
+        label = "Diện tích";
+      }
+
+      if (field === "dtich" && value !== null) {
+        value = `${parseFloat(value).toFixed(2)} ha`;
+        label = "Diện tích";
+      }
+
+      const fieldLabels = {
+        huyen: "Huyện", xa: "Xã", tk: "Tiểu khu", khoanh: "Khoảnh",
+        churung: "Chủ rừng", mahuyen: "Mã huyện", chuquanly: "Chủ quản lý",
+        ten: "Tên", ma: "Mã", tt: "Thứ tự", tieukhu: "Tiểu khu",
+        lo: "Lô", dtich: "Diện tích", ldlr: "Loại đất lâm nghiệp"
+      };
+
+      label = fieldLabels[field] || label;
+
+      popupContent += `
+        <tr>
+          <th>${label}</th>
+          <td>${value}</td>
+        </tr>
+      `;
+    }
+  });
+
+  Object.entries(props).forEach(([key, value]) => {
+    if (
+      !priorityFields.includes(key) &&
+      !key.includes("geom") &&
+      !key.startsWith("_") &&
+      !["x", "y", "x_vn2000", "y_vn2000", "gid"].includes(key) &&
+      value !== null && value !== undefined
+    ) {
+      popupContent += `
+        <tr>
+          <th>${key}</th>
+          <td>${value}</td>
+        </tr>
+      `;
+    }
+  });
+
+  popupContent += `</table></div>`;
+  return popupContent;
+};
+
 // Component hiển thị loading overlay
 const LoadingOverlay = ({ message }) => (
   <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
@@ -24,109 +203,279 @@ const LoadingOverlay = ({ message }) => (
   </div>
 );
 
-// Xác định tên bảng từ URL của layer
-const getTableNameFromLayerParam = (layerName) => {
-  if (!layerName) return null;
-  return layerName.includes(":") ? layerName.split(":")[1] : layerName;
-};
-
-// Component MapUpdater để xử lý flying đến vị trí của feature được chọn
-const MapUpdater = ({ selectedFeature }) => {
-  const map = useMap();
-
-  useEffect(() => {
-    if (selectedFeature && selectedFeature.geometry) {
-      try {
-        console.log("MapUpdater: Đang cố gắng zoom đến feature");
-        // Tạo layer mới từ geometry của feature đã chọn
-        const geojsonFeature = {
-          type: "Feature",
-          geometry: selectedFeature.geometry,
-          properties: {}
-        };
-        
-        // Tạo một layer tạm thời
-        const tempLayer = L.geoJSON(geojsonFeature);
-        const bounds = tempLayer.getBounds();
-        
-        if (bounds.isValid()) {
-          console.log("MapUpdater: Bounds hợp lệ, thực hiện flyToBounds:", bounds);
-          
-          // Sử dụng setTimeout để đảm bảo map đã render xong
-          setTimeout(() => {
-            map.flyToBounds(bounds, {
-              padding: [50, 50],
-              duration: 1.0,
-              animate: true
-            });
-          }, 200);
-        } else {
-          console.warn("MapUpdater: Bounds không hợp lệ, thử phương án khác");
-          
-          // Phương án dự phòng - zoom đến tọa độ trung tâm
-          try {
-            let centerCoords;
-            if (selectedFeature.geometry.type === "MultiPolygon") {
-              // Lấy tọa độ đầu tiên của polygon đầu tiên 
-              centerCoords = selectedFeature.geometry.coordinates[0][0][0];
-              map.setView([centerCoords[1], centerCoords[0]], 16);
-              console.log("MapUpdater: Đã zoom đến tọa độ MultiPolygon:", centerCoords);
-            } else if (selectedFeature.geometry.type === "Polygon") {
-              centerCoords = selectedFeature.geometry.coordinates[0][0];
-              map.setView([centerCoords[1], centerCoords[0]], 16);
-              console.log("MapUpdater: Đã zoom đến tọa độ Polygon:", centerCoords);
-            }
-          } catch (innerErr) {
-            console.error("MapUpdater: Lỗi khi dùng phương án dự phòng:", innerErr);
-          }
-        }
-      } catch (err) {
-        console.error("MapUpdater: Lỗi khi zoom đến feature:", err);
-      }
-    }
-  }, [selectedFeature, map]);
-
-  return null;
-};
-
-// Control để chọn loại bản đồ
-const CustomMapControl = ({ setMapType }) => {
+// Control để chọn loại bản đồ và quản lý lớp dữ liệu
+const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
   const map = useMap();
 
   useEffect(() => {
     const container = L.DomUtil.create("div");
 
     container.innerHTML = `
-      <div class="relative z-[1000]">
-        <button id="toggle-map-type" class="flex items-center space-x-2 px-3 py-2 bg-white rounded-lg shadow-md hover:bg-gray-100 text-sm font-semibold text-gray-700">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3V7z" />
+      <div class="map-legend-control" style="
+        position: relative;
+        z-index: 1000;
+        background: white;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        max-width: 280px;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+      ">
+        <!-- Header -->
+        <div style="
+          background: #f8f9fa;
+          padding: 8px 12px;
+          border-bottom: 1px solid #ddd;
+          border-radius: 6px 6px 0 0;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+        " id="legend-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-right: 8px;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V6.618a1 1 0 01.553-.894L9 3l6 3 6-3v13l-6 3-6-3z" />
           </svg>
-          <span>Lớp bản đồ</span>
-        </button>
-        <div id="map-dropdown" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 text-sm">
-          <div class="map-option px-4 py-2 hover:bg-gray-100 cursor-pointer" data-type="normal">🟢 Bản đồ thường</div>
-          <div class="map-option px-4 py-2 hover:bg-gray-100 cursor-pointer" data-type="satellite">🛰️ Bản đồ vệ tinh</div>
+          <span style="font-weight: bold; color: #333;">Lớp bản đồ</span>
+          <svg id="toggle-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-left: auto; transform: rotate(0deg); transition: transform 0.3s;">
+            <polyline points="6,9 12,15 18,9"></polyline>
+          </svg>
+        </div>
+
+        <!-- Content -->
+        <div id="legend-content" style="max-height: 400px; overflow-y: auto;">
+          
+          <!-- Chọn loại bản đồ nền -->
+          <div class="legend-section" style="padding: 8px 12px; border-bottom: 1px solid #eee;">
+            <div style="font-weight: bold; margin-bottom: 6px; color: #555;">Bản đồ nền</div>
+            <div style="display: flex; gap: 8px;">
+              <button class="map-type-btn" data-type="normal" style="
+                flex: 1;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                background: white;
+                cursor: pointer;
+                font-size: 11px;
+                transition: all 0.2s;
+              ">🗺️ Bản đồ thường</button>
+              <button class="map-type-btn active" data-type="satellite" style="
+                flex: 1;
+                padding: 4px 8px;
+                border: 1px solid #007bff;
+                border-radius: 4px;
+                background: #e3f2fd;
+                cursor: pointer;
+                font-size: 11px;
+                transition: all 0.2s;
+              ">🛰️ Bản đồ vệ tinh</button>
+            </div>
+          </div>
+
+          <!-- Lớp ranh giới hành chính -->
+          <div class="legend-section">
+            <div class="section-header" style="
+              padding: 8px 12px;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              border-bottom: 1px solid #eee;
+              background: #f8f9fa;
+            " data-section="administrative">
+              <input type="checkbox" id="administrative-checkbox" ${mapLayers.administrative?.visible ? 'checked' : ''} style="margin-right: 8px;">
+              <span style="color: #2c3e50;">🏛️</span>
+              <span style="margin-left: 6px; font-weight: 500;">Lớp ranh giới hành chính</span>
+              <svg class="section-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-left: auto; transform: rotate(0deg); transition: transform 0.3s;">
+                <polyline points="6,9 12,15 18,9"></polyline>
+              </svg>
+            </div>
+            <div class="section-content" style="padding: 6px 12px; padding-left: 32px;">
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 20px; height: 2px; background: #2c3e50; margin-right: 8px; border-top: 2px dashed #2c3e50;"></div>
+                <span>Ranh giới hành chính</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lớp ranh giới 3 loại rừng -->
+          <div class="legend-section">
+            <div class="section-header" style="
+              padding: 8px 12px;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              border-bottom: 1px solid #eee;
+            " data-section="forest-types">
+              <input type="checkbox" id="forest-types-checkbox" ${mapLayers.forestTypes?.visible ? 'checked' : ''} style="margin-right: 8px;">
+              <span style="color: #27ae60;">🌲</span>
+              <span style="margin-left: 6px; font-weight: 500;">Lớp ranh giới 3 loại rừng</span>
+            </div>
+          </div>
+
+          <!-- Lớp địa hình, thủy văn, giao thông -->
+          <div class="legend-section">
+            <div class="section-header" style="
+              padding: 8px 12px;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              border-bottom: 1px solid #eee;
+            " data-section="terrain">
+              <input type="checkbox" id="terrain-checkbox" ${mapLayers.terrain?.visible ? 'checked' : ''} style="margin-right: 8px;">
+              <span style="color: #3498db;">🏔️</span>
+              <span style="margin-left: 6px; font-weight: 500;">Lớp địa hình, thủy văn, giao thông</span>
+              <svg class="section-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-left: auto; transform: rotate(-90deg); transition: transform 0.3s;">
+                <polyline points="6,9 12,15 18,9"></polyline>
+              </svg>
+            </div>
+            <div class="section-content" style="padding: 6px 12px; padding-left: 32px; display: none;">
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 20px; height: 2px; background: #3498db; margin-right: 8px;"></div>
+                <span>Đường sông nước</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 20px; height: 2px; background: #17a2b8; margin-right: 8px;"></div>
+                <span>Thủy vận</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 20px; height: 2px; background: #8B4513; margin-right: 8px;"></div>
+                <span>Giao thông</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lớp ranh giới chủ quản lý rừng -->
+          <div class="legend-section">
+            <div class="section-header" style="
+              padding: 8px 12px;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              border-bottom: 1px solid #eee;
+            " data-section="forest-management">
+              <input type="checkbox" id="forest-management-checkbox" ${mapLayers.forestManagement?.visible ? 'checked' : ''} style="margin-right: 8px;">
+              <span style="color: #9b59b6;">🏢</span>
+              <span style="margin-left: 6px; font-weight: 500;">Lớp ranh giới chủ quản lý rừng</span>
+            </div>
+          </div>
+
+          <!-- Lớp hiện trạng rừng -->
+          <div class="legend-section">
+            <div class="section-header" style="
+              padding: 8px 12px;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              border-bottom: 1px solid #eee;
+            " data-section="forest-status">
+              <input type="checkbox" id="forest-status-checkbox" ${mapLayers.forestStatus?.visible ? 'checked' : ''} style="margin-right: 8px;">
+              <span style="color: #16a085;">🌿</span>
+              <span style="margin-left: 6px; font-weight: 500;">Lớp hiện trạng rừng</span>
+            </div>
+          </div>
+
+          <!-- Lớp dự báo mất rừng -->
+          <div class="legend-section">
+            <div class="section-header" style="
+              padding: 8px 12px;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+            " data-section="deforestation">
+              <input type="checkbox" checked style="margin-right: 8px;">
+              <span style="color: #dc3545;">⚠️</span>
+              <span style="margin-left: 6px; font-weight: 500;">Lớp dự báo mất rừng mới nhất</span>
+            </div>
+            <div class="section-content" style="padding: 6px 12px; padding-left: 32px;">
+              <div style="display: flex; align-items: center;">
+                <div style="width: 16px; height: 16px; background: #dc3545; margin-right: 8px; border-radius: 2px;"></div>
+                <span style="color: #dc3545; font-weight: 500;">Lỗ có khả năng mất rừng</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     `;
 
     container.className = "leaflet-control leaflet-bar";
 
-    const toggleBtn = container.querySelector("#toggle-map-type");
-    const dropdown = container.querySelector("#map-dropdown");
+    // Event handlers
+    const legendHeader = container.querySelector("#legend-header");
+    const legendContent = container.querySelector("#legend-content");
+    const toggleArrow = container.querySelector("#toggle-arrow");
+    let isExpanded = true;
 
-    toggleBtn.onclick = (e) => {
+    // Toggle legend visibility
+    legendHeader.onclick = (e) => {
       e.preventDefault();
-      dropdown.classList.toggle("hidden");
+      isExpanded = !isExpanded;
+      if (isExpanded) {
+        legendContent.style.display = "block";
+        toggleArrow.style.transform = "rotate(0deg)";
+      } else {
+        legendContent.style.display = "none";
+        toggleArrow.style.transform = "rotate(-90deg)";
+      }
     };
 
-    dropdown.querySelectorAll(".map-option").forEach((item) => {
-      item.addEventListener("click", () => {
-        const type = item.getAttribute("data-type");
+    // Map type selection
+    container.querySelectorAll(".map-type-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const type = btn.getAttribute("data-type");
+        
+        // Update button styles
+        container.querySelectorAll(".map-type-btn").forEach(b => {
+          b.style.border = "1px solid #ddd";
+          b.style.background = "white";
+          b.classList.remove("active");
+        });
+        
+        btn.style.border = "1px solid #007bff";
+        btn.style.background = "#e3f2fd";
+        btn.classList.add("active");
+        
         setMapType(type);
-        dropdown.classList.add("hidden");
       });
+    });
+
+    // Section toggle functionality
+    container.querySelectorAll(".section-header").forEach((header) => {
+      const arrow = header.querySelector(".section-arrow");
+      if (arrow) {
+        header.addEventListener("click", (e) => {
+          e.preventDefault();
+          const content = header.nextElementSibling;
+          const isVisible = content.style.display !== "none";
+          
+          if (isVisible) {
+            content.style.display = "none";
+            arrow.style.transform = "rotate(-90deg)";
+          } else {
+            content.style.display = "block";
+            arrow.style.transform = "rotate(0deg)";
+          }
+        });
+      }
+    });
+
+    // Checkbox functionality - Layer visibility toggle
+    const layerCheckboxes = {
+      'administrative-checkbox': 'administrative',
+      'forest-types-checkbox': 'forestTypes',
+      'terrain-checkbox': 'terrain',
+      'forest-management-checkbox': 'forestManagement',
+      'forest-status-checkbox': 'forestStatus'
+    };
+
+    Object.entries(layerCheckboxes).forEach(([checkboxId, layerKey]) => {
+      const checkbox = container.querySelector(`#${checkboxId}`);
+      if (checkbox) {
+        checkbox.addEventListener("change", (e) => {
+          e.stopPropagation();
+          console.log(`Toggle layer: ${layerKey}, checked: ${checkbox.checked}`);
+          toggleLayerVisibility(layerKey);
+        });
+      }
     });
 
     const CustomControl = L.Control.extend({
@@ -140,7 +489,7 @@ const CustomMapControl = ({ setMapType }) => {
     return () => {
       map.removeControl(control);
     };
-  }, [map, setMapType]);
+  }, [map, setMapType, mapLayers, toggleLayerVisibility]);
 
   return null;
 };
@@ -179,452 +528,48 @@ const getColorByStatus = (properties) => {
   return "#3388ff"; // Xanh mặc định
 };
 
-// Hàm chuyển đổi diện tích thành số
-const parseArea = (areaValue) => {
-  if (areaValue === null || areaValue === undefined) return null;
-  
-  // Nếu là chuỗi có chứa "ha"
-  if (typeof areaValue === 'string' && areaValue.includes('ha')) {
-    return parseFloat(areaValue.replace(/[^0-9.,]/g, '').replace(',', '.'));
-  }
-  
-  // Nếu là số hoặc chuỗi số
-  return parseFloat(String(areaValue).replace(',', '.'));
-};
-
 // Component chính
 const Map = () => {
-  const { geoData, loading, setGeoData } = useGeoData();
+  const { geoData, loading, mapLayers, toggleLayerVisibility } = useGeoData();
   const [mapType, setMapType] = useState("satellite");
   const [mapReady, setMapReady] = useState(false);
   const location = useLocation();
   const isDataPage = location.pathname === "/dashboard/quanlydulieu";
-  const geoJsonLayerRef = useRef(null);
   const [selectedFeature, setSelectedFeature] = useState(null);
-  const [selectedRowFeature, setSelectedRowFeature] = useState(null);
-  const [highlightedLayerRef, setHighlightedLayerRef] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
 
   const layerName = getQueryParam(location.search, "layer");
-  const tableName = getTableNameFromLayerParam(layerName) || "mat_rung"; // Mặc định là mat_rung nếu không có
-
-  // Debug geoData để kiểm tra nó nhận được gì từ backend
-  useEffect(() => {
-    if (geoData) {
-      console.log("Dữ liệu GeoJSON nhận được:", geoData);
-      console.log("Số lượng features:", geoData.features?.length || 0);
-      if (geoData.features && geoData.features.length > 0) {
-        console.log("Feature đầu tiên:", geoData.features[0]);
-      }
-    }
-  }, [geoData]);
-
-  // Hàm tối ưu để xử lý khi click vào một hàng trong bảng
-  const handleRowClick = (row) => {
-    setLoadingDetails(true);
-    setLoadingMessage("Đang tìm vị trí trên bản đồ...");
-    
-    console.log("Đã click vào hàng:", row);
-    console.log("Chi tiết dòng đã chọn:", JSON.stringify(row, null, 2));
-    
-    // Kiểm tra dữ liệu GeoJSON
-    if (!geoData || !geoData.features || geoData.features.length === 0) {
-      console.error("Không có dữ liệu GeoJSON hoặc dữ liệu rỗng");
-      setLoadingDetails(false);
-      return;
-    }
-    
-    console.log("Tổng số features:", geoData.features.length);
-    
-    try {
-      // Chuẩn bị các giá trị để so sánh
-      const rowArea = parseArea(row.area);
-      const rowTk = row.tk;
-      const rowKhoanh = row.khoanh;
-      const rowMahuyen = row.mahuyen;
-      const rowXa = row.xa;
-      const rowStartDau = row.start_dau;
-      const rowEndSau = row.end_sau;
-      
-      console.log(`Tìm feature với: TK=${rowTk}, Khoảnh=${rowKhoanh}, Diện tích=${rowArea}, Mã huyện=${rowMahuyen}, Từ=${rowStartDau}, Đến=${rowEndSau}`);
-      
-      // Tạo ID ảo để phân biệt các feature
-      const createVirtualId = (props) => {
-        return `${props.tk || ''}|${props.khoanh || ''}|${props.area || ''}|${props.start_dau || ''}|${props.end_sau || ''}`;
-      };
-      
-      const rowVirtualId = createVirtualId(row);
-      console.log("ID ảo của dòng:", rowVirtualId);
-      
-      // Tìm feature khớp chính xác nhất
-      let matchedFeature = null;
-      let bestMatchScore = -1;
-      
-      // Giả lập quá trình tìm kiếm để hiển thị loading
-      setTimeout(() => {
-        setLoadingMessage("Phân tích dữ liệu...");
-      }, 300);
-      
-      setTimeout(() => {
-        setLoadingMessage("Đang xác định vị trí...");
-      }, 600);
-      
-      // Duyệt qua từng feature để tìm khớp nhất
-      for (let i = 0; i < geoData.features.length; i++) {
-        const feature = geoData.features[i];
-        const props = feature.properties;
-        const featureArea = parseArea(props.area);
-        
-        // Tính điểm khớp cho feature này
-        let matchScore = 0;
-        
-        // Khớp theo tiểu khu (trọng số cao)
-        if (rowTk && props.tk && rowTk === props.tk) {
-          matchScore += 5;
-        }
-        
-        // Khớp theo khoảnh (trọng số cao)
-        if (rowKhoanh && props.khoanh && rowKhoanh === props.khoanh) {
-          matchScore += 5;
-        }
-        
-        // Khớp theo diện tích (với độ chính xác cao)
-        if (rowArea && featureArea && Math.abs(rowArea - featureArea) < 0.05) {
-          matchScore += 10 - Math.abs(rowArea - featureArea) * 100; // Điểm cao hơn cho khớp chính xác hơn
-        }
-        
-        // Khớp theo mã huyện
-        if (rowMahuyen && props.mahuyen && rowMahuyen === props.mahuyen) {
-          matchScore += 3;
-        }
-        
-        // Khớp theo xã
-        if (rowXa && props.xa && rowXa === props.xa) {
-          matchScore += 3;
-        }
-        
-        // Khớp theo thời gian
-        if (rowStartDau && props.start_dau && rowStartDau === props.start_dau) {
-          matchScore += 2;
-        }
-        
-        if (rowEndSau && props.end_sau && rowEndSau === props.end_sau) {
-          matchScore += 2;
-        }
-        
-        // So sánh ID ảo (trọng số rất cao)
-        const featureVirtualId = createVirtualId(props);
-        if (rowVirtualId === featureVirtualId) {
-          matchScore += 20;
-        }
-        
-        // Kiểm tra nếu feature này khớp tốt hơn
-        if (matchScore > bestMatchScore) {
-          bestMatchScore = matchScore;
-          matchedFeature = feature;
-          console.log(`Feature #${i} có điểm khớp: ${matchScore}, hiện là feature tốt nhất`);
-        }
-      }
-      
-      setTimeout(() => {
-        if (matchedFeature) {
-          console.log("Tìm thấy feature khớp tốt nhất với điểm:", bestMatchScore);
-          console.log("Feature:", matchedFeature);
-          
-          // Đánh dấu feature được chọn
-          setSelectedFeature(matchedFeature);
-          setSelectedRowFeature(matchedFeature);
-          
-          // Thực hiện zoom đến feature
-          if (window._leaflet_map) {
-            try {
-              // Reset style cho feature được highlight trước đó
-              if (highlightedLayerRef && geoJsonLayerRef.current) {
-                geoJsonLayerRef.current.resetStyle(highlightedLayerRef);
-              }
-              
-              // Highlight feature mới trên bản đồ
-              if (geoJsonLayerRef.current) {
-                let newHighlightedLayer = null;
-                
-                geoJsonLayerRef.current.eachLayer(layer => {
-                  if (layer.feature === matchedFeature) {
-                    layer.setStyle({
-                      weight: 3,
-                      color: '#ff7800',
-                      opacity: 1,
-                      fillOpacity: 0.7
-                    });
-                    layer.bringToFront();
-                    newHighlightedLayer = layer;
-                    
-                    // Mở popup nếu có
-                    if (layer.getPopup) {
-                      layer.openPopup();
-                    }
-                  }
-                });
-                
-                setHighlightedLayerRef(newHighlightedLayer);
-              }
-              
-              // Tạo layer tạm thời chỉ với geometry để tạo bounds
-              const tempGeojson = {
-                type: "Feature",
-                geometry: matchedFeature.geometry,
-                properties: {}
-              };
-              
-              const tempLayer = L.geoJSON(tempGeojson);
-              const bounds = tempLayer.getBounds();
-              
-              if (bounds && bounds.isValid()) {
-                console.log("Bounds hợp lệ, thực hiện flyToBounds:", bounds);
-                
-                // Sử dụng timeout để đảm bảo map đã render
-                setTimeout(() => {
-                  window._leaflet_map.flyToBounds(bounds, {
-                    padding: [100, 100],
-                    maxZoom: 18,
-                    duration: 1.5,
-                    animate: true
-                  });
-                  
-                  // Hoàn thành quá trình tìm kiếm
-                  setLoadingDetails(false);
-                }, 300);
-              } else {
-                console.warn("Bounds không hợp lệ, sử dụng phương án dự phòng");
-                
-                // Phương án dự phòng - zoom đến tọa độ trung tâm
-                let centerCoords;
-                if (matchedFeature.geometry.type === "MultiPolygon") {
-                  // Duyệt qua tất cả các polygon và tìm một điểm hợp lệ
-                  for (let i = 0; i < matchedFeature.geometry.coordinates.length; i++) {
-                    if (matchedFeature.geometry.coordinates[i][0].length > 0) {
-                      centerCoords = matchedFeature.geometry.coordinates[i][0][0];
-                      break;
-                    }
-                  }
-                } else if (matchedFeature.geometry.type === "Polygon") {
-                  centerCoords = matchedFeature.geometry.coordinates[0][0];
-                }
-                
-                if (centerCoords) {
-                  window._leaflet_map.setView([centerCoords[1], centerCoords[0]], 16);
-                  console.log("Đã zoom đến tọa độ:", centerCoords);
-                  
-                  // Hoàn thành quá trình tìm kiếm
-                  setLoadingDetails(false);
-                } else {
-                  console.error("Không thể tìm tọa độ hợp lệ trong geometry");
-                  setLoadingDetails(false);
-                }
-              }
-            } catch (error) {
-              console.error("Lỗi khi zoom:", error);
-              setLoadingDetails(false);
-            }
-          } else {
-            console.error("Map chưa được khởi tạo");
-            setLoadingDetails(false);
-          }
-        } else {
-          console.error("Không tìm thấy feature tương ứng");
-          toast.error("Không thể tìm thấy vị trí chính xác trên bản đồ. Vui lòng thử lại hoặc chọn mục khác.");
-          setLoadingDetails(false);
-        }
-      }, 1000); // Đợi 1 giây để giả lập quá trình tìm kiếm
-    } catch (error) {
-      console.error("Lỗi xử lý sự kiện click bảng:", error);
-      setLoadingDetails(false);
-    }
-  };
 
   // Xử lý cho mỗi feature trên bản đồ
-  const onEachFeature = (feature, layer) => {
+  const onEachFeature = (feature, layer, layerType) => {
     if (feature.properties) {
-      // Xây dựng HTML popup
-      let popupContent = `
-      <div class="custom-popup">
-        <h4 class="popup-title">Thông tin đối tượng</h4>
-        <table class="popup-table">
-      `;
-
-      // Các trường quan trọng hiển thị đầu tiên
-      const priorityFields = [
-        "huyen", "xa", "area", "start_dau", "end_sau", 
-        "tk", "khoanh", "churung", "mahuyen"
-      ];
-
-      // Xử lý các trường ưu tiên trước
-      priorityFields.forEach((field) => {
-        if (feature.properties[field] !== undefined) {
-          let value = feature.properties[field];
-          let label = field;
-
-          // Định dạng ngày tháng
-          if (field === "start_dau" || field === "end_sau") {
-            value = formatDate(value);
-            label = field === "start_dau" ? "Từ ngày" : "Đến ngày";
-          }
-
-          // Định dạng diện tích
-          if (field === "area" && value !== null) {
-            value = `${(parseFloat(value) / 10000).toFixed(2)} ha`;
-            label = "Diện tích";
-          }
-
-          // Đổi tên hiển thị các trường
-          if (field === "huyen") label = "Huyện";
-          if (field === "xa") label = "Xã";
-          if (field === "tk") label = "Tiểu khu";
-          if (field === "khoanh") label = "Khoảnh";
-          if (field === "churung") label = "Chủ rừng";
-          if (field === "mahuyen") label = "Mã huyện";
-
-          popupContent += `
-          <tr>
-            <th>${label}</th>
-            <td>${value !== null ? value : "Không có"}</td>
-          </tr>
-          `;
-        }
-      });
-
-      // Trạng thái xác minh nếu có
-      if (feature.properties.detection_status) {
-        popupContent += `
-        <tr>
-          <th>Trạng thái</th>
-          <td>${feature.properties.detection_status}</td>
-        </tr>
-        `;
-      }
-
-      // Thêm các thuộc tính còn lại (bỏ qua các thuộc tính kỹ thuật)
-      Object.entries(feature.properties).forEach(([key, value]) => {
-        // Bỏ qua các trường đã xử lý và trường kỹ thuật
-        if (
-          !priorityFields.includes(key) &&
-          key !== "detection_status" &&
-          !key.includes("geom") &&
-          !key.startsWith("_") &&
-          !["x", "y", "x_vn2000", "y_vn2000"].includes(key)
-        ) {
-          popupContent += `
-          <tr>
-            <th>${key}</th>
-            <td>${value !== null ? value : "Không có"}</td>
-          </tr>
-          `;
-        }
-      });
-
-      popupContent += `
-        </table>
-      </div>
-      `;
-
+      const popupContent = buildPopupContent(feature, layerType);
       layer.bindPopup(popupContent, { maxWidth: 300, className: "custom-popup-container" });
     }
 
-    // Sự kiện mouseover/mouseout để highlight đối tượng
     layer.on("mouseover", function () {
+      const currentStyle = getLayerStyle(this.feature, layerType, false);
       this.setStyle({
-        weight: 3,
+        ...currentStyle,
+        weight: currentStyle.weight + 1,
         color: "#ff7800",
-        dashArray: "",
-        fillOpacity: 0.7,
+        fillOpacity: Math.min(currentStyle.fillOpacity + 0.2, 1),
       });
       this.bringToFront();
     });
 
     layer.on("mouseout", function () {
-      // Chỉ reset style nếu không phải đối tượng được chọn
       if (!selectedFeature || this.feature !== selectedFeature) {
-        geoJsonLayerRef.current.resetStyle(this);
+        const originalStyle = getLayerStyle(this.feature, layerType, false);
+        this.setStyle(originalStyle);
       }
     });
 
-    // Sự kiện click cho layer
     layer.on("click", () => {
-      // Đặt style cho tất cả các layer
-      if (geoJsonLayerRef.current) {
-        geoJsonLayerRef.current.eachLayer((l) => {
-          l.setStyle({
-            weight: l === layer ? 3 : 1,
-            color: l === layer ? "#ff7800" : "#3388ff",
-            fillOpacity: l === layer ? 0.7 : 0.2,
-          });
-
-          if (l === layer) {
-            l.bringToFront();
-          }
-        });
-      }
-
       setSelectedFeature(feature);
-      setHighlightedLayerRef(layer);
     });
   };
-
-  // Xử lý zoom đến layer từ WMS
-  useEffect(() => {
-    const map = window._leaflet_map;
-    if (!map || !layerName) return;
-
-    const [workspace, layer] = layerName.split(":");
-    const url = `http://localhost:8080/geoserver/${workspace}/wms?service=WMS&version=1.1.1&request=GetCapabilities`;
-
-    fetch(url)
-      .then((res) => res.text())
-      .then((text) => {
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(text, "text/xml");
-        const layerNodes = xml.querySelectorAll("Layer > Layer");
-
-        for (let i = 0; i < layerNodes.length; i++) {
-          const name = layerNodes[i].getElementsByTagName("Name")[0]?.textContent;
-          if (name === layer) {
-            const bboxEl = layerNodes[i].getElementsByTagName("LatLonBoundingBox")[0];
-            if (bboxEl) {
-              const minx = parseFloat(bboxEl.getAttribute("minx"));
-              const miny = parseFloat(bboxEl.getAttribute("miny"));
-              const maxx = parseFloat(bboxEl.getAttribute("maxx"));
-              const maxy = parseFloat(bboxEl.getAttribute("maxy"));
-
-              const bounds = [[miny, minx], [maxy, maxx]];
-              map.flyToBounds(bounds, { padding: [20, 20] });
-              console.log("✅ Zoom đến bbox:", bounds);
-            }
-            break;
-          }
-        }
-      })
-      .catch((err) => console.error("❌ Lỗi khi lấy GetCapabilities:", err));
-  }, [layerName]);
-
-  // Zoom tới feature khi map và data sẵn sàng
-  useEffect(() => {
-    if (mapReady && geoData?.features?.length > 0 && window._leaflet_map) {
-      try {
-        console.log("Cố gắng zoom đến dữ liệu...");
-        const geoJsonLayer = L.geoJSON(geoData);
-        const bounds = geoJsonLayer.getBounds();
-
-        if (bounds.isValid()) {
-          console.log("Bounds hợp lệ:", bounds);
-          window._leaflet_map.fitBounds(bounds, { padding: [20, 20] });
-        } else {
-          console.log("Bounds không hợp lệ từ GeoJSON");
-        }
-      } catch (err) {
-        console.error("Lỗi khi zoom đến dữ liệu:", err);
-      }
-    }
-  }, [mapReady, geoData]);
 
   return (
     <div className="p-2 md:p-5 font-sans relative">
@@ -654,7 +599,6 @@ const Map = () => {
           whenCreated={(mapInstance) => {
             console.log("Map đã được khởi tạo");
             window._leaflet_map = mapInstance;
-            // Thêm timeout để đảm bảo map hoàn toàn sẵn sàng
             setTimeout(() => {
               setMapReady(true);
               console.log("Map đã sẵn sàng");
@@ -670,9 +614,6 @@ const Map = () => {
             </>
           )}
 
-          {/* Component để xử lý việc bay đến feature được chọn từ bảng */}
-          <MapUpdater selectedFeature={selectedRowFeature} />
-
           {layerName ? (
             <WMSTileLayer
               url="http://localhost:8080/geoserver/rung/wms"
@@ -682,44 +623,83 @@ const Map = () => {
               version="1.1.0"
               attribution="GeoServer"
             />
-          ) : loading ? (
-            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-3 rounded shadow-lg text-green-700 font-semibold z-[1000]">
-              ⏳ Đang tải dữ liệu...
-            </div>
           ) : (
-            geoData?.type === "FeatureCollection" &&
-            geoData.features?.length > 0 && (
-              <GeoJSON
-                key={Date.now()}
-                data={geoData}
-                onEachFeature={onEachFeature}
-                style={(feature) => ({
-                  fillColor: getColorByStatus(feature.properties),
-                  weight: selectedFeature && feature === selectedFeature ? 3 : 1,
-                  opacity: 1,
-                  color: selectedFeature && feature === selectedFeature ? "#ff7800" : "#ffffff",
-                  fillOpacity: 0.7,
-                })}
-                ref={(layerRef) => {
-                  if (layerRef) {
-                    geoJsonLayerRef.current = layerRef;
+            <>
+              {/* Hiển thị các layer theo thứ tự từ dưới lên trên */}
+              
+              {/* Layer hiện trạng rừng (dưới cùng) */}
+              {mapLayers.forestStatus?.data && mapLayers.forestStatus.visible && (
+                <GeoJSON
+                  key={`forest-status-${Date.now()}`}
+                  data={mapLayers.forestStatus.data}
+                  onEachFeature={(feature, layer) => onEachFeature(feature, layer, 'forestStatus')}
+                  style={(feature) => getLayerStyle(feature, 'forestStatus', selectedFeature === feature)}
+                />
+              )}
 
-                    if (mapReady) {
-                      const bounds = layerRef.getBounds();
-                      if (bounds.isValid()) {
-                        window._leaflet_map.fitBounds(bounds, {
-                          padding: [20, 20],
-                        });
-                        console.log("✅ Đã zoom đến dữ liệu GeoJSON");
-                      }
-                    }
-                  }
-                }}
-              />
-            )
+              {/* Layer chủ quản lý rừng */}
+              {mapLayers.forestManagement?.data && mapLayers.forestManagement.visible && (
+                <GeoJSON
+                  key={`forest-management-${Date.now()}`}
+                  data={mapLayers.forestManagement.data}
+                  onEachFeature={(feature, layer) => onEachFeature(feature, layer, 'forestManagement')}
+                  style={(feature) => getLayerStyle(feature, 'forestManagement', selectedFeature === feature)}
+                />
+              )}
+
+              {/* Layer 3 loại rừng */}
+              {mapLayers.forestTypes?.data && mapLayers.forestTypes.visible && (
+                <GeoJSON
+                  key={`forest-types-${Date.now()}`}
+                  data={mapLayers.forestTypes.data}
+                  onEachFeature={(feature, layer) => onEachFeature(feature, layer, 'forestTypes')}
+                  style={(feature) => getLayerStyle(feature, 'forestTypes', selectedFeature === feature)}
+                />
+              )}
+
+              {/* Layer địa hình */}
+              {mapLayers.terrain?.data && mapLayers.terrain.visible && (
+                <GeoJSON
+                  key={`terrain-${Date.now()}`}
+                  data={mapLayers.terrain.data}
+                  onEachFeature={(feature, layer) => onEachFeature(feature, layer, 'terrain')}
+                  style={(feature) => getLayerStyle(feature, 'terrain', selectedFeature === feature)}
+                />
+              )}
+
+              {/* Layer ranh giới hành chính (trên cùng) */}
+              {mapLayers.administrative?.data && mapLayers.administrative.visible && (
+                <GeoJSON
+                  key={`administrative-${Date.now()}`}
+                  data={mapLayers.administrative.data}
+                  onEachFeature={(feature, layer) => onEachFeature(feature, layer, 'administrative')}
+                  style={(feature) => getLayerStyle(feature, 'administrative', selectedFeature === feature)}
+                />
+              )}
+
+              {/* Layer dự báo mất rừng (nếu có) */}
+              {geoData?.type === "FeatureCollection" && geoData.features?.length > 0 && (
+                <GeoJSON
+                  key={`deforestation-${Date.now()}`}
+                  data={geoData}
+                  onEachFeature={(feature, layer) => onEachFeature(feature, layer, 'deforestation')}
+                  style={(feature) => ({
+                    fillColor: getColorByStatus(feature.properties),
+                    weight: selectedFeature && feature === selectedFeature ? 3 : 1,
+                    opacity: 1,
+                    color: selectedFeature && feature === selectedFeature ? "#ff7800" : "#ffffff",
+                    fillOpacity: 0.7,
+                  })}
+                />
+              )}
+            </>
           )}
 
-          <CustomMapControl setMapType={setMapType} />
+          <CustomMapControl 
+            setMapType={setMapType} 
+            mapLayers={mapLayers}
+            toggleLayerVisibility={toggleLayerVisibility}
+          />
         </MapContainer>
       </div>
 
@@ -740,8 +720,7 @@ const Map = () => {
               
               <Table
                 data={geoData.features.map((f) => f.properties)}
-                tableName={tableName}
-                onRowClick={handleRowClick}
+                onRowClick={() => {}}
               />
             </div>
           )
@@ -749,15 +728,10 @@ const Map = () => {
 
       {/* Debugging display */}
       {!loading &&
-        (!geoData || !geoData.features || geoData.features.length === 0) && (
+        (!geoData || !geoData.features || geoData.features.length === 0) && 
+        Object.values(mapLayers).every(layer => !layer.data) && (
           <div className="text-center text-amber-700 font-semibold p-3 bg-amber-50 rounded-md mt-2">
-            ⚠️ Không có dữ liệu hoặc dữ liệu không đúng định dạng.
-            {geoData && (
-              <div className="text-xs mt-1 text-gray-600">
-                Type: {geoData.type || "N/A"}, Features:{" "}
-                {geoData.features?.length || 0}
-              </div>
-            )}
+            ⚠️ Chưa có dữ liệu hiển thị. Hãy sử dụng chức năng "Cập nhật dữ liệu" để tải các lớp bản đồ.
           </div>
         )}
     </div>
