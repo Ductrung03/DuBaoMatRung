@@ -183,10 +183,68 @@ router.get("/administrative", async (req, res) => {
  *       200:
  *         description: Dữ liệu GeoJSON chủ quản lý rừng
  */
+// File: server/routes/layerData.routes.js
+// Debug và sửa lại endpoint forest-management
+
 router.get("/forest-management", async (req, res) => {
   try {
     console.log(`📥 Received request for forest management data`);
     
+    // Kiểm tra bảng tồn tại
+    const tableCheckQuery = `
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'laocai_chuquanly'
+      );
+    `;
+    
+    const tableCheck = await pool.query(tableCheckQuery);
+    if (!tableCheck.rows[0].exists) {
+      console.error(`❌ Bảng laocai_chuquanly không tồn tại`);
+      return res.status(404).json({ 
+        error: "Bảng dữ liệu không tồn tại",
+        table: "laocai_chuquanly"
+      });
+    }
+    
+    // Kiểm tra số lượng records
+    const countQuery = `SELECT COUNT(*) as count FROM laocai_chuquanly WHERE ST_IsValid(geom)`;
+    const countResult = await pool.query(countQuery);
+    console.log(`📊 Số records hợp lệ trong laocai_chuquanly: ${countResult.rows[0].count}`);
+    
+    if (countResult.rows[0].count === 0) {
+      console.warn(`⚠️ Không có dữ liệu hợp lệ trong bảng laocai_chuquanly`);
+      return res.json({
+        type: "FeatureCollection",
+        features: []
+      });
+    }
+    
+    // Kiểm tra cấu trúc bảng
+    const structureQuery = `
+      SELECT column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_schema = 'public' 
+      AND table_name = 'laocai_chuquanly'
+      ORDER BY ordinal_position;
+    `;
+    const structureResult = await pool.query(structureQuery);
+    console.log(`📋 Cấu trúc bảng laocai_chuquanly:`, structureResult.rows);
+    
+    // Lấy dữ liệu mẫu
+    const sampleQuery = `
+      SELECT gid, tt, chuquanly, 
+             ST_GeometryType(geom) as geom_type,
+             ST_SRID(geom) as srid
+      FROM laocai_chuquanly 
+      WHERE ST_IsValid(geom) 
+      LIMIT 3;
+    `;
+    const sampleResult = await pool.query(sampleQuery);
+    console.log(`🔍 Dữ liệu mẫu:`, sampleResult.rows);
+    
+    // Query chính với xử lý lỗi tốt hơn
     const query = `
       SELECT json_build_object(
         'type', 'FeatureCollection',
@@ -204,23 +262,26 @@ router.get("/forest-management", async (req, res) => {
           'properties', json_build_object(
             'gid', gid,
             'tt', tt,
-            'chuquanly', chuquanly,
+            'chuquanly', COALESCE(chuquanly, 'Không xác định'),
             'layer_type', 'forest_management'
           )
         ) as feature
         FROM laocai_chuquanly
-        WHERE ST_IsValid(geom) AND geom IS NOT NULL
+        WHERE ST_IsValid(geom) 
+          AND geom IS NOT NULL
+          AND ST_GeometryType(geom) IN ('ST_Polygon', 'ST_MultiPolygon')
         ORDER BY gid
+        LIMIT 1000
       ) AS features;
     `;
 
-    console.log(`🔍 Executing forest management query with coordinate transformation`);
+    console.log(`🔍 Executing forest management query...`);
     const result = await pool.query(query);
     let geojson = result.rows[0].geojson;
 
     console.log(`📊 Forest management result count: ${geojson.features?.length || 0}`);
     
-    // Log sample coordinates để kiểm tra transform
+    // Kiểm tra tọa độ mẫu
     if (geojson.features && geojson.features.length > 0) {
       const sampleFeature = geojson.features[0];
       const sampleCoords = sampleFeature.geometry?.coordinates?.[0]?.[0]?.[0];
@@ -250,7 +311,7 @@ router.get("/forest-management", async (req, res) => {
 
     console.log(`✅ Loaded ${geojson.features.length} forest management features`);
     
-    // Log thống kê theo loại chủ quản lý
+    // Thống kê theo loại chủ quản lý
     const managementStats = {};
     geojson.features.forEach(feature => {
       const chuQuanLy = feature.properties.chuquanly || "Không xác định";
@@ -261,9 +322,11 @@ router.get("/forest-management", async (req, res) => {
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu chủ quản lý rừng:", err);
+    console.error("Stack trace:", err.stack);
     res.status(500).json({ 
       error: "Lỗi server khi lấy dữ liệu chủ quản lý rừng",
-      details: err.message 
+      details: err.message,
+      stack: err.stack
     });
   }
 });

@@ -15,50 +15,51 @@ export const GeoDataProvider = ({ children }) => {
   
   // State để quản lý các lớp bản đồ - Cập nhật với tất cả các lớp
   const [mapLayers, setMapLayers] = useState({
-    administrative: { 
-      data: null, 
-      visible: true, 
-      loading: false,
-      name: "Ranh giới hành chính",
-      endpoint: "administrative",
-      bbox: null // Thêm bbox để zoom
-    },
-    forestTypes: { 
-      data: null, 
-      visible: true, 
-      loading: false,
-      name: "3 loại rừng",
-      endpoint: "forest-types"
-    },
-    terrain: { 
-      data: null, 
-      visible: false, 
-      loading: false,
-      name: "Địa hình, thủy văn, giao thông",
-      endpoint: "terrain"
-    },
-    forestManagement: { 
-      data: null, 
-      visible: false, 
-      loading: false,
-      name: "Chủ quản lý rừng",
-      endpoint: "forest-management"
-    },
-    forestStatus: { 
-      data: null, 
-      visible: false, 
-      loading: false,
-      name: "Hiện trạng rừng",
-      endpoint: "forest-status"
-    },
-    deforestationAlerts: { 
-      data: null, 
-      visible: true, 
-      loading: false,
-      name: "Dự báo mất rừng mới nhất",
-      endpoint: "deforestation-alerts"
-    }
-  });
+  administrative: { 
+    data: null, 
+    visible: true, 
+    loading: false,
+    name: "Ranh giới hành chính",
+    endpoint: "administrative",
+    bbox: null
+  },
+  forestTypes: { 
+    data: null, 
+    visible: true, 
+    loading: false,
+    name: "3 loại rừng",
+    endpoint: "forest-types"
+  },
+  terrain: { 
+    data: null, 
+    visible: false, 
+    loading: false,
+    name: "Địa hình, thủy văn, giao thông",
+    endpoint: "terrain"
+  },
+  forestManagement: { 
+    data: null, 
+    visible: true, // SỬA: Đặt visible = true mặc định
+    loading: false,
+    name: "Chủ quản lý rừng",
+    endpoint: "forest-management"
+  },
+  forestStatus: { 
+    data: null, 
+    visible: false, 
+    loading: false,
+    name: "Hiện trạng rừng",
+    endpoint: "forest-status"
+  },
+  deforestationAlerts: { 
+    data: null, 
+    visible: true, 
+    loading: false,
+    name: "Dự báo mất rừng mới nhất",
+    endpoint: "deforestation-alerts"
+  }
+});
+
 
   // Hàm để cập nhật dữ liệu cho một lớp cụ thể
 const updateLayerData = (layerName, data) => {

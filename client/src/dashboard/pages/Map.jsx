@@ -13,6 +13,7 @@ import Table from "./Table";
 import { useGeoData } from "../contexts/GeoDataContext";
 import { formatDate } from "../../utils/formatDate";
 import { ClipLoader } from "react-spinners";
+import DynamicLegendControl from "../components/DynamicLegendControl";
 
 // Trong file client/src/dashboard/pages/Map.jsx
 // Sửa hàm getLayerStyle để thêm case cho forestManagement
@@ -118,38 +119,38 @@ const getLayerStyle = (feature, layerType, isSelected = false) => {
         ...selectedStyle,
       };
 
-    case "forestManagement":
-      // THÊM CASE MỚI CHO CHỦ QUẢN LÝ RỪNG
-      console.log(`🏢 Forest Management feature:`, feature.properties);
-      
-      // Màu sắc theo từng loại chủ quản lý
-      const chuQuanLy = feature.properties.chuquanly || "";
-      let managementColor = "#9f1239"; // Màu đỏ đậm mặc định
+   case "forestManagement":
+    // SỬA LẠI PHẦN NÀY - tương tự như forestTypes
+    console.log(`🏢 Forest Management feature:`, feature.properties);
+    
+    // Màu sắc theo từng loại chủ quản lý - sử dụng màu rõ ràng hơn
+    const chuQuanLy = feature.properties.chuquanly || "";
+    let managementColor = "#7c3aed"; // Tím mặc định
 
-      // Phân loại màu theo chủ quản lý
-      if (chuQuanLy.includes("Nhà nước") || chuQuanLy.includes("UBND")) {
-        managementColor = "#dc2626"; // Đỏ - Nhà nước
-      } else if (chuQuanLy.includes("Công ty") || chuQuanLy.includes("Doanh nghiệp")) {
-        managementColor = "#ea580c"; // Cam - Doanh nghiệp
-      } else if (chuQuanLy.includes("Hợp tác xã") || chuQuanLy.includes("HTX")) {
-        managementColor = "#d97706"; // Vàng cam - Hợp tác xã
-      } else if (chuQuanLy.includes("Cá nhân") || chuQuanLy.includes("Hộ gia đình")) {
-        managementColor = "#059669"; // Xanh lá - Cá nhân/Hộ gia đình
-      } else if (chuQuanLy.includes("Cộng đồng") || chuQuanLy.includes("Thôn")) {
-        managementColor = "#0891b2"; // Xanh dương - Cộng đồng
-      } else {
-        managementColor = "#7c3aed"; // Tím - Khác
-      }
+    // Phân loại màu theo chủ quản lý - sử dụng màu tương tự 3 loại rừng
+    if (chuQuanLy.includes("Nhà nước") || chuQuanLy.includes("UBND") || chuQuanLy.includes("Chi cục")) {
+      managementColor = "#dc2626"; // Đỏ - Nhà nước
+    } else if (chuQuanLy.includes("Công ty") || chuQuanLy.includes("Doanh nghiệp")) {
+      managementColor = "#ea580c"; // Cam - Doanh nghiệp
+    } else if (chuQuanLy.includes("Hợp tác xã") || chuQuanLy.includes("HTX")) {
+      managementColor = "#d97706"; // Vàng cam - Hợp tác xã
+    } else if (chuQuanLy.includes("Cá nhân") || chuQuanLy.includes("Hộ gia đình")) {
+      managementColor = "#059669"; // Xanh lá - Cá nhân/Hộ gia đình
+    } else if (chuQuanLy.includes("Cộng đồng") || chuQuanLy.includes("Thôn")) {
+      managementColor = "#0891b2"; // Xanh dương - Cộng đồng
+    } else {
+      managementColor = "#7c3aed"; // Tím - Khác
+    }
 
-      return {
-        ...baseStyle,
-        color: isSelected ? "#ff7800" : "#1f2937",
-        fillColor: managementColor,
-        weight: isSelected ? 3 : 2,
-        opacity: 1,
-        fillOpacity: 0.7,
-        ...selectedStyle,
-      };
+    return {
+      ...baseStyle,
+      color: isSelected ? "#ff7800" : "#2d3748", // Giống như forestTypes
+      fillColor: managementColor,
+      weight: isSelected ? 3 : 2,
+      opacity: 1,
+      fillOpacity: 0.6, // Giống như forestTypes
+      ...selectedStyle,
+    };
 
     case "terrain":
       // Style cho địa hình, thủy văn, giao thông
@@ -414,14 +415,18 @@ const LoadingOverlay = ({ message }) => (
   </div>
 );
 
-// Control để chọn loại bản đồ và quản lý lớp dữ liệu với legend được cải thiện
+// File: client/src/dashboard/pages/Map.jsx
+// Cập nhật CustomMapControl để chỉ hiển thị checkbox khi đã tải dữ liệu
+
 const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
   const map = useMap();
 
   useEffect(() => {
     const container = L.DomUtil.create("div");
 
-    container.innerHTML = `
+    // Hàm tạo HTML động cho legend dựa trên trạng thái các layer
+    const createLegendHTML = () => {
+      return `
       <div class="map-legend-control" style="
         position: relative;
         z-index: 1000;
@@ -482,7 +487,8 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
             </div>
           </div>
 
-          <!-- Lớp ranh giới hành chính -->
+          <!-- Lớp ranh giới hành chính - CHỈ HIỂN THỊ KHI CÓ DỮ LIỆU -->
+          ${mapLayers.administrative?.data ? `
           <div class="legend-section">
             <div class="section-header" style="
               padding: 8px 12px;
@@ -497,6 +503,7 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               } style="margin-right: 8px;">
               <span style="color: #1a365d;">🏛️</span>
               <span style="margin-left: 6px; font-weight: 500;">Lớp ranh giới hành chính</span>
+              <span style="margin-left: 8px; font-size: 10px; color: #666;">(${mapLayers.administrative.data.features?.length || 0})</span>
               <svg class="section-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-left: auto; transform: rotate(0deg); transition: transform 0.3s;">
                 <polyline points="6,9 12,15 18,9"></polyline>
               </svg>
@@ -526,8 +533,10 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               </div>
             </div>
           </div>
+          ` : ''}
 
-          <!-- Lớp 3 loại rừng - CẬP NHẬT VỚI MÀU SẮCMỚI -->
+          <!-- Lớp 3 loại rừng - CHỈ HIỂN THỊ KHI CÓ DỮ LIỆU -->
+          ${mapLayers.forestTypes?.data ? `
           <div class="legend-section">
             <div class="section-header" style="
               padding: 8px 12px;
@@ -541,6 +550,7 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               } style="margin-right: 8px;">
               <span style="color: #38a169;">🌲</span>
               <span style="margin-left: 6px; font-weight: 500;">Lớp 3 loại rừng</span>
+              <span style="margin-left: 8px; font-size: 10px; color: #666;">(${mapLayers.forestTypes.data.features?.length || 0})</span>
               <svg class="section-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-left: auto; transform: rotate(-90deg); transition: transform 0.3s;">
                 <polyline points="6,9 12,15 18,9"></polyline>
               </svg>
@@ -560,8 +570,10 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               </div>
             </div>
           </div>
+          ` : ''}
 
-          <!-- Lớp địa hình, thủy văn, giao thông -->
+          <!-- Lớp địa hình, thủy văn, giao thông - CHỈ HIỂN THỊ KHI CÓ DỮ LIỆU -->
+          ${mapLayers.terrain?.data ? `
           <div class="legend-section">
             <div class="section-header" style="
               padding: 8px 12px;
@@ -575,6 +587,7 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               } style="margin-right: 8px;">
               <span style="color: #3182ce;">🏔️</span>
               <span style="margin-left: 6px; font-weight: 500;">Lớp địa hình, thủy văn, giao thông</span>
+              <span style="margin-left: 8px; font-size: 10px; color: #666;">(${mapLayers.terrain.data.features?.length || 0})</span>
               <svg class="section-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-left: auto; transform: rotate(-90deg); transition: transform 0.3s;">
                 <polyline points="6,9 12,15 18,9"></polyline>
               </svg>
@@ -594,8 +607,10 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               </div>
             </div>
           </div>
+          ` : ''}
 
-          <!-- Lớp chủ quản lý rừng -->
+          <!-- Lớp chủ quản lý rừng - CHỈ HIỂN THỊ KHI CÓ DỮ LIỆU -->
+          ${mapLayers.forestManagement?.data ? `
           <div class="legend-section">
             <div class="section-header" style="
               padding: 8px 12px;
@@ -609,22 +624,42 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               } style="margin-right: 8px;">
               <span style="color: #7c3aed;">🏢</span>
               <span style="margin-left: 6px; font-weight: 500;">Lớp chủ quản lý rừng</span>
+              <span style="margin-left: 8px; font-size: 10px; color: #666;">(${mapLayers.forestManagement.data.features?.length || 0})</span>
               <svg class="section-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-left: auto; transform: rotate(-90deg); transition: transform 0.3s;">
                 <polyline points="6,9 12,15 18,9"></polyline>
               </svg>
             </div>
             <div class="section-content" style="padding: 6px 12px; padding-left: 32px; display: none;">
               <div style="display: flex; align-items: center; margin-bottom: 3px;">
-                <div style="width: 16px; height: 16px; background: #7c3aed; margin-right: 8px; border-radius: 2px; border: 1px solid #5b21b6;"></div>
-                <span style="font-weight: 500; color: #7c3aed;">Vùng chủ quản lý rừng</span>
+                <div style="width: 16px; height: 16px; background: #dc2626; margin-right: 8px; border-radius: 2px; border: 1px solid #991b1b;"></div>
+                <span style="font-weight: 500; color: #dc2626;">Nhà nước</span>
               </div>
-              <div style="font-size: 10px; color: #6b7280; margin-top: 4px; padding-left: 24px;">
-                Phân chia theo đơn vị quản lý rừng
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 16px; height: 16px; background: #ea580c; margin-right: 8px; border-radius: 2px; border: 1px solid #c2410c;"></div>
+                <span style="font-weight: 500; color: #ea580c;">Doanh nghiệp</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 16px; height: 16px; background: #d97706; margin-right: 8px; border-radius: 2px; border: 1px solid #a16207;"></div>
+                <span style="font-weight: 500; color: #d97706;">Hợp tác xã</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 16px; height: 16px; background: #059669; margin-right: 8px; border-radius: 2px; border: 1px solid #047857;"></div>
+                <span style="font-weight: 500; color: #059669;">Cá nhân/Hộ gia đình</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 16px; height: 16px; background: #0891b2; margin-right: 8px; border-radius: 2px; border: 1px solid #0e7490;"></div>
+                <span style="font-weight: 500; color: #0891b2;">Cộng đồng</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 16px; height: 16px; background: #7c3aed; margin-right: 8px; border-radius: 2px; border: 1px solid #5b21b6;"></div>
+                <span style="color: #7c3aed;">Khác</span>
               </div>
             </div>
           </div>
+          ` : ''}
 
-          <!-- Lớp hiện trạng rừng -->
+          <!-- Lớp hiện trạng rừng - CHỈ HIỂN THỊ KHI CÓ DỮ LIỆU -->
+          ${mapLayers.forestStatus?.data ? `
           <div class="legend-section">
             <div class="section-header" style="
               padding: 8px 12px;
@@ -638,10 +673,12 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               } style="margin-right: 8px;">
               <span style="color: #166534;">🌿</span>
               <span style="margin-left: 6px; font-weight: 500;">Lớp hiện trạng rừng</span>
+              <span style="margin-left: 8px; font-size: 10px; color: #666;">(${mapLayers.forestStatus.data.features?.length || 0})</span>
             </div>
           </div>
+          ` : ''}
 
-          <!-- Lớp dự báo mất rừng -->
+          <!-- Lớp dự báo mất rừng - LUÔN HIỂN THỊ -->
           <div class="legend-section">
             <div class="section-header" style="
               padding: 8px 12px;
@@ -649,7 +686,7 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               display: flex;
               align-items: center;
             " data-section="deforestation">
-              <input type="checkbox" checked style="margin-right: 8px;">
+              <input type="checkbox" checked style="margin-right: 8px;" disabled>
               <span style="color: #dc2626;">⚠️</span>
               <span style="margin-left: 6px; font-weight: 500;">Lớp dự báo mất rừng mới nhất</span>
               <svg class="section-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-left: auto; transform: rotate(-90deg); transition: transform 0.3s;">
@@ -671,95 +708,117 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               </div>
             </div>
           </div>
+
+          <!-- Thông báo nếu chưa có layer nào được tải -->
+          ${!mapLayers.administrative?.data && !mapLayers.forestTypes?.data && !mapLayers.terrain?.data && !mapLayers.forestManagement?.data && !mapLayers.forestStatus?.data ? `
+          <div style="padding: 16px 12px; text-align: center; color: #666; font-style: italic;">
+            <div style="margin-bottom: 8px;">📂 Chưa có lớp dữ liệu nào được tải</div>
+            <div style="font-size: 10px;">Sử dụng menu bên trái để tải các lớp dữ liệu</div>
+          </div>
+          ` : ''}
         </div>
       </div>
     `;
+    };
 
-
-
+    // Tạo HTML ban đầu
+    container.innerHTML = createLegendHTML();
     container.className = "leaflet-control leaflet-bar";
 
-    // Event handlers
-    const legendHeader = container.querySelector("#legend-header");
-    const legendContent = container.querySelector("#legend-content");
-    const toggleArrow = container.querySelector("#toggle-arrow");
-    let isExpanded = true;
-
-    // Toggle legend visibility
-    legendHeader.onclick = (e) => {
-      e.preventDefault();
-      isExpanded = !isExpanded;
-      if (isExpanded) {
-        legendContent.style.display = "block";
-        toggleArrow.style.transform = "rotate(0deg)";
-      } else {
-        legendContent.style.display = "none";
-        toggleArrow.style.transform = "rotate(-90deg)";
-      }
+    // Hàm cập nhật lại legend khi mapLayers thay đổi
+    const updateLegend = () => {
+      container.innerHTML = createLegendHTML();
+      setupEventListeners();
     };
 
-    // Map type selection
-    container.querySelectorAll(".map-type-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.preventDefault();
-        const type = btn.getAttribute("data-type");
+    // Hàm setup event listeners
+    const setupEventListeners = () => {
+      const legendHeader = container.querySelector("#legend-header");
+      const legendContent = container.querySelector("#legend-content");
+      const toggleArrow = container.querySelector("#toggle-arrow");
+      let isExpanded = true;
 
-        // Update button styles
-        container.querySelectorAll(".map-type-btn").forEach((b) => {
-          b.style.border = "1px solid #ddd";
-          b.style.background = "white";
-          b.classList.remove("active");
-        });
-
-        btn.style.border = "1px solid #007bff";
-        btn.style.background = "#e3f2fd";
-        btn.classList.add("active");
-
-        setMapType(type);
-      });
-    });
-
-    // Section toggle functionality
-    container.querySelectorAll(".section-header").forEach((header) => {
-      const arrow = header.querySelector(".section-arrow");
-      if (arrow) {
-        header.addEventListener("click", (e) => {
+      // Toggle legend visibility
+      if (legendHeader) {
+        legendHeader.onclick = (e) => {
           e.preventDefault();
-          const content = header.nextElementSibling;
-          const isVisible = content.style.display !== "none";
-
-          if (isVisible) {
-            content.style.display = "none";
-            arrow.style.transform = "rotate(-90deg)";
+          isExpanded = !isExpanded;
+          if (isExpanded) {
+            legendContent.style.display = "block";
+            toggleArrow.style.transform = "rotate(0deg)";
           } else {
-            content.style.display = "block";
-            arrow.style.transform = "rotate(0deg)";
+            legendContent.style.display = "none";
+            toggleArrow.style.transform = "rotate(-90deg)";
           }
-        });
+        };
       }
-    });
 
-    // Checkbox functionality - Layer visibility toggle
-    const layerCheckboxes = {
-      "administrative-checkbox": "administrative",
-      "forest-types-checkbox": "forestTypes",
-      "terrain-checkbox": "terrain",
-      "forest-management-checkbox": "forestManagement",
-      "forest-status-checkbox": "forestStatus",
+      // Map type selection
+      container.querySelectorAll(".map-type-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          const type = btn.getAttribute("data-type");
+
+          // Update button styles
+          container.querySelectorAll(".map-type-btn").forEach((b) => {
+            b.style.border = "1px solid #ddd";
+            b.style.background = "white";
+            b.classList.remove("active");
+          });
+
+          btn.style.border = "1px solid #007bff";
+          btn.style.background = "#e3f2fd";
+          btn.classList.add("active");
+
+          setMapType(type);
+        });
+      });
+
+      // Section toggle functionality
+      container.querySelectorAll(".section-header").forEach((header) => {
+        const arrow = header.querySelector(".section-arrow");
+        if (arrow) {
+          header.addEventListener("click", (e) => {
+            e.preventDefault();
+            const content = header.nextElementSibling;
+            const isVisible = content.style.display !== "none";
+
+            if (isVisible) {
+              content.style.display = "none";
+              arrow.style.transform = "rotate(-90deg)";
+            } else {
+              content.style.display = "block";
+              arrow.style.transform = "rotate(0deg)";
+            }
+          });
+        }
+      });
+
+      // Checkbox functionality - Layer visibility toggle
+      const layerCheckboxes = {
+        "administrative-checkbox": "administrative",
+        "forest-types-checkbox": "forestTypes",
+        "terrain-checkbox": "terrain",
+        "forest-management-checkbox": "forestManagement",
+        "forest-status-checkbox": "forestStatus",
+      };
+
+      Object.entries(layerCheckboxes).forEach(([checkboxId, layerKey]) => {
+        const checkbox = container.querySelector(`#${checkboxId}`);
+        if (checkbox) {
+          checkbox.addEventListener("change", (e) => {
+            e.stopPropagation();
+            console.log(
+              `🔄 Toggle layer: ${layerKey}, checked: ${checkbox.checked}`
+            );
+            toggleLayerVisibility(layerKey);
+          });
+        }
+      });
     };
 
-    Object.entries(layerCheckboxes).forEach(([checkboxId, layerKey]) => {
-      const checkbox = container.querySelector(`#${checkboxId}`);
-      if (checkbox) {
-        checkbox.addEventListener("change", (e) => {
-          e.stopPropagation();
-          console.log(
-            `Toggle layer: ${layerKey}, checked: ${checkbox.checked}`
-          );
-          toggleLayerVisibility(layerKey);
-        });
-      }
-    });
+    // Setup event listeners lần đầu
+    setupEventListeners();
 
     const CustomControl = L.Control.extend({
       onAdd: () => container,
@@ -769,8 +828,18 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
     const control = new CustomControl({ position: "topright" });
     map.addControl(control);
 
+    // Watch for changes in mapLayers và update legend
+    const originalSetMapLayers = setMapType;
+    
+    // Observer để cập nhật legend khi mapLayers thay đổi
+    const observer = new MutationObserver(() => {
+      updateLegend();
+    });
+
+    // Cleanup
     return () => {
       map.removeControl(control);
+      observer.disconnect();
     };
   }, [map, setMapType, mapLayers, toggleLayerVisibility]);
 
@@ -944,23 +1013,24 @@ const Map = () => {
                 )}
 
               {/* Layer chủ quản lý rừng */}
-              {mapLayers.forestManagement?.data &&
-                mapLayers.forestManagement.visible && (
-                  <GeoJSON
-                    key={`forest-management-${Date.now()}`}
-                    data={mapLayers.forestManagement.data}
-                    onEachFeature={(feature, layer) =>
-                      onEachFeature(feature, layer, "forestManagement")
-                    }
-                    style={(feature) =>
-                      getLayerStyle(
-                        feature,
-                        "forestManagement",
-                        selectedFeature === feature
-                      )
-                    }
-                  />
-                )}
+             {mapLayers.forestManagement?.data &&
+  mapLayers.forestManagement.visible && (
+    <GeoJSON
+      key={`forest-management-${Date.now()}`}
+      data={mapLayers.forestManagement.data}
+      onEachFeature={(feature, layer) =>
+        onEachFeature(feature, layer, "forestManagement")
+      }
+      style={(feature) =>
+        getLayerStyle(
+          feature,
+          "forestManagement",
+          selectedFeature === feature
+        )
+      }
+    />
+  )}
+
 
               {/* Layer 3 loại rừng */}
               {mapLayers.forestTypes?.data && mapLayers.forestTypes.visible && (
@@ -1057,7 +1127,7 @@ const Map = () => {
             </>
           )}
 
-          <CustomMapControl
+          <DynamicLegendControl
             setMapType={setMapType}
             mapLayers={mapLayers}
             toggleLayerVisibility={toggleLayerVisibility}

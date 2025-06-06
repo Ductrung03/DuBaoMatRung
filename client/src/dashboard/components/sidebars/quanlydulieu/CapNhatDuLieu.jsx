@@ -101,71 +101,106 @@ const handleLoadLayer = async (layerKey, layerName) => {
 
   // Hàm load tất cả layers cơ bản cùng lúc - SỬA LẠI
   const handleLoadAllBasicLayers = async () => {
-    const basicLayers = [
-      { key: 'administrative', name: 'Ranh giới hành chính' },
-      { key: 'forestTypes', name: '3 loại rừng' }
-    ];
+  const basicLayers = [
+    { key: 'administrative', name: 'Ranh giới hành chính' },
+    { key: 'forestTypes', name: '3 loại rừng' },
+    { key: 'forestManagement', name: 'Chủ quản lý rừng' } // THÊM vào basic layers
+  ];
+  
+  toast.info("🔄 Đang tải tất cả các lớp cơ bản...");
+  
+  const loadPromises = basicLayers.map(({ key, name }) => 
+    handleLoadLayer(key, name).catch(err => {
+      console.error(`Lỗi tải ${name}:`, err);
+      return { error: err, layerKey: key };
+    })
+  );
+  
+  try {
+    const results = await Promise.allSettled(loadPromises);
     
-    toast.info("🔄 Đang tải tất cả các lớp cơ bản...");
+    const successCount = results.filter(result => result.status === 'fulfilled').length;
+    const failCount = results.length - successCount;
     
-    // Sử dụng Promise.allSettled để không bị dừng nếu một layer lỗi
-    const loadPromises = basicLayers.map(({ key, name }) => 
-      handleLoadLayer(key, name).catch(err => {
-        console.error(`Lỗi tải ${name}:`, err);
-        return { error: err, layerKey: key };
-      })
-    );
-    
-    try {
-      const results = await Promise.allSettled(loadPromises);
-      
-      const successCount = results.filter(result => result.status === 'fulfilled').length;
-      const failCount = results.length - successCount;
-      
-      if (failCount === 0) {
-        toast.success("✅ Đã tải xong tất cả các lớp cơ bản!");
-      } else {
-        toast.warning(`⚠️ Đã tải xong ${successCount}/${results.length} lớp. ${failCount} lớp gặp lỗi.`);
-      }
-    } catch (err) {
-      console.error("❌ Lỗi tổng quát khi tải layers:", err);
-      toast.error("❌ Có lỗi xảy ra khi tải một số lớp");
+    if (failCount === 0) {
+      toast.success("✅ Đã tải xong tất cả các lớp cơ bản!");
+    } else {
+      toast.warning(`⚠️ Đã tải xong ${successCount}/${results.length} lớp. ${failCount} lớp gặp lỗi.`);
     }
-  };
+  } catch (err) {
+    console.error("❌ Lỗi tổng quát khi tải layers:", err);
+    toast.error("❌ Có lỗi xảy ra khi tải một số lớp");
+  }
+};
 
-  // Hàm load tất cả layers nâng cao
-  const handleLoadAllAdvancedLayers = async () => {
-    const advancedLayers = [
-      { key: 'terrain', name: 'Địa hình, thủy văn, giao thông' },
-      { key: 'forestManagement', name: 'Chủ quản lý rừng' },
-      { key: 'forestStatus', name: 'Hiện trạng rừng' }
-    ];
+// Cập nhật hàm load tất cả layers nâng cao
+const handleLoadAllAdvancedLayers = async () => {
+  const advancedLayers = [
+    { key: 'terrain', name: 'Địa hình, thủy văn, giao thông' },
+    { key: 'forestStatus', name: 'Hiện trạng rừng' }
+  ];
+  
+  toast.info("🔄 Đang tải tất cả các lớp nâng cao...");
+  
+  const loadPromises = advancedLayers.map(({ key, name }) => 
+    handleLoadLayer(key, name).catch(err => {
+      console.error(`Lỗi tải ${name}:`, err);
+      return { error: err, layerKey: key };
+    })
+  );
+  
+  try {
+    const results = await Promise.allSettled(loadPromises);
     
-    toast.info("🔄 Đang tải tất cả các lớp nâng cao...");
+    const successCount = results.filter(result => result.status === 'fulfilled').length;
+    const failCount = results.length - successCount;
     
-    const loadPromises = advancedLayers.map(({ key, name }) => 
-      handleLoadLayer(key, name).catch(err => {
-        console.error(`Lỗi tải ${name}:`, err);
-        return { error: err, layerKey: key };
-      })
-    );
-    
-    try {
-      const results = await Promise.allSettled(loadPromises);
-      
-      const successCount = results.filter(result => result.status === 'fulfilled').length;
-      const failCount = results.length - successCount;
-      
-      if (failCount === 0) {
-        toast.success("✅ Đã tải xong tất cả các lớp nâng cao!");
-      } else {
-        toast.warning(`⚠️ Đã tải xong ${successCount}/${results.length} lớp. ${failCount} lớp gặp lỗi.`);
-      }
-    } catch (err) {
-      console.error("❌ Lỗi tổng quát khi tải layers:", err);
-      toast.error("❌ Có lỗi xảy ra khi tải một số lớp");
+    if (failCount === 0) {
+      toast.success("✅ Đã tải xong tất cả các lớp nâng cao!");
+    } else {
+      toast.warning(`⚠️ Đã tải xong ${successCount}/${results.length} lớp. ${failCount} lớp gặp lỗi.`);
     }
-  };
+  } catch (err) {
+    console.error("❌ Lỗi tổng quát khi tải layers:", err);
+    toast.error("❌ Có lỗi xảy ra khi tải một số lớp");
+  }
+};
+
+// Cập nhật phần hiển thị trạng thái các lớp
+<div className="mt-4 p-3 bg-gray-50 rounded-md">
+  <h4 className="text-sm font-medium mb-2">Trạng thái các lớp:</h4>
+  <div className="grid grid-cols-2 gap-2 text-xs">
+    {Object.entries(mapLayers).map(([key, layer]) => (
+      <div key={key} className="flex items-center gap-2">
+        <div 
+          className={`w-3 h-3 rounded-full ${
+            layer.loading ? 'bg-yellow-500' : 
+            layer.data ? 'bg-green-500' : 'bg-gray-300'
+          }`}
+        ></div>
+        <span className={`${layer.visible ? 'font-medium' : 'opacity-60'}`}>
+          {layer.name}
+          {/* Thêm icon đặc biệt cho forest management */}
+          {key === 'forestManagement' && ' 🏢'}
+        </span>
+        {layer.data && (
+          <span className="text-gray-500">
+            ({layer.data.features?.length || 0})
+          </span>
+        )}
+      </div>
+    ))}
+  </div>
+  
+  {/* Thêm thông tin debug cho forest management */}
+  {mapLayers.forestManagement?.data && (
+    <div className="mt-2 p-2 bg-blue-50 rounded text-xs">
+      <strong>🏢 Chủ quản lý rừng:</strong>
+      <div>✅ Đã tải {mapLayers.forestManagement.data.features?.length || 0} vùng quản lý</div>
+      <div>👁️ Hiển thị: {mapLayers.forestManagement.visible ? 'BẬT' : 'TẮT'}</div>
+    </div>
+  )}
+</div>
 
   return (
     <div>
