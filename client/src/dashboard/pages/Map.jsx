@@ -1127,7 +1127,7 @@ const Map = () => {
             </>
           )}
 
-          <DynamicLegendControl
+          <CustomMapControl 
             setMapType={setMapType}
             mapLayers={mapLayers}
             toggleLayerVisibility={toggleLayerVisibility}

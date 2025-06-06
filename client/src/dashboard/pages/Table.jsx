@@ -16,11 +16,9 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
 
   const formatValue = (columnName, value) => {
     if (columnName === "area" && value !== null) {
-      // Chuyển đổi từ m² sang ha và làm tròn đến 1 số thập phân
       return `${(value / 10000).toFixed(1)} ha`;
     }
 
-    // Format date fields
     if (["start_dau", "end_sau"].includes(columnName) && value) {
       const date = new Date(value);
       if (!isNaN(date.getTime())) {
@@ -38,7 +36,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   const columnsToHide = ['x', 'y', 'x_vn2000', 'y_vn2000', 'geom', 'geometry', '_whereCondition', '_originalData'];
   const columns = allColumns.filter(col => !columnsToHide.includes(col));
 
-  // Sắp xếp các cột theo một thứ tự cụ thể (để các cột quan trọng hiển thị trước)
+  // Sắp xếp các cột theo một thứ tự cụ thể
   const sortedColumns = [
     'huyen', 'xa', 'mahuyen', 'maxa', 'area', 'start_dau', 'end_sau', 
     'tk', 'khoanh', 'lo', 'churung', 'detection_status'
@@ -51,23 +49,18 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     }
   });
 
-  // Các cột không được phép chỉnh sửa
   const skipColumns = ["id", "gid", "geom", "geometry"];
 
-  // Kiểm tra xem cột có được phép chỉnh sửa hay không
   const isEditableColumn = (col) => {
     return !skipColumns.includes(col.toLowerCase());
   };
 
-  // Tạo điều kiện WHERE để xác định duy nhất một hàng
   const createWhereCondition = (row) => {
-    // Nếu có gid hoặc id, sử dụng trực tiếp
     if (row.gid !== undefined)
       return { field: "gid", value: row.gid, where: `gid = ${row.gid}` };
     if (row.id !== undefined)
       return { field: "id", value: row.id, where: `id = ${row.id}` };
 
-    // Tạo điều kiện dựa vào dữ liệu hiện có
     if (tableName === "mat_rung" || tableName.includes("mat_rung")) {
       if (row.start_dau && row.end_sau && row.mahuyen) {
         return {
@@ -87,17 +80,14 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
       }
     }
 
-    // Nếu là kết quả join hoặc không xác định được bảng dữ liệu
     let joinCondition = {};
 
-    // Thử tạo điều kiện cho mat_rung
     if (row.start_dau && row.end_sau) {
       joinCondition.mat_rung = `start_dau = '${row.start_dau}' AND end_sau = '${row.end_sau}'`;
       if (row.mahuyen)
         joinCondition.mat_rung += ` AND mahuyen = '${row.mahuyen}'`;
     }
 
-    // Thử tạo điều kiện cho tlaocai_tkk_3lr_cru
     if (row.tk && row.khoanh) {
       joinCondition.tlaocai_tkk_3lr_cru = `tk = '${row.tk}' AND khoanh = '${row.khoanh}'`;
       if (row.xa) joinCondition.tlaocai_tkk_3lr_cru += ` AND xa = '${row.xa}'`;
@@ -106,26 +96,19 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     return joinCondition;
   };
 
-  // Bắt đầu chỉnh sửa một hàng
   const startEdit = (rowIndex, rowData) => {
-    // Tạo một bản sao của dữ liệu hàng để chỉnh sửa
     const initialEditData = { ...rowData };
-
-    // Lưu lại điều kiện WHERE
     initialEditData._whereCondition = createWhereCondition(rowData);
     initialEditData._originalData = { ...rowData };
-
     setEditData(initialEditData);
     setEditRowIndex(rowIndex);
   };
 
-  // Hủy chỉnh sửa
   const cancelEdit = () => {
     setEditRowIndex(-1);
     setEditData({});
   };
 
-  // Xử lý thay đổi giá trị trong form chỉnh sửa
   const handleInputChange = (columnName, value) => {
     setEditData({
       ...editData,
@@ -133,44 +116,29 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     });
   };
 
-  // Lưu tất cả các thay đổi
   const saveChanges = async () => {
     try {
       setLoading(true);
-
-      // Lấy dữ liệu gốc để so sánh
       const originalRow = data[editRowIndex];
-      const whereCondition =
-        editData._whereCondition || createWhereCondition(originalRow);
+      const whereCondition = editData._whereCondition || createWhereCondition(originalRow);
 
-      // Kiểm tra từng cột đã thay đổi
       for (const column in editData) {
-        // Bỏ qua các trường meta
         if (column.startsWith("_") || columnsToHide.includes(column)) continue;
 
-        // Chỉ cập nhật các cột được phép chỉnh sửa và có giá trị thay đổi
         if (
           isEditableColumn(column) &&
           editData[column] !== originalRow[column]
         ) {
-          console.log(
-            `Cập nhật cột ${column} từ [${originalRow[column]}] thành [${editData[column]}]`
-          );
-
-          // Xác định bảng dữ liệu và điều kiện WHERE
           let targetTable, whereClause;
 
-          // Trường hợp đơn giản: biết chính xác bảng dữ liệu
           if (whereCondition.table) {
             targetTable = whereCondition.table;
             whereClause = whereCondition.where;
           }
-          // Trường hợp phức tạp: dữ liệu join
           else if (
             whereCondition.mat_rung ||
             whereCondition.tlaocai_tkk_3lr_cru
           ) {
-            // Xác định bảng dựa vào cột
             if (["start_dau", "end_sau", "mahuyen", "area"].includes(column)) {
               targetTable = "mat_rung";
               whereClause = whereCondition.mat_rung;
@@ -184,23 +152,16 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
               continue;
             }
           }
-          // Trường hợp đơn giản: có field và value rõ ràng
           else if (whereCondition.field && whereCondition.value !== undefined) {
             targetTable = tableName;
             whereClause = whereCondition.where;
           }
-          // Không thể xác định bảng và điều kiện
           else {
-            console.error(
-              "Không thể xác định bảng và điều kiện WHERE cho cập nhật"
-            );
-            toast.error(
-              `Không thể cập nhật cột ${column}: không xác định được dữ liệu`
-            );
+            console.error("Không thể xác định bảng và điều kiện WHERE cho cập nhật");
+            toast.error(`Không thể cập nhật cột ${column}: không xác định được dữ liệu`);
             continue;
           }
 
-          // API endpoint mới sử dụng cập nhật với WHERE clause
           try {
             const response = await axios.post(
               `${config.API_URL}/api/data/update-with-where`,
@@ -215,9 +176,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
             if (response.data.success) {
               toast.success(`Cập nhật cột ${column} thành công!`);
             } else {
-              toast.error(
-                `Lỗi cập nhật cột ${column}: ${response.data.message}`
-              );
+              toast.error(`Lỗi cập nhật cột ${column}: ${response.data.message}`);
             }
           } catch (error) {
             console.error(`Lỗi khi cập nhật cột ${column}:`, error);
@@ -226,7 +185,6 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
         }
       }
 
-      // Cập nhật lại dữ liệu hiển thị
       window.location.reload();
     } catch (error) {
       console.error("Lỗi khi cập nhật dữ liệu:", error);
@@ -239,7 +197,6 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     }
   };
 
-  // Xử lý xóa dữ liệu
   const handleDelete = async (row) => {
     try {
       const whereCondition = createWhereCondition(row);
@@ -250,24 +207,19 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
         return;
       }
 
-      // Hiển thị xác nhận trước khi xóa
       if (!window.confirm(`Bạn có chắc chắn muốn xóa bản ghi này không?`)) {
         return;
       }
 
       setLoading(true);
 
-      // Xác định bảng dữ liệu và điều kiện WHERE
       let targetTable, whereClause;
 
-      // Trường hợp đơn giản: biết chính xác bảng dữ liệu
       if (whereCondition.table) {
         targetTable = whereCondition.table;
         whereClause = whereCondition.where;
       }
-      // Trường hợp phức tạp: dữ liệu join
       else if (whereCondition.mat_rung || whereCondition.tlaocai_tkk_3lr_cru) {
-        // Ưu tiên xóa từ bảng mat_rung vì dữ liệu joint thường liên kết với mat_rung
         if (whereCondition.mat_rung) {
           targetTable = "mat_rung";
           whereClause = whereCondition.mat_rung;
@@ -276,12 +228,10 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
           whereClause = whereCondition.tlaocai_tkk_3lr_cru;
         }
       }
-      // Trường hợp đơn giản: có field và value rõ ràng
       else if (whereCondition.field && whereCondition.value !== undefined) {
         targetTable = tableName;
         whereClause = whereCondition.where;
       }
-      // Không thể xác định bảng và điều kiện
       else {
         console.error("Không thể xác định bảng và điều kiện WHERE cho xóa");
         toast.error("Không thể xóa dữ liệu: không xác định được bản ghi");
@@ -316,7 +266,6 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     }
   };
 
-  // Xử lý click vào một hàng để zoom tới đối tượng
   const handleRowClick = (row, rowIndex) => {
     setSelectedRow(rowIndex);
     if (onRowClick) {
@@ -324,7 +273,6 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     }
   };
 
-  // Hiển thị tên người dùng thân thiện cho một số cột
   const getColumnDisplayName = (columnName) => {
     const columnMap = {
       'huyen': 'Huyện',
@@ -344,163 +292,420 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     return columnMap[columnName] || columnName;
   };
 
+  // Inline styles
+  const containerStyle = {
+    width: '100%',
+  };
+
+  const headerStyle = {
+    display: 'flex',
+    flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+    justifyContent: 'space-between',
+    alignItems: window.innerWidth <= 768 ? 'flex-start' : 'center',
+    marginBottom: '1rem',
+    gap: '0.5rem',
+  };
+
+  const tableContainerStyle = {
+    backgroundColor: 'white',
+    borderRadius: '0.75rem',
+    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    border: '1px solid #e5e7eb',
+    overflow: 'hidden',
+  };
+
+  const tableWrapperStyle = {
+    position: 'relative',
+    overflowX: 'auto',
+    overflowY: 'auto',
+    maxHeight: '60vh',
+    minHeight: '300px',
+    // Custom scrollbar styles for webkit browsers
+    scrollbarWidth: 'thin',
+    scrollbarColor: '#027e02 #f1f5f9',
+  };
+
+  const tableStyle = {
+    width: '100%',
+    borderCollapse: 'collapse',
+    minWidth: '800px',
+  };
+
+  const headerRowStyle = {
+    background: 'linear-gradient(to right, #027e02, #15803d)',
+    color: 'white',
+    position: 'sticky',
+    top: 0,
+    zIndex: 10,
+  };
+
+  const headerCellStyle = {
+    padding: '0.75rem 1rem',
+    textAlign: 'left',
+    fontSize: '0.75rem',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    borderRight: '1px solid #16a34a',
+    whiteSpace: 'nowrap',
+  };
+
+  const getRowStyle = (rowIndex) => ({
+    backgroundColor: 
+      selectedRow === rowIndex 
+        ? '#dbeafe' 
+        : editRowIndex === rowIndex 
+        ? '#fefce8'
+        : rowIndex % 2 === 0 
+        ? '#f9fafb' 
+        : 'white',
+    borderLeft: 
+      selectedRow === rowIndex 
+        ? '4px solid #3b82f6'
+        : editRowIndex === rowIndex
+        ? '4px solid #eab308'
+        : 'none',
+    cursor: 'pointer',
+    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+  });
+
+  const cellStyle = {
+    padding: '0.75rem 1rem',
+    fontSize: '0.875rem',
+    color: '#111827',
+    borderRight: '1px solid #f3f4f6',
+    maxWidth: '200px',
+  };
+
+  const actionsCellStyle = {
+    ...cellStyle,
+    textAlign: 'center',
+    width: '6rem',
+    backgroundColor: 'white',
+    position: 'sticky',
+    right: 0,
+    borderLeft: '1px solid #e5e7eb',
+  };
+
+  const actionButtonStyle = {
+    padding: '0.5rem',
+    borderRadius: '0.5rem',
+    transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+    border: '1px solid transparent',
+    minWidth: '36px',
+    height: '36px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    margin: '0 0.125rem',
+  };
+
+  const editInputStyle = {
+    width: '100%',
+    padding: '0.5rem 0.75rem',
+    fontSize: '0.875rem',
+    border: '1px solid #d1d5db',
+    borderRadius: '0.375rem',
+    transition: 'all 0.2s',
+  };
+
+  const footerStyle = {
+    padding: '0.75rem 1rem',
+    backgroundColor: '#f9fafb',
+    borderTop: '1px solid #e5e7eb',
+  };
+
+  // Add CSS for webkit scrollbar via style tag
+  React.useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .custom-table-scroll::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+      }
+      .custom-table-scroll::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 6px;
+      }
+      .custom-table-scroll::-webkit-scrollbar-thumb {
+        background: linear-gradient(to bottom, #027e02, #15803d);
+        border-radius: 6px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+      }
+      .custom-table-scroll::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(to bottom, #15803d, #166534);
+      }
+      .custom-table-scroll::-webkit-scrollbar-corner {
+        background: #f1f5f9;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
+
   return (
-    <div className="font-sans">
-      <div className="flex justify-between items-center mb-5">
-        <h2 className="text-center text-xl font-bold">Bảng dữ liệu</h2>
+    <div style={containerStyle}>
+      {/* Header */}
+      <div style={headerStyle}>
+        <h2 className="text-lg sm:text-xl font-bold text-gray-800">
+          Bảng dữ liệu
+        </h2>
         {isAdmin() && (
-          <div className="text-sm text-gray-600 italic">
-            <span className="text-forest-green-primary mr-1">Lưu ý:</span>
-            Nhấp vào biểu tượng <FaEdit className="inline text-blue-600" /> để
-            chỉnh sửa hoặc <FaTrash className="inline text-red-600" /> để xóa dữ
-            liệu
+          <div className="text-xs sm:text-sm text-gray-600 italic bg-blue-50 p-2 rounded-md border-l-4 border-blue-400">
+            <span className="text-forest-green-primary font-medium">💡 Lưu ý:</span>
+            <span className="ml-1">Nhấp</span>
+            <FaEdit className="inline mx-1 text-blue-600" />
+            <span>để chỉnh sửa hoặc</span>
+            <FaTrash className="inline mx-1 text-red-600" />
+            <span>để xóa</span>
           </div>
         )}
       </div>
 
-      <div
-        style={{
-          overflowX: "auto",
-          overflowY: "auto",
-          maxHeight: "400px",
-          border: "1px solid #ccc",
-          borderRadius: "10px",
-          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
-          padding: "10px",
-          backgroundColor: "#fff",
-        }}
-      >
-        <table  style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead
-            style={{
-              backgroundColor: "#4CAF50",
-              color: "white",
-              position: "sticky",
-              top: 0,
-              zIndex: 1,
-            }}
-          >
-            <tr>
-              {sortedColumns.map((col, index) => (
-                <th
-                  key={index}
-                  style={{ padding: "10px", border: "1px solid #ddd" }}
-                >
-                  {getColumnDisplayName(col)}
-                </th>
-              ))}
-              {isAdmin() && (
-                <th
-                  style={{
-                    padding: "10px",
-                    border: "1px solid #ddd",
-                    width: "100px",
-                  }}
-                >
-                  Thao tác
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, rowIndex) => (
-              <tr
-                key={rowIndex}
-                style={{
-                  backgroundColor: rowIndex % 2 === 0 ? "#f2f2f2" : "white",
-                  cursor: "pointer",
-                  border:
-                    selectedRow === rowIndex
-                      ? "2px solid #4CAF50"
-                      : "1px solid #ddd",
-                }}
-                onClick={() => handleRowClick(row, rowIndex)}
-              >
-                {sortedColumns.map((col, colIndex) => (
-                  <td
-                    key={colIndex}
-                    style={{ padding: "10px", border: "1px solid #ddd" }}
-                  >
-                    {editRowIndex === rowIndex && isEditableColumn(col) ? (
-                      <input
-                        type="text"
-                        value={
-                          editData[col] !== undefined
-                            ? editData[col]
-                            : row[col] !== null
-                            ? row[col]
-                            : ""
-                        }
-                        onChange={(e) => handleInputChange(col, e.target.value)}
-                        className="border border-gray-300 rounded px-2 py-1 w-full"
-                        onClick={(e) => e.stopPropagation()} // Ngăn sự kiện click lan ra row
-                      />
-                    ) : (
-                      formatValue(col, row[col])
-                    )}
-                  </td>
+      {/* Table Container */}
+      <div style={tableContainerStyle}>
+        <div 
+          style={tableWrapperStyle} 
+          className="custom-table-scroll"
+        >
+          <table style={tableStyle}>
+            {/* Header */}
+            <thead>
+              <tr style={headerRowStyle}>
+                {sortedColumns.map((col, index) => (
+                  <th key={index} style={headerCellStyle}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-sm">
+                        {getColumnDisplayName(col)}
+                      </span>
+                      {col === 'area' && <span className="text-green-200 ml-1">📏</span>}
+                      {col === 'huyen' && <span className="text-blue-200 ml-1">🏛️</span>}
+                      {col === 'xa' && <span className="text-purple-200 ml-1">🏘️</span>}
+                    </div>
+                  </th>
                 ))}
                 {isAdmin() && (
-                  <td
-                    style={{
-                      padding: "10px",
-                      border: "1px solid #ddd",
-                      textAlign: "center",
-                    }}
-                     onClick={(e) => e.stopPropagation()} // Ngăn sự kiện click lan ra row
-                  >
-                    {editRowIndex === rowIndex ? (
-                      <div className="flex justify-center space-x-3">
-                        <button
-                          onClick={saveChanges}
-                          disabled={loading}
-                          className="text-green-600 hover:text-green-900"
-                          title="Lưu"
-                        >
-                          <FaSave />
-                        </button>
-                        <button
-                          onClick={cancelEdit}
-                          className="text-red-600 hover:text-red-900"
-                          title="Hủy"
-                        >
-                          <FaTimes />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex justify-center space-x-4">
-                        <button
-                          onClick={() => startEdit(rowIndex, row)}
-                          className="text-blue-600 hover:text-blue-900"
-                          title="Chỉnh sửa"
-                          disabled={editRowIndex !== -1}
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(row)}
-                          className="text-red-600 hover:text-red-900"
-                          title="Xóa"
-                          disabled={editRowIndex !== -1 || loading}
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
-                    )}
-                  </td>
+                  <th style={{...headerCellStyle, textAlign: 'center', borderRight: 'none'}}>
+                    <span className="font-semibold text-sm">Thao tác</span>
+                  </th>
                 )}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            {/* Body */}
+            <tbody>
+              {data.map((row, rowIndex) => (
+                <tr
+                  key={rowIndex}
+                  style={getRowStyle(rowIndex)}
+                  onClick={() => handleRowClick(row, rowIndex)}
+                  onMouseEnter={(e) => {
+                    if (selectedRow !== rowIndex && editRowIndex !== rowIndex) {
+                      e.target.parentElement.style.backgroundColor = '#f0f9ff';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedRow !== rowIndex && editRowIndex !== rowIndex) {
+                      e.target.parentElement.style.backgroundColor = 
+                        rowIndex % 2 === 0 ? '#f9fafb' : 'white';
+                    }
+                  }}
+                >
+                  {sortedColumns.map((col, colIndex) => (
+                    <td key={colIndex} style={cellStyle}>
+                      {editRowIndex === rowIndex && isEditableColumn(col) ? (
+                        <input
+                          type="text"
+                          value={
+                            editData[col] !== undefined
+                              ? editData[col]
+                              : row[col] !== null
+                              ? row[col]
+                              : ""
+                          }
+                          onChange={(e) => handleInputChange(col, e.target.value)}
+                          style={editInputStyle}
+                          onClick={(e) => e.stopPropagation()}
+                          placeholder={`Nhập ${getColumnDisplayName(col).toLowerCase()}...`}
+                          onFocus={(e) => {
+                            e.target.style.outline = 'none';
+                            e.target.style.boxShadow = '0 0 0 2px #027e02';
+                            e.target.style.borderColor = '#027e02';
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.boxShadow = 'none';
+                            e.target.style.borderColor = '#d1d5db';
+                          }}
+                        />
+                      ) : (
+                        <div className="flex items-center">
+                          <span 
+                            className={`truncate ${
+                              col === 'area' ? 'text-green-700 font-medium' : ''
+                            } ${
+                              ['start_dau', 'end_sau'].includes(col) ? 'text-blue-700' : ''
+                            }`}
+                            title={formatValue(col, row[col])}
+                          >
+                            {formatValue(col, row[col])}
+                          </span>
+                        </div>
+                      )}
+                    </td>
+                  ))}
+                  
+                  {/* Actions column */}
+                  {isAdmin() && (
+                    <td 
+                      style={actionsCellStyle}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {editRowIndex === rowIndex ? (
+                        <div className="flex justify-center items-center gap-3">
+                          <button
+                            onClick={saveChanges}
+                            disabled={loading}
+                            style={{
+                              ...actionButtonStyle,
+                              color: '#16a34a',
+                              backgroundColor: loading ? '#f3f4f6' : 'transparent',
+                            }}
+                            title="Lưu thay đổi"
+                            onMouseEnter={(e) => {
+                              if (!loading) {
+                                e.target.style.backgroundColor = '#f0fdf4';
+                                e.target.style.borderColor = '#bbf7d0';
+                                e.target.style.color = '#15803d';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!loading) {
+                                e.target.style.backgroundColor = 'transparent';
+                                e.target.style.borderColor = 'transparent';
+                                e.target.style.color = '#16a34a';
+                              }
+                            }}
+                          >
+                            <FaSave className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={cancelEdit}
+                            style={{
+                              ...actionButtonStyle,
+                              color: '#6b7280',
+                            }}
+                            title="Hủy chỉnh sửa"
+                            onMouseEnter={(e) => {
+                              e.target.style.backgroundColor = '#f9fafb';
+                              e.target.style.borderColor = '#e5e7eb';
+                              e.target.style.color = '#374151';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.backgroundColor = 'transparent';
+                              e.target.style.borderColor = 'transparent';
+                              e.target.style.color = '#6b7280';
+                            }}
+                          >
+                            <FaTimes className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex justify-center items-center gap-2">
+                          <button
+                            onClick={() => startEdit(rowIndex, row)}
+                            style={{
+                              ...actionButtonStyle,
+                              color: '#2563eb',
+                              opacity: editRowIndex !== -1 ? 0.5 : 0.7,
+                            }}
+                            title="Chỉnh sửa"
+                            disabled={editRowIndex !== -1}
+                            onMouseEnter={(e) => {
+                              if (editRowIndex === -1) {
+                                e.target.style.backgroundColor = '#eff6ff';
+                                e.target.style.borderColor = '#bfdbfe';
+                                e.target.style.color = '#1d4ed8';
+                                e.target.style.opacity = '1';
+                                e.target.style.transform = 'scale(1.05)';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (editRowIndex === -1) {
+                                e.target.style.backgroundColor = 'transparent';
+                                e.target.style.borderColor = 'transparent';
+                                e.target.style.color = '#2563eb';
+                                e.target.style.opacity = '0.7';
+                                e.target.style.transform = 'scale(1)';
+                              }
+                            }}
+                          >
+                            <FaEdit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(row)}
+                            style={{
+                              ...actionButtonStyle,
+                              color: '#dc2626',
+                              opacity: editRowIndex !== -1 || loading ? 0.5 : 0.7,
+                            }}
+                            title="Xóa"
+                            disabled={editRowIndex !== -1 || loading}
+                            onMouseEnter={(e) => {
+                              if (editRowIndex === -1 && !loading) {
+                                e.target.style.backgroundColor = '#fef2f2';
+                                e.target.style.borderColor = '#fecaca';
+                                e.target.style.color = '#b91c1c';
+                                e.target.style.opacity = '1';
+                                e.target.style.transform = 'scale(1.05)';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (editRowIndex === -1 && !loading) {
+                                e.target.style.backgroundColor = 'transparent';
+                                e.target.style.borderColor = 'transparent';
+                                e.target.style.color = '#dc2626';
+                                e.target.style.opacity = '0.7';
+                                e.target.style.transform = 'scale(1)';
+                              }
+                            }}
+                          >
+                            <FaTrash className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Debug information */}
-      {data.length > 0 && (
-        <div className="mt-2 text-xs text-gray-500">
-          Số bản ghi: {data.length}
+      {/* Footer */}
+      <div style={footerStyle}>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-4">
+            <span className="font-medium">
+              📊 Tổng số bản ghi: 
+              <span className="text-forest-green-primary font-bold ml-1">{data.length}</span>
+            </span>
+            {selectedRow !== null && (
+              <span className="text-blue-600">
+                🎯 Đã chọn hàng #{selectedRow + 1}
+              </span>
+            )}
+          </div>
+          
+          {editRowIndex !== -1 && (
+            <div className="text-orange-600 font-medium">
+              ✏️ Đang chỉnh sửa hàng #{editRowIndex + 1}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
