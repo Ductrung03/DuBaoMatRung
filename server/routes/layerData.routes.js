@@ -64,6 +64,8 @@ router.get("/info", async (req, res) => {
   }
 });
 
+// server/routes/layerData.routes.js - SỬA LỖI RANH GIỚI HÀNH CHÍNH
+
 /**
  * @swagger
  * /layer-data/administrative:
@@ -77,6 +79,11 @@ router.get("/info", async (req, res) => {
  */
 router.get("/administrative", async (req, res) => {
   try {
+    console.log(`📥 Received request for administrative data`);
+    
+    const limit = Math.min(parseInt(req.query.limit) || 1000, 2000);
+    console.log(`📊 Limit set to: ${limit}`);
+    
     const query = `
       SELECT json_build_object(
         'type', 'FeatureCollection',
@@ -85,7 +92,12 @@ router.get("/administrative", async (req, res) => {
       FROM (
         SELECT json_build_object(
           'type', 'Feature',
-          'geometry', ST_AsGeoJSON(ST_Transform(geom, 4326))::json,
+          'geometry', ST_AsGeoJSON(
+            ST_Transform(
+              ST_SetSRID(geom, 3405), 
+              4326
+            )
+          )::json,
           'properties', json_build_object(
             'gid', gid,
             'huyen', huyen,
@@ -94,35 +106,38 @@ router.get("/administrative", async (req, res) => {
             'khoanh', khoanh,
             'layer_type', 'administrative_boundary',
             'boundary_level', CASE
-              WHEN khoanh IS NOT NULL AND khoanh != '' THEN 'khoanh'
-              WHEN tieukhu IS NOT NULL AND tieukhu != '' THEN 'tieukhu'
-              WHEN xa IS NOT NULL AND xa != '' THEN 'xa'
-              WHEN huyen IS NOT NULL AND huyen != '' THEN 'huyen'
-              ELSE 'tinh'
-            END,
-            'level_priority', CASE
-              WHEN khoanh IS NOT NULL AND khoanh != '' THEN 5
-              WHEN tieukhu IS NOT NULL AND tieukhu != '' THEN 4
-              WHEN xa IS NOT NULL AND xa != '' THEN 3
-              WHEN huyen IS NOT NULL AND huyen != '' THEN 2
-              ELSE 1
+              WHEN khoanh IS NOT NULL AND trim(khoanh) != '' THEN 'khoanh'
+              WHEN tieukhu IS NOT NULL AND trim(tieukhu) != '' THEN 'tieukhu'
+              WHEN xa IS NOT NULL AND trim(xa) != '' THEN 'xa'
+              WHEN huyen IS NOT NULL AND trim(huyen) != '' THEN 'huyen'
+              ELSE 'unknown'
             END
           )
         ) as feature
         FROM laocai_ranhgioihc
-        WHERE ST_IsValid(geom)
-        ORDER BY CASE
-          WHEN khoanh IS NOT NULL AND khoanh != '' THEN 5
-          WHEN tieukhu IS NOT NULL AND tieukhu != '' THEN 4
-          WHEN xa IS NOT NULL AND xa != '' THEN 3
-          WHEN huyen IS NOT NULL AND huyen != '' THEN 2
-          ELSE 1
-        END, gid
+        WHERE ST_IsValid(geom) AND geom IS NOT NULL
+        ORDER BY gid
+        LIMIT $1
       ) AS features;
     `;
 
-    const result = await pool.query(query);
+    console.log(`🔍 Executing query with coordinate transformation VN-2000 -> WGS84`);
+    const result = await pool.query(query, [limit]);
     let geojson = result.rows[0].geojson;
+
+    console.log(`📊 Raw result count: ${geojson.features?.length || 0}`);
+    
+    // Log sample transformed coordinates
+    if (geojson.features && geojson.features.length > 0) {
+      const sampleCoords = geojson.features[0].geometry?.coordinates?.[0]?.[0]?.[0];
+      console.log(`🔍 Sample transformed coordinates (should be WGS84):`, sampleCoords);
+      
+      if (sampleCoords && (sampleCoords[0] > 180 || sampleCoords[0] < -180)) {
+        console.error(`❌ Tọa độ vẫn chưa đúng WGS84: ${sampleCoords}`);
+      } else {
+        console.log(`✅ Tọa độ đã được transform thành WGS84`);
+      }
+    }
 
     // Chuyển đổi TCVN3 sang Unicode
     if (geojson.features) {
@@ -171,21 +186,24 @@ router.get("/forest-management", async (req, res) => {
     const query = `
       SELECT json_build_object(
         'type', 'FeatureCollection',
-        'features', COALESCE(json_agg(
-          json_build_object(
-            'type', 'Feature',
-            'geometry', ST_AsGeoJSON(ST_Transform(geom, 4326))::json,
-            'properties', json_build_object(
-              'gid', gid,
-              'tt', tt,
-              'chuquanly', chuquanly,
-              'layer_type', 'forest_management'
-            )
-          )
-        ), '[]'::json)
+        'features', COALESCE(json_agg(feature), '[]'::json)
       ) AS geojson
-      FROM laocai_chuquanly
-      WHERE ST_IsValid(geom);
+      FROM (
+        SELECT json_build_object(
+          'type', 'Feature',
+          'geometry', ST_AsGeoJSON(
+            ST_Transform(ST_SetSRID(geom, 3405), 4326)
+          )::json,
+          'properties', json_build_object(
+            'gid', gid,
+            'tt', tt,
+            'chuquanly', chuquanly,
+            'layer_type', 'forest_management'
+          )
+        ) as feature
+        FROM laocai_chuquanly
+        WHERE ST_IsValid(geom) AND geom IS NOT NULL
+      ) AS features;
     `;
 
     const result = await pool.query(query);
@@ -226,28 +244,31 @@ router.get("/terrain", async (req, res) => {
     const query = `
       SELECT json_build_object(
         'type', 'FeatureCollection',
-        'features', COALESCE(json_agg(
-          json_build_object(
-            'type', 'Feature',
-            'geometry', ST_AsGeoJSON(ST_Transform(geom, 4326))::json,
-            'properties', json_build_object(
-              'gid', gid,
-              'id', id,
-              'ma', ma,
-              'ten', ten,
-              'layer_type', 'terrain_hydro_transport',
-              'feature_type', CASE
-                WHEN LOWER(ten) LIKE '%sông%' OR LOWER(ten) LIKE '%suối%' OR LOWER(ten) LIKE '%kênh%' THEN 'waterway'
-                WHEN LOWER(ten) LIKE '%thủy%' OR LOWER(ten) LIKE '%cảng%' THEN 'water_transport'
-                WHEN LOWER(ten) LIKE '%đường%' OR LOWER(ten) LIKE '%quốc lộ%' OR LOWER(ten) LIKE '%tỉnh lộ%' THEN 'road'
-                ELSE 'terrain'
-              END
-            )
-          )
-        ), '[]'::json)
+        'features', COALESCE(json_agg(feature), '[]'::json)
       ) AS geojson
-      FROM laocai_nendiahinh
-      WHERE ST_IsValid(geom);
+      FROM (
+        SELECT json_build_object(
+          'type', 'Feature',
+          'geometry', ST_AsGeoJSON(
+            ST_Transform(ST_SetSRID(geom, 3405), 4326)
+          )::json,
+          'properties', json_build_object(
+            'gid', gid,
+            'id', id,
+            'ma', ma,
+            'ten', ten,
+            'layer_type', 'terrain_hydro_transport',
+            'feature_type', CASE
+              WHEN LOWER(ten) LIKE '%sông%' OR LOWER(ten) LIKE '%suối%' OR LOWER(ten) LIKE '%kênh%' THEN 'waterway'
+              WHEN LOWER(ten) LIKE '%thủy%' OR LOWER(ten) LIKE '%cảng%' THEN 'water_transport'
+              WHEN LOWER(ten) LIKE '%đường%' OR LOWER(ten) LIKE '%quốc lộ%' OR LOWER(ten) LIKE '%tỉnh lộ%' THEN 'road'
+              ELSE 'terrain'
+            END
+          )
+        ) as feature
+        FROM laocai_nendiahinh
+        WHERE ST_IsValid(geom) AND geom IS NOT NULL
+      ) AS features;
     `;
 
     const result = await pool.query(query);
@@ -271,7 +292,6 @@ router.get("/terrain", async (req, res) => {
     res.status(500).json({ error: "Lỗi server khi lấy dữ liệu địa hình" });
   }
 });
-
 /**
  * @swagger
  * /layer-data/forest-types:
@@ -294,45 +314,68 @@ router.get("/forest-types", async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.query.limit) || 1000, 5000);
 
-    // SỬA LỖI: Chỉ lấy các properties cần thiết để tránh lỗi 100 arguments
+    // THÊM TRANSFORM từ VN-2000 (3405) sang WGS84 (4326)
     const query = `
       SELECT json_build_object(
         'type', 'FeatureCollection',
-        'features', COALESCE(json_agg(
-          json_build_object(
-            'type', 'Feature',
-            'geometry', ST_AsGeoJSON(ST_Transform(geom, 4326))::json,
-            'properties', json_build_object(
-              'gid', gid,
-              'xa', xa,
-              'tk', tk,
-              'khoanh', khoanh,
-              'lo', lo,
-              'dtich', dtich,
-              'ldlr', ldlr,
-              'malr3', malr3,
-              'churung', churung,
-              'tinh', tinh,
-              'huyen', huyen,
-              'layer_type', '3_forest_types',
-              'forest_function', CASE
-                WHEN malr3 = 1 THEN 'Rừng đặc dụng'
-                WHEN malr3 = 2 THEN 'Rừng phòng hộ'
-                WHEN malr3 = 3 THEN 'Rừng sản xuất'
-                ELSE 'Không xác định'
-              END
-            )
-          )
-        ), '[]'::json)
+        'features', COALESCE(json_agg(feature), '[]'::json)
       ) AS geojson
-      FROM laocai_rg3lr
-      WHERE ST_IsValid(geom)
-      ORDER BY gid
-      LIMIT $1;
+      FROM (
+        SELECT json_build_object(
+          'type', 'Feature',
+          'geometry', ST_AsGeoJSON(
+            ST_Transform(
+              ST_SetSRID(geom, 3405), 
+              4326
+            )
+          )::json,
+          'properties', json_build_object(
+            'gid', gid,
+            'xa', xa,
+            'tk', tk,
+            'khoanh', khoanh,
+            'lo', lo,
+            'dtich', dtich,
+            'ldlr', ldlr,
+            'malr3', malr3,
+            'churung', churung,
+            'tinh', tinh,
+            'huyen', huyen,
+            'layer_type', '3_forest_types',
+            'forest_function', CASE
+              WHEN malr3 = 1 THEN 'Rừng đặc dụng'
+              WHEN malr3 = 2 THEN 'Rừng sản xuất'
+              ELSE 'Không xác định'
+            END
+          )
+        ) as feature
+        FROM laocai_rg3lr
+        WHERE ST_IsValid(geom) AND geom IS NOT NULL
+        ORDER BY gid
+        LIMIT $1
+      ) AS features;
     `;
 
+    console.log(`🔍 Executing forest types query with coordinate transformation`);
     const result = await pool.query(query, [limit]);
     let geojson = result.rows[0].geojson;
+
+    console.log(`📊 Forest types result count: ${geojson.features?.length || 0}`);
+    
+    // Log sample coordinates để kiểm tra TRANSFORM
+    if (geojson.features && geojson.features.length > 0) {
+      const sampleCoords = geojson.features[0].geometry?.coordinates?.[0]?.[0]?.[0];
+      console.log(`🔍 Sample forest types coordinates AFTER transform:`, sampleCoords);
+      
+      if (sampleCoords && Array.isArray(sampleCoords)) {
+        const [lng, lat] = sampleCoords;
+        if (lng >= 103 && lng <= 105 && lat >= 21 && lat <= 24) {
+          console.log(`✅ Transform thành công! WGS84 hợp lệ: lng=${lng}, lat=${lat}`);
+        } else {
+          console.error(`❌ Transform thất bại! Tọa độ không hợp lệ: lng=${lng}, lat=${lat}`);
+        }
+      }
+    }
 
     // Chuyển đổi TCVN3 sang Unicode cho các trường text
     if (geojson.features) {
@@ -384,31 +427,34 @@ router.get("/forest-status", async (req, res) => {
     const query = `
       SELECT json_build_object(
         'type', 'FeatureCollection',
-        'features', COALESCE(json_agg(
-          json_build_object(
-            'type', 'Feature',
-            'geometry', ST_AsGeoJSON(ST_Transform(ST_SetSRID(geom, 3405), 4326))::json,
-            'properties', json_build_object(
-              'gid', gid,
-              'huyen', huyen,
-              'xa', xa,
-              'tk', tk,
-              'khoanh', khoanh,
-              'lo', lo,
-              'thuad', thuad,
-              'dtich', dtich,
-              'ldlr', ldlr,
-              'churung', churung,
-              'layer_type', 'current_forest_status',
-              'area_ha', ROUND((dtich)::numeric, 2)
-            )
-          )
-        ), '[]'::json)
+        'features', COALESCE(json_agg(feature), '[]'::json)
       ) AS geojson
-      FROM tlaocai_tkk_3lr_cru
-      WHERE ST_IsValid(geom)
-      ORDER BY gid
-      LIMIT $1;
+      FROM (
+        SELECT json_build_object(
+          'type', 'Feature',
+          'geometry', ST_AsGeoJSON(
+            ST_Transform(ST_SetSRID(geom, 3405), 4326)
+          )::json,
+          'properties', json_build_object(
+            'gid', gid,
+            'huyen', huyen,
+            'xa', xa,
+            'tk', tk,
+            'khoanh', khoanh,
+            'lo', lo,
+            'thuad', thuad,
+            'dtich', dtich,
+            'ldlr', ldlr,
+            'churung', churung,
+            'layer_type', 'current_forest_status',
+            'area_ha', ROUND((dtich)::numeric, 2)
+          )
+        ) as feature
+        FROM tlaocai_tkk_3lr_cru
+        WHERE ST_IsValid(geom) AND geom IS NOT NULL
+        ORDER BY gid
+        LIMIT $1
+      ) AS features;
     `;
 
     const result = await pool.query(query, [limit]);
