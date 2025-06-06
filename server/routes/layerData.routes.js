@@ -169,12 +169,14 @@ router.get("/administrative", async (req, res) => {
     res.status(500).json({ error: "Lỗi server khi lấy dữ liệu ranh giới hành chính" });
   }
 });
+// Trong file server/routes/layerData.routes.js 
+// Cập nhật endpoint /forest-management
 
 /**
  * @swagger
  * /layer-data/forest-management:
  *   get:
- *     summary: Lấy dữ liệu lớp chủ quản lý rừng
+ *     summary: Lấy dữ liệu lớp chủ quản lý rừng (ĐÃ SỬA LỖI)
  *     tags:
  *       - Layer Data
  *     responses:
@@ -183,6 +185,8 @@ router.get("/administrative", async (req, res) => {
  */
 router.get("/forest-management", async (req, res) => {
   try {
+    console.log(`📥 Received request for forest management data`);
+    
     const query = `
       SELECT json_build_object(
         'type', 'FeatureCollection',
@@ -192,7 +196,10 @@ router.get("/forest-management", async (req, res) => {
         SELECT json_build_object(
           'type', 'Feature',
           'geometry', ST_AsGeoJSON(
-            ST_Transform(ST_SetSRID(geom, 3405), 4326)
+            ST_Transform(
+              ST_SetSRID(geom, 3405), 
+              4326
+            )
           )::json,
           'properties', json_build_object(
             'gid', gid,
@@ -203,11 +210,32 @@ router.get("/forest-management", async (req, res) => {
         ) as feature
         FROM laocai_chuquanly
         WHERE ST_IsValid(geom) AND geom IS NOT NULL
+        ORDER BY gid
       ) AS features;
     `;
 
+    console.log(`🔍 Executing forest management query with coordinate transformation`);
     const result = await pool.query(query);
     let geojson = result.rows[0].geojson;
+
+    console.log(`📊 Forest management result count: ${geojson.features?.length || 0}`);
+    
+    // Log sample coordinates để kiểm tra transform
+    if (geojson.features && geojson.features.length > 0) {
+      const sampleFeature = geojson.features[0];
+      const sampleCoords = sampleFeature.geometry?.coordinates?.[0]?.[0]?.[0];
+      console.log(`🔍 Sample forest management coordinates:`, sampleCoords);
+      console.log(`🏢 Sample forest management properties:`, sampleFeature.properties);
+      
+      if (sampleCoords && Array.isArray(sampleCoords)) {
+        const [lng, lat] = sampleCoords;
+        if (lng >= 103 && lng <= 105 && lat >= 21 && lat <= 24) {
+          console.log(`✅ Transform thành công! WGS84 hợp lệ: lng=${lng}, lat=${lat}`);
+        } else {
+          console.error(`❌ Transform thất bại! Tọa độ không hợp lệ: lng=${lng}, lat=${lat}`);
+        }
+      }
+    }
 
     // Chuyển đổi TCVN3 sang Unicode
     if (geojson.features) {
@@ -221,13 +249,24 @@ router.get("/forest-management", async (req, res) => {
     }
 
     console.log(`✅ Loaded ${geojson.features.length} forest management features`);
+    
+    // Log thống kê theo loại chủ quản lý
+    const managementStats = {};
+    geojson.features.forEach(feature => {
+      const chuQuanLy = feature.properties.chuquanly || "Không xác định";
+      managementStats[chuQuanLy] = (managementStats[chuQuanLy] || 0) + 1;
+    });
+    console.log("📊 Thống kê theo chủ quản lý:", managementStats);
+    
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu chủ quản lý rừng:", err);
-    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu chủ quản lý rừng" });
+    res.status(500).json({ 
+      error: "Lỗi server khi lấy dữ liệu chủ quản lý rừng",
+      details: err.message 
+    });
   }
 });
-
 /**
  * @swagger
  * /layer-data/terrain:
@@ -310,11 +349,12 @@ router.get("/terrain", async (req, res) => {
  *       200:
  *         description: Dữ liệu GeoJSON 3 loại rừng
  */
+// Sửa endpoint forest-types trong layerData.routes.js
 router.get("/forest-types", async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.query.limit) || 1000, 5000);
 
-    // THÊM TRANSFORM từ VN-2000 (3405) sang WGS84 (4326)
+    // SỬA LẠI MAPPING CHO 3 LOẠI RỪNG
     const query = `
       SELECT json_build_object(
         'type', 'FeatureCollection',
@@ -344,7 +384,9 @@ router.get("/forest-types", async (req, res) => {
             'layer_type', '3_forest_types',
             'forest_function', CASE
               WHEN malr3 = 1 THEN 'Rừng đặc dụng'
-              WHEN malr3 = 2 THEN 'Rừng sản xuất'
+              WHEN malr3 = 3 THEN 'Rừng sản xuất'
+              WHEN malr3 = 4 THEN 'Không xác định'
+              WHEN malr3 IS NULL OR malr3 = 0 THEN 'Không xác định'
               ELSE 'Không xác định'
             END
           )
@@ -394,13 +436,17 @@ router.get("/forest-types", async (req, res) => {
 
     console.log(`✅ Loaded ${geojson.features.length} forest types features`);
     
-    // Log thống kê theo loại rừng
+    // Log thống kê theo loại rừng để debug
     const typeStats = {};
+    const malr3Stats = {};
     geojson.features.forEach(feature => {
       const type = feature.properties.forest_function;
+      const malr3 = feature.properties.malr3;
       typeStats[type] = (typeStats[type] || 0) + 1;
+      malr3Stats[malr3] = (malr3Stats[malr3] || 0) + 1;
     });
     console.log("📊 Thống kê theo loại rừng:", typeStats);
+    console.log("📊 Thống kê theo mã malr3:", malr3Stats);
     
     res.json(geojson);
   } catch (err) {

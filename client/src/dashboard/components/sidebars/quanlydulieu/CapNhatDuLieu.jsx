@@ -9,8 +9,10 @@ const CapNhatDuLieu = () => {
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   const { updateLayerData, setLayerLoading, mapLayers } = useGeoData();
 
-  // Hàm load dữ liệu cho từng layer
-// Hàm load dữ liệu cho từng layer
+  // Trong file client/src/dashboard/components/sidebars/quanlydulieu/CapNhatDuLieu.jsx
+// Cập nhật hàm handleLoadLayer
+
+// Hàm load dữ liệu cho từng layer với debug tốt hơn
 const handleLoadLayer = async (layerKey, layerName) => {
   try {
     const layer = mapLayers[layerKey];
@@ -26,7 +28,12 @@ const handleLoadLayer = async (layerKey, layerName) => {
       ? `${config.API_URL}/api/layer-data/${layer.endpoint}?limit=1000`
       : `${config.API_URL}/api/layer-data/${layer.endpoint}`;
     
+    console.log(`📡 Request URL: ${url}`);
+    
     const response = await axios.get(url);
+    
+    console.log(`📊 Response status: ${response.status}`);
+    console.log(`📊 Response data:`, response.data);
     
     if (response.data && response.data.features) {
       const layerData = {
@@ -34,37 +41,128 @@ const handleLoadLayer = async (layerKey, layerName) => {
         layerType: layerKey
       };
       
+      console.log(`✅ Layer data structure:`, {
+        type: layerData.type,
+        featuresCount: layerData.features.length,
+        sampleFeature: layerData.features[0]
+      });
+      
       updateLayerData(layerKey, layerData);
-      toast.success(`✅ Đã tải ${layerName} thành công! (${response.data.features.length} đối tượng)`);
+      
+      // Thông báo chi tiết cho từng loại layer
+      let successMessage = `✅ Đã tải ${layerName} thành công! (${response.data.features.length} đối tượng)`;
+      
+      if (layerKey === 'forestManagement') {
+        // Đếm các loại chủ quản lý
+        const managementTypes = {};
+        response.data.features.forEach(feature => {
+          const chuQuanLy = feature.properties.chuquanly || "Không xác định";
+          managementTypes[chuQuanLy] = (managementTypes[chuQuanLy] || 0) + 1;
+        });
+        
+        console.log(`🏢 Các loại chủ quản lý:`, managementTypes);
+        successMessage += `\n🏢 Gồm ${Object.keys(managementTypes).length} loại chủ quản lý khác nhau`;
+      }
+      
+      toast.success(successMessage);
       console.log(`✅ Đã tải ${response.data.features.length} features cho ${layerName}`);
       
       // Thông báo đang zoom
       toast.info(`🗺️ Đang zoom đến vùng ${layerName}...`);
     } else {
+      console.warn(`⚠️ Không có dữ liệu features trong response cho ${layerName}`);
       toast.warning(`⚠️ Không có dữ liệu cho ${layerName}`);
     }
   } catch (err) {
     console.error(`❌ Lỗi khi tải ${layerName}:`, err);
-    toast.error(`❌ Không thể tải ${layerName}: ${err.response?.data?.error || err.message}`);
+    
+    // Log chi tiết lỗi
+    if (err.response) {
+      console.error(`📡 Response error:`, {
+        status: err.response.status,
+        statusText: err.response.statusText,
+        data: err.response.data
+      });
+    }
+    
+    let errorMessage = `❌ Không thể tải ${layerName}`;
+    if (err.response?.status === 404) {
+      errorMessage += ": Không tìm thấy dữ liệu";
+    } else if (err.response?.status === 500) {
+      errorMessage += ": Lỗi server";
+    } else {
+      errorMessage += `: ${err.response?.data?.error || err.message}`;
+    }
+    
+    toast.error(errorMessage);
     setLayerLoading(layerKey, false);
   }
 };
 
-  // Hàm load tất cả layers cơ bản cùng lúc
+  // Hàm load tất cả layers cơ bản cùng lúc - SỬA LẠI
   const handleLoadAllBasicLayers = async () => {
-    const basicLayers = ['administrative', 'forestTypes'];
+    const basicLayers = [
+      { key: 'administrative', name: 'Ranh giới hành chính' },
+      { key: 'forestTypes', name: '3 loại rừng' }
+    ];
     
     toast.info("🔄 Đang tải tất cả các lớp cơ bản...");
     
-    const loadPromises = basicLayers.map(layerKey => {
-      const layer = mapLayers[layerKey];
-      return handleLoadLayer(layerKey, layer.name);
-    });
+    // Sử dụng Promise.allSettled để không bị dừng nếu một layer lỗi
+    const loadPromises = basicLayers.map(({ key, name }) => 
+      handleLoadLayer(key, name).catch(err => {
+        console.error(`Lỗi tải ${name}:`, err);
+        return { error: err, layerKey: key };
+      })
+    );
     
     try {
-      await Promise.all(loadPromises);
-      toast.success("✅ Đã tải xong tất cả các lớp cơ bản!");
+      const results = await Promise.allSettled(loadPromises);
+      
+      const successCount = results.filter(result => result.status === 'fulfilled').length;
+      const failCount = results.length - successCount;
+      
+      if (failCount === 0) {
+        toast.success("✅ Đã tải xong tất cả các lớp cơ bản!");
+      } else {
+        toast.warning(`⚠️ Đã tải xong ${successCount}/${results.length} lớp. ${failCount} lớp gặp lỗi.`);
+      }
     } catch (err) {
+      console.error("❌ Lỗi tổng quát khi tải layers:", err);
+      toast.error("❌ Có lỗi xảy ra khi tải một số lớp");
+    }
+  };
+
+  // Hàm load tất cả layers nâng cao
+  const handleLoadAllAdvancedLayers = async () => {
+    const advancedLayers = [
+      { key: 'terrain', name: 'Địa hình, thủy văn, giao thông' },
+      { key: 'forestManagement', name: 'Chủ quản lý rừng' },
+      { key: 'forestStatus', name: 'Hiện trạng rừng' }
+    ];
+    
+    toast.info("🔄 Đang tải tất cả các lớp nâng cao...");
+    
+    const loadPromises = advancedLayers.map(({ key, name }) => 
+      handleLoadLayer(key, name).catch(err => {
+        console.error(`Lỗi tải ${name}:`, err);
+        return { error: err, layerKey: key };
+      })
+    );
+    
+    try {
+      const results = await Promise.allSettled(loadPromises);
+      
+      const successCount = results.filter(result => result.status === 'fulfilled').length;
+      const failCount = results.length - successCount;
+      
+      if (failCount === 0) {
+        toast.success("✅ Đã tải xong tất cả các lớp nâng cao!");
+      } else {
+        toast.warning(`⚠️ Đã tải xong ${successCount}/${results.length} lớp. ${failCount} lớp gặp lỗi.`);
+      }
+    } catch (err) {
+      console.error("❌ Lỗi tổng quát khi tải layers:", err);
       toast.error("❌ Có lỗi xảy ra khi tải một số lớp");
     }
   };
@@ -82,6 +180,24 @@ const handleLoadLayer = async (layerKey, layerName) => {
         <div className="flex flex-col gap-2 px-1 pt-3">
           <div className="flex flex-col gap-3">
             
+            {/* Nút tải tất cả layers cơ bản */}
+            <div className="mb-3 p-2 bg-green-50 rounded border border-green-200">
+              <h4 className="text-sm font-semibold text-green-800 mb-2">Tải nhanh</h4>
+              <div className="flex gap-2">
+                <button 
+                  onClick={handleLoadAllBasicLayers}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-1 px-2 rounded text-xs transition-colors"
+                >
+                  Tải lớp cơ bản
+                </button>
+                <button 
+                  onClick={handleLoadAllAdvancedLayers}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-2 rounded text-xs transition-colors"
+                >
+                  Tải lớp nâng cao
+                </button>
+              </div>
+            </div>
 
             {/* Lớp ranh giới hành chính */}
             <div className="flex items-center gap-1">
@@ -140,9 +256,9 @@ const handleLoadLayer = async (layerKey, layerName) => {
               </button>
             </div>
 
-            {/* Lớp ranh giới chủ quản lý rừng */}
+            {/* Lớp chủ quản lý rừng */}
             <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-96">Lớp ranh giới chủ quản lý rừng</label>
+              <label className="text-sm font-medium w-96">Lớp chủ quản lý rừng</label>
               <button 
                 onClick={() => handleLoadLayer('forestManagement', 'Chủ quản lý rừng')}
                 disabled={mapLayers.forestManagement.loading}
@@ -177,7 +293,6 @@ const handleLoadLayer = async (layerKey, layerName) => {
                 )}
               </button>
             </div>
-
 
             {/* Thông tin trạng thái */}
             <div className="mt-4 p-3 bg-gray-50 rounded-md">

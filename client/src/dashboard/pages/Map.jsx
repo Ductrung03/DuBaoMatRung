@@ -14,7 +14,9 @@ import { useGeoData } from "../contexts/GeoDataContext";
 import { formatDate } from "../../utils/formatDate";
 import { ClipLoader } from "react-spinners";
 
-// Sửa hàm getLayerStyle để đảm bảo ranh giới hiển thị rõ
+// Trong file client/src/dashboard/pages/Map.jsx
+// Sửa hàm getLayerStyle để thêm case cho forestManagement
+
 const getLayerStyle = (feature, layerType, isSelected = false) => {
   console.log(`🎨 Getting style for:`, {
     layerType,
@@ -93,7 +95,130 @@ const getLayerStyle = (feature, layerType, isSelected = false) => {
         ...selectedStyle,
       };
 
-    // ... các case khác không đổi
+    case "forestTypes":
+      // Màu cho 3 loại rừng
+      const forestFunction = feature.properties.forest_function;
+      let forestColor = "#38a169"; // Mặc định xanh lá
+
+      if (forestFunction === "Rừng đặc dụng") {
+        forestColor = "#e53e3e"; // Đỏ
+      } else if (forestFunction === "Rừng phòng hộ") {
+        forestColor = "#dd6b20"; // Cam
+      } else if (forestFunction === "Rừng sản xuất") {
+        forestColor = "#38a169"; // Xanh lá
+      }
+
+      return {
+        ...baseStyle,
+        color: isSelected ? "#ff7800" : "#2d3748",
+        fillColor: forestColor,
+        weight: isSelected ? 3 : 2,
+        opacity: 1,
+        fillOpacity: 0.6,
+        ...selectedStyle,
+      };
+
+    case "forestManagement":
+      // THÊM CASE MỚI CHO CHỦ QUẢN LÝ RỪNG
+      console.log(`🏢 Forest Management feature:`, feature.properties);
+      
+      // Màu sắc theo từng loại chủ quản lý
+      const chuQuanLy = feature.properties.chuquanly || "";
+      let managementColor = "#9f1239"; // Màu đỏ đậm mặc định
+
+      // Phân loại màu theo chủ quản lý
+      if (chuQuanLy.includes("Nhà nước") || chuQuanLy.includes("UBND")) {
+        managementColor = "#dc2626"; // Đỏ - Nhà nước
+      } else if (chuQuanLy.includes("Công ty") || chuQuanLy.includes("Doanh nghiệp")) {
+        managementColor = "#ea580c"; // Cam - Doanh nghiệp
+      } else if (chuQuanLy.includes("Hợp tác xã") || chuQuanLy.includes("HTX")) {
+        managementColor = "#d97706"; // Vàng cam - Hợp tác xã
+      } else if (chuQuanLy.includes("Cá nhân") || chuQuanLy.includes("Hộ gia đình")) {
+        managementColor = "#059669"; // Xanh lá - Cá nhân/Hộ gia đình
+      } else if (chuQuanLy.includes("Cộng đồng") || chuQuanLy.includes("Thôn")) {
+        managementColor = "#0891b2"; // Xanh dương - Cộng đồng
+      } else {
+        managementColor = "#7c3aed"; // Tím - Khác
+      }
+
+      return {
+        ...baseStyle,
+        color: isSelected ? "#ff7800" : "#1f2937",
+        fillColor: managementColor,
+        weight: isSelected ? 3 : 2,
+        opacity: 1,
+        fillOpacity: 0.7,
+        ...selectedStyle,
+      };
+
+    case "terrain":
+      // Style cho địa hình, thủy văn, giao thông
+      const featureType = feature.properties.feature_type;
+      let terrainColor = "#6b7280"; // Xám mặc định
+
+      switch (featureType) {
+        case "waterway":
+          terrainColor = "#3182ce"; // Xanh dương cho sông nước
+          break;
+        case "water_transport":
+          terrainColor = "#0987a0"; // Xanh dương đậm cho thủy vận
+          break;
+        case "road":
+          terrainColor = "#b7791f"; // Nâu cho giao thông
+          break;
+        default:
+          terrainColor = "#6b7280"; // Xám cho địa hình
+      }
+
+      return {
+        ...baseStyle,
+        color: terrainColor,
+        fillColor: terrainColor,
+        weight: featureType === "road" ? 3 : 2,
+        opacity: 1,
+        fillOpacity: featureType === "waterway" ? 0.8 : 0.5,
+        ...selectedStyle,
+      };
+
+    case "forestStatus":
+      // Style cho hiện trạng rừng
+      return {
+        ...baseStyle,
+        color: isSelected ? "#ff7800" : "#166534",
+        fillColor: "#16a34a", // Xanh lá đậm
+        weight: isSelected ? 3 : 2,
+        opacity: 1,
+        fillOpacity: 0.5,
+        ...selectedStyle,
+      };
+
+    case "deforestation":
+      // Style cho dự báo mất rừng theo mức độ nghiêm trọng
+      const alertLevel = feature.properties.alert_level;
+      let deforestationColor = "#ea580c"; // Cam mặc định
+
+      switch (alertLevel) {
+        case "critical":
+          deforestationColor = "#7f1d1d"; // Đỏ đậm
+          break;
+        case "high":
+          deforestationColor = "#dc2626"; // Đỏ
+          break;
+        case "medium":
+        default:
+          deforestationColor = "#ea580c"; // Cam
+          break;
+      }
+
+      return {
+        ...baseStyle,
+        color: isSelected ? "#ff7800" : "#1f2937",
+        fillColor: deforestationColor,
+        weight: isSelected ? 3 : 2,
+        opacity: 1,
+        fillOpacity: 0.8,
+        ...selectedStyle,
+      };
 
     default:
       return {
@@ -107,6 +232,7 @@ const getLayerStyle = (feature, layerType, isSelected = false) => {
 };
 
 // Hàm xây dựng popup content dựa trên loại layer
+// Cập nhật hàm buildPopupContent trong Map.jsx để hiển thị thông tin chủ quản lý rừng
 const buildPopupContent = (feature, layerType) => {
   const props = feature.properties;
 
@@ -142,7 +268,7 @@ const buildPopupContent = (feature, layerType) => {
         "Địa hình - Thủy văn - Giao thông";
       break;
     case "forestManagement":
-      popupContent += "Chủ quản lý rừng";
+      popupContent += "Chủ quản lý rừng - " + (props.chuquanly || "Không xác định");
       break;
     case "forestStatus":
       popupContent += "Hiện trạng rừng";
@@ -165,35 +291,16 @@ const buildPopupContent = (feature, layerType) => {
   const priorityFieldsByType = {
     administrative: ["boundary_level", "huyen", "xa", "tieukhu", "khoanh"],
     forestTypes: [
-      "xa",
-      "tk",
-      "khoanh",
-      "lo",
-      "dtich",
-      "ldlr",
-      "forest_function",
-      "churung",
+      "forest_function", "xa", "tk", "khoanh", "lo", "dtich", "ldlr", "churung"
     ],
     terrain: ["ten", "ma", "feature_type"],
-    forestManagement: ["chuquanly", "tt"],
+    forestManagement: ["chuquanly", "tt", "gid"], // Thêm trường ưu tiên cho chủ quản lý rừng
     forestStatus: ["huyen", "xa", "tk", "khoanh", "churung", "area_ha"],
     deforestation: [
-      "area_ha",
-      "start_dau",
-      "end_sau",
-      "alert_level",
-      "days_since",
+      "area_ha", "start_dau", "end_sau", "alert_level", "days_since"
     ],
     default: [
-      "huyen",
-      "xa",
-      "area",
-      "start_dau",
-      "end_sau",
-      "tk",
-      "khoanh",
-      "churung",
-      "mahuyen",
+      "huyen", "xa", "area", "start_dau", "end_sau", "tk", "khoanh", "churung", "mahuyen"
     ],
   };
 
@@ -247,10 +354,11 @@ const buildPopupContent = (feature, layerType) => {
         khoanh: "Khoảnh",
         churung: "Chủ rừng",
         mahuyen: "Mã huyện",
-        chuquanly: "Chủ quản lý",
+        chuquanly: "Chủ quản lý", // Thêm label cho chủ quản lý
         ten: "Tên",
         ma: "Mã",
         tt: "Thứ tự",
+        gid: "ID",
         tieukhu: "Tiểu khu",
         lo: "Lô",
         dtich: "Diện tích",
@@ -273,6 +381,7 @@ const buildPopupContent = (feature, layerType) => {
     }
   });
 
+  // Hiển thị các trường còn lại
   Object.entries(props).forEach(([key, value]) => {
     if (
       !priorityFields.includes(key) &&
@@ -395,36 +504,30 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
             <div class="section-content" style="padding: 6px 12px; padding-left: 32px;">
               <div style="display: flex; align-items: center; margin-bottom: 4px;">
                 <div style="width: 24px; height: 4px; background: #000000; margin-right: 8px; border: none;"></div>
-                <span style="font-size: 11px; font-weight: 500;">Ranh giới tỉnh</span>
-              </div>
-              <div style="display: flex; align-items: center; margin-bottom: 4px;">
-                <svg width="24" height="4" style="margin-right: 8px;">
-                  <line x1="0" y1="2" x2="24" y2="2" stroke="#1a365d" stroke-width="3" stroke-dasharray="6,3"/>
-                </svg>
                 <span style="font-size: 11px; font-weight: 500;">Ranh giới huyện</span>
               </div>
               <div style="display: flex; align-items: center; margin-bottom: 4px;">
                 <svg width="24" height="4" style="margin-right: 8px;">
-                  <line x1="0" y1="2" x2="24" y2="2" stroke="#2d3748" stroke-width="2" stroke-dasharray="4,2"/>
+                  <line x1="0" y1="2" x2="24" y2="2" stroke="#333333" stroke-width="2" stroke-dasharray="4,2"/>
                 </svg>
                 <span style="font-size: 11px;">Ranh giới xã</span>
               </div>
               <div style="display: flex; align-items: center; margin-bottom: 4px;">
                 <svg width="24" height="4" style="margin-right: 8px;">
-                  <line x1="0" y1="2" x2="24" y2="2" stroke="#4a5568" stroke-width="1.5" stroke-dasharray="3,2"/>
+                  <line x1="0" y1="2" x2="24" y2="2" stroke="#666666" stroke-width="1.5" stroke-dasharray="3,2"/>
                 </svg>
                 <span style="font-size: 11px;">Ranh giới tiểu khu</span>
               </div>
               <div style="display: flex; align-items: center; margin-bottom: 3px;">
                 <svg width="24" height="4" style="margin-right: 8px;">
-                  <line x1="0" y1="2" x2="24" y2="2" stroke="#718096" stroke-width="1" stroke-dasharray="2,2"/>
+                  <line x1="0" y1="2" x2="24" y2="2" stroke="#999999" stroke-width="1" stroke-dasharray="2,2"/>
                 </svg>
                 <span style="font-size: 11px;">Ranh giới khoảnh</span>
               </div>
             </div>
           </div>
 
-          <!-- Lớp 3 loại rừng -->
+          <!-- Lớp 3 loại rừng - CẬP NHẬT VỚI MÀU SẮCMỚI -->
           <div class="legend-section">
             <div class="section-header" style="
               padding: 8px 12px;
@@ -444,16 +547,16 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
             </div>
             <div class="section-content" style="padding: 6px 12px; padding-left: 32px; display: none;">
               <div style="display: flex; align-items: center; margin-bottom: 3px;">
-                <div style="width: 16px; height: 16px; background: #e53e3e; margin-right: 8px; border-radius: 2px; border: 1px solid #c53030;"></div>
-                <span style="font-weight: 500;">Rừng đặc dụng</span>
+                <div style="width: 16px; height: 16px; background: #dc2626; margin-right: 8px; border-radius: 2px; border: 1px solid #991b1b;"></div>
+                <span style="font-weight: 500; color: #dc2626;">Rừng đặc dụng</span>
               </div>
               <div style="display: flex; align-items: center; margin-bottom: 3px;">
-                <div style="width: 16px; height: 16px; background: #dd6b20; margin-right: 8px; border-radius: 2px; border: 1px solid #c05621;"></div>
-                <span style="font-weight: 500;">Rừng phòng hộ</span>
+                <div style="width: 16px; height: 16px; background: #16a34a; margin-right: 8px; border-radius: 2px; border: 1px solid #15803d;"></div>
+                <span style="font-weight: 500; color: #16a34a;">Rừng sản xuất</span>
               </div>
               <div style="display: flex; align-items: center; margin-bottom: 3px;">
-                <div style="width: 16px; height: 16px; background: #38a169; margin-right: 8px; border-radius: 2px; border: 1px solid #2f855a;"></div>
-                <span style="font-weight: 500;">Rừng sản xuất</span>
+                <div style="width: 16px; height: 16px; background: #6b7280; margin-right: 8px; border-radius: 2px; border: 1px solid #4b5563;"></div>
+                <span style="color: #6b7280;">Không xác định</span>
               </div>
             </div>
           </div>
@@ -504,8 +607,20 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               <input type="checkbox" id="forest-management-checkbox" ${
                 mapLayers.forestManagement?.visible ? "checked" : ""
               } style="margin-right: 8px;">
-              <span style="color: #9f1239;">🏢</span>
+              <span style="color: #7c3aed;">🏢</span>
               <span style="margin-left: 6px; font-weight: 500;">Lớp chủ quản lý rừng</span>
+              <svg class="section-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-left: auto; transform: rotate(-90deg); transition: transform 0.3s;">
+                <polyline points="6,9 12,15 18,9"></polyline>
+              </svg>
+            </div>
+            <div class="section-content" style="padding: 6px 12px; padding-left: 32px; display: none;">
+              <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                <div style="width: 16px; height: 16px; background: #7c3aed; margin-right: 8px; border-radius: 2px; border: 1px solid #5b21b6;"></div>
+                <span style="font-weight: 500; color: #7c3aed;">Vùng chủ quản lý rừng</span>
+              </div>
+              <div style="font-size: 10px; color: #6b7280; margin-top: 4px; padding-left: 24px;">
+                Phân chia theo đơn vị quản lý rừng
+              </div>
             </div>
           </div>
 
@@ -559,6 +674,8 @@ const CustomMapControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
         </div>
       </div>
     `;
+
+
 
     container.className = "leaflet-control leaflet-bar";
 
