@@ -43,9 +43,7 @@ const DistrictDropdown = ({
         let data = res.data;
         
         // Log dữ liệu gốc để debug
-        console.log("Original district data:", data);
-        console.log("Current user:", user);
-        console.log("User district_id (TCVN3):", user?.district_id); // Giá trị TCVN3 như "B¶o Yªn"
+      
         
         // Lưu tất cả các huyện
         setDistricts(data);
@@ -60,7 +58,7 @@ const DistrictDropdown = ({
             return exactMatch;
           });
           
-          console.log("Filtered districts (should only show user's district):", filtered);
+       
           
           // Lưu danh sách đã lọc
           setFilteredOptions(filtered);

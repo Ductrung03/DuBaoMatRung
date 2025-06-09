@@ -26,13 +26,8 @@ const LoadingSpinner = ({ size = "medium" }) => {
   }[size];
 
   return (
-    <div
-      className={`inline-block ${sizeClass} animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]`}
-      role="status"
-    >
-      <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-        Đang tải...
-      </span>
+    <div className={`inline-block ${sizeClass} animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]`} role="status">
+      <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Đang tải...</span>
     </div>
   );
 };
@@ -70,10 +65,10 @@ const TraCuuDuLieuDuBaoMatRung = () => {
           fetch(`${config.API_URL}/api/dropdown/khoanh`),
           fetch(`${config.API_URL}/api/dropdown/churung`),
         ]);
-
+        
         const khoanhData = await khoanhRes.json();
         const churungData = await churungRes.json();
-
+        
         setKhoanhList(khoanhData.map((item) => item.khoanh));
         setChuRungList(churungData.map((item) => item.churung));
       } catch (error) {
@@ -83,9 +78,9 @@ const TraCuuDuLieuDuBaoMatRung = () => {
         setIsLoading(false);
       }
     };
-
+    
     fetchInitialData();
-  }, []);
+  }, []); 
 
   const handleHuyenChange = async (e) => {
     const huyen = e.target.value;
@@ -138,23 +133,23 @@ const TraCuuDuLieuDuBaoMatRung = () => {
   const handleTraCuu = async () => {
     try {
       setNoDataMessage(""); // reset thông báo cũ nếu có
-
+      
       // Kiểm tra nếu người dùng là admin, bắt buộc phải chọn huyện và nhập từ ngày/đến ngày
       if (isAdmin() && !selectedHuyen) {
         toast.warning("Vui lòng chọn huyện trước khi tra cứu");
         return;
       }
-
+      
       // Kiểm tra từ ngày và đến ngày cho tất cả người dùng
       if (!fromDate || !toDate) {
         toast.warning("Vui lòng nhập đầy đủ từ ngày và đến ngày");
         return;
       }
-
+      
       setIsLoading(true); // Bắt đầu loading cho button
       setIsLoadingOverlay(true); // Hiển thị overlay loading
       setLoadingMessage("Đang truy vấn dữ liệu mất rừng...");
-
+  
       const queryParams = new URLSearchParams({
         fromDate,
         toDate,
@@ -162,9 +157,9 @@ const TraCuuDuLieuDuBaoMatRung = () => {
         xa: selectedXa,
         tieukhu: selectedTieukhu,
         khoanh: selectedKhoanh,
-        churung: selectedChuRung,
+        churung: selectedChuRung
       });
-
+  
       // Fake loading progress
       let fakeProgress = 0;
       const progressInterval = setInterval(() => {
@@ -182,28 +177,26 @@ const TraCuuDuLieuDuBaoMatRung = () => {
           clearInterval(progressInterval);
         }
       }, 700);
-
+  
       const res = await fetch(
-        `${
-          config.API_URL
-        }/api/quan-ly-du-lieu/tra-cuu-du-lieu-bao-mat-rung?${queryParams.toString()}`
+        `${config.API_URL}/api/quan-ly-du-lieu/tra-cuu-du-lieu-bao-mat-rung?${queryParams.toString()}`
       );
-
+  
       clearInterval(progressInterval);
-
+  
       if (!res.ok) {
         if (res.status === 400) {
           const errData = await res.json();
           toast.error(errData.message || "Thiếu tham số bắt buộc.");
-          setIsLoading(false);
+          setIsLoading(false); // Kết thúc loading khi có lỗi
           setIsLoadingOverlay(false); // Ẩn overlay loading
           return;
         }
         throw new Error(`Lỗi ${res.status}: ${res.statusText}`);
       }
-
+  
       const data = await res.json();
-
+  
       if (!data.success) {
         toast.error(data.message || "Lỗi từ backend.");
         setGeoData({ type: "FeatureCollection", features: [] });
@@ -211,7 +204,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
         setIsLoadingOverlay(false); // Ẩn overlay loading
         return;
       }
-
+  
       if (!data.data || data.data.features.length === 0) {
         toast.warning("Không có dữ liệu phù hợp.");
         setGeoData({ type: "FeatureCollection", features: [] });
@@ -219,39 +212,14 @@ const TraCuuDuLieuDuBaoMatRung = () => {
         setIsLoadingOverlay(false); // Ẩn overlay loading
         return;
       }
-
-      console.log("🔍 DEBUG: Raw data từ API:", data);
-      console.log("🔍 DEBUG: GeoJSON data:", data.data);
-      console.log("🔍 DEBUG: Số features:", data.data.features?.length);
-      console.log("🔍 DEBUG: Sample feature:", data.data.features?.[0]);
-      if (data.data.features?.[0]?.geometry?.coordinates) {
-      console.log("🔍 DEBUG: Sample coordinates:", data.data.features[0].geometry.coordinates[0]?.[0]?.[0]);
-    }
+  
       // Thêm hiệu ứng delay để hiển thị quá trình loading hoàn thiện
       setLoadingMessage("Hoàn thành truy vấn!");
-
-       setTimeout(() => {
-      // ===== SỬA: Thêm layer_type cho dữ liệu =====
-      const geoDataWithLayerType = {
-        ...data.data,
-        features: data.data.features.map(feature => ({
-          ...feature,
-          properties: {
-            ...feature.properties,
-            layer_type: 'deforestation_search_result' // Thêm layer type
-          }
-        }))
-      };
-      
-      console.log("🔍 DEBUG: Setting GeoData with layer type:", geoDataWithLayerType);
-      setGeoData(geoDataWithLayerType);
-      
-      // Thông báo thành công
-      toast.success(`Đã tìm thấy ${data.data.features.length} vùng mất rừng!`);
-      
-      setIsLoading(false);
-      setIsLoadingOverlay(false);
-    }, 500);
+      setTimeout(() => {
+        setGeoData(data.data);
+        setIsLoading(false); // Kết thúc loading khi thành công
+        setIsLoadingOverlay(false); // Ẩn overlay loading
+      }, 500);
     } catch (err) {
       console.error("Lỗi tra cứu:", err);
       toast.error(`Lỗi khi tra cứu dữ liệu: ${err.message}`);
@@ -259,7 +227,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
       setIsLoadingOverlay(false); // Ẩn overlay loading
     }
   };
-
+  
   const nguyenNhanList = [
     "Khai thác rừng trái phép",
     "Chuyển đổi mục đích sử dụng đất",
@@ -294,7 +262,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
     <div>
       {/* Overlay loading khi đang truy vấn dữ liệu */}
       {isLoadingOverlay && <LoadingOverlay message={loadingMessage} />}
-
+      
       {/* DỰ BÁO MẤT RỪNG TỰ ĐỘNG */}
       <div
         className="bg-forest-green-primary text-white py-0.2 px-4 rounded-full text-sm font-medium uppercase tracking-wide text-left shadow-md w-full cursor-pointer"
@@ -526,7 +494,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
           >
             {isLoading ? (
               <>
-                <LoadingSpinner size="small" />
+                <LoadingSpinner size="small" /> 
                 <span className="ml-2">Đang tải...</span>
               </>
             ) : (

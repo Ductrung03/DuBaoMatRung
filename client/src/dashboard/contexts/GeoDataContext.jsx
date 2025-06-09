@@ -67,6 +67,24 @@ const updateLayerData = (layerName, data) => {
   console.log(`📊 Số features: ${data?.features?.length || 0}`);
   console.log(`🔍 Sample feature:`, data?.features?.[0]);
   
+ if (layerName === 'forestManagement') {
+    console.log(`🏢 Forest Management Data:`, {
+      featureCount: data?.features?.length,
+      sampleFeature: data?.features?.[0],
+      sampleProperties: data?.features?.[0]?.properties
+    });
+    
+    // Kiểm tra dữ liệu chủ quản lý
+    if (data?.features?.length > 0) {
+      const managementTypes = {};
+      data.features.forEach(feature => {
+        const chuQuanLy = feature.properties.chuquanly || "Không xác định";
+        managementTypes[chuQuanLy] = (managementTypes[chuQuanLy] || 0) + 1;
+      });
+      console.log(`🏢 Thống kê chủ quản lý:`, managementTypes);
+    }
+  }
+
   setMapLayers(prev => ({
     ...prev,
     [layerName]: {
