@@ -14,7 +14,8 @@ exports.getLayerInfo = async (req, res) => {
       { name: 'laocai_ranhgioihc', key: 'administrative' },
       { name: 'laocai_chuquanly', key: 'forest_management' },
       { name: 'laocai_nendiahinh', key: 'terrain' },
-      { name: 'laocai_rg3lr', key: 'forest_types' }
+      { name: 'laocai_rg3lr', key: 'forest_types' },
+      { name: 'mat_rung', key: 'deforestation_alerts' }
     ];
 
     for (const table of tables) {
@@ -175,7 +176,6 @@ exports.getForestManagement = async (req, res) => {
 
 /**
  * Lấy dữ liệu lớp nền địa hình từ laocai_nendiahinh và laocai_nendiahinh_line
- * GIẢI PHÁP ĐỚN GIẢN NHẤT: Lấy raw data, build GeoJSON trong JavaScript
  */
 exports.getTerrainData = async (req, res) => {
   try {
@@ -277,14 +277,6 @@ exports.getTerrainData = async (req, res) => {
     console.log(`🔳 Polygons: ${polygonCount}`);
     console.log(`📏 Lines: ${lineCount}`);
     
-    // Thống kê theo loại feature
-    const featureTypeStats = {};
-    geojson.features.forEach(feature => {
-      const type = feature.properties.feature_type;
-      featureTypeStats[type] = (featureTypeStats[type] || 0) + 1;
-    });
-    console.log(`📊 Feature types:`, featureTypeStats);
-    
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu nền địa hình:", err);
@@ -315,13 +307,13 @@ function getFeatureType(ten) {
 }
 
 /**
- * Lấy dữ liệu lớp 3 loại rừng từ laocai_rg3lr
+ * Lấy dữ liệu lớp 3 loại rừng từ laocai_rg3lr - HIỂN THỊ ĐẦY ĐỦ TẤT CẢ LOẠI RỪNG
  */
 exports.getForestTypes = async (req, res) => {
   try {
-    console.log(`📥 Loading 3 forest types data from laocai_rg3lr`);
+    console.log(`📥 Loading all forest types data from laocai_rg3lr`);
     
-    const limit = Math.min(parseInt(req.query.limit) || 1000, 5000);
+    const limit = Math.min(parseInt(req.query.limit) || 2000, 5000);
 
     const query = `
       SELECT json_build_object(
@@ -344,13 +336,25 @@ exports.getForestTypes = async (req, res) => {
             'churung', churung,
             'tinh', tinh,
             'huyen', huyen,
-            'layer_type', '3_forest_types',
+            'layer_type', 'forest_types_full',
             'forest_function', CASE
               WHEN malr3 = 1 THEN 'Rừng đặc dụng'
               WHEN malr3 = 2 THEN 'Rừng phòng hộ'
               WHEN malr3 = 3 THEN 'Rừng sản xuất'
-              ELSE 'Không xác định'
-            END
+              ELSE CASE
+                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%RDD%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%ĐẶC DỤNG%' THEN 'Rừng đặc dụng (LDLR)'
+                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%RPH%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%PHÒNG HỘ%' THEN 'Rừng phòng hộ (LDLR)'
+                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%RSX%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%SẢN XUẤT%' THEN 'Rừng sản xuất (LDLR)'
+                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%KLN%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%KHÁC%' THEN 'Đất lâm nghiệp khác'
+                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%NKR%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%KHÔNG RỪNG%' THEN 'Đất không rừng'
+                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%RNT%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%TỰ NHIÊN%' THEN 'Rừng tự nhiên'
+                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%RTT%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%TRỒNG%' THEN 'Rừng trồng'
+                WHEN TRIM(COALESCE(ldlr, '')) != '' THEN ldlr
+                ELSE 'Không xác định'
+              END
+            END,
+            'malr3_code', malr3,
+            'ldlr_code', ldlr
           )
         ) as feature
         FROM laocai_rg3lr
@@ -373,24 +377,107 @@ exports.getForestTypes = async (req, res) => {
           churung: convertTcvn3ToUnicode(feature.properties.churung || ""),
           tinh: convertTcvn3ToUnicode(feature.properties.tinh || ""),
           huyen: convertTcvn3ToUnicode(feature.properties.huyen || ""),
-          ldlr: convertTcvn3ToUnicode(feature.properties.ldlr || "")
+          ldlr: convertTcvn3ToUnicode(feature.properties.ldlr || ""),
+          forest_function: convertTcvn3ToUnicode(feature.properties.forest_function || "")
         }
       }));
     }
 
-    // Log thống kê để debug
+    // Log thống kê tất cả các loại rừng có trong dữ liệu
     const typeStats = {};
+    const malr3Stats = {};
+    const ldlrStats = {};
+    
     geojson.features.forEach(feature => {
-      const type = feature.properties.forest_function;
-      typeStats[type] = (typeStats[type] || 0) + 1;
+      const forestFunction = feature.properties.forest_function;
+      const malr3 = feature.properties.malr3_code;
+      const ldlr = feature.properties.ldlr_code || "";
+      
+      typeStats[forestFunction] = (typeStats[forestFunction] || 0) + 1;
+      malr3Stats[malr3] = (malr3Stats[malr3] || 0) + 1;
+      if (ldlr.trim()) {
+        ldlrStats[ldlr] = (ldlrStats[ldlr] || 0) + 1;
+      }
     });
-    console.log("📊 Thống kê 3 loại rừng:", typeStats);
+    
+    console.log("📊 Thống kê đầy đủ các loại rừng:", typeStats);
+    console.log("📊 Thống kê MALR3:", malr3Stats);
+    console.log("📊 Thống kê LDLR:", ldlrStats);
 
-    console.log(`✅ Loaded ${geojson.features.length} forest types features`);
+    // Thêm metadata về các loại rừng có trong dữ liệu
+    geojson.forestTypes = Object.keys(typeStats).map(type => ({
+      name: type,
+      count: typeStats[type]
+    })).sort((a, b) => b.count - a.count);
+
+    console.log(`✅ Loaded ${geojson.features.length} forest features with ${Object.keys(typeStats).length} different types`);
     res.json(geojson);
   } catch (err) {
-    console.error("❌ Lỗi lấy dữ liệu 3 loại rừng:", err);
-    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu 3 loại rừng" });
+    console.error("❌ Lỗi lấy dữ liệu đầy đủ các loại rừng:", err);
+    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu đầy đủ các loại rừng" });
+  }
+};
+/**
+ * Lấy dữ liệu lớp dự báo mất rừng mới nhất từ bảng mat_rung - 30 NGÀY GẦN NHẤT
+ */
+exports.getDeforestationAlerts = async (req, res) => {
+  try {
+    console.log(`📥 Loading latest deforestation alerts from mat_rung`);
+    
+    const days = parseInt(req.query.days) || 30;
+
+    const query = `
+      SELECT json_build_object(
+        'type', 'FeatureCollection',
+        'features', COALESCE(json_agg(
+          json_build_object(
+            'type', 'Feature',
+            'geometry', ST_AsGeoJSON(geom)::json,
+            'properties', json_build_object(
+              'gid', gid,
+              'start_dau', start_dau,
+              'end_sau', end_sau,
+              'area', area,
+              'area_ha', ROUND((area / 10000)::numeric, 2),
+              'mahuyen', mahuyen,
+              'layer_type', 'deforestation_alert',
+              'alert_level', CASE
+                WHEN CURRENT_DATE - end_sau::date <= 7 THEN 'critical'
+                WHEN CURRENT_DATE - end_sau::date <= 15 THEN 'high'
+                WHEN CURRENT_DATE - end_sau::date <= 30 THEN 'medium'
+                ELSE 'low'
+              END,
+              'days_since', CURRENT_DATE - end_sau::date,
+              'detection_status', COALESCE(detection_status, 'Chưa xác minh')
+            )
+          )
+        ), '[]'::json)
+      ) AS geojson
+      FROM mat_rung
+      WHERE ST_IsValid(geom)
+        AND end_sau::date >= CURRENT_DATE - INTERVAL '$1 days'
+      ORDER BY end_sau DESC
+      LIMIT 1000;
+    `;
+
+    const result = await pool.query(query, [days]);
+    let geojson = result.rows[0].geojson;
+
+    // Log thống kê mức cảnh báo
+    if (geojson.features) {
+      const alertStats = {};
+      geojson.features.forEach(feature => {
+        const level = feature.properties.alert_level;
+        alertStats[level] = (alertStats[level] || 0) + 1;
+      });
+      console.log("⚠️ Thống kê mức cảnh báo:", alertStats);
+    }
+
+    console.log(`✅ Loaded ${geojson.features.length} deforestation alert features from last ${days} days`);
+    res.json(geojson);
+  } catch (err) {
+    console.error("❌ Lỗi lấy dữ liệu dự báo mất rừng:", err);
+    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu dự báo mất rừng" });
   }
 };
 
@@ -454,55 +541,5 @@ exports.getForestStatus = async (req, res) => {
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu hiện trạng rừng:", err);
     res.status(500).json({ error: "Lỗi server khi lấy dữ liệu hiện trạng rừng" });
-  }
-};
-
-/**
- * Lấy dữ liệu lớp dự báo mất rừng mới nhất (giữ nguyên)
- */
-exports.getDeforestationAlerts = async (req, res) => {
-  try {
-    const days = parseInt(req.query.days) || 30;
-
-    const query = `
-      SELECT json_build_object(
-        'type', 'FeatureCollection',
-        'features', COALESCE(json_agg(
-          json_build_object(
-            'type', 'Feature',
-            'geometry', ST_AsGeoJSON(geom)::json,
-            'properties', json_build_object(
-              'gid', gid,
-              'start_dau', start_dau,
-              'end_sau', end_sau,
-              'area', area,
-              'area_ha', ROUND((area / 10000)::numeric, 2),
-              'mahuyen', mahuyen,
-              'layer_type', 'deforestation_alert',
-              'alert_level', CASE
-                WHEN CURRENT_DATE - end_sau::date <= 7 THEN 'critical'
-                WHEN CURRENT_DATE - end_sau::date <= 30 THEN 'high'
-                ELSE 'medium'
-              END,
-              'days_since', CURRENT_DATE - end_sau::date
-            )
-          )
-        ), '[]'::json)
-      ) AS geojson
-      FROM mat_rung
-      WHERE ST_IsValid(geom)
-        AND end_sau::date >= CURRENT_DATE - INTERVAL '$1 days'
-      ORDER BY end_sau DESC
-      LIMIT 1000;
-    `;
-
-    const result = await pool.query(query, [days]);
-    let geojson = result.rows[0].geojson;
-
-    console.log(`✅ Loaded ${geojson.features.length} deforestation alert features`);
-    res.json(geojson);
-  } catch (err) {
-    console.error("❌ Lỗi lấy dữ liệu dự báo mất rừng:", err);
-    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu dự báo mất rừng" });
   }
 };

@@ -1,4 +1,4 @@
-// server/routes/layerData.routes.js - Routes gọn gàng sau khi tách controller
+// server/routes/layerData.routes.js - Routes đầy đủ cho 5 lớp dữ liệu
 const express = require("express");
 const router = express.Router();
 const layerDataController = require("../controllers/layerData.controller");
@@ -66,7 +66,7 @@ router.get("/terrain", layerDataController.getTerrainData);
  * @swagger
  * /layer-data/forest-types:
  *   get:
- *     summary: Lấy dữ liệu lớp 3 loại rừng từ laocai_rg3lr
+ *     summary: Lấy dữ liệu lớp 3 loại rừng từ laocai_rg3lr (dựa trên MALR3)
  *     tags:
  *       - Layer Data
  *     parameters:
@@ -78,15 +78,35 @@ router.get("/terrain", layerDataController.getTerrainData);
  *         description: Số lượng records tối đa
  *     responses:
  *       200:
- *         description: Dữ liệu GeoJSON 3 loại rừng
+ *         description: Dữ liệu GeoJSON 3 loại rừng phân biệt theo MALR3
  */
 router.get("/forest-types", layerDataController.getForestTypes);
 
 /**
  * @swagger
+ * /layer-data/deforestation-alerts:
+ *   get:
+ *     summary: Lấy dữ liệu lớp dự báo mất rừng mới nhất từ bảng mat_rung
+ *     tags:
+ *       - Layer Data
+ *     parameters:
+ *       - in: query
+ *         name: days
+ *         schema:
+ *           type: integer
+ *           default: 30
+ *         description: Số ngày gần đây để lấy dữ liệu
+ *     responses:
+ *       200:
+ *         description: Dữ liệu GeoJSON dự báo mất rừng mới nhất với mức cảnh báo
+ */
+router.get("/deforestation-alerts", layerDataController.getDeforestationAlerts);
+
+/**
+ * @swagger
  * /layer-data/forest-status:
  *   get:
- *     summary: Lấy dữ liệu lớp hiện trạng rừng từ tlaocai_tkk_3lr_cru
+ *     summary: Lấy dữ liệu lớp hiện trạng rừng từ tlaocai_tkk_3lr_cru (endpoint cũ - giữ để tương thích)
  *     tags:
  *       - Layer Data
  *     parameters:
@@ -101,25 +121,5 @@ router.get("/forest-types", layerDataController.getForestTypes);
  *         description: Dữ liệu GeoJSON hiện trạng rừng
  */
 router.get("/forest-status", layerDataController.getForestStatus);
-
-/**
- * @swagger
- * /layer-data/deforestation-alerts:
- *   get:
- *     summary: Lấy dữ liệu lớp dự báo mất rừng mới nhất
- *     tags:
- *       - Layer Data
- *     parameters:
- *       - in: query
- *         name: days
- *         schema:
- *           type: integer
- *           default: 30
- *         description: Số ngày gần đây
- *     responses:
- *       200:
- *         description: Dữ liệu GeoJSON dự báo mất rừng mới nhất
- */
-router.get("/deforestation-alerts", layerDataController.getDeforestationAlerts);
 
 module.exports = router;

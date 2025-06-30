@@ -72,6 +72,16 @@ const CapNhatDuLieu = () => {
           console.log(`🌲 Thống kê 3 loại rừng:`, typeStats);
           successMessage += `\n🌲 Gồm ${Object.keys(typeStats).length} loại rừng`;
         }
+
+        if (layerKey === 'deforestationAlerts') {
+          const alertStats = {};
+          response.data.features.forEach(feature => {
+            const level = feature.properties.alert_level || "Không xác định";
+            alertStats[level] = (alertStats[level] || 0) + 1;
+          });
+          console.log(`⚠️ Thống kê mức cảnh báo:`, alertStats);
+          successMessage += `\n⚠️ Có ${response.data.features.length} cảnh báo mất rừng`;
+        }
         
         toast.success(successMessage);
         console.log(`✅ Đã tải ${response.data.features.length} features cho ${layerName}`);
@@ -108,45 +118,6 @@ const CapNhatDuLieu = () => {
     }
   };
 
-  // Hàm load tất cả layers cơ bản cùng lúc
-  const handleLoadAllBasicLayers = async () => {
-    const basicLayers = [
-      { key: 'administrative', name: 'Ranh giới hành chính' },
-      { key: 'forestTypes', name: '3 loại rừng' },
-      { key: 'forestManagement', name: 'Chủ quản lý rừng' }
-    ];
-    
-    toast.info("🔄 Đang tải tất cả các lớp cơ bản...");
-    
-    const loadPromises = basicLayers.map(({ key, name }) => 
-      handleLoadLayer(key, name).catch(err => {
-        console.error(`Lỗi tải ${name}:`, err);
-        return { error: err, layerKey: key };
-      })
-    );
-    
-    try {
-      const results = await Promise.allSettled(loadPromises);
-      
-      const successCount = results.filter(result => result.status === 'fulfilled').length;
-      const failCount = results.length - successCount;
-      
-      if (failCount === 0) {
-        toast.success("✅ Đã tải xong tất cả các lớp cơ bản!");
-      } else {
-        toast.warning(`⚠️ Đã tải xong ${successCount}/${results.length} lớp. ${failCount} lớp gặp lỗi.`);
-      }
-    } catch (err) {
-      console.error("❌ Lỗi tổng quát khi tải layers:", err);
-      toast.error("❌ Có lỗi xảy ra khi tải một số lớp");
-    }
-  };
-
-  // Hàm load lớp nâng cao (chỉ có terrain)
-  const handleLoadAdvancedLayer = async () => {
-    await handleLoadLayer('terrain', 'Nền địa hình, thủy văn, giao thông');
-  };
-
   return (
     <div>
       <div
@@ -159,25 +130,6 @@ const CapNhatDuLieu = () => {
       {isForecastOpen && (
         <div className="flex flex-col gap-2 px-1 pt-3">
           <div className="flex flex-col gap-3">
-            
-            {/* Nút tải nhanh */}
-            <div className="mb-3 p-2 bg-green-50 rounded border border-green-200">
-              <h4 className="text-sm font-semibold text-green-800 mb-2">Tải nhanh</h4>
-              <div className="flex gap-2">
-                <button 
-                  onClick={handleLoadAllBasicLayers}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-1 px-2 rounded text-xs transition-colors"
-                >
-                  Tải lớp cơ bản
-                </button>
-                <button 
-                  onClick={handleLoadAdvancedLayer}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-2 rounded text-xs transition-colors"
-                >
-                  Tải lớp nâng cao
-                </button>
-              </div>
-            </div>
 
             {/* 1. Lớp ranh giới hành chính */}
             <div className="flex items-center gap-1">
@@ -255,10 +207,29 @@ const CapNhatDuLieu = () => {
               </button>
             </div>
 
+            {/* 5. Lớp dự báo mất rừng mới nhất */}
+            <div className="flex items-center gap-1">
+              <label className="text-sm font-medium w-full">Dự báo mất rừng mới nhất</label>
+              <button 
+                onClick={() => handleLoadLayer('deforestationAlerts', 'Dự báo mất rừng mới nhất')}
+                disabled={mapLayers.deforestationAlerts.loading}
+                className="w-18 whitespace-nowrap bg-red-100 hover:bg-red-200 text-red-800 font-medium py-0.5 px-3 rounded-full text-center mt-2 self-center flex items-center justify-center disabled:opacity-50"
+              >
+                {mapLayers.deforestationAlerts.loading ? (
+                  <>
+                    <ClipLoader color="#dc2626" size={14} />
+                    <span className="ml-1">Đang tải...</span>
+                  </>
+                ) : (
+                  "Tải lên"
+                )}
+              </button>
+            </div>
+
             {/* Thông tin trạng thái */}
             <div className="mt-4 p-3 bg-gray-50 rounded-md">
               <h4 className="text-sm font-medium mb-2">Trạng thái các lớp:</h4>
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-1 gap-2 text-xs">
                 {Object.entries(mapLayers).map(([key, layer]) => (
                   <div key={key} className="flex items-center gap-2">
                     <div 

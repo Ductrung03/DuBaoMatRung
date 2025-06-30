@@ -1,4 +1,4 @@
-// src/contexts/GeoDataContext.jsx - CẬP NHẬT CHO 4 LỚP DỮ LIỆU
+// src/contexts/GeoDataContext.jsx - CẬP NHẬT CHO 5 LỚP DỮ LIỆU (THÊM DEFORESTATION ALERTS)
 import React, { createContext, useContext, useState } from "react";
 import L from "leaflet";
 
@@ -13,7 +13,7 @@ export const GeoDataProvider = ({ children }) => {
   const [geoData, setGeoData] = useState(null);
   const [loading, setLoading] = useState(false);
   
-  // State để quản lý các lớp bản đồ - CHỈ 4 LỚP THỰC TẾ
+  // State để quản lý các lớp bản đồ - 5 LỚP THỰC TẾ
   const [mapLayers, setMapLayers] = useState({
     // 1. Lớp ranh giới hành chính
     administrative: { 
@@ -40,7 +40,7 @@ export const GeoDataProvider = ({ children }) => {
       name: "Nền địa hình, thủy văn, giao thông",
       endpoint: "terrain"
     },
-    // 4. Lớp 3 loại rừng
+    // 4. Lớp 3 loại rừng (dựa trên MALR3)
     forestTypes: { 
       data: null, 
       visible: true, 
@@ -48,7 +48,7 @@ export const GeoDataProvider = ({ children }) => {
       name: "3 loại rừng",
       endpoint: "forest-types"
     },
-    // GIỮ LẠI lớp dự báo mất rừng - LUÔN HIỂN THỊ
+    // 5. Lớp dự báo mất rừng mới nhất - RIÊNG BIỆT VÀ CÓ THỂ TẢI
     deforestationAlerts: { 
       data: null, 
       visible: true, 
@@ -88,6 +88,42 @@ export const GeoDataProvider = ({ children }) => {
         polygonCount: data?.features?.filter(f => f.properties.layer_type === 'terrain_polygon').length,
         lineCount: data?.features?.filter(f => f.properties.layer_type === 'terrain_line').length
       });
+    }
+
+    if (layerName === 'forestTypes') {
+      console.log(`🌲 Forest Types Data:`, {
+        featureCount: data?.features?.length,
+        sampleFeature: data?.features?.[0],
+        sampleProperties: data?.features?.[0]?.properties
+      });
+      
+      // Kiểm tra dữ liệu 3 loại rừng
+      if (data?.features?.length > 0) {
+        const forestTypes = {};
+        data.features.forEach(feature => {
+          const forestFunction = feature.properties.forest_function || "Không xác định";
+          forestTypes[forestFunction] = (forestTypes[forestFunction] || 0) + 1;
+        });
+        console.log(`🌲 Thống kê 3 loại rừng:`, forestTypes);
+      }
+    }
+
+    if (layerName === 'deforestationAlerts') {
+      console.log(`⚠️ Deforestation Alerts Data:`, {
+        featureCount: data?.features?.length,
+        sampleFeature: data?.features?.[0],
+        sampleProperties: data?.features?.[0]?.properties
+      });
+      
+      // Kiểm tra dữ liệu dự báo mất rừng
+      if (data?.features?.length > 0) {
+        const alertLevels = {};
+        data.features.forEach(feature => {
+          const level = feature.properties.alert_level || "Không xác định";
+          alertLevels[level] = (alertLevels[level] || 0) + 1;
+        });
+        console.log(`⚠️ Thống kê mức cảnh báo:`, alertLevels);
+      }
     }
 
     setMapLayers(prev => ({
