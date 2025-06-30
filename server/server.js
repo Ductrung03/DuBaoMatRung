@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const { default: open } = require("open");
+// Bỏ dòng import open ở đây
 const pool = require("./db/index");
 const cookieParser = require("cookie-parser");
 
@@ -131,17 +131,27 @@ app.use((req, res) => {
     message: "API endpoint không tồn tại",
   });
 });
+
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`🚀 Backend chạy tại http://localhost:${port}`);
-  console.log(`📚 API Docs tại http://localhost:${port}/api-docs`);
-  
-  // Không chạy open() trên môi trường production
-  if (process.env.NODE_ENV !== 'production') {
-    try {
-      open(`http://localhost:${port}/api-docs`);
-    } catch (err) {
-      console.log("⚠️ Không thể mở trình duyệt tự động");
+
+// Hàm async để xử lý dynamic import
+const startServer = async () => {
+  app.listen(port, async () => {
+    console.log(`🚀 Backend chạy tại http://localhost:${port}`);
+    console.log(`📚 API Docs tại http://localhost:${port}/api-docs`);
+    
+    // Không chạy open() trên môi trường production
+    if (process.env.NODE_ENV !== 'production') {
+      try {
+        // Sử dụng dynamic import thay vì require
+        const { default: open } = await import('open');
+        await open(`http://localhost:${port}/api-docs`);
+      } catch (err) {
+        console.log("⚠️ Không thể mở trình duyệt tự động:", err.message);
+      }
     }
-  }
-});
+  });
+};
+
+// Khởi chạy server
+startServer();
