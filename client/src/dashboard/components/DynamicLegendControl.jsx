@@ -1,5 +1,5 @@
 // File: client/src/dashboard/components/DynamicLegendControl.jsx
-// Component legend tự động cập nhật khi mapLayers thay đổi - VỚI HIỂN THỊ ĐẦY ĐỦ LOẠI RỪNG
+// Component legend với chú thích màu đầy đủ cho các loại rừng LDLR và dự báo mất rừng
 
 import React, { useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
@@ -14,23 +14,39 @@ const DynamicLegendControl = ({
   const controlRef = useRef(null);
   const isExpandedRef = useRef(true);
 
-  // Hàm helper để lấy màu sắc cho loại rừng
+  // Hàm helper để lấy màu sắc cho loại rừng (giống trong Map.jsx)
   const getForestTypeColorForLegend = (forestFunction) => {
     const colorMap = {
-      // 3 loại rừng chính (theo MALR3)
-      "Rừng đặc dụng": "#dc2626", // Đỏ
-      "Rừng phòng hộ": "#ea580c", // Cam
-      "Rừng sản xuất": "#16a34a", // Xanh lá
+      // Rừng tự nhiên (màu xanh các sắc độ)
+      "Rừng tự nhiên giàu": "#065f46", // Xanh đậm
+      "Rừng tự nhiên nghèo": "#047857", // Xanh vừa
+      "Rừng trồng tự nhiên": "#059669", // Xanh lá
 
-      // Các loại rừng khác (theo LDLR)
-      "Rừng đặc dụng (LDLR)": "#b91c1c", // Đỏ đậm hơn
-      "Rừng phòng hộ (LDLR)": "#c2410c", // Cam đậm hơn
-      "Rừng sản xuất (LDLR)": "#15803d", // Xanh đậm hơn
-      "Rừng tự nhiên": "#22c55e", // Xanh lá sáng
-      "Rừng trồng": "#84cc16", // Xanh lime
-      "Đất lâm nghiệp khác": "#64748b", // Xám xanh
-      "Đất không rừng": "#94a3b8", // Xám nhạt
-      "Không xác định": "#a3a3a3", // Xám
+      // Rừng trồng (màu xanh lá các sắc độ)
+      "Rừng trồng khác": "#10b981", // Xanh lime
+      "Rừng trồng cây dược liệu": "#34d399", // Xanh mint
+
+      // Đất trồng cây lâm nghiệp (màu cam các sắc độ)
+      "Trồng xen nương": "#fdba74", // Cam nhạt
+      "Trồng xen phụ": "#fb923c", // Cam
+      "Trồng xen khác": "#f97316", // Cam đậm
+      "Trồng xen đặc nông": "#ea580c", // Cam đỏ
+      "Trồng nương khác": "#dc2626", // Đỏ cam
+
+      // Đất trống (màu xám các sắc độ)
+      "Đất trống loại 1": "#e5e7eb", // Xám rất nhạt
+      "Đất trống loại 2": "#d1d5db", // Xám nhạt
+      "Đất trống rừng": "#9ca3af", // Xám vừa
+
+      // Đất nông nghiệp (màu vàng)
+      "Đất nông nghiệp": "#fbbf24", // Vàng
+
+      // Hỗn giao (màu tím)
+      "Hỗn giao loại 1": "#a78bfa", // Tím nhạt
+      "Hỗn giao loại 2": "#8b5cf6", // Tím đậm
+
+      // Fallback
+      "Không xác định": "#6b7280", // Xám
     };
 
     if (colorMap[forestFunction]) {
@@ -79,7 +95,7 @@ const DynamicLegendControl = ({
         border: 2px solid #ddd;
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        max-width: 350px;
+        max-width: 400px;
         font-family: Arial, sans-serif;
         font-size: 12px;
       ">
@@ -158,7 +174,7 @@ const DynamicLegendControl = ({
               : ""
           }
 
-          <!-- Lớp 3 loại rừng với đầy đủ các loại -->
+          <!-- Lớp các loại rừng với chú thích màu đầy đủ -->
 ${
   mapLayers.forestTypes?.data
     ? `
@@ -171,74 +187,106 @@ ${
       mapLayers.forestTypes?.visible ? "checked" : ""
     } style="margin-right: 8px;">
     <span style="color: #38a169;">🌲</span>
-    <span style="margin-left: 6px; font-weight: 500;">3 loại rừng</span>
+    <span style="margin-left: 6px; font-weight: 500;">Các loại rừng (LDLR)</span>
     <span style="margin-left: 8px; font-size: 10px; color: #666; background: #d4edda; padding: 1px 4px; border-radius: 8px;">
       ${mapLayers.forestTypes.data.features?.length || 0}
     </span>
   </div>
-  <!-- Chú thích màu động cho tất cả loại rừng có trong dữ liệu -->
-  <div style="padding: 6px 12px 12px 28px; background: #f9fafb; font-size: 10px; max-height: 200px; overflow-y: auto;">
-    ${(() => {
-      // Lấy danh sách các loại rừng từ dữ liệu thực tế
-      if (!mapLayers.forestTypes.data.forestTypes) {
-        // Nếu không có metadata, tạo từ features
-        const forestTypeCounts = {};
-        mapLayers.forestTypes.data.features.forEach((feature) => {
-          const forestFunction =
-            feature.properties.forest_function || "Không xác định";
-          forestTypeCounts[forestFunction] =
-            (forestTypeCounts[forestFunction] || 0) + 1;
-        });
+  <!-- Chú thích màu đầy đủ cho tất cả loại rừng -->
+  <div style="padding: 6px 12px 12px 28px; background: #f9fafb; font-size: 10px; max-height: 300px; overflow-y: auto;">
+    
+    <!-- Nhóm Rừng tự nhiên -->
+    <div style="margin-bottom: 8px;">
+      <div style="font-weight: bold; color: #065f46; margin-bottom: 3px; font-size: 11px;">🌳 Rừng tự nhiên</div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #065f46; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Rừng tự nhiên giàu (RTG)</span>
+      </div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #047857; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Rừng tự nhiên nghèo (RTN)</span>
+      </div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #059669; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Rừng trồng tự nhiên (RTTN)</span>
+      </div>
+    </div>
 
-        return Object.entries(forestTypeCounts)
-          .sort((a, b) => b[1] - a[1]) // Sắp xếp theo số lượng giảm dần
-          .map(([forestType, count]) => {
-            const color = getForestTypeColorForLegend(forestType);
-            return `
-              <div style="margin-bottom: 3px; display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center;">
-                  <div style="width: 12px; height: 12px; background: ${color}; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
-                  <span style="font-size: 10px;">${forestType}</span>
-                </div>
-                <span style="font-size: 9px; color: #666; margin-left: 4px;">(${count})</span>
-              </div>
-            `;
-          })
-          .join("");
-      } else {
-        // Sử dụng metadata có sẵn
-        return mapLayers.forestTypes.data.forestTypes
-          .map((type) => {
-            const color = getForestTypeColorForLegend(type.name);
-            return `
-              <div style="margin-bottom: 3px; display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center;">
-                  <div style="width: 12px; height: 12px; background: ${color}; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
-                  <span style="font-size: 10px;">${type.name}</span>
-                </div>
-                <span style="font-size: 9px; color: #666; margin-left: 4px;">(${type.count})</span>
-              </div>
-            `;
-          })
-          .join("");
-      }
-    })()}
+    <!-- Nhóm Rừng trồng -->
+    <div style="margin-bottom: 8px;">
+      <div style="font-weight: bold; color: #10b981; margin-bottom: 3px; font-size: 11px;">🌱 Rừng trồng</div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #10b981; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Rừng trồng khác (RTK)</span>
+      </div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #34d399; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Rừng trồng cây dược liệu (RTCD)</span>
+      </div>
+    </div>
+
+    <!-- Nhóm Đất trồng cây lâm nghiệp -->
+    <div style="margin-bottom: 8px;">
+      <div style="font-weight: bold; color: #f97316; margin-bottom: 3px; font-size: 11px;">🌾 Đất trồng cây lâm nghiệp</div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #fdba74; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Trồng xen nương (TXN)</span>
+      </div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #fb923c; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Trồng xen phụ (TXP)</span>
+      </div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #f97316; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Trồng xen khác (TXK)</span>
+      </div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #ea580c; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Trồng xen đặc nông (TXDN)</span>
+      </div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #dc2626; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Trồng nương khác (TNK)</span>
+      </div>
+    </div>
+
+    <!-- Nhóm Đất trống -->
+    <div style="margin-bottom: 8px;">
+      <div style="font-weight: bold; color: #9ca3af; margin-bottom: 3px; font-size: 11px;">⬜ Đất trống</div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #e5e7eb; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Đất trống loại 1 (DT1)</span>
+      </div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #d1d5db; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Đất trống loại 2 (DT2)</span>
+      </div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #9ca3af; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Đất trống rừng (DTR)</span>
+      </div>
+    </div>
+
+    <!-- Nhóm khác -->
+    <div style="margin-bottom: 8px;">
+      <div style="font-weight: bold; color: #6b7280; margin-bottom: 3px; font-size: 11px;">🌾 Khác</div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #fbbf24; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Đất nông nghiệp (DNN)</span>
+      </div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #a78bfa; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Hỗn giao loại 1 (HG1)</span>
+      </div>
+      <div style="margin-bottom: 2px; display: flex; align-items: center;">
+        <div style="width: 12px; height: 12px; background: #8b5cf6; margin-right: 6px; border-radius: 2px; border: 1px solid #ccc;"></div>
+        <span style="font-size: 10px;">Hỗn giao loại 2 (HG2)</span>
+      </div>
+    </div>
     
     <!-- Tổng số loại -->
     <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid #e5e7eb; font-size: 9px; color: #666; text-align: center;">
-      <strong>Tổng: ${(() => {
-        if (mapLayers.forestTypes.data.forestTypes) {
-          return mapLayers.forestTypes.data.forestTypes.length;
-        } else {
-          const uniqueTypes = new Set();
-          mapLayers.forestTypes.data.features.forEach((feature) => {
-            uniqueTypes.add(
-              feature.properties.forest_function || "Không xác định"
-            );
-          });
-          return uniqueTypes.size;
-        }
-      })()} loại rừng</strong>
+      <strong>Ghi chú:</strong> Phân loại dựa trên mã LDLR
     </div>
   </div>
 </div>
@@ -338,7 +386,7 @@ ${
               : ""
           }
 
-          <!-- Lớp dự báo mất rừng mới nhất -->
+          <!-- Lớp dự báo mất rừng mới nhất với chú thích màu đầy đủ -->
           ${
             mapLayers.deforestationAlerts?.data
               ? `
@@ -356,23 +404,29 @@ ${
                 ${mapLayers.deforestationAlerts.data.features?.length || 0}
               </span>
             </div>
-            <!-- Chú thích màu cho mức cảnh báo -->
+            <!-- Chú thích màu chi tiết cho mức cảnh báo -->
             <div style="padding: 6px 12px 12px 28px; background: #fef2f2; font-size: 10px;">
+              <div style="font-weight: bold; margin-bottom: 6px; color: #991b1b;">📊 Mức độ cảnh báo theo thời gian</div>
+              
               <div style="margin-bottom: 3px; display: flex; align-items: center;">
-                <div style="width: 12px; height: 12px; background: #7f1d1d; margin-right: 6px; border-radius: 2px;"></div>
-                <span>Nghiêm trọng (0-7 ngày)</span>
+                <div style="width: 12px; height: 12px; background: #991b1b; margin-right: 6px; border-radius: 2px; border: 1px solid #7f1d1d;"></div>
+                <span style="font-weight: 500; color: #991b1b;">Nghiêm trọng (0-7 ngày)</span>
               </div>
               <div style="margin-bottom: 3px; display: flex; align-items: center;">
-                <div style="width: 12px; height: 12px; background: #dc2626; margin-right: 6px; border-radius: 2px;"></div>
-                <span>Cao (8-15 ngày)</span>
+                <div style="width: 12px; height: 12px; background: #dc2626; margin-right: 6px; border-radius: 2px; border: 1px solid #b91c1c;"></div>
+                <span style="font-weight: 500; color: #dc2626;">Cao (8-15 ngày)</span>
               </div>
               <div style="margin-bottom: 3px; display: flex; align-items: center;">
-                <div style="width: 12px; height: 12px; background: #ea580c; margin-right: 6px; border-radius: 2px;"></div>
-                <span>Trung bình (16-30 ngày)</span>
+                <div style="width: 12px; height: 12px; background: #ea580c; margin-right: 6px; border-radius: 2px; border: 1px solid #c2410c;"></div>
+                <span style="font-weight: 500; color: #ea580c;">Trung bình (16-30 ngày)</span>
               </div>
-              <div style="display: flex; align-items: center;">
-                <div style="width: 12px; height: 12px; background: #f59e0b; margin-right: 6px; border-radius: 2px;"></div>
-                <span>Thấp (>30 ngày)</span>
+              <div style="margin-bottom: 6px; display: flex; align-items: center;">
+                <div style="width: 12px; height: 12px; background: #f59e0b; margin-right: 6px; border-radius: 2px; border: 1px solid #d97706;"></div>
+                <span style="font-weight: 500; color: #f59e0b;">Thấp (>30 ngày)</span>
+              </div>
+              
+              <div style="font-size: 9px; color: #666; text-align: center; padding-top: 4px; border-top: 1px solid #fee2e2;">
+                <strong>Lưu ý:</strong> Màu sắc dựa trên thời gian phát hiện gần nhất
               </div>
             </div>
           </div>
@@ -389,6 +443,31 @@ ${
               <span style="margin-left: 8px; font-size: 10px; color: #dc2626; background: #fecaca; padding: 1px 4px; border-radius: 8px;">
                 Chưa tải
               </span>
+            </div>
+            <!-- Hiển thị chú thích màu ngay cả khi chưa tải -->
+            <div style="padding: 6px 12px 12px 28px; background: #fef2f2; font-size: 10px;">
+              <div style="font-weight: bold; margin-bottom: 6px; color: #991b1b;">📊 Mức độ cảnh báo theo thời gian</div>
+              
+              <div style="margin-bottom: 3px; display: flex; align-items: center;">
+                <div style="width: 12px; height: 12px; background: #991b1b; margin-right: 6px; border-radius: 2px; border: 1px solid #7f1d1d;"></div>
+                <span style="font-weight: 500; color: #991b1b;">Nghiêm trọng (0-7 ngày)</span>
+              </div>
+              <div style="margin-bottom: 3px; display: flex; align-items: center;">
+                <div style="width: 12px; height: 12px; background: #dc2626; margin-right: 6px; border-radius: 2px; border: 1px solid #b91c1c;"></div>
+                <span style="font-weight: 500; color: #dc2626;">Cao (8-15 ngày)</span>
+              </div>
+              <div style="margin-bottom: 3px; display: flex; align-items: center;">
+                <div style="width: 12px; height: 12px; background: #ea580c; margin-right: 6px; border-radius: 2px; border: 1px solid #c2410c;"></div>
+                <span style="font-weight: 500; color: #ea580c;">Trung bình (16-30 ngày)</span>
+              </div>
+              <div style="margin-bottom: 6px; display: flex; align-items: center;">
+                <div style="width: 12px; height: 12px; background: #f59e0b; margin-right: 6px; border-radius: 2px; border: 1px solid #d97706;"></div>
+                <span style="font-weight: 500; color: #f59e0b;">Thấp (>30 ngày)</span>
+              </div>
+              
+              <div style="font-size: 9px; color: #666; text-align: center; padding-top: 4px; border-top: 1px solid #fee2e2;">
+                <strong>Cần tải dữ liệu để xem trên bản đồ</strong>
+              </div>
             </div>
           </div>
           `

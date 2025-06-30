@@ -69,8 +69,8 @@ const CapNhatDuLieu = () => {
             const type = feature.properties.forest_function || "Không xác định";
             typeStats[type] = (typeStats[type] || 0) + 1;
           });
-          console.log(`🌲 Thống kê 3 loại rừng:`, typeStats);
-          successMessage += `\n🌲 Gồm ${Object.keys(typeStats).length} loại rừng`;
+          console.log(`🌲 Thống kê các loại rừng (theo LDLR):`, typeStats);
+          successMessage += `\n🌲 Gồm ${Object.keys(typeStats).length} loại rừng khác nhau`;
         }
 
         if (layerKey === 'deforestationAlerts') {
@@ -150,11 +150,11 @@ const CapNhatDuLieu = () => {
               </button>
             </div>
 
-            {/* 2. Lớp 3 loại rừng */}
+            {/* 2. Lớp các loại rừng (dựa trên LDLR) */}
             <div className="flex items-center gap-1">
               <label className="text-sm font-medium w-full">Lớp 3 loại rừng</label>
               <button 
-                onClick={() => handleLoadLayer('forestTypes', '3 loại rừng')}
+                onClick={() => handleLoadLayer('forestTypes', 'Các loại rừng (LDLR)')}
                 disabled={mapLayers.forestTypes.loading}
                 className="w-18 whitespace-nowrap bg-forest-green-gray hover:bg-green-200 text-black-800 font-medium py-0.5 px-3 rounded-full text-center mt-2 self-center flex items-center justify-center disabled:opacity-50"
               >

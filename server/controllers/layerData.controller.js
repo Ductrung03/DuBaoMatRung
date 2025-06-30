@@ -307,11 +307,11 @@ function getFeatureType(ten) {
 }
 
 /**
- * Lấy dữ liệu lớp 3 loại rừng từ laocai_rg3lr - HIỂN THỊ ĐẦY ĐỦ TẤT CẢ LOẠI RỪNG
+ * Lấy dữ liệu lớp các loại rừng từ laocai_rg3lr - DỰA TRÊN CỘT LDLR
  */
 exports.getForestTypes = async (req, res) => {
   try {
-    console.log(`📥 Loading all forest types data from laocai_rg3lr`);
+    console.log(`📥 Loading forest types data from laocai_rg3lr based on LDLR column`);
     
     const limit = Math.min(parseInt(req.query.limit) || 2000, 5000);
 
@@ -336,29 +336,44 @@ exports.getForestTypes = async (req, res) => {
             'churung', churung,
             'tinh', tinh,
             'huyen', huyen,
-            'layer_type', 'forest_types_full',
+            'layer_type', 'forest_types_ldlr',
             'forest_function', CASE
-              WHEN malr3 = 1 THEN 'Rừng đặc dụng'
-              WHEN malr3 = 2 THEN 'Rừng phòng hộ'
-              WHEN malr3 = 3 THEN 'Rừng sản xuất'
-              ELSE CASE
-                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%RDD%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%ĐẶC DỤNG%' THEN 'Rừng đặc dụng (LDLR)'
-                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%RPH%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%PHÒNG HỘ%' THEN 'Rừng phòng hộ (LDLR)'
-                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%RSX%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%SẢN XUẤT%' THEN 'Rừng sản xuất (LDLR)'
-                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%KLN%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%KHÁC%' THEN 'Đất lâm nghiệp khác'
-                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%NKR%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%KHÔNG RỪNG%' THEN 'Đất không rừng'
-                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%RNT%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%TỰ NHIÊN%' THEN 'Rừng tự nhiên'
-                WHEN UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%RTT%' OR UPPER(TRIM(COALESCE(ldlr, ''))) LIKE '%TRỒNG%' THEN 'Rừng trồng'
-                WHEN TRIM(COALESCE(ldlr, '')) != '' THEN ldlr
-                ELSE 'Không xác định'
-              END
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'RTG' THEN 'Rừng tự nhiên giàu'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'RTN' THEN 'Rừng tự nhiên nghèo'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'RTTN' THEN 'Rừng trồng tự nhiên'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'RTK' THEN 'Rừng trồng khác'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'RTCD' THEN 'Rừng trồng cây dược liệu'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'TXN' THEN 'Trồng xen nương'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'TXP' THEN 'Trồng xen phụ'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'TXK' THEN 'Trồng xen khác'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'TXDN' THEN 'Trồng xen đặc nông'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'TNK' THEN 'Trồng nương khác'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'DT1' THEN 'Đất trống loại 1'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'DT2' THEN 'Đất trống loại 2'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'DTR' THEN 'Đất trống rừng'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'DNN' THEN 'Đất nông nghiệp'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'HG1' THEN 'Hỗn giao loại 1'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'HG2' THEN 'Hỗn giao loại 2'
+              WHEN TRIM(COALESCE(ldlr, '')) != '' THEN ldlr
+              ELSE 'Không xác định'
             END,
-            'malr3_code', malr3,
-            'ldlr_code', ldlr
+            'ldlr_code', ldlr,
+            'ldlr_category', CASE
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) IN ('RTG', 'RTN', 'RTTN') THEN 'Rừng tự nhiên'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) IN ('RTK', 'RTCD') THEN 'Rừng trồng'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) IN ('TXN', 'TXP', 'TXK', 'TXDN', 'TNK') THEN 'Đất trồng cây lâm nghiệp'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) IN ('DT1', 'DT2', 'DTR') THEN 'Đất trống'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) = 'DNN' THEN 'Đất nông nghiệp'
+              WHEN TRIM(UPPER(COALESCE(ldlr, ''))) IN ('HG1', 'HG2') THEN 'Hỗn giao'
+              ELSE 'Khác'
+            END
           )
         ) as feature
         FROM laocai_rg3lr
-        WHERE ST_IsValid(geom) AND geom IS NOT NULL
+        WHERE ST_IsValid(geom) 
+          AND geom IS NOT NULL
+          AND ldlr IS NOT NULL 
+          AND TRIM(ldlr) != ''
         ORDER BY gid
         LIMIT $1
       ) AS features;
@@ -377,44 +392,57 @@ exports.getForestTypes = async (req, res) => {
           churung: convertTcvn3ToUnicode(feature.properties.churung || ""),
           tinh: convertTcvn3ToUnicode(feature.properties.tinh || ""),
           huyen: convertTcvn3ToUnicode(feature.properties.huyen || ""),
-          ldlr: convertTcvn3ToUnicode(feature.properties.ldlr || ""),
           forest_function: convertTcvn3ToUnicode(feature.properties.forest_function || "")
         }
       }));
     }
 
-    // Log thống kê tất cả các loại rừng có trong dữ liệu
+    // Log thống kê chi tiết các loại rừng theo LDLR
     const typeStats = {};
-    const malr3Stats = {};
+    const categoryStats = {};
     const ldlrStats = {};
     
     geojson.features.forEach(feature => {
       const forestFunction = feature.properties.forest_function;
-      const malr3 = feature.properties.malr3_code;
+      const category = feature.properties.ldlr_category;
       const ldlr = feature.properties.ldlr_code || "";
       
       typeStats[forestFunction] = (typeStats[forestFunction] || 0) + 1;
-      malr3Stats[malr3] = (malr3Stats[malr3] || 0) + 1;
+      categoryStats[category] = (categoryStats[category] || 0) + 1;
       if (ldlr.trim()) {
         ldlrStats[ldlr] = (ldlrStats[ldlr] || 0) + 1;
       }
     });
     
-    console.log("📊 Thống kê đầy đủ các loại rừng:", typeStats);
-    console.log("📊 Thống kê MALR3:", malr3Stats);
-    console.log("📊 Thống kê LDLR:", ldlrStats);
+    console.log("📊 Thống kê các loại rừng theo LDLR:", typeStats);
+    console.log("📊 Thống kê theo nhóm:", categoryStats);
+    console.log("📊 Thống kê mã LDLR:", ldlrStats);
 
     // Thêm metadata về các loại rừng có trong dữ liệu
     geojson.forestTypes = Object.keys(typeStats).map(type => ({
       name: type,
-      count: typeStats[type]
+      count: typeStats[type],
+      category: Object.keys(categoryStats).find(cat => 
+        geojson.features.some(f => 
+          f.properties.forest_function === type && f.properties.ldlr_category === cat
+        )
+      )
     })).sort((a, b) => b.count - a.count);
 
-    console.log(`✅ Loaded ${geojson.features.length} forest features with ${Object.keys(typeStats).length} different types`);
+    // Thêm metadata về các nhóm
+    geojson.forestCategories = Object.keys(categoryStats).map(category => ({
+      name: category,
+      count: categoryStats[category]
+    })).sort((a, b) => b.count - a.count);
+
+    console.log(`✅ Loaded ${geojson.features.length} forest features with ${Object.keys(typeStats).length} different types in ${Object.keys(categoryStats).length} categories`);
     res.json(geojson);
   } catch (err) {
-    console.error("❌ Lỗi lấy dữ liệu đầy đủ các loại rừng:", err);
-    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu đầy đủ các loại rừng" });
+    console.error("❌ Lỗi lấy dữ liệu các loại rừng theo LDLR:", err);
+    res.status(500).json({ 
+      error: "Lỗi server khi lấy dữ liệu các loại rừng theo LDLR",
+      details: err.message
+    });
   }
 };
 /**

@@ -1,4 +1,4 @@
-// src/contexts/GeoDataContext.jsx - CẬP NHẬT CHO 5 LỚP DỮ LIỆU (THÊM DEFORESTATION ALERTS)
+// src/contexts/GeoDataContext.jsx - CẬP NHẬT CHO CÁC LỚP DỮ LIỆU VỚI TÊN MỚI
 import React, { createContext, useContext, useState } from "react";
 import L from "leaflet";
 
@@ -13,7 +13,7 @@ export const GeoDataProvider = ({ children }) => {
   const [geoData, setGeoData] = useState(null);
   const [loading, setLoading] = useState(false);
   
-  // State để quản lý các lớp bản đồ - 5 LỚP THỰC TẾ
+  // State để quản lý các lớp bản đồ - 5 LỚP THỰC TẾ VỚI TÊN CẬP NHẬT
   const [mapLayers, setMapLayers] = useState({
     // 1. Lớp ranh giới hành chính
     administrative: { 
@@ -40,12 +40,12 @@ export const GeoDataProvider = ({ children }) => {
       name: "Nền địa hình, thủy văn, giao thông",
       endpoint: "terrain"
     },
-    // 4. Lớp 3 loại rừng (dựa trên MALR3)
+    // 4. Lớp các loại rừng (dựa trên LDLR) - TÊN MỚI
     forestTypes: { 
       data: null, 
       visible: true, 
       loading: false,
-      name: "3 loại rừng",
+      name: "Các loại rừng (phân loại LDLR)", // TÊN CẬP NHẬT
       endpoint: "forest-types"
     },
     // 5. Lớp dự báo mất rừng mới nhất - RIÊNG BIỆT VÀ CÓ THỂ TẢI
@@ -91,20 +91,24 @@ export const GeoDataProvider = ({ children }) => {
     }
 
     if (layerName === 'forestTypes') {
-      console.log(`🌲 Forest Types Data:`, {
+      console.log(`🌲 Forest Types Data (LDLR):`, {
         featureCount: data?.features?.length,
         sampleFeature: data?.features?.[0],
         sampleProperties: data?.features?.[0]?.properties
       });
       
-      // Kiểm tra dữ liệu 3 loại rừng
+      // Kiểm tra dữ liệu các loại rừng theo LDLR
       if (data?.features?.length > 0) {
         const forestTypes = {};
+        const ldlrCategories = {};
         data.features.forEach(feature => {
           const forestFunction = feature.properties.forest_function || "Không xác định";
+          const ldlrCategory = feature.properties.ldlr_category || "Khác";
           forestTypes[forestFunction] = (forestTypes[forestFunction] || 0) + 1;
+          ldlrCategories[ldlrCategory] = (ldlrCategories[ldlrCategory] || 0) + 1;
         });
-        console.log(`🌲 Thống kê 3 loại rừng:`, forestTypes);
+        console.log(`🌲 Thống kê các loại rừng (LDLR):`, forestTypes);
+        console.log(`🌲 Thống kê theo nhóm LDLR:`, ldlrCategories);
       }
     }
 

@@ -97,23 +97,38 @@ const MapUpdater = ({ selectedFeature }) => {
 };
 const getForestTypeColor = (forestFunction) => {
   const colorMap = {
-    // 3 loại rừng chính (theo MALR3)
-    "Rừng đặc dụng": "#dc2626", // Đỏ
-    "Rừng phòng hộ": "#ea580c", // Cam  
-    "Rừng sản xuất": "#16a34a", // Xanh lá
-    
-    // Các loại rừng khác (theo LDLR)
-    "Rừng đặc dụng (LDLR)": "#b91c1c", // Đỏ đậm hơn
-    "Rừng phòng hộ (LDLR)": "#c2410c", // Cam đậm hơn
-    "Rừng sản xuất (LDLR)": "#15803d", // Xanh đậm hơn
-    "Rừng tự nhiên": "#22c55e", // Xanh lá sáng
-    "Rừng trồng": "#84cc16", // Xanh lime
-    "Đất lâm nghiệp khác": "#64748b", // Xám xanh
-    "Đất không rừng": "#94a3b8", // Xám nhạt
-    "Không xác định": "#a3a3a3", // Xám
+    // Rừng tự nhiên (màu xanh các sắc độ)
+    "Rừng tự nhiên giàu": "#065f46", // Xanh đậm
+    "Rừng tự nhiên nghèo": "#047857", // Xanh vừa
+    "Rừng trồng tự nhiên": "#059669", // Xanh lá
+
+    // Rừng trồng (màu xanh lá các sắc độ)
+    "Rừng trồng khác": "#10b981", // Xanh lime
+    "Rừng trồng cây dược liệu": "#34d399", // Xanh mint
+
+    // Đất trồng cây lâm nghiệp (màu cam các sắc độ)
+    "Trồng xen nương": "#fdba74", // Cam nhạt
+    "Trồng xen phụ": "#fb923c", // Cam
+    "Trồng xen khác": "#f97316", // Cam đậm
+    "Trồng xen đặc nông": "#ea580c", // Cam đỏ
+    "Trồng nương khác": "#dc2626", // Đỏ cam
+
+    // Đất trống (màu xám các sắc độ)
+    "Đất trống loại 1": "#e5e7eb", // Xám rất nhạt
+    "Đất trống loại 2": "#d1d5db", // Xám nhạt
+    "Đất trống rừng": "#9ca3af", // Xám vừa
+
+    // Đất nông nghiệp (màu vàng)
+    "Đất nông nghiệp": "#fbbf24", // Vàng
+
+    // Hỗn giao (màu tím)
+    "Hỗn giao loại 1": "#a78bfa", // Tím nhạt
+    "Hỗn giao loại 2": "#8b5cf6", // Tím đậm
+
+    // Fallback
+    "Không xác định": "#6b7280", // Xám
   };
 
-  // Nếu không có trong map, tạo màu động dựa trên tên
   if (colorMap[forestFunction]) {
     return colorMap[forestFunction];
   }
@@ -123,7 +138,7 @@ const getForestTypeColor = (forestFunction) => {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
     return hash;
@@ -131,12 +146,40 @@ const getForestTypeColor = (forestFunction) => {
 
   const hash = hashCode(forestFunction || "unknown");
   const hue = Math.abs(hash) % 360;
-  const saturation = 60 + (Math.abs(hash) % 30); // 60-90%
-  const lightness = 40 + (Math.abs(hash) % 20); // 40-60%
-  
+  const saturation = 60 + (Math.abs(hash) % 30);
+  const lightness = 40 + (Math.abs(hash) % 20);
+
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
+
+const getDeforestationAlertColor = (alertLevel, daysSince) => {
+  // Ưu tiên theo alert_level trước
+  if (alertLevel) {
+    switch (alertLevel) {
+      case "critical":
+        return "#991b1b"; // Đỏ đậm - Nghiêm trọng (0-7 ngày)
+      case "high":
+        return "#dc2626"; // Đỏ - Cao (8-15 ngày)
+      case "medium":
+        return "#ea580c"; // Cam - Trung bình (16-30 ngày)
+      case "low":
+        return "#f59e0b"; // Vàng - Thấp (>30 ngày)
+      default:
+        return "#ea580c"; // Cam mặc định
+    }
+  }
+
+  // Fallback theo số ngày nếu không có alert_level
+  if (daysSince !== undefined && daysSince !== null) {
+    if (daysSince <= 7) return "#991b1b"; // Đỏ đậm
+    if (daysSince <= 15) return "#dc2626"; // Đỏ
+    if (daysSince <= 30) return "#ea580c"; // Cam
+    return "#f59e0b"; // Vàng
+  }
+
+  return "#ea580c"; // Cam mặc định
+};
 // Hàm lấy style cho các layer - CẬP NHẬT VỚI LDLR VÀ MỨC CẢNH BÁO
 const getLayerStyle = (feature, layerType, isSelected = false) => {
   console.log(`🎨 Getting style for:`, {
@@ -217,23 +260,12 @@ const getLayerStyle = (feature, layerType, isSelected = false) => {
       };
 
     case "forestTypes":
-      // Màu cho 3 loại rừng dựa trên forest_function (từ MALR3)
+      // Màu cho các loại rừng dựa trên forest_function (từ LDLR)
       const forestFunction = feature.properties.forest_function;
-       const forestColor = getForestTypeColor(forestFunction);
+      const forestColor = getForestTypeColor(forestFunction);
 
       console.log(`🌲 Forest function: "${forestFunction}"`);
-
-      if (forestFunction === "Rừng đặc dụng") {
-        forestColor = "#dc2626"; // Đỏ - Rừng đặc dụng
-      } else if (forestFunction === "Rừng phòng hộ") {
-        forestColor = "#ea580c"; // Cam - Rừng phòng hộ
-      } else if (forestFunction === "Rừng sản xuất") {
-        forestColor = "#16a34a"; // Xanh lá - Rừng sản xuất
-      }
-
-      console.log(
-        `🌲 Applied forest color: ${forestColor} for function: ${forestFunction}`
-      );
+      console.log(`🌲 Applied forest color: ${forestColor} for function: ${forestFunction}`);
 
       return {
         ...baseStyle,
@@ -296,7 +328,7 @@ const getLayerStyle = (feature, layerType, isSelected = false) => {
     case "terrain":
       // Style cho địa hình, thủy văn, giao thông - XỬ LÝ CẢ POLYGON VÀ LINE
       const featureType = feature.properties.feature_type;
-      const layerType = feature.properties.layer_type; // 'terrain_polygon' hoặc 'terrain_line'
+      const terrainLayerType = feature.properties.layer_type; // 'terrain_polygon' hoặc 'terrain_line'
       let terrainColor = "#6b7280"; // Xám mặc định
 
       switch (featureType) {
@@ -314,7 +346,7 @@ const getLayerStyle = (feature, layerType, isSelected = false) => {
       }
 
       // Xử lý khác nhau cho polygon và line
-      if (layerType === "terrain_line") {
+      if (terrainLayerType === "terrain_line") {
         // Style cho đường line
         return {
           color: terrainColor,
@@ -339,32 +371,47 @@ const getLayerStyle = (feature, layerType, isSelected = false) => {
 
     case "deforestation":
     case "deforestationAlerts":
-      // Style cho dự báo mất rừng theo mức độ cảnh báo mới
+      // Style cho dự báo mất rừng theo mức độ cảnh báo MỚI
       const alertLevel = feature.properties.alert_level;
+      const daysSince = feature.properties.days_since;
       let deforestationColor = "#ea580c"; // Cam mặc định
 
-      console.log(`⚠️ Alert level: "${alertLevel}"`);
+      console.log(`⚠️ Alert level: "${alertLevel}", Days since: ${daysSince}`);
 
-      switch (alertLevel) {
-        case "critical":
-          deforestationColor = "#7f1d1d"; // Đỏ đậm - Nghiêm trọng (0-7 ngày)
-          break;
-        case "high":
-          deforestationColor = "#dc2626"; // Đỏ - Cao (8-15 ngày)
-          break;
-        case "medium":
-          deforestationColor = "#ea580c"; // Cam - Trung bình (16-30 ngày)
-          break;
-        case "low":
-          deforestationColor = "#f59e0b"; // Vàng - Thấp (>30 ngày)
-          break;
-        default:
-          deforestationColor = "#ea580c"; // Cam mặc định
-          break;
+      // Ưu tiên theo alert_level trước
+      if (alertLevel) {
+        switch (alertLevel) {
+          case "critical":
+            deforestationColor = "#991b1b"; // Đỏ đậm - Nghiêm trọng (0-7 ngày)
+            break;
+          case "high":
+            deforestationColor = "#dc2626"; // Đỏ - Cao (8-15 ngày)
+            break;
+          case "medium":
+            deforestationColor = "#ea580c"; // Cam - Trung bình (16-30 ngày)
+            break;
+          case "low":
+            deforestationColor = "#f59e0b"; // Vàng - Thấp (>30 ngày)
+            break;
+          default:
+            deforestationColor = "#ea580c"; // Cam mặc định
+            break;
+        }
+      } else if (daysSince !== undefined && daysSince !== null) {
+        // Fallback theo số ngày nếu không có alert_level
+        if (daysSince <= 7) {
+          deforestationColor = "#991b1b"; // Đỏ đậm
+        } else if (daysSince <= 15) {
+          deforestationColor = "#dc2626"; // Đỏ
+        } else if (daysSince <= 30) {
+          deforestationColor = "#ea580c"; // Cam
+        } else {
+          deforestationColor = "#f59e0b"; // Vàng
+        }
       }
 
       console.log(
-        `⚠️ Applied deforestation color: ${deforestationColor} for level: ${alertLevel}`
+        `⚠️ Applied deforestation color: ${deforestationColor} for level: ${alertLevel}, days: ${daysSince}`
       );
 
       return {
@@ -387,6 +434,7 @@ const getLayerStyle = (feature, layerType, isSelected = false) => {
       };
   }
 };
+
 
 
 
