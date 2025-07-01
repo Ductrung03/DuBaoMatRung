@@ -29,7 +29,7 @@ const Header = () => {
   const isActive = (path) => currentPath === path;
 
   return (
-    <header className="bg-gradient-to-r from-forest-green-primary from-30% to-forest-green-secondary text-white w-full flex items-center h-16 px-4 shadow-md">
+    <header className="bg-gradient-to-r from-forest-green-primary from-30% to-forest-green-secondary text-white w-full flex items-center h-16 px-4 shadow-md relative z-40">
       {/* Logo và icon */}
       <div className="flex items-center gap-2">
         <Link to="/dashboard">
@@ -52,7 +52,7 @@ const Header = () => {
           <div className="flex gap-8 mt-1">
             <Link to="/dashboard/dubaomatrung">
               <a
-                className={`text-base font-semibold hover:underline ${
+                className={`text-base font-semibold hover:underline transition-colors ${
                   isActive("/dashboard/dubaomatrung")
                     ? "text-red-600"
                     : "text-white"
@@ -63,7 +63,7 @@ const Header = () => {
             </Link>
             <Link to="/dashboard/quanlydulieu">
               <a
-                className={`text-base font-semibold hover:underline ${
+                className={`text-base font-semibold hover:underline transition-colors ${
                   isActive("/dashboard/quanlydulieu")
                     ? "text-red-600"
                     : "text-white"
@@ -74,7 +74,7 @@ const Header = () => {
             </Link>
             <Link to="/dashboard/baocao">
               <a
-                className={`text-base font-semibold hover:underline ${
+                className={`text-base font-semibold hover:underline transition-colors ${
                   isActive("/dashboard/baocao") ? "text-red-600" : "text-white"
                 }`}
               >
@@ -83,7 +83,7 @@ const Header = () => {
             </Link>
             {isAdmin() && (<Link to="/dashboard/phathienmatrung">
               <a
-                className={`text-base font-semibold hover:underline ${
+                className={`text-base font-semibold hover:underline transition-colors ${
                   isActive("/dashboard/phathienmatrung")
                     ? "text-red-600"
                     : "text-white"
@@ -96,7 +96,7 @@ const Header = () => {
             {isAdmin() && (
               <Link to="/dashboard/quanlynguoidung">
                 <a
-                  className={`text-base font-semibold hover:underline ${
+                  className={`text-base font-semibold hover:underline transition-colors ${
                     isActive("/dashboard/quanlynguoidung")
                       ? "text-red-600"
                       : "text-white"
@@ -113,7 +113,7 @@ const Header = () => {
       {/* User Profile */}
       <div className="ml-auto relative" ref={userMenuRef}>
         <div
-          className="flex items-center cursor-pointer hover:opacity-80"
+          className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
           onClick={() => setShowUserMenu(!showUserMenu)}
         >
           <div className="w-10 h-10 rounded-full bg-red-100 border-2 border-white overflow-hidden flex items-center justify-center">
@@ -129,9 +129,21 @@ const Header = () => {
           )}
         </div>
 
-        {/* User Menu - Added z-50 to ensure it appears above all other elements */}
+        {/* User Menu với z-index cực cao */}
         {showUserMenu && (
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-[9999]">
+          <div 
+            className="user-menu-dropdown absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1"
+            style={{ 
+              zIndex: 99998,
+              position: 'absolute',
+              top: '100%',
+              right: 0,
+              backgroundColor: 'white',
+              borderRadius: '0.375rem',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+              border: '1px solid #e5e7eb'
+            }}
+          >
             <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
               Đăng nhập với{" "}
               <span className="font-semibold">{user?.username}</span>
@@ -140,7 +152,7 @@ const Header = () => {
             {isAdmin() && (
               <Link
                 to="/dashboard/quanlynguoidung"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center transition-colors"
                 onClick={() => setShowUserMenu(false)}
               >
                 <FaUserCog className="mr-2" />
@@ -153,7 +165,7 @@ const Header = () => {
                 setShowUserMenu(false);
                 setShowPasswordModal(true);
               }}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center transition-colors"
             >
               <FaKey className="mr-2" />
               Đổi mật khẩu
@@ -161,7 +173,7 @@ const Header = () => {
 
             <button
               onClick={logout}
-              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"
+              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center transition-colors"
             >
               <FaSignOutAlt className="mr-2" />
               Đăng xuất
@@ -170,10 +182,11 @@ const Header = () => {
         )}
       </div>
 
-      {/* Modal đổi mật khẩu */}
+      {/* Modal đổi mật khẩu với z-index cực cao */}
       <ChangePasswordModal
         isOpen={showPasswordModal}
         onClose={() => setShowPasswordModal(false)}
+        style={{ zIndex: 100000 }}
       />
     </header>
   );

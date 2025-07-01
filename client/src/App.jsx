@@ -57,7 +57,43 @@ function App() {
           </ReportProvider>
         </GeoDataProvider>
       </AuthProvider>
-      <ToastContainer position="top-center" autoClose={3000} />
+      {/* ToastContainer với z-index cao nhất và cấu hình tối ưu */}
+      <ToastContainer 
+        position="top-center" 
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick={true}
+        rtl={false}
+        pauseOnFocusLoss={true}
+        draggable={true}
+        pauseOnHover={true}
+        style={{ 
+          zIndex: 99999,
+          position: 'fixed',
+          top: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 'auto',
+          maxWidth: '500px'
+        }}
+        toastStyle={{
+          zIndex: 100000,
+          position: 'relative',
+          backgroundColor: 'white',
+          color: '#333',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          border: '1px solid #e5e7eb'
+        }}
+        bodyStyle={{
+          fontSize: '14px',
+          lineHeight: '1.5'
+        }}
+        progressStyle={{
+          background: 'linear-gradient(to right, #10b981, #059669)'
+        }}
+      />
     </BrowserRouter>
   );
 }
