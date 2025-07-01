@@ -1,4 +1,4 @@
-// server/controllers/layerData.controller.js
+// server/controllers/layerData.controller.js - CẬP NHẬT ĐỂ TẢI TOÀN BỘ DỮ LIỆU
 const pool = require("../db");
 const convertTcvn3ToUnicode = require("../utils/convertTcvn3ToUnicode");
 
@@ -53,13 +53,21 @@ exports.getLayerInfo = async (req, res) => {
 };
 
 /**
- * Lấy dữ liệu lớp ranh giới hành chính từ laocai_ranhgioihc
+ * Lấy dữ liệu lớp ranh giới hành chính - TOÀN BỘ DỮ LIỆU
  */
 exports.getAdministrativeBoundaries = async (req, res) => {
   try {
-    console.log(`📥 Loading administrative boundaries from laocai_ranhgioihc`);
+    console.log(`📥 Loading ALL administrative boundaries from laocai_ranhgioihc`);
     
-    const limit = Math.min(parseInt(req.query.limit) || 1000, 2000);
+    // Đếm tổng số records trước
+    const countResult = await pool.query(`
+      SELECT COUNT(*) as total 
+      FROM laocai_ranhgioihc 
+      WHERE ST_IsValid(geom) AND geom IS NOT NULL
+    `);
+    
+    const totalRecords = parseInt(countResult.rows[0].total);
+    console.log(`📊 Total administrative boundaries: ${totalRecords}`);
     
     const query = `
       SELECT json_build_object(
@@ -69,7 +77,7 @@ exports.getAdministrativeBoundaries = async (req, res) => {
       FROM (
         SELECT json_build_object(
           'type', 'Feature',
-          'geometry', ST_AsGeoJSON(geom)::json,
+          'geometry', ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001))::json,
           'properties', json_build_object(
             'gid', gid,
             'huyen', huyen,
@@ -89,11 +97,10 @@ exports.getAdministrativeBoundaries = async (req, res) => {
         FROM laocai_ranhgioihc
         WHERE ST_IsValid(geom) AND geom IS NOT NULL
         ORDER BY gid
-        LIMIT $1
       ) AS features;
     `;
 
-    const result = await pool.query(query, [limit]);
+    const result = await pool.query(query);
     let geojson = result.rows[0].geojson;
 
     // Chuyển đổi TCVN3 sang Unicode
@@ -110,7 +117,7 @@ exports.getAdministrativeBoundaries = async (req, res) => {
       }));
     }
 
-    console.log(`✅ Loaded ${geojson.features.length} administrative boundary features`);
+    console.log(`✅ Loaded ALL ${geojson.features.length} administrative boundary features`);
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu ranh giới hành chính:", err);
@@ -119,11 +126,21 @@ exports.getAdministrativeBoundaries = async (req, res) => {
 };
 
 /**
- * Lấy dữ liệu lớp chủ quản lý rừng từ laocai_chuquanly
+ * Lấy dữ liệu lớp chủ quản lý rừng - TOÀN BỘ DỮ LIỆU
  */
 exports.getForestManagement = async (req, res) => {
   try {
-    console.log(`📥 Loading forest management data from laocai_chuquanly`);
+    console.log(`📥 Loading ALL forest management data from laocai_chuquanly`);
+    
+    // Đếm tổng số records
+    const countResult = await pool.query(`
+      SELECT COUNT(*) as total 
+      FROM laocai_chuquanly 
+      WHERE ST_IsValid(geom) AND geom IS NOT NULL
+    `);
+    
+    const totalRecords = parseInt(countResult.rows[0].total);
+    console.log(`📊 Total forest management records: ${totalRecords}`);
     
     const query = `
       SELECT json_build_object(
@@ -133,7 +150,7 @@ exports.getForestManagement = async (req, res) => {
       FROM (
         SELECT json_build_object(
           'type', 'Feature',
-          'geometry', ST_AsGeoJSON(geom)::json,
+          'geometry', ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001))::json,
           'properties', json_build_object(
             'gid', gid,
             'tt', tt,
@@ -145,7 +162,6 @@ exports.getForestManagement = async (req, res) => {
         WHERE ST_IsValid(geom) 
           AND geom IS NOT NULL
         ORDER BY gid
-        LIMIT 1000
       ) AS features;
     `;
 
@@ -163,7 +179,7 @@ exports.getForestManagement = async (req, res) => {
       }));
     }
 
-    console.log(`✅ Loaded ${geojson.features.length} forest management features`);
+    console.log(`✅ Loaded ALL ${geojson.features.length} forest management features`);
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu chủ quản lý rừng:", err);
@@ -175,48 +191,61 @@ exports.getForestManagement = async (req, res) => {
 };
 
 /**
- * Lấy dữ liệu lớp nền địa hình từ laocai_nendiahinh và laocai_nendiahinh_line
+ * Lấy dữ liệu lớp nền địa hình - TOÀN BỘ DỮ LIỆU
  */
 exports.getTerrainData = async (req, res) => {
   try {
-    console.log(`📥 Loading terrain data from laocai_nendiahinh and laocai_nendiahinh_line`);
+    console.log(`📥 Loading ALL terrain data from laocai_nendiahinh and laocai_nendiahinh_line`);
     
-    // Query 1: Lấy dữ liệu polygon từ laocai_nendiahinh - RAW DATA
+    // Đếm tổng số records từ cả hai bảng
+    const countPolygon = await pool.query(`
+      SELECT COUNT(*) as total FROM laocai_nendiahinh 
+      WHERE ST_IsValid(geom) AND geom IS NOT NULL
+    `);
+    
+    const countLine = await pool.query(`
+      SELECT COUNT(*) as total FROM laocai_nendiahinh_line 
+      WHERE ST_IsValid(geom) AND geom IS NOT NULL
+    `);
+    
+    const totalPolygons = parseInt(countPolygon.rows[0].total);
+    const totalLines = parseInt(countLine.rows[0].total);
+    console.log(`📊 Total terrain polygons: ${totalPolygons}, lines: ${totalLines}`);
+    
+    // Query 1: Lấy TOÀN BỘ dữ liệu polygon
     const polygonQuery = `
       SELECT 
         gid,
         id,
         ma,
         ten,
-        ST_AsGeoJSON(geom) as geometry
+        ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001)) as geometry
       FROM laocai_nendiahinh
       WHERE ST_IsValid(geom) AND geom IS NOT NULL
-      ORDER BY gid
-      LIMIT 500;
+      ORDER BY gid;
     `;
 
-    // Query 2: Lấy dữ liệu line từ laocai_nendiahinh_line - RAW DATA
+    // Query 2: Lấy TOÀN BỘ dữ liệu line
     const lineQuery = `
       SELECT 
         gid,
         id,
         ma,
         ten,
-        ST_AsGeoJSON(geom) as geometry
+        ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001)) as geometry
       FROM laocai_nendiahinh_line
       WHERE ST_IsValid(geom) AND geom IS NOT NULL
-      ORDER BY gid
-      LIMIT 500;
+      ORDER BY gid;
     `;
 
-    console.log(`🔍 Executing polygon query...`);
+    console.log(`🔍 Executing polygon query for ALL data...`);
     const polygonResult = await pool.query(polygonQuery);
     
-    console.log(`🔍 Executing line query...`);
+    console.log(`🔍 Executing line query for ALL data...`);
     const lineResult = await pool.query(lineQuery);
 
-    console.log(`📊 Raw polygon records: ${polygonResult.rows.length}`);
-    console.log(`📊 Raw line records: ${lineResult.rows.length}`);
+    console.log(`📊 Loaded ${polygonResult.rows.length} polygon records`);
+    console.log(`📊 Loaded ${lineResult.rows.length} line records`);
 
     // Build GeoJSON features trong JavaScript
     const allFeatures = [];
@@ -273,7 +302,7 @@ exports.getTerrainData = async (req, res) => {
     const polygonCount = geojson.features.filter(f => f.properties.layer_type === 'terrain_polygon').length;
     const lineCount = geojson.features.filter(f => f.properties.layer_type === 'terrain_line').length;
     
-    console.log(`✅ Built ${geojson.features.length} terrain features:`);
+    console.log(`✅ Built ALL ${geojson.features.length} terrain features:`);
     console.log(`🔳 Polygons: ${polygonCount}`);
     console.log(`📏 Lines: ${lineCount}`);
     
@@ -307,13 +336,21 @@ function getFeatureType(ten) {
 }
 
 /**
- * Lấy dữ liệu lớp các loại rừng từ laocai_rg3lr - DỰA TRÊN CỘT LDLR
+ * Lấy dữ liệu lớp các loại rừng - TOÀN BỘ DỮ LIỆU
  */
 exports.getForestTypes = async (req, res) => {
   try {
-    console.log(`📥 Loading forest types data from laocai_rg3lr based on LDLR column`);
+    console.log(`📥 Loading ALL forest types data from laocai_rg3lr based on LDLR column`);
     
-    const limit = Math.min(parseInt(req.query.limit) || 2000, 5000);
+    // Đếm tổng số records
+    const countResult = await pool.query(`
+      SELECT COUNT(*) as total 
+      FROM laocai_rg3lr 
+      WHERE ST_IsValid(geom) AND geom IS NOT NULL AND ldlr IS NOT NULL AND TRIM(ldlr) != ''
+    `);
+    
+    const totalRecords = parseInt(countResult.rows[0].total);
+    console.log(`📊 Total forest type records: ${totalRecords}`);
 
     const query = `
       SELECT json_build_object(
@@ -323,7 +360,7 @@ exports.getForestTypes = async (req, res) => {
       FROM (
         SELECT json_build_object(
           'type', 'Feature',
-          'geometry', ST_AsGeoJSON(geom)::json,
+          'geometry', ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001))::json,
           'properties', json_build_object(
             'gid', gid,
             'xa', xa,
@@ -375,11 +412,10 @@ exports.getForestTypes = async (req, res) => {
           AND ldlr IS NOT NULL 
           AND TRIM(ldlr) != ''
         ORDER BY gid
-        LIMIT $1
       ) AS features;
     `;
 
-    const result = await pool.query(query, [limit]);
+    const result = await pool.query(query);
     let geojson = result.rows[0].geojson;
 
     // Chuyển đổi TCVN3 sang Unicode
@@ -435,7 +471,7 @@ exports.getForestTypes = async (req, res) => {
       count: categoryStats[category]
     })).sort((a, b) => b.count - a.count);
 
-    console.log(`✅ Loaded ${geojson.features.length} forest features with ${Object.keys(typeStats).length} different types in ${Object.keys(categoryStats).length} categories`);
+    console.log(`✅ Loaded ALL ${geojson.features.length} forest features with ${Object.keys(typeStats).length} different types in ${Object.keys(categoryStats).length} categories`);
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu các loại rừng theo LDLR:", err);
@@ -445,14 +481,25 @@ exports.getForestTypes = async (req, res) => {
     });
   }
 };
+
 /**
- * Lấy dữ liệu lớp dự báo mất rừng mới nhất từ bảng mat_rung - 30 NGÀY GẦN NHẤT
+ * Lấy dữ liệu lớp dự báo mất rừng mới nhất - TOÀN BỘ DỮ LIỆU
  */
 exports.getDeforestationAlerts = async (req, res) => {
   try {
-    console.log(`📥 Loading latest deforestation alerts from mat_rung`);
+    console.log(`📥 Loading ALL deforestation alerts from mat_rung`);
     
-    const days = parseInt(req.query.days) || 30;
+    const days = parseInt(req.query.days) || 365; // Mặc định 1 năm thay vì 30 ngày
+    
+    // Đếm tổng số records
+    const countResult = await pool.query(`
+      SELECT COUNT(*) as total 
+      FROM mat_rung 
+      WHERE ST_IsValid(geom) AND end_sau::date >= CURRENT_DATE - INTERVAL '${days} days'
+    `);
+    
+    const totalRecords = parseInt(countResult.rows[0].total);
+    console.log(`📊 Total deforestation alerts (${days} days): ${totalRecords}`);
 
     const query = `
       SELECT json_build_object(
@@ -460,7 +507,7 @@ exports.getDeforestationAlerts = async (req, res) => {
         'features', COALESCE(json_agg(
           json_build_object(
             'type', 'Feature',
-            'geometry', ST_AsGeoJSON(geom)::json,
+            'geometry', ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001))::json,
             'properties', json_build_object(
               'gid', gid,
               'start_dau', start_dau,
@@ -483,12 +530,11 @@ exports.getDeforestationAlerts = async (req, res) => {
       ) AS geojson
       FROM mat_rung
       WHERE ST_IsValid(geom)
-        AND end_sau::date >= CURRENT_DATE - INTERVAL '$1 days'
-      ORDER BY end_sau DESC
-      LIMIT 1000;
+        AND end_sau::date >= CURRENT_DATE - INTERVAL '${days} days'
+      ORDER BY end_sau DESC;
     `;
 
-    const result = await pool.query(query, [days]);
+    const result = await pool.query(query);
     let geojson = result.rows[0].geojson;
 
     // Log thống kê mức cảnh báo
@@ -501,7 +547,7 @@ exports.getDeforestationAlerts = async (req, res) => {
       console.log("⚠️ Thống kê mức cảnh báo:", alertStats);
     }
 
-    console.log(`✅ Loaded ${geojson.features.length} deforestation alert features from last ${days} days`);
+    console.log(`✅ Loaded ALL ${geojson.features.length} deforestation alert features from last ${days} days`);
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu dự báo mất rừng:", err);
@@ -514,7 +560,17 @@ exports.getDeforestationAlerts = async (req, res) => {
  */
 exports.getForestStatus = async (req, res) => {
   try {
-    const limit = Math.min(parseInt(req.query.limit) || 1000, 5000);
+    console.log(`📥 Loading ALL forest status data from tlaocai_tkk_3lr_cru`);
+    
+    // Đếm tổng số records
+    const countResult = await pool.query(`
+      SELECT COUNT(*) as total 
+      FROM tlaocai_tkk_3lr_cru 
+      WHERE ST_IsValid(geom) AND geom IS NOT NULL
+    `);
+    
+    const totalRecords = parseInt(countResult.rows[0].total);
+    console.log(`📊 Total forest status records: ${totalRecords}`);
 
     const query = `
       SELECT json_build_object(
@@ -524,7 +580,7 @@ exports.getForestStatus = async (req, res) => {
       FROM (
         SELECT json_build_object(
           'type', 'Feature',
-          'geometry', ST_AsGeoJSON(geom)::json,
+          'geometry', ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001))::json,
           'properties', json_build_object(
             'gid', gid,
             'huyen', huyen,
@@ -543,11 +599,10 @@ exports.getForestStatus = async (req, res) => {
         FROM tlaocai_tkk_3lr_cru
         WHERE ST_IsValid(geom) AND geom IS NOT NULL
         ORDER BY gid
-        LIMIT $1
       ) AS features;
     `;
 
-    const result = await pool.query(query, [limit]);
+    const result = await pool.query(query);
     let geojson = result.rows[0].geojson;
 
     // Chuyển đổi TCVN3 sang Unicode
@@ -564,7 +619,7 @@ exports.getForestStatus = async (req, res) => {
       }));
     }
 
-    console.log(`✅ Loaded ${geojson.features.length} forest status features`);
+    console.log(`✅ Loaded ALL ${geojson.features.length} forest status features`);
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu hiện trạng rừng:", err);
