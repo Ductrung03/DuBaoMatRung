@@ -43,8 +43,8 @@ const CapNhatDuLieu = () => {
         params: {
           useServerCache: 'true',
           optimize: 'true'
-        },
-        timeout: 180000 // 3 minutes timeout for large datasets
+        }
+        // 3 minutes timeout for large datasets
       });
       
       const loadTime = ((Date.now() - startTime) / 1000).toFixed(1);
