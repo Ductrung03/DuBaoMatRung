@@ -1,4 +1,4 @@
-// client/src/dashboard/components/sidebars/quanlydulieu/CapNhatDuLieu.jsx - SIMPLIFIED
+// client/src/dashboard/components/sidebars/quanlydulieu/CapNhatDuLieu.jsx - WITH ENHANCED CACHE
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useGeoData } from "../../../contexts/GeoDataContext";
@@ -6,33 +6,18 @@ import config from "../../../../config";
 import { toast } from "react-toastify";
 import { ClipLoader } from 'react-spinners';
 import RealTimeDataLoader from '../../RealTimeDataLoader';
+import CacheStatusComponent from '../../CacheStatusComponent';
 
 const CapNhatDuLieu = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const [showCacheStatus, setShowCacheStatus] = useState(false);
   const { updateLayerData, setLayerLoading, mapLayers } = useGeoData();
   
   // Loading states
   const [currentLoadingLayer, setCurrentLoadingLayer] = useState(null);
   const [globalLoading, setGlobalLoading] = useState(false);
-  
-  // Server cache status
-  const [serverCacheStatus, setServerCacheStatus] = useState(null);
 
-  // Load server cache status on mount
-  useEffect(() => {
-    loadServerCacheStatus();
-  }, []);
-
-  const loadServerCacheStatus = async () => {
-    try {
-      const response = await axios.get(`${config.API_URL}/api/layer-data/server-cache/status`);
-      setServerCacheStatus(response.data);
-    } catch (error) {
-      console.error("Error loading server cache status:", error);
-    }
-  };
-
-  // Enhanced load layer function with real-time progress
+  // Enhanced load layer function with persistent cache support
   const handleLoadLayer = async (layerKey, layerName) => {
     try {
       const layer = mapLayers[layerKey];
@@ -44,55 +29,55 @@ const CapNhatDuLieu = () => {
       setLayerLoading(layerKey, true);
       setCurrentLoadingLayer({ key: layerKey, name: layerName });
       
-      const isServerCached = serverCacheStatus?.cached_layers?.includes(layerKey);
-      const loadingMessage = isServerCached ? 
-        `🚀 Tải instant từ server cache: ${layerName}...` : 
-        `🔄 Tải lần đầu (sẽ cache cho lần sau): ${layerName}...`;
-      
-      toast.info(loadingMessage, { autoClose: 3000 });
+      toast.info(`🔄 Đang tải ${layerName}... (kiểm tra cache)`, { autoClose: 2000 });
       
       const startTime = Date.now();
       const url = `${config.API_URL}/api/layer-data/${layer.endpoint}`;
       
+      // Enhanced request with cache headers
       const response = await axios.get(url, {
         headers: {
           'Accept': 'application/json',
-          'Cache-Control': 'no-cache'
+          'Cache-Control': 'max-age=0' // Always check for fresh data but allow cache
         },
         params: {
           useServerCache: 'true',
           optimize: 'true'
-        }
+        },
+        timeout: 180000 // 3 minutes timeout for large datasets
       });
       
       const loadTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      const cacheStatus = response.headers['x-cache-status'] || 'UNKNOWN';
       
       if (response.data && response.data.features) {
         const layerData = {
           ...response.data,
           layerType: layerKey,
           loadTime: parseFloat(loadTime),
-          loadStrategy: response.data.metadata?.load_strategy || 'server_cache',
+          loadStrategy: response.data.metadata?.load_strategy || 'persistent_cache',
           loadTimestamp: new Date().toISOString(),
-          serverCached: isServerCached,
-          fromPersistentCache: response.data.metadata?.from_persistent_cache || false
+          cacheStatus: cacheStatus,
+          fromPersistentCache: response.data.metadata?.from_persistent_cache || false,
+          fromMemoryCache: response.data.metadata?.from_memory_cache || false,
+          cacheAgeMinutes: response.data.metadata?.cache_age_minutes || 0
         };
         
         updateLayerData(layerKey, layerData);
         
-        // Success message
+        // Enhanced success message with cache info
         let successMessage = `✅ ${layerName}: ${response.data.features.length.toLocaleString()} đối tượng (${loadTime}s)`;
         
-        if (layerData.fromPersistentCache) {
-          successMessage += ` 💾 Instant từ cache!`;
+        if (layerData.fromMemoryCache) {
+          successMessage += ` 🚀 Instant từ memory cache!`;
+        } else if (layerData.fromPersistentCache) {
+          successMessage += ` 💾 Tải từ persistent cache (${layerData.cacheAgeMinutes}p cũ)`;
         } else {
-          successMessage += ` 🎉 Đã lưu cache cho lần sau!`;
+          successMessage += ` 📥 Tải mới + đã cache cho lần sau!`;
         }
         
-        toast.success(successMessage);
+        toast.success(successMessage, { autoClose: 5000 });
         
-        // Update cache status
-        loadServerCacheStatus();
       } else {
         toast.warning(`⚠️ Không có dữ liệu cho ${layerName}`);
       }
@@ -104,6 +89,10 @@ const CapNhatDuLieu = () => {
         errorMessage += ": Không tìm thấy dữ liệu";
       } else if (err.response?.status === 500) {
         errorMessage += ": Lỗi server";
+      } else if (err.code === 'ECONNABORTED') {
+        errorMessage += ": Timeout - dataset quá lớn";
+      } else if (err.message.includes('CORS')) {
+        errorMessage += ": Lỗi CORS - vui lòng thử lại";
       } else {
         errorMessage += `: ${err.response?.data?.error || err.message}`;
       }
@@ -115,36 +104,35 @@ const CapNhatDuLieu = () => {
     }
   };
 
-  // Load all layers
+  // Enhanced load all layers with better sequencing
   const handleLoadAllLayers = async () => {
     const layersToLoad = [
-      { key: 'administrative', name: 'Ranh giới hành chính' },
-      { key: 'forestManagement', name: 'Chủ quản lý rừng' },
-      { key: 'terrain', name: 'Nền địa hình' },
-      { key: 'deforestationAlerts', name: 'Dự báo mất rừng' },
-      { key: 'forestTypes', name: 'Các loại rừng (LDLR)' }
+      { key: 'administrative', name: 'Ranh giới hành chính', priority: 1 },
+      { key: 'forestManagement', name: 'Chủ quản lý rừng', priority: 2 },
+      { key: 'terrain', name: 'Nền địa hình', priority: 3 },
+      { key: 'deforestationAlerts', name: 'Dự báo mất rừng', priority: 4 },
+      { key: 'forestTypes', name: 'Các loại rừng (LDLR)', priority: 5 } // Tải cuối vì lớn nhất
     ];
 
     setGlobalLoading(true);
 
     try {
-      toast.info(`🚀 Bắt đầu tải ${layersToLoad.length} lớp dữ liệu...`);
+      toast.info(`🚀 Bắt đầu tải ${layersToLoad.length} lớp dữ liệu với persistent cache...`);
 
       for (let i = 0; i < layersToLoad.length; i++) {
         const layer = layersToLoad[i];
         
-        toast.info(`📥 Đang tải lớp ${i + 1}/${layersToLoad.length}: ${layer.name}`, { autoClose: 2000 });
+        toast.info(`📥 Tải lớp ${i + 1}/${layersToLoad.length}: ${layer.name}`, { autoClose: 2000 });
         
         await handleLoadLayer(layer.key, layer.name);
         
-        // Pause between layers
+        // Shorter pause for cached layers
         if (i < layersToLoad.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
 
-      toast.success(`🎉 Đã tải thành công ${layersToLoad.length} lớp dữ liệu!`);
-      loadServerCacheStatus();
+      toast.success(`🎉 Đã tải thành công ${layersToLoad.length} lớp dữ liệu!`, { autoClose: 5000 });
       
     } catch (error) {
       console.error('Lỗi khi tải tất cả layers:', error);
@@ -154,58 +142,20 @@ const CapNhatDuLieu = () => {
     }
   };
 
-  // Quick load cached layers
-  const handleQuickLoadCached = async () => {
-    if (!serverCacheStatus?.cached_layers?.length) {
-      toast.info("Không có server cache để tải nhanh.");
-      return;
-    }
-
-    const cachedLayers = serverCacheStatus.cached_layers
-      .map(layerKey => ({
-        key: layerKey,
-        name: mapLayers[layerKey]?.name || layerKey
-      }))
-      .filter(layer => mapLayers[layer.key]);
-
-    toast.success(`🚀 Tải instant ${cachedLayers.length} lớp từ server cache...`);
-    
-    for (const layer of cachedLayers) {
-      await handleLoadLayer(layer.key, layer.name);
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-  };
-
-  // Clear server cache
-  const handleClearServerCache = async () => {
-    if (!window.confirm("Xóa TOÀN BỘ server cache? Lần tải tiếp theo sẽ chậm hơn.")) return;
-    
-    try {
-      await axios.post(`${config.API_URL}/api/layer-data/server-cache/clear`);
-      toast.success("🗑️ Đã xóa server cache!");
-      loadServerCacheStatus();
-    } catch (error) {
-      toast.error("❌ Không thể xóa cache");
-    }
-  };
-
-  // Format file size
-  const formatBytes = (bytes) => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-  };
-
-  // Get status indicator
+  // Get enhanced status indicator
   const getStatusIndicator = (layerKey) => {
     const layer = mapLayers[layerKey];
-    const isServerCached = serverCacheStatus?.cached_layers?.includes(layerKey);
     
     if (layer.loading) return <span className="text-yellow-600">⏳ Đang tải...</span>;
-    if (layer.data) return <span className="text-green-600">✅ Đã tải</span>;
-    if (isServerCached) return <span className="text-blue-600">💾 Có cache</span>;
+    if (layer.data) {
+      let status = <span className="text-green-600">✅ Đã tải</span>;
+      if (layer.data.fromMemoryCache) {
+        status = <span className="text-blue-600">🚀 Memory cache</span>;
+      } else if (layer.data.fromPersistentCache) {
+        status = <span className="text-purple-600">💾 File cache</span>;
+      }
+      return status;
+    }
     return <span className="text-gray-500">➖ Chưa tải</span>;
   };
 
@@ -227,7 +177,7 @@ const CapNhatDuLieu = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md text-center">
             <ClipLoader color="#027e02" size={50} />
             <h3 className="text-lg font-bold mt-3 mb-2">Đang tải hàng loạt</h3>
-            <p className="text-gray-600">Vui lòng đợi...</p>
+            <p className="text-gray-600">Sử dụng persistent cache để tăng tốc...</p>
           </div>
         </div>
       )}
@@ -238,7 +188,7 @@ const CapNhatDuLieu = () => {
           onClick={() => setIsOpen(!isOpen)}
         >
           <div className="flex items-center justify-between">
-            <span>📊 Cập nhật dữ liệu</span>
+            <span>📊 Cập nhật dữ liệu (Enhanced Cache)</span>
             <span className="text-xs">{isOpen ? '▼' : '▶'}</span>
           </div>
         </div>
@@ -246,42 +196,13 @@ const CapNhatDuLieu = () => {
         {isOpen && (
           <div className="flex flex-col gap-3 px-1 pt-3">
             
-            {/* Server Cache Status */}
-            {serverCacheStatus && (
-              <div className="mb-3 p-3 bg-blue-50 rounded-md border border-blue-200">
-                <h4 className="text-sm font-medium text-blue-800 mb-2">💾 Server Cache</h4>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <span className="font-medium">Cached:</span>
-                    <br />
-                    <span className="text-blue-600">{serverCacheStatus.cached_layers?.length || 0} lớp</span>
-                  </div>
-                  <div>
-                    <span className="font-medium">Dung lượng:</span>
-                    <br />
-                    <span className="text-green-600">{formatBytes(serverCacheStatus.total_cache_size || 0)}</span>
-                  </div>
-                </div>
-                
-                <div className="mt-2 flex gap-2">
-                  <button
-                    onClick={handleQuickLoadCached}
-                    disabled={!serverCacheStatus.cached_layers?.length}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-2 rounded text-xs disabled:opacity-50 transition-colors"
-                  >
-                    ⚡ Tải instant
-                  </button>
-                  <button
-                    onClick={handleClearServerCache}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-2 rounded text-xs transition-colors"
-                  >
-                    🗑️ Xóa cache
-                  </button>
-                </div>
-              </div>
-            )}
+            {/* Enhanced Cache Status Component */}
+            <CacheStatusComponent 
+              isOpen={showCacheStatus} 
+              onToggle={() => setShowCacheStatus(!showCacheStatus)}
+            />
 
-            {/* Bulk Actions */}
+            {/* Enhanced Bulk Actions */}
             <div className="mb-4 p-3 bg-green-50 rounded-md border border-green-200">
               <button 
                 onClick={handleLoadAllLayers}
@@ -291,15 +212,17 @@ const CapNhatDuLieu = () => {
                 {globalLoading ? (
                   <>
                     <ClipLoader color="#ffffff" size={16} />
-                    <span className="ml-2">Đang tải...</span>
+                    <span className="ml-2">Đang tải với cache...</span>
                   </>
                 ) : (
-                  <>🚀 Tải TẤT CẢ - 5 lớp</>
+                  <>🚀 Tải TẤT CẢ - 5 lớp (Persistent Cache)</>
                 )}
               </button>
+             
+             
             </div>
 
-            {/* Individual Layers - SIMPLIFIED */}
+            {/* Individual Layers with enhanced info */}
             <div className="border-t border-gray-200 pt-3">
               <h4 className="text-sm font-medium mb-3 text-gray-700">Hoặc tải từng lớp:</h4>
             </div>
@@ -321,6 +244,11 @@ const CapNhatDuLieu = () => {
                       {layer.data && (
                         <span className="ml-2">
                           ({layer.data.features?.length?.toLocaleString() || 0} đối tượng)
+                          {layer.data.loadTime && (
+                            <span className="ml-1 text-blue-600">
+                              - {layer.data.loadTime}s
+                            </span>
+                          )}
                         </span>
                       )}
                     </div>
@@ -341,24 +269,23 @@ const CapNhatDuLieu = () => {
               ))}
             </div>
 
-            {/* Status Summary */}
+            {/* Enhanced Status Summary */}
             <div className="mt-4 p-3 bg-gray-50 rounded-md text-xs">
-              <div className="text-gray-700 font-medium mb-2">📈 Tổng quan:</div>
+              <div className="text-gray-700 font-medium mb-2">📈 Tổng quan Enhanced Cache:</div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <span>Đã tải: </span>
                   <strong className="text-green-600">{Object.values(mapLayers).filter(layer => layer.data).length}/5</strong>
                 </div>
                 <div>
-                  <span>Server cache: </span>
-                  <strong className="text-blue-600">{serverCacheStatus?.cached_layers?.length || 0}/5</strong>
+                  <span>Cache hits: </span>
+                  <strong className="text-blue-600">
+                    {Object.values(mapLayers).filter(layer => layer.data?.fromPersistentCache || layer.data?.fromMemoryCache).length}
+                  </strong>
                 </div>
               </div>
               
-              <div className="mt-2 text-gray-600">
-                💡 <strong>Lần đầu tải:</strong> Chậm, nhưng sẽ được cache<br/>
-                💾 <strong>Lần sau tải:</strong> Instant từ server cache
-              </div>
+              
             </div>
           </div>
         )}

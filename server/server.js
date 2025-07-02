@@ -1,4 +1,4 @@
-// server/server.js - CẬP NHẬT VỚI CSP MIDDLEWARE
+// server/server.js - FIXED CORS CONFIGURATION
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -52,11 +52,11 @@ const swaggerOptions = require("./swaggerOptions");
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Middleware - IMPORTANT: CSP phải được áp dụng trước CORS
-// Set CSP headers để cho phép Google Earth Engine iframe
+// MIDDLEWARE ORDER IS CRITICAL
+// 1. First apply CSP headers
 app.use(setCspHeaders);
 
-// CORS with enhanced options for Google Earth Engine
+// 2. Then configure CORS with ALL required headers
 app.use(cors({
   origin: [
     'http://localhost:5173',
@@ -67,10 +67,41 @@ app.use(cors({
     'https://ee-phathiensommatrung.projects.earthengine.app'
   ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
-  optionsSuccessStatus: 200
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  // ✅ FIX: Add ALL headers that might be sent by frontend
+  allowedHeaders: [
+    'Origin', 
+    'X-Requested-With', 
+    'Content-Type', 
+    'Accept', 
+    'Authorization',
+    'Cache-Control',  // ✅ This was missing!
+    'Pragma',
+    'Expires',
+    'If-Modified-Since',
+    'If-None-Match',
+    'X-Cache-Control'
+  ],
+  // ✅ Also expose headers for frontend to read
+  exposedHeaders: [
+    'Cache-Control',
+    'ETag',
+    'Last-Modified',
+    'X-Cache-Status'
+  ],
+  optionsSuccessStatus: 200,
+  preflightContinue: false
 }));
+
+// 3. Handle preflight requests explicitly
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS,PATCH');
+  res.header('Access-Control-Allow-Headers', 'Origin,X-Requested-With,Content-Type,Accept,Authorization,Cache-Control,Pragma,Expires,If-Modified-Since,If-None-Match,X-Cache-Control');
+  res.header('Access-Control-Expose-Headers', 'Cache-Control,ETag,Last-Modified,X-Cache-Status');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.sendStatus(200);
+});
 
 app.use(express.json({ limit: '50mb' })); // Tăng limit cho large data
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -83,6 +114,13 @@ app.use((req, res, next) => {
   const referer = req.get('Referer');
   
   console.log(`📝 [${timestamp}] ${req.method} ${req.url}`);
+  
+  // Log headers for CORS debugging
+  if (req.method === 'OPTIONS') {
+    console.log(`🔧 CORS Preflight for: ${req.url}`);
+    console.log(`   Origin: ${req.get('Origin')}`);
+    console.log(`   Headers: ${req.get('Access-Control-Request-Headers')}`);
+  }
   
   // Log thêm thông tin cho Google Earth Engine requests
   if (req.url.includes('earth') || req.url.includes('gee') || req.headers['sec-fetch-dest'] === 'iframe') {
@@ -123,7 +161,8 @@ app.get("/api/test", (req, res) => {
   res.json({ 
     message: "API đang hoạt động!",
     csp_enabled: true,
-    earth_engine_support: true
+    earth_engine_support: true,
+    cors_fixed: true
   });
 });
 
@@ -176,6 +215,7 @@ app.get("/", (req, res) => {
     <h1>✅ Backend Geo API đang hoạt động</h1>
     <p>🌍 Google Earth Engine iframe support enabled</p>
     <p>🔒 Content Security Policy configured</p>
+    <p>🔧 CORS headers fixed for Cache-Control</p>
     <p>📚 <a href="/api-docs">API Documentation</a></p>
     <p>🧪 <a href="/api/test-iframe">Test Iframe Embedding</a></p>
   `);
@@ -188,6 +228,13 @@ app.use((err, req, res, next) => {
   // Log thêm thông tin cho iframe/CSP related errors
   if (err.message.includes('CSP') || err.message.includes('iframe') || err.message.includes('frame')) {
     console.error("🖼️ Iframe/CSP related error detected");
+    console.error("Headers:", req.headers);
+  }
+  
+  // Log CORS related errors
+  if (err.message.includes('CORS') || err.message.includes('origin')) {
+    console.error("🔧 CORS related error detected");
+    console.error("Origin:", req.headers.origin);
     console.error("Headers:", req.headers);
   }
   
@@ -222,6 +269,7 @@ const startServer = async () => {
     console.log(`🧪 Test Iframe tại http://localhost:${port}/api/test-iframe`);
     console.log(`🌍 Google Earth Engine iframe support: ENABLED`);
     console.log(`🔒 Content Security Policy: CONFIGURED`);
+    console.log(`🔧 CORS Cache-Control headers: FIXED`);
     
     // Không chạy open() trên môi trường production
     if (process.env.NODE_ENV !== 'production') {

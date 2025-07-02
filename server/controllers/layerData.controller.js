@@ -14,7 +14,7 @@ const CACHE_TTL = 10 * 60 * 1000; // 10 phút
 const progressTracking = new Map();
 
 /**
- * ✅ API để lấy progress real-time - FUNCTION BỊ THIẾU
+ * ✅ API để lấy progress real-time
  */
 exports.getProgress = async (req, res) => {
   try {
@@ -54,231 +54,292 @@ const updateProgress = (layerKey, current, total, stage = 'loading') => {
 };
 
 /**
- * Hàm streaming với progress tracking
+ * FIXED: Hàm streaming với improved error handling
  */
 const streamLargeDatasetWithProgress = async (layerKey, tableName, query, simplifyTolerance = 0.00001, pageSize = 5000) => {
-  const client = await pool.connect();
+  let client;
   
   try {
     // Initialize progress
     updateProgress(layerKey, 0, 0, 'initializing');
     
+    // Get client from pool
+    client = await pool.connect();
+    console.log(`🔗 Connected to database for ${layerKey}`);
+    
+    // FIXED: Set work_mem outside of transaction, with error handling
+    try {
+      await client.query('SET work_mem = "256MB"');
+      console.log(`🔧 Set work_mem for ${layerKey}`);
+    } catch (configError) {
+      console.warn(`⚠️ Could not set work_mem for ${layerKey}:`, configError.message);
+      // Continue without setting work_mem
+    }
+    
     // Get total count first
+    updateProgress(layerKey, 0, 0, 'counting');
     const countQuery = `SELECT COUNT(*) as total FROM (${query.replace(/SELECT.*?FROM/, 'SELECT 1 FROM').replace(/ORDER BY.*$/, '')}) as count_query`;
     const countResult = await client.query(countQuery);
     const totalRecords = parseInt(countResult.rows[0].total);
     
-    updateProgress(layerKey, 0, totalRecords, 'counting');
+    updateProgress(layerKey, 0, totalRecords, 'database_loading');
     
     console.log(`🔄 Starting streaming for ${layerKey}: ${totalRecords} total records`);
-    
-    await client.query('BEGIN');
-    await client.query('SET work_mem = "256MB"');
-    await client.query('COMMIT');
     
     const allFeatures = [];
     let offset = 0;
     let hasMore = true;
     let totalLoaded = 0;
+    let batchCount = 0;
     
-    while (hasMore) {
+    while (hasMore && totalLoaded < 500000) { // Safety limit
       const startTime = Date.now();
+      batchCount++;
       
       // Update progress
       updateProgress(layerKey, totalLoaded, totalRecords, 'streaming');
       
+      // Build paginated query with proper ORDER BY
       const paginatedQuery = query.replace(/ORDER BY.*?;?\s*$/, '') + 
         ` ORDER BY gid LIMIT ${pageSize} OFFSET ${offset}`;
       
-      const result = await client.query(paginatedQuery);
-      const loadTime = Date.now() - startTime;
-      
-      if (result.rows.length === 0) {
-        hasMore = false;
-        break;
-      }
-      
-      // Process features
-      for (const row of result.rows) {
-        try {
-          const feature = {
-            type: "Feature",
-            geometry: JSON.parse(row.geometry),
-            properties: { ...row }
-          };
-          delete feature.properties.geometry;
-          allFeatures.push(feature);
-        } catch (err) {
-          console.warn(`⚠️ Skipping invalid geometry for gid: ${row.gid}`);
+      try {
+        const result = await client.query(paginatedQuery);
+        const loadTime = Date.now() - startTime;
+        
+        if (result.rows.length === 0) {
+          hasMore = false;
+          break;
         }
-      }
-      
-      totalLoaded += result.rows.length;
-      console.log(`✅ Loaded ${result.rows.length} records in ${loadTime}ms (Total: ${totalLoaded}/${totalRecords})`);
-      
-      // Update progress
-      updateProgress(layerKey, totalLoaded, totalRecords, 'processing');
-      
-      offset += pageSize;
-      
-      if (result.rows.length < pageSize) {
-        hasMore = false;
-      }
-      
-      if (offset > 1000000) {
-        console.warn(`⚠️ Safety limit reached`);
-        hasMore = false;
+        
+        // Process features with better error handling
+        let validFeatures = 0;
+        for (const row of result.rows) {
+          try {
+            if (row.geometry) {
+              const feature = {
+                type: "Feature",
+                geometry: JSON.parse(row.geometry),
+                properties: { ...row }
+              };
+              delete feature.properties.geometry;
+              allFeatures.push(feature);
+              validFeatures++;
+            }
+          } catch (geomError) {
+            console.warn(`⚠️ Skipping invalid geometry for gid: ${row.gid || 'unknown'} - ${geomError.message}`);
+          }
+        }
+        
+        totalLoaded += validFeatures;
+        console.log(`✅ Batch ${batchCount}: Loaded ${validFeatures}/${result.rows.length} valid features in ${loadTime}ms (Total: ${totalLoaded}/${totalRecords})`);
+        
+        // Update progress
+        updateProgress(layerKey, totalLoaded, totalRecords, 'processing');
+        
+        offset += pageSize;
+        
+        // Break conditions
+        if (result.rows.length < pageSize) {
+          hasMore = false;
+        }
+        
+        // Small delay to prevent overwhelming the database
+        if (batchCount % 10 === 0) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+      } catch (queryError) {
+        console.error(`❌ Error in batch ${batchCount} for ${layerKey}:`, queryError.message);
+        
+        // If it's a serious error, break the loop
+        if (queryError.code === '25P02' || queryError.code === '57P01') {
+          console.error(`💀 Fatal database error, stopping stream for ${layerKey}`);
+          break;
+        }
+        
+        // For other errors, skip this batch and continue
+        offset += pageSize;
+        continue;
       }
     }
     
     // Final progress update
     updateProgress(layerKey, totalLoaded, totalRecords, 'completed');
     
-    console.log(`🎉 Completed streaming ${totalLoaded} features for ${layerKey}`);
+    console.log(`🎉 Completed streaming ${totalLoaded} features for ${layerKey} in ${batchCount} batches`);
     
     return {
       type: "FeatureCollection",
       features: allFeatures,
       metadata: {
         total_features: totalLoaded,
+        total_records: totalRecords,
         load_strategy: 'stream_with_progress',
         page_size: pageSize,
+        batch_count: batchCount,
         build_time: Date.now() - (progressTracking.get(layerKey)?.timestamp || Date.now()),
         cache_saved: false
       }
     };
     
+  } catch (error) {
+    console.error(`❌ Fatal error streaming ${layerKey}:`, error);
+    updateProgress(layerKey, 0, 0, 'error');
+    throw error;
   } finally {
-    client.release();
-  }
-};
-
-/**
- * ✅ Lấy thông tin tổng quan về các lớp dữ liệu
- */
-exports.getLayerInfo = async (req, res) => {
-  try {
-    const info = {};
-    
-    const tables = [
-      { name: 'laocai_ranhgioihc', key: 'administrative' },
-      { name: 'laocai_chuquanly', key: 'forest_management' },
-      { name: 'laocai_nendiahinh', key: 'terrain' },
-      { name: 'laocai_rg3lr', key: 'forest_types' },
-      { name: 'mat_rung', key: 'deforestation_alerts' }
-    ];
-
-    for (const table of tables) {
+    // ALWAYS release the client
+    if (client) {
       try {
-        const result = await pool.query(`
-          SELECT COUNT(*) as count,
-                 ST_Extent(geom) as bbox
-          FROM ${table.name} 
-          WHERE ST_IsValid(geom)
-        `);
-        
-        info[table.key] = {
-          table_name: table.name,
-          total_records: parseInt(result.rows[0].count),
-          bbox: result.rows[0].bbox,
-          available: true
-        };
-      } catch (err) {
-        info[table.key] = {
-          table_name: table.name,
-          total_records: 0,
-          bbox: null,
-          available: false,
-          error: err.message
-        };
+        client.release();
+        console.log(`🔌 Released database connection for ${layerKey}`);
+      } catch (releaseError) {
+        console.error(`⚠️ Error releasing client for ${layerKey}:`, releaseError.message);
       }
     }
-
-    console.log("📊 Layer data info:", info);
-    res.json(info);
-  } catch (err) {
-    console.error("❌ Lỗi lấy thông tin layers:", err);
-    res.status(500).json({ error: "Lỗi server khi lấy thông tin layers" });
   }
 };
 
 /**
- * ✅ Lấy dữ liệu lớp ranh giới hành chính
+ * IMPROVED: Enhanced caching with better error handling
+ */
+const loadLayerWithCache = async (layerKey, loadFunction, ...args) => {
+  try {
+    console.log(`📥 Loading ${layerKey} with cache check...`);
+    
+    // Check memory cache first
+    const cacheKey = `${layerKey}_${JSON.stringify(args)}`;
+    if (cache.has(cacheKey)) {
+      const cached = cache.get(cacheKey);
+      if (Date.now() - cached.timestamp < CACHE_TTL) {
+        console.log(`⚡ Memory cache HIT for ${layerKey}`);
+        updateProgress(layerKey, cached.data.features?.length || 0, cached.data.features?.length || 0, 'cache_loaded');
+        return cached.data;
+      } else {
+        cache.delete(cacheKey);
+        console.log(`🗑️ Expired cache cleared for ${layerKey}`);
+      }
+    }
+    
+    console.log(`❌ Cache MISS: ${layerKey} - Loading fresh data`);
+    
+    // Load fresh data
+    const data = await loadFunction(...args);
+    
+    // Cache the result
+    cache.set(cacheKey, {
+      data,
+      timestamp: Date.now()
+    });
+    
+    console.log(`💾 Cached fresh data for ${layerKey}`);
+    return data;
+    
+  } catch (error) {
+    console.error(`❌ Error loading ${layerKey}:`, error);
+    updateProgress(layerKey, 0, 0, 'error');
+    throw error;
+  }
+};
+
+/**
+ * WRAPPER function để load data với cache
+ */
+const loadAdministrativeData = async (layerKey) => {
+  console.log(`📥 Loading fresh data for ${layerKey} from laocai_ranhgioihc`);
+  
+  const query = `
+    SELECT 
+      gid,
+      huyen,
+      xa,
+      tieukhu,
+      khoanh,
+      ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001)) as geometry
+    FROM laocai_ranhgioihc
+    WHERE ST_IsValid(geom) AND geom IS NOT NULL
+    ORDER BY gid
+  `;
+
+  const geojson = await streamLargeDatasetWithProgress(layerKey, 'laocai_ranhgioihc', query, 0.00001, 2000);
+  
+  // Chuyển đổi TCVN3 sang Unicode và thêm properties
+  geojson.features = geojson.features.map(feature => ({
+    ...feature,
+    properties: {
+      gid: feature.properties.gid,
+      huyen: convertTcvn3ToUnicode(feature.properties.huyen || ""),
+      xa: convertTcvn3ToUnicode(feature.properties.xa || ""),
+      tieukhu: convertTcvn3ToUnicode(feature.properties.tieukhu || ""),
+      khoanh: convertTcvn3ToUnicode(feature.properties.khoanh || ""),
+      layer_type: 'administrative_boundary',
+      boundary_level: getBoundaryLevel(feature.properties)
+    }
+  }));
+
+  return geojson;
+};
+
+/**
+ * ✅ Lấy dữ liệu lớp ranh giới hành chính - FIXED
  */
 exports.getAdministrativeBoundaries = async (req, res) => {
   const layerKey = 'administrative';
   
   try {
-    console.log(`📥 Loading administrative boundaries from laocai_ranhgioihc`);
-    
-    const query = `
-      SELECT 
-        gid,
-        huyen,
-        xa,
-        tieukhu,
-        khoanh,
-        ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001)) as geometry
-      FROM laocai_ranhgioihc
-      WHERE ST_IsValid(geom) AND geom IS NOT NULL
-    `;
-
-    const geojson = await streamLargeDatasetWithProgress(layerKey, 'laocai_ranhgioihc', query, 0.00001, 2000);
-    
-    // Chuyển đổi TCVN3 sang Unicode và thêm properties
-    geojson.features = geojson.features.map(feature => ({
-      ...feature,
-      properties: {
-        gid: feature.properties.gid,
-        huyen: convertTcvn3ToUnicode(feature.properties.huyen || ""),
-        xa: convertTcvn3ToUnicode(feature.properties.xa || ""),
-        tieukhu: convertTcvn3ToUnicode(feature.properties.tieukhu || ""),
-        khoanh: convertTcvn3ToUnicode(feature.properties.khoanh || ""),
-        layer_type: 'administrative_boundary',
-        boundary_level: getBoundaryLevel(feature.properties)
-      }
-    }));
-
+    const geojson = await loadLayerWithCache(layerKey, loadAdministrativeData, layerKey);
     console.log(`✅ Loaded ${geojson.features.length} administrative boundary features`);
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu ranh giới hành chính:", err);
-    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu ranh giới hành chính" });
+    res.status(500).json({ 
+      error: "Lỗi server khi lấy dữ liệu ranh giới hành chính",
+      details: err.message
+    });
   }
 };
 
 /**
- * ✅ Lấy dữ liệu lớp chủ quản lý rừng
+ * WRAPPER function để load forest management data
+ */
+const loadForestManagementData = async (layerKey) => {
+  console.log(`📥 Loading fresh data for ${layerKey} from laocai_chuquanly`);
+  
+  const query = `
+    SELECT 
+      gid,
+      tt,
+      chuquanly,
+      ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001)) as geometry
+    FROM laocai_chuquanly
+    WHERE ST_IsValid(geom) AND geom IS NOT NULL
+    ORDER BY gid
+  `;
+
+  const geojson = await streamLargeDatasetWithProgress(layerKey, 'laocai_chuquanly', query, 0.00001, 3000);
+
+  // Chuyển đổi TCVN3 sang Unicode
+  geojson.features = geojson.features.map(feature => ({
+    ...feature,
+    properties: {
+      gid: feature.properties.gid,
+      tt: feature.properties.tt,
+      chuquanly: convertTcvn3ToUnicode(feature.properties.chuquanly || ""),
+      layer_type: 'forest_management'
+    }
+  }));
+
+  return geojson;
+};
+
+/**
+ * ✅ Lấy dữ liệu lớp chủ quản lý rừng - FIXED
  */
 exports.getForestManagement = async (req, res) => {
   const layerKey = 'forestManagement';
   
   try {
-    console.log(`📥 Loading forest management data from laocai_chuquanly`);
-    
-    const query = `
-      SELECT 
-        gid,
-        tt,
-        chuquanly,
-        ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001)) as geometry
-      FROM laocai_chuquanly
-      WHERE ST_IsValid(geom) AND geom IS NOT NULL
-    `;
-
-    const geojson = await streamLargeDatasetWithProgress(layerKey, 'laocai_chuquanly', query, 0.00001, 3000);
-
-    // Chuyển đổi TCVN3 sang Unicode
-    geojson.features = geojson.features.map(feature => ({
-      ...feature,
-      properties: {
-        gid: feature.properties.gid,
-        tt: feature.properties.tt,
-        chuquanly: convertTcvn3ToUnicode(feature.properties.chuquanly || ""),
-        layer_type: 'forest_management'
-      }
-    }));
-
+    const geojson = await loadLayerWithCache(layerKey, loadForestManagementData, layerKey);
     console.log(`✅ Loaded ${geojson.features.length} forest management features`);
     res.json(geojson);
   } catch (err) {
@@ -291,84 +352,92 @@ exports.getForestManagement = async (req, res) => {
 };
 
 /**
- * ✅ Lấy dữ liệu lớp nền địa hình
+ * WRAPPER function để load terrain data
+ */
+const loadTerrainData = async (layerKey) => {
+  console.log(`📥 Loading fresh data for ${layerKey} from terrain tables`);
+  
+  // Query cho polygons
+  const polygonQuery = `
+    SELECT 
+      gid,
+      id,
+      ma,
+      ten,
+      'terrain_polygon' as layer_type,
+      ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.0001)) as geometry
+    FROM laocai_nendiahinh
+    WHERE ST_IsValid(geom) AND geom IS NOT NULL
+    ORDER BY gid
+  `;
+
+  // Query cho lines  
+  const lineQuery = `
+    SELECT 
+      gid,
+      id,
+      ma,
+      ten,
+      'terrain_line' as layer_type,
+      ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.0001)) as geometry
+    FROM laocai_nendiahinh_line
+    WHERE ST_IsValid(geom) AND geom IS NOT NULL
+    ORDER BY gid
+  `;
+
+  // Load cả hai loại song song
+  const [polygonData, lineData] = await Promise.all([
+    streamLargeDatasetWithProgress(`${layerKey}_polygon`, 'laocai_nendiahinh', polygonQuery, 0.0001, 2000),
+    streamLargeDatasetWithProgress(`${layerKey}_line`, 'laocai_nendiahinh_line', lineQuery, 0.0001, 2000)
+  ]);
+
+  // Gộp features và convert TCVN3
+  const allFeatures = [
+    ...polygonData.features.map(feature => ({
+      ...feature,
+      properties: {
+        gid: feature.properties.gid,
+        id: feature.properties.id,
+        ma: feature.properties.ma,
+        ten: convertTcvn3ToUnicode(feature.properties.ten || ""),
+        layer_type: 'terrain_polygon',
+        feature_type: getFeatureType(feature.properties.ten)
+      }
+    })),
+    ...lineData.features.map(feature => ({
+      ...feature,
+      properties: {
+        gid: feature.properties.gid,
+        id: feature.properties.id,
+        ma: feature.properties.ma,
+        ten: convertTcvn3ToUnicode(feature.properties.ten || ""),
+        layer_type: 'terrain_line',
+        feature_type: getFeatureType(feature.properties.ten)
+      }
+    }))
+  ];
+
+  return {
+    type: "FeatureCollection",
+    features: allFeatures,
+    metadata: {
+      polygon_count: polygonData.features.length,
+      line_count: lineData.features.length,
+      total_features: allFeatures.length,
+      load_strategy: 'parallel_stream'
+    }
+  };
+};
+
+/**
+ * ✅ Lấy dữ liệu lớp nền địa hình - FIXED
  */
 exports.getTerrainData = async (req, res) => {
   const layerKey = 'terrain';
   
   try {
-    console.log(`📥 Loading terrain data from laocai_nendiahinh and laocai_nendiahinh_line`);
-    
-    // Query cho polygons
-    const polygonQuery = `
-      SELECT 
-        gid,
-        id,
-        ma,
-        ten,
-        'terrain_polygon' as layer_type,
-        ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.0001)) as geometry
-      FROM laocai_nendiahinh
-      WHERE ST_IsValid(geom) AND geom IS NOT NULL
-    `;
-
-    // Query cho lines  
-    const lineQuery = `
-      SELECT 
-        gid,
-        id,
-        ma,
-        ten,
-        'terrain_line' as layer_type,
-        ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.0001)) as geometry
-      FROM laocai_nendiahinh_line
-      WHERE ST_IsValid(geom) AND geom IS NOT NULL
-    `;
-
-    // Load cả hai loại song song
-    const [polygonData, lineData] = await Promise.all([
-      streamLargeDatasetWithProgress(`${layerKey}_polygon`, 'laocai_nendiahinh', polygonQuery, 0.0001, 2000),
-      streamLargeDatasetWithProgress(`${layerKey}_line`, 'laocai_nendiahinh_line', lineQuery, 0.0001, 2000)
-    ]);
-
-    // Gộp features và convert TCVN3
-    const allFeatures = [
-      ...polygonData.features.map(feature => ({
-        ...feature,
-        properties: {
-          gid: feature.properties.gid,
-          id: feature.properties.id,
-          ma: feature.properties.ma,
-          ten: convertTcvn3ToUnicode(feature.properties.ten || ""),
-          layer_type: 'terrain_polygon',
-          feature_type: getFeatureType(feature.properties.ten)
-        }
-      })),
-      ...lineData.features.map(feature => ({
-        ...feature,
-        properties: {
-          gid: feature.properties.gid,
-          id: feature.properties.id,
-          ma: feature.properties.ma,
-          ten: convertTcvn3ToUnicode(feature.properties.ten || ""),
-          layer_type: 'terrain_line',
-          feature_type: getFeatureType(feature.properties.ten)
-        }
-      }))
-    ];
-
-    const geojson = {
-      type: "FeatureCollection",
-      features: allFeatures,
-      metadata: {
-        polygon_count: polygonData.features.length,
-        line_count: lineData.features.length,
-        total_features: allFeatures.length,
-        load_strategy: 'parallel_stream'
-      }
-    };
-    
-    console.log(`✅ Loaded ${geojson.features.length} terrain features (${polygonData.features.length} polygons, ${lineData.features.length} lines)`);
+    const geojson = await loadLayerWithCache(layerKey, loadTerrainData, layerKey);
+    console.log(`✅ Loaded ${geojson.features.length} terrain features`);
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu nền địa hình:", err);
@@ -380,16 +449,15 @@ exports.getTerrainData = async (req, res) => {
 };
 
 /**
- * ✅ Lấy dữ liệu lớp các loại rừng - OPTIMIZED
+ * WRAPPER function để load forest types data
  */
-exports.getForestTypes = async (req, res) => {
-  const layerKey = 'forestTypes';
+const loadForestTypesData = async (layerKey) => {
+  console.log(`📥 Loading fresh data for ${layerKey} from laocai_rg3lr`);
   
+  // Đếm tổng số records trước
+  const client = await pool.connect();
   try {
-    console.log(`📥 Loading forest types data from laocai_rg3lr based on LDLR column - OPTIMIZED`);
-    
-    // Đếm tổng số records trước
-    const countResult = await pool.query(`
+    const countResult = await client.query(`
       SELECT COUNT(*) as total 
       FROM laocai_rg3lr 
       WHERE ST_IsValid(geom) AND geom IS NOT NULL AND ldlr IS NOT NULL AND TRIM(ldlr) != ''
@@ -421,6 +489,7 @@ exports.getForestTypes = async (req, res) => {
         AND geom IS NOT NULL
         AND ldlr IS NOT NULL 
         AND TRIM(ldlr) != ''
+      ORDER BY gid
     `;
 
     console.log(`🚀 Starting optimized streaming with tolerance: ${tolerance}, pageSize: ${pageSize}`);
@@ -474,8 +543,23 @@ exports.getForestTypes = async (req, res) => {
 
     console.log(`📊 Thống kê các loại rừng theo LDLR:`, typeStats);
     console.log(`📊 Thống kê theo nhóm:`, categoryStats);
-    console.log(`✅ Loaded ${geojson.features.length} forest features with ${Object.keys(typeStats).length} different types`);
     
+    return geojson;
+    
+  } finally {
+    client.release();
+  }
+};
+
+/**
+ * ✅ Lấy dữ liệu lớp các loại rừng - FIXED  
+ */
+exports.getForestTypes = async (req, res) => {
+  const layerKey = 'forestTypes';
+  
+  try {
+    const geojson = await loadLayerWithCache(layerKey, loadForestTypesData, layerKey);
+    console.log(`✅ Loaded ${geojson.features.length} forest features with ${geojson.forestTypes?.length || 0} different types`);
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu các loại rừng theo LDLR:", err);
@@ -487,53 +571,114 @@ exports.getForestTypes = async (req, res) => {
 };
 
 /**
- * ✅ Lấy dữ liệu lớp dự báo mất rừng mới nhất
+ * WRAPPER function để load deforestation alerts data
+ */
+const loadDeforestationAlertsData = async (layerKey, days = 365) => {
+  console.log(`📥 Loading fresh data for ${layerKey} from mat_rung`);
+  
+  const query = `
+    SELECT 
+      gid,
+      start_dau,
+      end_sau,
+      area,
+      mahuyen,
+      detection_status,
+      ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001)) as geometry
+    FROM mat_rung
+    WHERE ST_IsValid(geom)
+      AND end_sau::date >= CURRENT_DATE - INTERVAL '${days} days'
+    ORDER BY gid
+  `;
+
+  const geojson = await streamLargeDatasetWithProgress(layerKey, 'mat_rung', query, 0.00001, 2000);
+
+  // Thêm properties cho deforestation alerts
+  geojson.features = geojson.features.map(feature => ({
+    ...feature,
+    properties: {
+      gid: feature.properties.gid,
+      start_dau: feature.properties.start_dau,
+      end_sau: feature.properties.end_sau,
+      area: feature.properties.area,
+      area_ha: Math.round((feature.properties.area / 10000) * 100) / 100,
+      mahuyen: feature.properties.mahuyen,
+      layer_type: 'deforestation_alert',
+      alert_level: getAlertLevel(feature.properties.end_sau),
+      days_since: getDaysSince(feature.properties.end_sau),
+      detection_status: feature.properties.detection_status || 'Chưa xác minh'
+    }
+  }));
+
+  return geojson;
+};
+
+/**
+ * ✅ Lấy dữ liệu lớp dự báo mất rừng mới nhất - FIXED
  */
 exports.getDeforestationAlerts = async (req, res) => {
   const days = parseInt(req.query.days) || 365;
   const layerKey = `deforestationAlerts`;
   
   try {
-    console.log(`📥 Loading deforestation alerts from mat_rung`);
-    
-    const query = `
-      SELECT 
-        gid,
-        start_dau,
-        end_sau,
-        area,
-        mahuyen,
-        detection_status,
-        ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001)) as geometry
-      FROM mat_rung
-      WHERE ST_IsValid(geom)
-        AND end_sau::date >= CURRENT_DATE - INTERVAL '${days} days'
-    `;
-
-    const geojson = await streamLargeDatasetWithProgress(layerKey, 'mat_rung', query, 0.00001, 2000);
-
-    // Thêm properties cho deforestation alerts
-    geojson.features = geojson.features.map(feature => ({
-      ...feature,
-      properties: {
-        gid: feature.properties.gid,
-        start_dau: feature.properties.start_dau,
-        end_sau: feature.properties.end_sau,
-        area: feature.properties.area,
-        area_ha: Math.round((feature.properties.area / 10000) * 100) / 100,
-        mahuyen: feature.properties.mahuyen,
-        layer_type: 'deforestation_alert',
-        alert_level: getAlertLevel(feature.properties.end_sau),
-        days_since: getDaysSince(feature.properties.end_sau),
-        detection_status: feature.properties.detection_status || 'Chưa xác minh'
-      }
-    }));
-
+    const geojson = await loadLayerWithCache(layerKey, loadDeforestationAlertsData, layerKey, days);
     console.log(`✅ Loaded ${geojson.features.length} deforestation alert features from last ${days} days`);
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu dự báo mất rừng:", err);
-    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu dự báo mất rừng" });
+    res.status(500).json({ 
+      error: "Lỗi server khi lấy dữ liệu dự báo mất rừng",
+      details: err.message
+    });
+  }
+};
+
+/**
+ * ✅ Lấy thông tin tổng quan về các lớp dữ liệu
+ */
+exports.getLayerInfo = async (req, res) => {
+  try {
+    const info = {};
+    
+    const tables = [
+      { name: 'laocai_ranhgioihc', key: 'administrative' },
+      { name: 'laocai_chuquanly', key: 'forest_management' },
+      { name: 'laocai_nendiahinh', key: 'terrain' },
+      { name: 'laocai_rg3lr', key: 'forest_types' },
+      { name: 'mat_rung', key: 'deforestation_alerts' }
+    ];
+
+    for (const table of tables) {
+      try {
+        const result = await pool.query(`
+          SELECT COUNT(*) as count,
+                 ST_Extent(geom) as bbox
+          FROM ${table.name} 
+          WHERE ST_IsValid(geom)
+        `);
+        
+        info[table.key] = {
+          table_name: table.name,
+          total_records: parseInt(result.rows[0].count),
+          bbox: result.rows[0].bbox,
+          available: true
+        };
+      } catch (err) {
+        info[table.key] = {
+          table_name: table.name,
+          total_records: 0,
+          bbox: null,
+          available: false,
+          error: err.message
+        };
+      }
+    }
+
+    console.log("📊 Layer data info:", info);
+    res.json(info);
+  } catch (err) {
+    console.error("❌ Lỗi lấy thông tin layers:", err);
+    res.status(500).json({ error: "Lỗi server khi lấy thông tin layers" });
   }
 };
 
@@ -541,6 +686,8 @@ exports.getDeforestationAlerts = async (req, res) => {
  * ✅ Lấy dữ liệu lớp hiện trạng rừng (legacy endpoint)
  */
 exports.getForestStatus = async (req, res) => {
+  const layerKey = 'forestStatus';
+  
   try {
     console.log(`📥 Loading forest status data from tlaocai_tkk_3lr_cru`);
     
@@ -559,9 +706,10 @@ exports.getForestStatus = async (req, res) => {
         ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.0001)) as geometry
       FROM tlaocai_tkk_3lr_cru
       WHERE ST_IsValid(geom) AND geom IS NOT NULL
+      ORDER BY gid
     `;
 
-    const geojson = await streamLargeDatasetWithProgress('forestStatus', 'tlaocai_tkk_3lr_cru', query, 0.0001, 3000);
+    const geojson = await streamLargeDatasetWithProgress(layerKey, 'tlaocai_tkk_3lr_cru', query, 0.0001, 3000);
 
     // Chuyển đổi TCVN3 sang Unicode
     geojson.features = geojson.features.map(feature => ({
@@ -586,7 +734,10 @@ exports.getForestStatus = async (req, res) => {
     res.json(geojson);
   } catch (err) {
     console.error("❌ Lỗi lấy dữ liệu hiện trạng rừng:", err);
-    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu hiện trạng rừng" });
+    res.status(500).json({ 
+      error: "Lỗi server khi lấy dữ liệu hiện trạng rừng",
+      details: err.message
+    });
   }
 };
 
@@ -639,7 +790,7 @@ exports.getServerCacheStatus = async (req, res) => {
     const status = {
       memory_cache_count: cache.size,
       file_cache_count: 0,
-      cached_layers: [],
+      cached_layers: Array.from(cache.keys()).map(key => key.split('_')[0]),
       total_cache_size: 0
     };
     
