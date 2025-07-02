@@ -215,7 +215,7 @@ const CapNhatDuLieu = () => {
                     <span className="ml-2">Đang tải với cache...</span>
                   </>
                 ) : (
-                  <>🚀 Tải TẤT CẢ - 5 lớp (Persistent Cache)</>
+                  <>🚀 Tải TẤT CẢ - 5 lớp </>
                 )}
               </button>
              
