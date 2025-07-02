@@ -1415,9 +1415,7 @@ const Map = () => {
           )}
           {/* Component để xử lý việc bay đến feature được chọn từ bảng */}
           <MapUpdater selectedFeature={selectedRowFeature} />
-          // Thay thế phần hiển thị layers trong Map.jsx (từ dòng ~400 trở đi):
-          // Thêm đoạn debug này vào đầu phần hiển thị layers trong Map.jsx //
-          để kiểm tra tại sao deforestation alerts không hiện
+          
           {layerName ? (
             <WMSTileLayer
               url="http://localhost:8080/geoserver/rung/wms"

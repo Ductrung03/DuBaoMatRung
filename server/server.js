@@ -1,9 +1,12 @@
+// server/server.js - CẬP NHẬT VỚI CSP MIDDLEWARE
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-// Bỏ dòng import open ở đây
 const pool = require("./db/index");
 const cookieParser = require("cookie-parser");
+
+// Import CSP middleware
+const setCspHeaders = require("./middleware/csp.middleware");
 
 const hanhchinhRoutes = require("./routes/hanhchinh.route");
 const shapefileRoutes = require("./routes/shapefile.route");
@@ -18,22 +21,16 @@ const dataRoutes = require("./routes/data.routes");
 const layerDataRoutes = require("./routes/layerData.routes");
 require("dotenv").config();
 
-// Log biến môi trường khi khởi động (chỉ log dạng **, không log thông tin thật)
+// Log biến môi trường khi khởi động
 console.log("🔄 Thông tin môi trường:");
 console.log(`- PGHOST: ${process.env.PGHOST ? "***" : "không có"}`);
 console.log(`- PGPORT: ${process.env.PGPORT ? "***" : "không có"}`);
 console.log(`- PGUSER: ${process.env.PGUSER ? "***" : "không có"}`);
 console.log(`- PGPASSWORD: ${process.env.PGPASSWORD ? "***" : "không có"}`);
 console.log(`- PGDATABASE: ${process.env.PGDATABASE ? "***" : "không có"}`);
-console.log(
-  `- GEOSERVER_USER: ${process.env.GEOSERVER_USER ? "***" : "không có"}`
-);
-console.log(
-  `- GEOSERVER_PASS: ${process.env.GEOSERVER_PASS ? "***" : "không có"}`
-);
-console.log(
-  `- JWT_SECRET: ${process.env.JWT_SECRET ? "***" : "sử dụng secret mặc định"}`
-);
+console.log(`- GEOSERVER_USER: ${process.env.GEOSERVER_USER ? "***" : "không có"}`);
+console.log(`- GEOSERVER_PASS: ${process.env.GEOSERVER_PASS ? "***" : "không có"}`);
+console.log(`- JWT_SECRET: ${process.env.JWT_SECRET ? "***" : "sử dụng secret mặc định"}`);
 
 // Kiểm tra kết nối database ngay khi khởi động
 pool
@@ -55,19 +52,57 @@ const swaggerOptions = require("./swaggerOptions");
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// Middleware - IMPORTANT: CSP phải được áp dụng trước CORS
+// Set CSP headers để cho phép Google Earth Engine iframe
+app.use(setCspHeaders);
+
+// CORS with enhanced options for Google Earth Engine
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000', 
+    'https://dubaomatrung-frontend.onrender.com',
+    // Thêm domains cho Google Earth Engine
+    'https://earthengine.googleapis.com',
+    'https://ee-phathiensommatrung.projects.earthengine.app'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  optionsSuccessStatus: 200
+}));
+
+app.use(express.json({ limit: '50mb' })); // Tăng limit cho large data
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
+
+// Enhanced logging middleware
 app.use((req, res, next) => {
-  console.log(`📝 ${req.method} ${req.url}`);
+  const timestamp = new Date().toISOString();
+  const userAgent = req.get('User-Agent');
+  const referer = req.get('Referer');
+  
+  console.log(`📝 [${timestamp}] ${req.method} ${req.url}`);
+  
+  // Log thêm thông tin cho Google Earth Engine requests
+  if (req.url.includes('earth') || req.url.includes('gee') || req.headers['sec-fetch-dest'] === 'iframe') {
+    console.log(`🌍 Earth Engine related request detected`);
+    console.log(`   User-Agent: ${userAgent ? userAgent.substring(0, 100) + '...' : 'N/A'}`);
+    console.log(`   Referer: ${referer || 'N/A'}`);
+  }
+  
   next();
 });
 
-// Middleware for debugging routes
-app.use((req, res, next) => {
-  console.log(`📝 ${req.method} ${req.url}`);
-  next();
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  res.json({ 
+    status: "OK", 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    env: process.env.NODE_ENV || 'development'
+  });
 });
 
 // Routes
@@ -83,9 +118,13 @@ app.use("/api/quan-ly-du-lieu", quanlydulieu);
 app.use("/api/bao-cao", baocao);
 app.use("/api/layer-data", layerDataRoutes);
 
-// Test route
+// Test routes
 app.get("/api/test", (req, res) => {
-  res.json({ message: "API đang hoạt động!" });
+  res.json({ 
+    message: "API đang hoạt động!",
+    csp_enabled: true,
+    earth_engine_support: true
+  });
 });
 
 app.get("/api/test-db", async (req, res) => {
@@ -109,26 +148,67 @@ app.get("/api/test-db", async (req, res) => {
   }
 });
 
-app.get("/", (req, res) => {
-  res.send("✅ Backend Geo API đang hoạt động");
+// Test Google Earth Engine iframe embedding
+app.get("/api/test-iframe", (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Test Google Earth Engine Iframe</title>
+      <meta charset="utf-8">
+    </head>
+    <body>
+      <h1>Test Google Earth Engine Iframe</h1>
+      <iframe 
+        src="https://ee-phathiensommatrung.projects.earthengine.app/view/phantichmatrung"
+        width="100%"
+        height="600"
+        frameborder="0"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+      ></iframe>
+    </body>
+    </html>
+  `);
 });
 
-// Error handling middleware
+app.get("/", (req, res) => {
+  res.send(`
+    <h1>✅ Backend Geo API đang hoạt động</h1>
+    <p>🌍 Google Earth Engine iframe support enabled</p>
+    <p>🔒 Content Security Policy configured</p>
+    <p>📚 <a href="/api-docs">API Documentation</a></p>
+    <p>🧪 <a href="/api/test-iframe">Test Iframe Embedding</a></p>
+  `);
+});
+
+// Enhanced error handling middleware
 app.use((err, req, res, next) => {
   console.error("🔴 Lỗi server:", err);
-  res.status(500).json({
+  
+  // Log thêm thông tin cho iframe/CSP related errors
+  if (err.message.includes('CSP') || err.message.includes('iframe') || err.message.includes('frame')) {
+    console.error("🖼️ Iframe/CSP related error detected");
+    console.error("Headers:", req.headers);
+  }
+  
+  res.status(err.status || 500).json({
     success: false,
-    message: "Lỗi server",
-    error: err.message,
+    message: process.env.NODE_ENV === 'production' ? "Lỗi server" : err.message,
+    error: process.env.NODE_ENV === 'production' ? {} : err,
+    timestamp: new Date().toISOString()
   });
 });
 
-// 404 middleware
+// Enhanced 404 middleware
 app.use((req, res) => {
-  console.log(`❌ 404 Not Found: ${req.method} ${req.url}`);
+  const timestamp = new Date().toISOString();
+  console.log(`❌ [${timestamp}] 404 Not Found: ${req.method} ${req.url}`);
   res.status(404).json({
     success: false,
     message: "API endpoint không tồn tại",
+    path: req.url,
+    method: req.method,
+    timestamp
   });
 });
 
@@ -139,6 +219,9 @@ const startServer = async () => {
   app.listen(port, async () => {
     console.log(`🚀 Backend chạy tại http://localhost:${port}`);
     console.log(`📚 API Docs tại http://localhost:${port}/api-docs`);
+    console.log(`🧪 Test Iframe tại http://localhost:${port}/api/test-iframe`);
+    console.log(`🌍 Google Earth Engine iframe support: ENABLED`);
+    console.log(`🔒 Content Security Policy: CONFIGURED`);
     
     // Không chạy open() trên môi trường production
     if (process.env.NODE_ENV !== 'production') {

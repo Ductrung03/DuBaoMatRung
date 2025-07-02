@@ -1,21 +1,165 @@
-// server/controllers/layerData.controller.js - PHIÊN BẢN TỐI ƯU
+// server/controllers/layerData.controller.js - FIXED VERSION
 const pool = require("../db");
 const convertTcvn3ToUnicode = require("../utils/convertTcvn3ToUnicode");
 
 /**
- * Cache để lưu trữ kết quả
+ * Memory cache (giữ nguyên để backward compatibility)
  */
 const cache = new Map();
 const CACHE_TTL = 10 * 60 * 1000; // 10 phút
 
 /**
- * Lấy thông tin tổng quan về các lớp dữ liệu
+ * Progress tracking cho real-time updates
+ */
+const progressTracking = new Map();
+
+/**
+ * ✅ API để lấy progress real-time - FUNCTION BỊ THIẾU
+ */
+exports.getProgress = async (req, res) => {
+  try {
+    const { layer } = req.params;
+    const progress = progressTracking.get(layer) || { 
+      current: 0, 
+      total: 0, 
+      percentage: 0, 
+      stage: 'idle',
+      timestamp: Date.now()
+    };
+    
+    console.log(`📊 Progress request for ${layer}:`, progress);
+    res.json(progress);
+  } catch (error) {
+    console.error(`❌ Error getting progress for ${layer}:`, error);
+    res.status(500).json({ 
+      error: "Error getting progress",
+      details: error.message 
+    });
+  }
+};
+
+/**
+ * Hàm helper để cập nhật progress
+ */
+const updateProgress = (layerKey, current, total, stage = 'loading') => {
+  const progress = {
+    current,
+    total,
+    percentage: total > 0 ? Math.round((current / total) * 100) : 0,
+    stage,
+    timestamp: Date.now()
+  };
+  progressTracking.set(layerKey, progress);
+  console.log(`📊 Progress ${layerKey}: ${current}/${total} (${progress.percentage}%)`);
+};
+
+/**
+ * Hàm streaming với progress tracking
+ */
+const streamLargeDatasetWithProgress = async (layerKey, tableName, query, simplifyTolerance = 0.00001, pageSize = 5000) => {
+  const client = await pool.connect();
+  
+  try {
+    // Initialize progress
+    updateProgress(layerKey, 0, 0, 'initializing');
+    
+    // Get total count first
+    const countQuery = `SELECT COUNT(*) as total FROM (${query.replace(/SELECT.*?FROM/, 'SELECT 1 FROM').replace(/ORDER BY.*$/, '')}) as count_query`;
+    const countResult = await client.query(countQuery);
+    const totalRecords = parseInt(countResult.rows[0].total);
+    
+    updateProgress(layerKey, 0, totalRecords, 'counting');
+    
+    console.log(`🔄 Starting streaming for ${layerKey}: ${totalRecords} total records`);
+    
+    await client.query('BEGIN');
+    await client.query('SET work_mem = "256MB"');
+    await client.query('COMMIT');
+    
+    const allFeatures = [];
+    let offset = 0;
+    let hasMore = true;
+    let totalLoaded = 0;
+    
+    while (hasMore) {
+      const startTime = Date.now();
+      
+      // Update progress
+      updateProgress(layerKey, totalLoaded, totalRecords, 'streaming');
+      
+      const paginatedQuery = query.replace(/ORDER BY.*?;?\s*$/, '') + 
+        ` ORDER BY gid LIMIT ${pageSize} OFFSET ${offset}`;
+      
+      const result = await client.query(paginatedQuery);
+      const loadTime = Date.now() - startTime;
+      
+      if (result.rows.length === 0) {
+        hasMore = false;
+        break;
+      }
+      
+      // Process features
+      for (const row of result.rows) {
+        try {
+          const feature = {
+            type: "Feature",
+            geometry: JSON.parse(row.geometry),
+            properties: { ...row }
+          };
+          delete feature.properties.geometry;
+          allFeatures.push(feature);
+        } catch (err) {
+          console.warn(`⚠️ Skipping invalid geometry for gid: ${row.gid}`);
+        }
+      }
+      
+      totalLoaded += result.rows.length;
+      console.log(`✅ Loaded ${result.rows.length} records in ${loadTime}ms (Total: ${totalLoaded}/${totalRecords})`);
+      
+      // Update progress
+      updateProgress(layerKey, totalLoaded, totalRecords, 'processing');
+      
+      offset += pageSize;
+      
+      if (result.rows.length < pageSize) {
+        hasMore = false;
+      }
+      
+      if (offset > 1000000) {
+        console.warn(`⚠️ Safety limit reached`);
+        hasMore = false;
+      }
+    }
+    
+    // Final progress update
+    updateProgress(layerKey, totalLoaded, totalRecords, 'completed');
+    
+    console.log(`🎉 Completed streaming ${totalLoaded} features for ${layerKey}`);
+    
+    return {
+      type: "FeatureCollection",
+      features: allFeatures,
+      metadata: {
+        total_features: totalLoaded,
+        load_strategy: 'stream_with_progress',
+        page_size: pageSize,
+        build_time: Date.now() - (progressTracking.get(layerKey)?.timestamp || Date.now()),
+        cache_saved: false
+      }
+    };
+    
+  } finally {
+    client.release();
+  }
+};
+
+/**
+ * ✅ Lấy thông tin tổng quan về các lớp dữ liệu
  */
 exports.getLayerInfo = async (req, res) => {
   try {
     const info = {};
     
-    // Kiểm tra và đếm records của từng bảng thực tế
     const tables = [
       { name: 'laocai_ranhgioihc', key: 'administrative' },
       { name: 'laocai_chuquanly', key: 'forest_management' },
@@ -59,124 +203,13 @@ exports.getLayerInfo = async (req, res) => {
 };
 
 /**
- * Hàm helper để xử lý pagination và streaming
- */
-const streamLargeDataset = async (tableName, query, simplifyTolerance = 0.00001, pageSize = 5000) => {
-  const client = await pool.connect();
-  
-  try {
-    // Bật autocommit để tránh long-running transactions
-    await client.query('BEGIN');
-    await client.query('SET work_mem = "256MB"'); // Tăng memory cho query
-    await client.query('COMMIT');
-    
-    const allFeatures = [];
-    let offset = 0;
-    let hasMore = true;
-    let totalLoaded = 0;
-    
-    console.log(`🔄 Bắt đầu stream data từ ${tableName} với page size ${pageSize}`);
-    
-    while (hasMore) {
-      const startTime = Date.now();
-      
-      // Modify query để có LIMIT và OFFSET
-      const paginatedQuery = query.replace(/ORDER BY.*?;?\s*$/, '') + 
-        ` ORDER BY gid LIMIT ${pageSize} OFFSET ${offset}`;
-      
-      console.log(`📄 Loading page ${Math.floor(offset/pageSize) + 1}, offset: ${offset}`);
-      
-      const result = await client.query(paginatedQuery);
-      const loadTime = Date.now() - startTime;
-      
-      if (result.rows.length === 0) {
-        hasMore = false;
-        break;
-      }
-      
-      // Process từng row thay vì dùng json_agg()
-      for (const row of result.rows) {
-        try {
-          const feature = {
-            type: "Feature",
-            geometry: JSON.parse(row.geometry),
-            properties: { ...row }
-          };
-          delete feature.properties.geometry; // Remove geometry from properties
-          allFeatures.push(feature);
-        } catch (err) {
-          console.warn(`⚠️ Skipping invalid geometry for gid: ${row.gid}`);
-        }
-      }
-      
-      totalLoaded += result.rows.length;
-      console.log(`✅ Loaded ${result.rows.length} records in ${loadTime}ms (Total: ${totalLoaded})`);
-      
-      // Kiểm tra memory usage
-      const memUsage = process.memoryUsage();
-      console.log(`💾 Memory: ${Math.round(memUsage.heapUsed / 1024 / 1024)}MB`);
-      
-      offset += pageSize;
-      
-      // Dừng nếu ít hơn pageSize (page cuối)
-      if (result.rows.length < pageSize) {
-        hasMore = false;
-      }
-      
-      // Safety break để tránh infinite loop
-      if (offset > 1000000) { // Max 1M records
-        console.warn(`⚠️ Reached safety limit at ${offset} records`);
-        hasMore = false;
-      }
-    }
-    
-    console.log(`🎉 Completed streaming ${totalLoaded} features from ${tableName}`);
-    
-    return {
-      type: "FeatureCollection",
-      features: allFeatures,
-      metadata: {
-        total_features: totalLoaded,
-        load_strategy: 'stream_pagination',
-        page_size: pageSize
-      }
-    };
-    
-  } finally {
-    client.release();
-  }
-};
-
-/**
- * Lấy dữ liệu lớp ranh giới hành chính - TỐI ƯU
+ * ✅ Lấy dữ liệu lớp ranh giới hành chính
  */
 exports.getAdministrativeBoundaries = async (req, res) => {
+  const layerKey = 'administrative';
+  
   try {
-    const cacheKey = 'administrative_boundaries';
-    
-    // Kiểm tra cache
-    if (cache.has(cacheKey)) {
-      const cached = cache.get(cacheKey);
-      if (Date.now() - cached.timestamp < CACHE_TTL) {
-        console.log(`📋 Cache HIT for ${cacheKey}`);
-        return res.json(cached.data);
-      }
-    }
-    
     console.log(`📥 Loading administrative boundaries from laocai_ranhgioihc`);
-    
-    // Đếm tổng số records trước
-    const countResult = await pool.query(`
-      SELECT COUNT(*) as total 
-      FROM laocai_ranhgioihc 
-      WHERE ST_IsValid(geom) AND geom IS NOT NULL
-    `);
-    
-    const totalRecords = parseInt(countResult.rows[0].total);
-    console.log(`📊 Total administrative boundaries: ${totalRecords}`);
-    
-    // Sử dụng tolerance cao hơn để giảm dung lượng
-    const tolerance = totalRecords > 10000 ? 0.0001 : 0.00001;
     
     const query = `
       SELECT 
@@ -185,12 +218,12 @@ exports.getAdministrativeBoundaries = async (req, res) => {
         xa,
         tieukhu,
         khoanh,
-        ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, ${tolerance})) as geometry
+        ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001)) as geometry
       FROM laocai_ranhgioihc
       WHERE ST_IsValid(geom) AND geom IS NOT NULL
     `;
 
-    const geojson = await streamLargeDataset('laocai_ranhgioihc', query, tolerance, 2000);
+    const geojson = await streamLargeDatasetWithProgress(layerKey, 'laocai_ranhgioihc', query, 0.00001, 2000);
     
     // Chuyển đổi TCVN3 sang Unicode và thêm properties
     geojson.features = geojson.features.map(feature => ({
@@ -206,12 +239,6 @@ exports.getAdministrativeBoundaries = async (req, res) => {
       }
     }));
 
-    // Cache kết quả
-    cache.set(cacheKey, {
-      data: geojson,
-      timestamp: Date.now()
-    });
-
     console.log(`✅ Loaded ${geojson.features.length} administrative boundary features`);
     res.json(geojson);
   } catch (err) {
@@ -220,31 +247,13 @@ exports.getAdministrativeBoundaries = async (req, res) => {
   }
 };
 
-// Helper function
-function getBoundaryLevel(props) {
-  if (props.khoanh && props.khoanh.trim() !== '') return 'khoanh';
-  if (props.tieukhu && props.tieukhu.trim() !== '') return 'tieukhu';
-  if (props.xa && props.xa.trim() !== '') return 'xa';
-  if (props.huyen && props.huyen.trim() !== '') return 'huyen';
-  return 'unknown';
-}
-
 /**
- * Lấy dữ liệu lớp chủ quản lý rừng - TỐI ƯU
+ * ✅ Lấy dữ liệu lớp chủ quản lý rừng
  */
 exports.getForestManagement = async (req, res) => {
+  const layerKey = 'forestManagement';
+  
   try {
-    const cacheKey = 'forest_management';
-    
-    // Kiểm tra cache
-    if (cache.has(cacheKey)) {
-      const cached = cache.get(cacheKey);
-      if (Date.now() - cached.timestamp < CACHE_TTL) {
-        console.log(`📋 Cache HIT for ${cacheKey}`);
-        return res.json(cached.data);
-      }
-    }
-    
     console.log(`📥 Loading forest management data from laocai_chuquanly`);
     
     const query = `
@@ -257,7 +266,7 @@ exports.getForestManagement = async (req, res) => {
       WHERE ST_IsValid(geom) AND geom IS NOT NULL
     `;
 
-    const geojson = await streamLargeDataset('laocai_chuquanly', query, 0.00001, 3000);
+    const geojson = await streamLargeDatasetWithProgress(layerKey, 'laocai_chuquanly', query, 0.00001, 3000);
 
     // Chuyển đổi TCVN3 sang Unicode
     geojson.features = geojson.features.map(feature => ({
@@ -269,12 +278,6 @@ exports.getForestManagement = async (req, res) => {
         layer_type: 'forest_management'
       }
     }));
-
-    // Cache kết quả
-    cache.set(cacheKey, {
-      data: geojson,
-      timestamp: Date.now()
-    });
 
     console.log(`✅ Loaded ${geojson.features.length} forest management features`);
     res.json(geojson);
@@ -288,21 +291,12 @@ exports.getForestManagement = async (req, res) => {
 };
 
 /**
- * Lấy dữ liệu lớp nền địa hình - TỐI ƯU
+ * ✅ Lấy dữ liệu lớp nền địa hình
  */
 exports.getTerrainData = async (req, res) => {
+  const layerKey = 'terrain';
+  
   try {
-    const cacheKey = 'terrain_data';
-    
-    // Kiểm tra cache
-    if (cache.has(cacheKey)) {
-      const cached = cache.get(cacheKey);
-      if (Date.now() - cached.timestamp < CACHE_TTL) {
-        console.log(`📋 Cache HIT for ${cacheKey}`);
-        return res.json(cached.data);
-      }
-    }
-    
     console.log(`📥 Loading terrain data from laocai_nendiahinh and laocai_nendiahinh_line`);
     
     // Query cho polygons
@@ -333,8 +327,8 @@ exports.getTerrainData = async (req, res) => {
 
     // Load cả hai loại song song
     const [polygonData, lineData] = await Promise.all([
-      streamLargeDataset('laocai_nendiahinh', polygonQuery, 0.0001, 2000),
-      streamLargeDataset('laocai_nendiahinh_line', lineQuery, 0.0001, 2000)
+      streamLargeDatasetWithProgress(`${layerKey}_polygon`, 'laocai_nendiahinh', polygonQuery, 0.0001, 2000),
+      streamLargeDatasetWithProgress(`${layerKey}_line`, 'laocai_nendiahinh_line', lineQuery, 0.0001, 2000)
     ]);
 
     // Gộp features và convert TCVN3
@@ -373,12 +367,6 @@ exports.getTerrainData = async (req, res) => {
         load_strategy: 'parallel_stream'
       }
     };
-
-    // Cache kết quả
-    cache.set(cacheKey, {
-      data: geojson,
-      timestamp: Date.now()
-    });
     
     console.log(`✅ Loaded ${geojson.features.length} terrain features (${polygonData.features.length} polygons, ${lineData.features.length} lines)`);
     res.json(geojson);
@@ -391,41 +379,13 @@ exports.getTerrainData = async (req, res) => {
   }
 };
 
-// Helper function để xác định loại feature
-function getFeatureType(ten) {
-  if (!ten) return 'terrain';
-  
-  const tenLower = ten.toLowerCase();
-  
-  if (tenLower.includes('sông') || tenLower.includes('suối') || tenLower.includes('kênh')) {
-    return 'waterway';
-  }
-  if (tenLower.includes('thủy') || tenLower.includes('cảng')) {
-    return 'water_transport';
-  }
-  if (tenLower.includes('đường') || tenLower.includes('quốc lộ') || tenLower.includes('tỉnh lộ')) {
-    return 'road';
-  }
-  
-  return 'terrain';
-}
-
 /**
- * Lấy dữ liệu lớp các loại rừng - TỐI ƯU MẠNH
+ * ✅ Lấy dữ liệu lớp các loại rừng - OPTIMIZED
  */
 exports.getForestTypes = async (req, res) => {
+  const layerKey = 'forestTypes';
+  
   try {
-    const cacheKey = 'forest_types';
-    
-    // Kiểm tra cache
-    if (cache.has(cacheKey)) {
-      const cached = cache.get(cacheKey);
-      if (Date.now() - cached.timestamp < CACHE_TTL) {
-        console.log(`📋 Cache HIT for ${cacheKey}`);
-        return res.json(cached.data);
-      }
-    }
-    
     console.log(`📥 Loading forest types data from laocai_rg3lr based on LDLR column - OPTIMIZED`);
     
     // Đếm tổng số records trước
@@ -439,8 +399,8 @@ exports.getForestTypes = async (req, res) => {
     console.log(`📊 Total forest type records: ${totalRecords}`);
 
     // Với dataset lớn, tăng tolerance và giảm detail
-    const tolerance = totalRecords > 100000 ? 0.001 : 0.0001; // Tolerance cao hơn cho dataset lớn
-    const pageSize = 3000; // Page size nhỏ hơn để tránh timeout
+    const tolerance = totalRecords > 100000 ? 0.001 : 0.0001;
+    const pageSize = 3000;
 
     const query = `
       SELECT 
@@ -465,7 +425,7 @@ exports.getForestTypes = async (req, res) => {
 
     console.log(`🚀 Starting optimized streaming with tolerance: ${tolerance}, pageSize: ${pageSize}`);
     
-    const geojson = await streamLargeDataset('laocai_rg3lr', query, tolerance, pageSize);
+    const geojson = await streamLargeDatasetWithProgress(layerKey, 'laocai_rg3lr', query, tolerance, pageSize);
 
     // Chuyển đổi TCVN3 và thêm metadata
     geojson.features = geojson.features.map(feature => ({
@@ -512,12 +472,6 @@ exports.getForestTypes = async (req, res) => {
       count: categoryStats[category]
     })).sort((a, b) => b.count - a.count);
 
-    // Cache kết quả
-    cache.set(cacheKey, {
-      data: geojson,
-      timestamp: Date.now()
-    });
-
     console.log(`📊 Thống kê các loại rừng theo LDLR:`, typeStats);
     console.log(`📊 Thống kê theo nhóm:`, categoryStats);
     console.log(`✅ Loaded ${geojson.features.length} forest features with ${Object.keys(typeStats).length} different types`);
@@ -532,7 +486,229 @@ exports.getForestTypes = async (req, res) => {
   }
 };
 
-// Helper functions for forest types
+/**
+ * ✅ Lấy dữ liệu lớp dự báo mất rừng mới nhất
+ */
+exports.getDeforestationAlerts = async (req, res) => {
+  const days = parseInt(req.query.days) || 365;
+  const layerKey = `deforestationAlerts`;
+  
+  try {
+    console.log(`📥 Loading deforestation alerts from mat_rung`);
+    
+    const query = `
+      SELECT 
+        gid,
+        start_dau,
+        end_sau,
+        area,
+        mahuyen,
+        detection_status,
+        ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001)) as geometry
+      FROM mat_rung
+      WHERE ST_IsValid(geom)
+        AND end_sau::date >= CURRENT_DATE - INTERVAL '${days} days'
+    `;
+
+    const geojson = await streamLargeDatasetWithProgress(layerKey, 'mat_rung', query, 0.00001, 2000);
+
+    // Thêm properties cho deforestation alerts
+    geojson.features = geojson.features.map(feature => ({
+      ...feature,
+      properties: {
+        gid: feature.properties.gid,
+        start_dau: feature.properties.start_dau,
+        end_sau: feature.properties.end_sau,
+        area: feature.properties.area,
+        area_ha: Math.round((feature.properties.area / 10000) * 100) / 100,
+        mahuyen: feature.properties.mahuyen,
+        layer_type: 'deforestation_alert',
+        alert_level: getAlertLevel(feature.properties.end_sau),
+        days_since: getDaysSince(feature.properties.end_sau),
+        detection_status: feature.properties.detection_status || 'Chưa xác minh'
+      }
+    }));
+
+    console.log(`✅ Loaded ${geojson.features.length} deforestation alert features from last ${days} days`);
+    res.json(geojson);
+  } catch (err) {
+    console.error("❌ Lỗi lấy dữ liệu dự báo mất rừng:", err);
+    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu dự báo mất rừng" });
+  }
+};
+
+/**
+ * ✅ Lấy dữ liệu lớp hiện trạng rừng (legacy endpoint)
+ */
+exports.getForestStatus = async (req, res) => {
+  try {
+    console.log(`📥 Loading forest status data from tlaocai_tkk_3lr_cru`);
+    
+    const query = `
+      SELECT 
+        gid,
+        huyen,
+        xa,
+        tk,
+        khoanh,
+        lo,
+        thuad,
+        dtich,
+        ldlr,
+        churung,
+        ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.0001)) as geometry
+      FROM tlaocai_tkk_3lr_cru
+      WHERE ST_IsValid(geom) AND geom IS NOT NULL
+    `;
+
+    const geojson = await streamLargeDatasetWithProgress('forestStatus', 'tlaocai_tkk_3lr_cru', query, 0.0001, 3000);
+
+    // Chuyển đổi TCVN3 sang Unicode
+    geojson.features = geojson.features.map(feature => ({
+      ...feature,
+      properties: {
+        gid: feature.properties.gid,
+        huyen: convertTcvn3ToUnicode(feature.properties.huyen || ""),
+        xa: convertTcvn3ToUnicode(feature.properties.xa || ""),
+        tk: feature.properties.tk,
+        khoanh: feature.properties.khoanh,
+        lo: feature.properties.lo,
+        thuad: feature.properties.thuad,
+        dtich: feature.properties.dtich,
+        ldlr: convertTcvn3ToUnicode(feature.properties.ldlr || ""),
+        churung: convertTcvn3ToUnicode(feature.properties.churung || ""),
+        layer_type: 'current_forest_status',
+        area_ha: Math.round((feature.properties.dtich || 0) * 100) / 100
+      }
+    }));
+
+    console.log(`✅ Loaded ${geojson.features.length} forest status features`);
+    res.json(geojson);
+  } catch (err) {
+    console.error("❌ Lỗi lấy dữ liệu hiện trạng rừng:", err);
+    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu hiện trạng rừng" });
+  }
+};
+
+/**
+ * ✅ API để clear cache (memory only - giữ cho backward compatibility)
+ */
+exports.clearCache = async (req, res) => {
+  try {
+    cache.clear();
+    progressTracking.clear();
+    console.log("🗑️ Cache cleared");
+    res.json({ success: true, message: "Cache đã được xóa" });
+  } catch (err) {
+    res.status(500).json({ error: "Lỗi khi xóa cache" });
+  }
+};
+
+/**
+ * ✅ API để xem cache status (memory only)
+ */
+exports.getCacheStatus = async (req, res) => {
+  try {
+    const cacheInfo = [];
+    for (const [key, value] of cache.entries()) {
+      cacheInfo.push({
+        key,
+        size: JSON.stringify(value.data).length,
+        age: Date.now() - value.timestamp,
+        expires_in: CACHE_TTL - (Date.now() - value.timestamp)
+      });
+    }
+    
+    res.json({
+      cache_count: cache.size,
+      cache_ttl: CACHE_TTL,
+      cache_entries: cacheInfo,
+      progress_tracking: Object.fromEntries(progressTracking)
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Lỗi khi lấy thông tin cache" });
+  }
+};
+
+/**
+ * ✅ MOCK Server cache management APIs (để tránh lỗi routes)
+ */
+exports.getServerCacheStatus = async (req, res) => {
+  try {
+    // Mock response - có thể implement persistent cache sau
+    const status = {
+      memory_cache_count: cache.size,
+      file_cache_count: 0,
+      cached_layers: [],
+      total_cache_size: 0
+    };
+    
+    console.log("📊 Server cache status (mock):", status);
+    res.json(status);
+  } catch (err) {
+    console.error("❌ Error getting server cache status:", err);
+    res.status(500).json({ error: "Error getting server cache status" });
+  }
+};
+
+exports.clearServerCache = async (req, res) => {
+  try {
+    // Mock implementation - clear memory cache
+    cache.clear();
+    progressTracking.clear();
+    
+    console.log("🗑️ Server cache cleared (mock)");
+    res.json({ success: true, message: "Server cache cleared" });
+  } catch (err) {
+    console.error("❌ Error clearing server cache:", err);
+    res.status(500).json({ error: "Error clearing server cache" });
+  }
+};
+
+exports.rebuildServerCache = async (req, res) => {
+  try {
+    // Mock implementation  
+    cache.clear();
+    progressTracking.clear();
+    
+    console.log("🔄 Server cache rebuild initiated (mock)");
+    res.json({ success: true, message: "Server cache rebuild initiated" });
+  } catch (err) {
+    console.error("❌ Error rebuilding server cache:", err);
+    res.status(500).json({ error: "Error rebuilding server cache" });
+  }
+};
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+function getBoundaryLevel(props) {
+  if (props.khoanh && props.khoanh.trim() !== '') return 'khoanh';
+  if (props.tieukhu && props.tieukhu.trim() !== '') return 'tieukhu';
+  if (props.xa && props.xa.trim() !== '') return 'xa';
+  if (props.huyen && props.huyen.trim() !== '') return 'huyen';
+  return 'unknown';
+}
+
+function getFeatureType(ten) {
+  if (!ten) return 'terrain';
+  
+  const tenLower = ten.toLowerCase();
+  
+  if (tenLower.includes('sông') || tenLower.includes('suối') || tenLower.includes('kênh')) {
+    return 'waterway';
+  }
+  if (tenLower.includes('thủy') || tenLower.includes('cảng')) {
+    return 'water_transport';
+  }
+  if (tenLower.includes('đường') || tenLower.includes('quốc lộ') || tenLower.includes('tỉnh lộ')) {
+    return 'road';
+  }
+  
+  return 'terrain';
+}
+
 function getForestFunction(ldlr) {
   if (!ldlr) return 'Không xác định';
   
@@ -574,74 +750,6 @@ function getLdlrCategory(ldlr) {
   return 'Khác';
 }
 
-/**
- * Lấy dữ liệu lớp dự báo mất rừng mới nhất - TỐI ƯU
- */
-exports.getDeforestationAlerts = async (req, res) => {
-  try {
-    const cacheKey = `deforestation_alerts_${req.query.days || 365}`;
-    
-    // Kiểm tra cache
-    if (cache.has(cacheKey)) {
-      const cached = cache.get(cacheKey);
-      if (Date.now() - cached.timestamp < CACHE_TTL) {
-        console.log(`📋 Cache HIT for ${cacheKey}`);
-        return res.json(cached.data);
-      }
-    }
-    
-    console.log(`📥 Loading deforestation alerts from mat_rung`);
-    
-    const days = parseInt(req.query.days) || 365;
-    
-    const query = `
-      SELECT 
-        gid,
-        start_dau,
-        end_sau,
-        area,
-        mahuyen,
-        detection_status,
-        ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.00001)) as geometry
-      FROM mat_rung
-      WHERE ST_IsValid(geom)
-        AND end_sau::date >= CURRENT_DATE - INTERVAL '${days} days'
-    `;
-
-    const geojson = await streamLargeDataset('mat_rung', query, 0.00001, 2000);
-
-    // Thêm properties cho deforestation alerts
-    geojson.features = geojson.features.map(feature => ({
-      ...feature,
-      properties: {
-        gid: feature.properties.gid,
-        start_dau: feature.properties.start_dau,
-        end_sau: feature.properties.end_sau,
-        area: feature.properties.area,
-        area_ha: Math.round((feature.properties.area / 10000) * 100) / 100,
-        mahuyen: feature.properties.mahuyen,
-        layer_type: 'deforestation_alert',
-        alert_level: getAlertLevel(feature.properties.end_sau),
-        days_since: getDaysSince(feature.properties.end_sau),
-        detection_status: feature.properties.detection_status || 'Chưa xác minh'
-      }
-    }));
-
-    // Cache kết quả
-    cache.set(cacheKey, {
-      data: geojson,
-      timestamp: Date.now()
-    });
-
-    console.log(`✅ Loaded ${geojson.features.length} deforestation alert features from last ${days} days`);
-    res.json(geojson);
-  } catch (err) {
-    console.error("❌ Lỗi lấy dữ liệu dự báo mất rừng:", err);
-    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu dự báo mất rừng" });
-  }
-};
-
-// Helper functions for deforestation alerts
 function getAlertLevel(endDate) {
   const daysSince = getDaysSince(endDate);
   if (daysSince <= 7) return 'critical';
@@ -655,94 +763,3 @@ function getDaysSince(endDate) {
   const end = new Date(endDate);
   return Math.floor((today - end) / (1000 * 60 * 60 * 24));
 }
-
-/**
- * API để clear cache
- */
-exports.clearCache = async (req, res) => {
-  try {
-    cache.clear();
-    console.log("🗑️ Cache cleared");
-    res.json({ success: true, message: "Cache đã được xóa" });
-  } catch (err) {
-    res.status(500).json({ error: "Lỗi khi xóa cache" });
-  }
-};
-
-/**
- * API để xem cache status
- */
-exports.getCacheStatus = async (req, res) => {
-  try {
-    const cacheInfo = [];
-    for (const [key, value] of cache.entries()) {
-      cacheInfo.push({
-        key,
-        size: JSON.stringify(value.data).length,
-        age: Date.now() - value.timestamp,
-        expires_in: CACHE_TTL - (Date.now() - value.timestamp)
-      });
-    }
-    
-    res.json({
-      cache_count: cache.size,
-      cache_ttl: CACHE_TTL,
-      cache_entries: cacheInfo
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Lỗi khi lấy thông tin cache" });
-  }
-};
-
-/**
- * Lấy dữ liệu lớp hiện trạng rừng (giữ nguyên endpoint cũ)
- */
-exports.getForestStatus = async (req, res) => {
-  try {
-    console.log(`📥 Loading forest status data from tlaocai_tkk_3lr_cru`);
-    
-    const query = `
-      SELECT 
-        gid,
-        huyen,
-        xa,
-        tk,
-        khoanh,
-        lo,
-        thuad,
-        dtich,
-        ldlr,
-        churung,
-        ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, 0.0001)) as geometry
-      FROM tlaocai_tkk_3lr_cru
-      WHERE ST_IsValid(geom) AND geom IS NOT NULL
-    `;
-
-    const geojson = await streamLargeDataset('tlaocai_tkk_3lr_cru', query, 0.0001, 3000);
-
-    // Chuyển đổi TCVN3 sang Unicode
-    geojson.features = geojson.features.map(feature => ({
-      ...feature,
-      properties: {
-        gid: feature.properties.gid,
-        huyen: convertTcvn3ToUnicode(feature.properties.huyen || ""),
-        xa: convertTcvn3ToUnicode(feature.properties.xa || ""),
-        tk: feature.properties.tk,
-        khoanh: feature.properties.khoanh,
-        lo: feature.properties.lo,
-        thuad: feature.properties.thuad,
-        dtich: feature.properties.dtich,
-        ldlr: convertTcvn3ToUnicode(feature.properties.ldlr || ""),
-        churung: convertTcvn3ToUnicode(feature.properties.churung || ""),
-        layer_type: 'current_forest_status',
-        area_ha: Math.round((feature.properties.dtich || 0) * 100) / 100
-      }
-    }));
-
-    console.log(`✅ Loaded ${geojson.features.length} forest status features`);
-    res.json(geojson);
-  } catch (err) {
-    console.error("❌ Lỗi lấy dữ liệu hiện trạng rừng:", err);
-    res.status(500).json({ error: "Lỗi server khi lấy dữ liệu hiện trạng rừng" });
-  }
-};
