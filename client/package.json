@@ -36,6 +36,8 @@
     "react-spinners-components": "^2.0.4",
     "react-to-print": "^3.1.0",
     "react-toastify": "^11.0.5",
+    "react-window": "^1.8.11",
+    "react-window-infinite-loader": "^1.0.10",
     "recharts": "^2.15.2"
   },
   "devDependencies": {

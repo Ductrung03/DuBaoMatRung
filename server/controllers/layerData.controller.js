@@ -6,7 +6,7 @@ const convertTcvn3ToUnicode = require("../utils/convertTcvn3ToUnicode");
  * Memory cache (giữ nguyên để backward compatibility)
  */
 const cache = new Map();
-const CACHE_TTL = 10 * 60 * 1000; // 10 phút
+
 
 /**
  * Progress tracking cho real-time updates
@@ -209,19 +209,8 @@ const loadLayerWithCache = async (layerKey, loadFunction, ...args) => {
     
     // Check memory cache first
     const cacheKey = `${layerKey}_${JSON.stringify(args)}`;
-    if (cache.has(cacheKey)) {
-      const cached = cache.get(cacheKey);
-      if (Date.now() - cached.timestamp < CACHE_TTL) {
-        console.log(`⚡ Memory cache HIT for ${layerKey}`);
-        updateProgress(layerKey, cached.data.features?.length || 0, cached.data.features?.length || 0, 'cache_loaded');
-        return cached.data;
-      } else {
-        cache.delete(cacheKey);
-        console.log(`🗑️ Expired cache cleared for ${layerKey}`);
-      }
-    }
     
-    console.log(`❌ Cache MISS: ${layerKey} - Loading fresh data`);
+   
     
     // Load fresh data
     const data = await loadFunction(...args);
@@ -766,13 +755,14 @@ exports.getCacheStatus = async (req, res) => {
         key,
         size: JSON.stringify(value.data).length,
         age: Date.now() - value.timestamp,
-        expires_in: CACHE_TTL - (Date.now() - value.timestamp)
+        
+        
       });
     }
     
     res.json({
       cache_count: cache.size,
-      cache_ttl: CACHE_TTL,
+      
       cache_entries: cacheInfo,
       progress_tracking: Object.fromEntries(progressTracking)
     });
