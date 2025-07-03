@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -13,6 +13,7 @@ import { FaFileWord, FaFilePdf, FaDownload, FaEye } from "react-icons/fa";
 import { ClipLoader } from 'react-spinners';
 import config from "../../config";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 // Hiển thị overlay loading khi đang xử lý báo cáo
 const ReportLoadingOverlay = ({ message }) => (
@@ -29,26 +30,50 @@ const ThongKeBaoCaoMatRung = () => {
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Đang tạo báo cáo...");
+  const location = useLocation();
+
+  // ✅ Lấy thông tin từ URL params
+  const [reportParams, setReportParams] = useState({
+    fromDate: '',
+    toDate: '',
+    huyen: '',
+    xa: ''
+  });
+
+  useEffect(() => {
+    // Lấy params từ URL
+    const urlParams = new URLSearchParams(location.search);
+    const fromDate = urlParams.get('fromDate') || '';
+    const toDate = urlParams.get('toDate') || '';
+    const huyen = urlParams.get('huyen') || '';
+    const xa = urlParams.get('xa') || '';
+    
+    setReportParams({ fromDate, toDate, huyen, xa });
+  }, [location.search]);
+
+  // Hàm format ngày để hiển thị đẹp hơn
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('vi-VN');
+    } catch {
+      return dateString;
+    }
+  };
 
   // Hàm xử lý xuất file DOCX
   const handleExportDocx = () => {
     try {
-      // Lấy tham số từ URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const fromDate = urlParams.get('fromDate') || '';
-      const toDate = urlParams.get('toDate') || '';
-      const huyen = urlParams.get('huyen') || '';
-      const xa = urlParams.get('xa') || '';
-      
       // Hiển thị loading
       setIsExportingDocx(true);
       setLoadingMessage("Đang chuẩn bị tải DOCX...");
       
       // Tạo thẻ a để tải file
-      const exportUrl = `${config.API_URL}/api/bao-cao/export-docx?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(huyen)}&xa=${encodeURIComponent(xa)}`;
+      const exportUrl = `${config.API_URL}/api/bao-cao/export-docx?fromDate=${reportParams.fromDate}&toDate=${reportParams.toDate}&huyen=${encodeURIComponent(reportParams.huyen)}&xa=${encodeURIComponent(reportParams.xa)}`;
       const link = document.createElement('a');
       link.href = exportUrl;
-      link.setAttribute('download', `bao-cao-mat-rung-${fromDate}-${toDate}.docx`);
+      link.setAttribute('download', `bao-cao-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.docx`);
       link.setAttribute('target', '_blank');
       
       // Thêm vào DOM, click và xóa
@@ -71,19 +96,12 @@ const ThongKeBaoCaoMatRung = () => {
   // Hàm xử lý xuất PDF - sửa thành mở cửa sổ mới hiển thị HTML
   const handleExportPdf = () => {
     try {
-      // Lấy tham số từ URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const fromDate = urlParams.get('fromDate') || '';
-      const toDate = urlParams.get('toDate') || '';
-      const huyen = urlParams.get('huyen') || '';
-      const xa = urlParams.get('xa') || '';
-      
       // Hiển thị loading
       setIsExportingPdf(true);
       setLoadingMessage("Đang chuẩn bị mở trang báo cáo...");
       
       // Tạo URL cho trang in PDF
-      const exportUrl = `${config.API_URL}/api/bao-cao/export-pdf?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(huyen)}&xa=${encodeURIComponent(xa)}`;
+      const exportUrl = `${config.API_URL}/api/bao-cao/export-pdf?fromDate=${reportParams.fromDate}&toDate=${reportParams.toDate}&huyen=${encodeURIComponent(reportParams.huyen)}&xa=${encodeURIComponent(reportParams.xa)}`;
       
       // Mở cửa sổ mới
       window.open(exportUrl, '_blank');
@@ -168,11 +186,17 @@ const ThongKeBaoCaoMatRung = () => {
         </div>
         
         <div className="overflow-auto border border-gray-300 rounded shadow px-6 pt-2 pb-6">
+          {/* ✅ SỬA: Hiển thị thông tin từ params thực tế */}
           <div className="text-sm mb-2">
             <div className="flex justify-between font-semibold">
-              <span>Tỉnh: ........................................</span>
-              <span>Từ ngày: .......... Đến ngày: ..........</span>
+              <span>Tỉnh: Lào Cai</span>
+              <span>
+                Từ ngày: {formatDate(reportParams.fromDate) || '..........'}
+                {' '}
+                Đến ngày: {formatDate(reportParams.toDate) || '..........'}
+              </span>
             </div>
+            
           </div>
 
           <table className="w-full border border-black text-sm text-center table-fixed">
@@ -225,7 +249,7 @@ const ThongKeBaoCaoMatRung = () => {
               <strong>Người tổng hợp</strong>
             </span>
             <span className="text-right">
-              ........., ngày ...... tháng ...... năm ......
+              Lào Cai, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
               <br />
               <strong>Chi cục trưởng</strong>
             </span>
@@ -253,6 +277,22 @@ const ThongKeBaoCaoMatRung = () => {
       <h2 className="text-center text-lg font-bold mb-4">
         THỐNG KÊ KẾT QUẢ DỰ BÁO MẤT RỪNG
       </h2>
+
+      {/* ✅ SỬA: Hiển thị thông tin từ params thực tế */}
+      <div className="text-center text-sm mb-4 bg-gray-50 p-3 rounded">
+        <div className="font-semibold">
+          Tỉnh: Lào Cai | 
+          Từ ngày: {formatDate(reportParams.fromDate)} - 
+          Đến ngày: {formatDate(reportParams.toDate)}
+        </div>
+        {(reportParams.huyen || reportParams.xa) && (
+          <div className="text-xs text-gray-600 mt-1">
+            {reportParams.huyen && `Huyện: ${reportParams.huyen}`}
+            {reportParams.huyen && reportParams.xa && ' | '}
+            {reportParams.xa && `Xã: ${reportParams.xa}`}
+          </div>
+        )}
+      </div>
 
       <div className="flex gap-6">
         <div className="w-1/2 space-y-8">

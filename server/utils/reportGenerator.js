@@ -12,6 +12,17 @@ const createCell = (text, bold = false, align = AlignmentType.CENTER) =>
     }
   });
 
+// Hàm format ngày để hiển thị đẹp
+const formatDate = (dateString) => {
+  if (!dateString) return "..........";
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN');
+  } catch {
+    return dateString;
+  }
+};
+
 // Hàm xuất file Word (.docx)
 async function createReportDocx(data, { fromDate, toDate, huyen, xa }) {
   const doc = new Document({
@@ -26,16 +37,31 @@ async function createReportDocx(data, { fromDate, toDate, huyen, xa }) {
             spacing: { after: 300 },
           }),
 
-          // Thông tin thời gian và địa phương
+          // ✅ SỬA: Thông tin thời gian và địa phương với dữ liệu thực
           new Paragraph({
             alignment: AlignmentType.LEFT,
             children: [
-              new TextRun(`Tỉnh: ${huyen || "........................."}    `),
-              new TextRun(`Từ ngày: ${fromDate}  Đến ngày: ${toDate}`),
+              new TextRun(`Tỉnh: Lào Cai    `),
+              new TextRun(`Từ ngày: ${formatDate(fromDate)}  Đến ngày: ${formatDate(toDate)}`),
             ],
           }),
 
+         
+         
           new Paragraph({ text: "", spacing: { after: 200 } }),
+
+          // ✅ Thêm thống kê tổng quan
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [
+              new TextRun({ 
+                text: `Tổng số khu vực mất rừng: ${data.length}`, 
+                bold: true, 
+                size: 24 
+              })
+            ],
+            spacing: { after: 200 }
+          }),
 
           // Bảng dữ liệu
           new Table({
@@ -83,11 +109,11 @@ async function createReportDocx(data, { fromDate, toDate, huyen, xa }) {
 
           new Paragraph({ text: "", spacing: { after: 300 } }),
 
-          // Người ký + ngày
+          // ✅ SỬA: Người ký + ngày với thông tin thực
           new Paragraph({
             alignment: AlignmentType.RIGHT,
             children: [
-              new TextRun("......., ngày ...... tháng ...... năm ......"),
+              new TextRun(`Lào Cai, ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}`),
             ],
           }),
           new Paragraph({

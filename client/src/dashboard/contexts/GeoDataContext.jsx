@@ -80,7 +80,7 @@ export const GeoDataProvider = ({ children }) => {
         // Cũng có thể set vào deforestationAlerts layer
         updateLayerData('deforestationAlerts', matRungData);
         
-        toast.success(`Đã tải ${matRungData.features?.length || 0} khu vực mất rừng`);
+        
       } else {
         console.log("⚠️ Không có dữ liệu mat_rung");
         toast.info("Không có dữ liệu mất rừng");
