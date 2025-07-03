@@ -3,8 +3,7 @@ const convertTcvn3ToUnicode = require("../utils/convertTcvn3ToUnicode");
 
 // In-memory cache with TTL
 const cache = new Map();
-const CACHE_TTL = 10 * 60 * 1000; // 10 phút
-const DB_CACHE_TTL = 60 * 60 * 1000; // 1 giờ cho database cache
+const CACHE_TTL = 99999999999999999 * 60 * 1000; // 10 phút
 
 function getCacheKey(type, param) {
   return `${type}_${param || 'all'}`;
@@ -28,61 +27,7 @@ function setCachedData(key, data) {
   console.log(`📋 Cache SET for ${key}`);
 }
 
-// Fallback to normal query if materialized view fails
-async function fallbackQuery(queryType, param = null) {
-  console.log(`🔄 Using fallback query for ${queryType}`);
-  
-  switch (queryType) {
-    case 'huyen':
-      const huyenQuery = `
-        SELECT DISTINCT huyen
-        FROM tlaocai_tkk_3lr_cru 
-        WHERE huyen IS NOT NULL AND trim(huyen) != ''
-        ORDER BY huyen
-      `;
-      return await pool.query(huyenQuery);
-      
-    case 'xa':
-      const xaQuery = `
-        SELECT DISTINCT xa
-        FROM tlaocai_tkk_3lr_cru 
-        WHERE huyen = $1 AND xa IS NOT NULL AND trim(xa) != ''
-        ORDER BY xa
-      `;
-      return await pool.query(xaQuery, [param]);
-      
-    case 'tieukhu':
-      const tkQuery = `
-        SELECT DISTINCT tk
-        FROM tlaocai_tkk_3lr_cru 
-        WHERE xa = $1 AND tk IS NOT NULL AND trim(tk) != ''
-        ORDER BY tk
-      `;
-      return await pool.query(tkQuery, [param]);
-      
-    case 'khoanh':
-      const khoanhQuery = `
-        SELECT DISTINCT khoanh
-        FROM tlaocai_tkk_3lr_cru 
-        WHERE khoanh IS NOT NULL AND trim(khoanh) != ''
-        ORDER BY khoanh
-      `;
-      return await pool.query(khoanhQuery);
-      
-    case 'churung':
-      const churungQuery = `
-        SELECT DISTINCT churung
-        FROM tlaocai_tkk_3lr_cru 
-        WHERE churung IS NOT NULL AND trim(churung) != ''
-        ORDER BY churung
-      `;
-      return await pool.query(churungQuery);
-      
-    default:
-      throw new Error(`Unknown query type: ${queryType}`);
-  }
-}
-
+// ✅ CẬP NHẬT: Lấy huyện từ bảng laocai_ranhgioihc
 exports.getHuyen = async (req, res) => {
   try {
     const cacheKey = getCacheKey('huyen');
@@ -92,17 +37,16 @@ exports.getHuyen = async (req, res) => {
       return res.json(cached);
     }
 
-    console.log("🚀 Fetching huyen using materialized view...");
+    console.log("🚀 Fetching huyen from laocai_ranhgioihc...");
     
-    let result;
-    try {
-      // Try materialized view first
-      result = await pool.query('SELECT huyen FROM mv_dropdown_huyen ORDER BY huyen');
-      console.log("✅ Using materialized view for huyen");
-    } catch (mvError) {
-      console.log("⚠️ Materialized view failed, using fallback:", mvError.message);
-      result = await fallbackQuery('huyen');
-    }
+    const huyenQuery = `
+      SELECT DISTINCT huyen
+      FROM laocai_ranhgioihc 
+      WHERE huyen IS NOT NULL AND trim(huyen) != ''
+      ORDER BY huyen
+    `;
+    
+    const result = await pool.query(huyenQuery);
     
     const data = result.rows.map((row) => ({
       value: row.huyen,
@@ -110,7 +54,7 @@ exports.getHuyen = async (req, res) => {
     }));
 
     setCachedData(cacheKey, data);
-    console.log(`✅ Loaded ${data.length} huyen options`);
+    console.log(`✅ Loaded ${data.length} huyen options from laocai_ranhgioihc`);
     
     res.json(data);
   } catch (error) {
@@ -119,6 +63,7 @@ exports.getHuyen = async (req, res) => {
   }
 };
 
+// ✅ CẬP NHẬT: Lấy xã từ bảng laocai_ranhgioihc theo huyện
 exports.getXaByHuyen = async (req, res) => {
   const { huyen } = req.query;
   console.log("🎯 Huyện FE truyền lên:", huyen);
@@ -135,17 +80,16 @@ exports.getXaByHuyen = async (req, res) => {
       return res.json(cached);
     }
 
-    console.log("🚀 Fetching xa using optimized query...");
+    console.log("🚀 Fetching xa from laocai_ranhgioihc by huyen...");
     
-    let result;
-    try {
-      // Use optimized query with index
-      result = await fallbackQuery('xa', huyen);
-      console.log("✅ Using optimized xa query");
-    } catch (error) {
-      console.error("❌ Optimized xa query failed:", error);
-      throw error;
-    }
+    const xaQuery = `
+      SELECT DISTINCT xa
+      FROM laocai_ranhgioihc 
+      WHERE huyen = $1 AND xa IS NOT NULL AND trim(xa) != ''
+      ORDER BY xa
+    `;
+    
+    const result = await pool.query(xaQuery, [huyen]);
     
     const data = result.rows.map((row) => ({
       value: row.xa,
@@ -153,7 +97,7 @@ exports.getXaByHuyen = async (req, res) => {
     }));
 
     setCachedData(cacheKey, data);
-    console.log(`✅ Loaded ${data.length} xa options for huyen: ${huyen}`);
+    console.log(`✅ Loaded ${data.length} xa options for huyen: ${huyen} from laocai_ranhgioihc`);
     
     res.json(data);
   } catch (error) {
@@ -162,6 +106,7 @@ exports.getXaByHuyen = async (req, res) => {
   }
 };
 
+// ✅ CẬP NHẬT: Lấy tiểu khu từ bảng laocai_ranhgioihc theo xã
 exports.getTieuKhuByXa = async (req, res) => {
   const { xa } = req.query;
   
@@ -177,16 +122,23 @@ exports.getTieuKhuByXa = async (req, res) => {
       return res.json(cached);
     }
 
-    console.log("🚀 Fetching tk using optimized query...");
+    console.log("🚀 Fetching tieukhu from laocai_ranhgioihc by xa...");
     
-    const result = await fallbackQuery('tieukhu', xa);
+    const tkQuery = `
+      SELECT DISTINCT tieukhu as tk
+      FROM laocai_ranhgioihc 
+      WHERE xa = $1 AND tieukhu IS NOT NULL AND trim(tieukhu) != ''
+      ORDER BY tieukhu
+    `;
+    
+    const result = await pool.query(tkQuery, [xa]);
     
     const data = result.rows.map((row) => ({
       tk: row.tk,
     }));
 
     setCachedData(cacheKey, data);
-    console.log(`✅ Loaded ${data.length} tk options for xa: ${xa}`);
+    console.log(`✅ Loaded ${data.length} tk options for xa: ${xa} from laocai_ranhgioihc`);
     
     res.json(data);
   } catch (error) {
@@ -195,6 +147,7 @@ exports.getTieuKhuByXa = async (req, res) => {
   }
 };
 
+// ✅ CẬP NHẬT: Lấy tất cả khoảnh từ bảng laocai_ranhgioihc
 exports.getAllKhoanh = async (req, res) => {
   try {
     const cacheKey = getCacheKey('khoanh');
@@ -204,24 +157,23 @@ exports.getAllKhoanh = async (req, res) => {
       return res.json(cached);
     }
 
-    console.log("🚀 Fetching khoanh using materialized view...");
+    console.log("🚀 Fetching khoanh from laocai_ranhgioihc...");
     
-    let result;
-    try {
-      // Try materialized view first
-      result = await pool.query('SELECT khoanh FROM mv_dropdown_khoanh ORDER BY khoanh');
-      console.log("✅ Using materialized view for khoanh");
-    } catch (mvError) {
-      console.log("⚠️ Materialized view failed, using fallback:", mvError.message);
-      result = await fallbackQuery('khoanh');
-    }
+    const khoanhQuery = `
+      SELECT DISTINCT khoanh
+      FROM laocai_ranhgioihc 
+      WHERE khoanh IS NOT NULL AND trim(khoanh) != ''
+      ORDER BY khoanh
+    `;
+    
+    const result = await pool.query(khoanhQuery);
     
     const data = result.rows.map((row) => ({
       khoanh: row.khoanh,
     }));
 
     setCachedData(cacheKey, data);
-    console.log(`✅ Loaded ${data.length} khoanh options`);
+    console.log(`✅ Loaded ${data.length} khoanh options from laocai_ranhgioihc`);
     
     res.json(data);
   } catch (error) {
@@ -230,6 +182,7 @@ exports.getAllKhoanh = async (req, res) => {
   }
 };
 
+// ✅ GIỮ NGUYÊN: Chủ rừng vẫn từ bảng tlaocai_tkk_3lr_cru (vì laocai_ranhgioihc không có trường này)
 exports.getAllChuRung = async (req, res) => {
   try {
     const cacheKey = getCacheKey('churung');
@@ -239,24 +192,23 @@ exports.getAllChuRung = async (req, res) => {
       return res.json(cached);
     }
 
-    console.log("🚀 Fetching churung using materialized view...");
+    console.log("🚀 Fetching churung from tlaocai_tkk_3lr_cru...");
     
-    let result;
-    try {
-      // Try materialized view first
-      result = await pool.query('SELECT churung FROM mv_dropdown_churung ORDER BY churung');
-      console.log("✅ Using materialized view for churung");
-    } catch (mvError) {
-      console.log("⚠️ Materialized view failed, using fallback:", mvError.message);
-      result = await fallbackQuery('churung');
-    }
+    const churungQuery = `
+      SELECT DISTINCT churung
+      FROM tlaocai_tkk_3lr_cru 
+      WHERE churung IS NOT NULL AND trim(churung) != ''
+      ORDER BY churung
+    `;
+    
+    const result = await pool.query(churungQuery);
     
     const data = result.rows.map((row) => ({
       churung: convertTcvn3ToUnicode(row.churung),
     }));
 
     setCachedData(cacheKey, data);
-    console.log(`✅ Loaded ${data.length} churung options`);
+    console.log(`✅ Loaded ${data.length} churung options from tlaocai_tkk_3lr_cru`);
     
     res.json(data);
   } catch (error) {
@@ -272,28 +224,6 @@ exports.clearCache = async (req, res) => {
   res.json({ success: true, message: "Cache cleared successfully" });
 };
 
-// API để refresh materialized views
-exports.refreshMaterializedViews = async (req, res) => {
-  try {
-    console.log("🔄 Refreshing materialized views...");
-    
-    await pool.query('SELECT refresh_dropdown_cache()');
-    
-    // Also clear in-memory cache
-    cache.clear();
-    
-    console.log("✅ Materialized views refreshed successfully");
-    res.json({ 
-      success: true, 
-      message: "Materialized views and cache refreshed successfully",
-      timestamp: new Date().toISOString()
-    });
-  } catch (error) {
-    console.error("❌ Lỗi refresh materialized views:", error);
-    res.status(500).json({ error: error.message });
-  }
-};
-
 // API để check cache status
 exports.getCacheStatus = async (req, res) => {
   try {
@@ -302,25 +232,8 @@ exports.getCacheStatus = async (req, res) => {
         size: cache.size,
         keys: Array.from(cache.keys()),
         ttl: CACHE_TTL / 1000 + ' seconds'
-      },
-      databaseCache: {
-        ttl: DB_CACHE_TTL / 1000 + ' seconds'
       }
     };
-
-    // Check materialized view status
-    const mvStatusQuery = `
-      SELECT 
-        schemaname,
-        matviewname,
-        hasindexes,
-        ispopulated
-      FROM pg_matviews 
-      WHERE matviewname LIKE 'mv_dropdown_%'
-    `;
-    
-    const mvResult = await pool.query(mvStatusQuery);
-    cacheInfo.materializedViews = mvResult.rows;
 
     res.json({
       success: true,
