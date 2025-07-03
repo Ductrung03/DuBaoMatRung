@@ -95,6 +95,31 @@ const MapUpdater = ({ selectedFeature }) => {
 
   return null;
 };
+
+const getDefaultMatRungStyle = (feature, isSelected = false) => {
+  const baseStyle = {
+    fillColor: "#dc2626",        // ✅ MÀU ĐỎ CHỦ ĐẠO
+    color: "#991b1b",            // ✅ Viền đỏ đậm
+    weight: isSelected ? 3 : 2,
+    opacity: 1,
+    fillOpacity: 0.7,
+    dashArray: null
+  };
+
+  // Nếu được chọn, làm nổi bật hơn
+  if (isSelected) {
+    return {
+      ...baseStyle,
+      fillColor: "#ef4444",      // ✅ Đỏ sáng hơn khi chọn
+      color: "#ff7800",          // Viền cam khi chọn
+      weight: 4,
+      fillOpacity: 0.8
+    };
+  }
+
+  return baseStyle;
+};
+
 const getForestTypeColor = (forestFunction) => {
   const colorMap = {
     // Rừng tự nhiên (màu xanh các sắc độ)
@@ -424,14 +449,12 @@ const getLayerStyle = (feature, layerType, isSelected = false) => {
         ...selectedStyle,
       };
 
+    case "mat_rung_default":
+      return getDefaultMatRungStyle(feature, isSelected);
+
     default:
-      return {
-        fillColor: getColorByStatus(feature.properties),
-        weight: isSelected ? 3 : 2,
-        opacity: 1,
-        color: isSelected ? "#ff7800" : "#2d3748",
-        fillOpacity: 0.7,
-      };
+      // ✅ Mặc định cũng dùng màu đỏ cho dữ liệu mat_rung
+      return getDefaultMatRungStyle(feature, isSelected);
   }
 };
 
@@ -1130,6 +1153,13 @@ const Map = () => {
     }
   }, [geoData]);
 
+useEffect(() => {
+    if (geoData && geoData.features && geoData.features.length > 0) {
+      console.log(`🎉 Hiển thị ${geoData.features.length} khu vực mất rừng trên bản đồ`);
+    }
+  }, [geoData]);
+
+
   // Hàm tối ưu để xử lý khi click vào một hàng trong bảng
   const handleRowClick = (row) => {
     setLoadingDetails(true);
@@ -1269,12 +1299,8 @@ const Map = () => {
 
                 geoJsonLayerRef.current.eachLayer((layer) => {
                   if (layer.feature === matchedFeature) {
-                    layer.setStyle({
-                      weight: 3,
-                      color: "#ff7800",
-                      opacity: 1,
-                      fillOpacity: 0.7,
-                    });
+                    // ✅ Sử dụng style màu đỏ cho feature được chọn
+                    layer.setStyle(getDefaultMatRungStyle(matchedFeature, true));
                     layer.bringToFront();
                     newHighlightedLayer = layer;
 
@@ -1323,7 +1349,9 @@ const Map = () => {
     }
 
     layer.on("mouseover", function () {
-      const currentStyle = getLayerStyle(this.feature, layerType, false);
+      const currentStyle = layerType === "default" || !layerType 
+        ? getDefaultMatRungStyle(this.feature, false)
+        : getLayerStyle(this.feature, layerType, false);
       this.setStyle({
         ...currentStyle,
         weight: currentStyle.weight + 1,
@@ -1427,6 +1455,137 @@ const Map = () => {
             />
           ) : (
             <>
+            {/* ✅ HIỂN THỊ DỮ LIỆU MẶC ĐỊNH TỪ BẢNG MAT_RUNG VỚI MÀU ĐỎ */}
+              {geoData?.type === "FeatureCollection" &&
+                geoData.features?.length > 0 && (
+                  <>
+                    {console.log(
+                      "🔴 Rendering dữ liệu mat_rung mặc định với",
+                      geoData.features.length,
+                      "features - MÀU ĐỎ"
+                    )}
+                    <GeoJSON
+                      key={`mat-rung-default-${Date.now()}`}
+                      data={geoData}
+                      onEachFeature={(feature, layer) => {
+                        // ✅ Popup cho dữ liệu mat_rung
+                        if (feature.properties) {
+                          let popupContent = `
+                            <div class="custom-popup">
+                              <h4 class="popup-title">🔴 Khu vực mất rừng</h4>
+                              <table class="popup-table">
+                          `;
+
+                          // Các trường quan trọng hiển thị đầu tiên
+                          const priorityFields = [
+                            "huyen",
+                            "xa",
+                            "area",
+                            "start_dau",
+                            "end_sau",
+                            "tk",
+                            "khoanh",
+                            "churung",
+                            "mahuyen",
+                          ];
+
+                          // Xử lý các trường ưu tiên trước
+                          priorityFields.forEach((field) => {
+                            if (feature.properties[field] !== undefined) {
+                              let value = feature.properties[field];
+                              let label = field;
+
+                              // Định dạng ngày tháng
+                              if (
+                                field === "start_dau" ||
+                                field === "end_sau"
+                              ) {
+                                value = formatDate(value);
+                                label =
+                                  field === "start_dau"
+                                    ? "Từ ngày"
+                                    : "Đến ngày";
+                              }
+
+                              // Định dạng diện tích
+                              if (field === "area" && value !== null) {
+                                value = `${(parseFloat(value) / 10000).toFixed(
+                                  2
+                                )} ha`;
+                                label = "Diện tích";
+                              }
+
+                              // Đổi tên hiển thị các trường
+                              const fieldLabels = {
+                                huyen: "Huyện",
+                                xa: "Xã",
+                                tk: "Tiểu khu",
+                                khoanh: "Khoảnh",
+                                churung: "Chủ rừng",
+                                mahuyen: "Mã huyện",
+                              };
+
+                              label = fieldLabels[field] || label;
+
+                              popupContent += `
+                                <tr>
+                                  <th>${label}</th>
+                                  <td>${value !== null ? value : "Không có"}</td>
+                                </tr>
+                              `;
+                            }
+                          });
+
+                          popupContent += `</table></div>`;
+
+                          layer.bindPopup(popupContent, {
+                            maxWidth: 300,
+                            className: "custom-popup-container",
+                          });
+                        }
+
+                        // Hover effects
+                        layer.on("mouseover", function () {
+                          this.setStyle(getDefaultMatRungStyle(this.feature, true));
+                          this.bringToFront();
+                        });
+
+                        layer.on("mouseout", function () {
+                          if (!selectedFeature || this.feature !== selectedFeature) {
+                            this.setStyle(getDefaultMatRungStyle(this.feature, false));
+                          }
+                        });
+
+                        // Click event
+                        layer.on("click", () => {
+                          setSelectedFeature(feature);
+                          setHighlightedLayerRef(layer);
+                        });
+                      }}
+                      style={(feature) => {
+                        // ✅ Sử dụng style màu đỏ mặc định
+                        const style = getDefaultMatRungStyle(feature, selectedFeature === feature);
+                        console.log("🔴 Default mat_rung style applied:", style);
+                        return style;
+                      }}
+                      ref={(layerRef) => {
+                        if (layerRef) {
+                          geoJsonLayerRef.current = layerRef;
+
+                          if (mapReady) {
+                            const bounds = layerRef.getBounds();
+                            if (bounds.isValid()) {
+                              window._leaflet_map.fitBounds(bounds, {
+                                padding: [20, 20],
+                              });
+                              console.log("✅ Đã zoom đến dữ liệu GeoJSON màu đỏ");
+                            }
+                          }
+                        }
+                      }}
+                    />
+                  </>
+                )}
               {/* DEBUG: Log trạng thái deforestation alerts */}
               {console.log("🔍 DEBUG - Deforestation Alerts Status:", {
                 hasData: !!mapLayers.deforestationAlerts?.data,
@@ -1851,6 +2010,7 @@ const Map = () => {
         </MapContainer>
       </div>
 
+       {/* ✅ HIỂN THỊ BẢNG DỮ LIỆU MẶC ĐỊNH */}
       {!layerName &&
         isDataPage &&
         (loading ? (
@@ -1884,5 +2044,7 @@ const Map = () => {
     </div>
   );
 };
+
+
 
 export default Map;

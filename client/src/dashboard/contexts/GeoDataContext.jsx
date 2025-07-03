@@ -1,4 +1,7 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
+import config from "../../config";
+import { toast } from "react-toastify";
 
 const GeoDataContext = createContext();
 
@@ -16,7 +19,7 @@ export const GeoDataProvider = ({ children }) => {
       loading: false,
       name: "Ranh giới hành chính",
       endpoint: "administrative",
-      useViewport: true // Enable viewport loading
+      useViewport: true
     },
     forestManagement: { 
       data: null, 
@@ -51,6 +54,50 @@ export const GeoDataProvider = ({ children }) => {
       useViewport: true
     }
   });
+
+  // ✅ HÀM MỚI: Load dữ liệu mặc định từ bảng mat_rung
+  const loadDefaultMatRungData = async () => {
+    try {
+      console.log("🔄 Loading mặc định dữ liệu từ bảng mat_rung...");
+      setLoading(true);
+
+      // Gọi API để lấy toàn bộ dữ liệu mat_rung (không có filter)
+      const response = await axios.get(`${config.API_URL}/api/mat-rung`, {
+        params: {
+          fromDate: '2020-01-01', // Lấy từ 2020 để có nhiều dữ liệu
+          toDate: '2030-12-31'     // Đến 2030 để bao gồm tất cả
+        }
+      });
+
+      if (response.data && response.data.mat_rung) {
+        const matRungData = response.data.mat_rung;
+        
+        console.log(`✅ Loaded ${matRungData.features?.length || 0} mat_rung features mặc định`);
+        
+        // Set vào geoData để hiển thị trong Map và Table
+        setGeoData(matRungData);
+        
+        // Cũng có thể set vào deforestationAlerts layer
+        updateLayerData('deforestationAlerts', matRungData);
+        
+        toast.success(`Đã tải ${matRungData.features?.length || 0} khu vực mất rừng`);
+      } else {
+        console.log("⚠️ Không có dữ liệu mat_rung");
+        toast.info("Không có dữ liệu mất rừng");
+      }
+    } catch (error) {
+      console.error("❌ Lỗi khi load dữ liệu mat_rung mặc định:", error);
+      toast.error("Lỗi khi tải dữ liệu mất rừng: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Load dữ liệu mặc định khi component mount
+  useEffect(() => {
+    console.log("🚀 GeoDataProvider mounted - loading default data...");
+    loadDefaultMatRungData();
+  }, []); // Chỉ chạy 1 lần khi mount
 
   // Enhanced layer data update với viewport metadata
   const updateLayerData = (layerName, data) => {
@@ -128,6 +175,11 @@ export const GeoDataProvider = ({ children }) => {
     setGeoData(null);
   };
 
+  // ✅ HÀM MỚI: Refresh dữ liệu mặc định
+  const refreshDefaultData = () => {
+    loadDefaultMatRungData();
+  };
+
   return (
     <GeoDataContext.Provider value={{ 
       geoData, 
@@ -139,7 +191,9 @@ export const GeoDataProvider = ({ children }) => {
       toggleLayerVisibility,
       setLayerLoading,
       clearAllLayers,
-      getLayersStats
+      getLayersStats,
+      loadDefaultMatRungData,     // ✅ Export hàm load mặc định
+      refreshDefaultData          // ✅ Export hàm refresh
     }}>
       {children}
     </GeoDataContext.Provider>
