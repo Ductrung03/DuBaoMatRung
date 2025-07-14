@@ -1,0 +1,518 @@
+-- Table: public.laocai_chuquanly
+
+-- DROP TABLE IF EXISTS public.laocai_chuquanly;
+
+CREATE TABLE IF NOT EXISTS public.laocai_chuquanly
+(
+    gid integer NOT NULL DEFAULT nextval('laocai_chuquanly_gid_seq'::regclass),
+    tt integer,
+    chuquanly character varying(50) COLLATE pg_catalog."default",
+    geom geometry(MultiPolygon,4326),
+    geom_simplified geometry(MultiPolygon,4326),
+    CONSTRAINT laocai_chuquanly_pkey PRIMARY KEY (gid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.laocai_chuquanly
+    OWNER to postgres;
+-- Index: idx_laocai_chuquanly_geom_gist
+
+-- DROP INDEX IF EXISTS public.idx_laocai_chuquanly_geom_gist;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_chuquanly_geom_gist
+    ON public.laocai_chuquanly USING gist
+    (geom)
+    TABLESPACE pg_default;
+-- Index: idx_laocai_chuquanly_geom_simplified_gist
+
+-- DROP INDEX IF EXISTS public.idx_laocai_chuquanly_geom_simplified_gist;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_chuquanly_geom_simplified_gist
+    ON public.laocai_chuquanly USING gist
+    (geom_simplified)
+    TABLESPACE pg_default;
+-- Index: laocai_chuquanly_geom_idx
+
+-- DROP INDEX IF EXISTS public.laocai_chuquanly_geom_idx;
+
+CREATE INDEX IF NOT EXISTS laocai_chuquanly_geom_idx
+    ON public.laocai_chuquanly USING gist
+    (geom)
+    TABLESPACE pg_default;
+
+-- Table: public.laocai_huyen
+
+-- DROP TABLE IF EXISTS public.laocai_huyen;
+
+CREATE TABLE IF NOT EXISTS public.laocai_huyen
+(
+    gid integer NOT NULL DEFAULT nextval('laocai_huyen_gid_seq'::regclass),
+    objectid double precision,
+    matinh double precision,
+    tinh character varying(30) COLLATE pg_catalog."default",
+    huyen character varying(30) COLLATE pg_catalog."default",
+    sum_dtich numeric,
+    shape_leng numeric,
+    shape_area numeric,
+    mahuyen_1 character varying(50) COLLATE pg_catalog."default",
+    geom geometry(MultiPolygon,4326),
+    CONSTRAINT laocai_huyen_pkey PRIMARY KEY (gid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.laocai_huyen
+    OWNER to postgres;
+-- Index: laocai_huyen_geom_idx
+
+-- DROP INDEX IF EXISTS public.laocai_huyen_geom_idx;
+
+CREATE INDEX IF NOT EXISTS laocai_huyen_geom_idx
+    ON public.laocai_huyen USING gist
+    (geom)
+    TABLESPACE pg_default;
+
+-- Table: public.laocai_nendiahinh
+
+-- DROP TABLE IF EXISTS public.laocai_nendiahinh;
+
+CREATE TABLE IF NOT EXISTS public.laocai_nendiahinh
+(
+    gid integer NOT NULL DEFAULT nextval('laocai_nendiahinh_gid_seq'::regclass),
+    id double precision,
+    ma double precision,
+    ten character varying(30) COLLATE pg_catalog."default",
+    geom geometry(MultiPolygon,4326),
+    CONSTRAINT laocai_nendiahinh_pkey PRIMARY KEY (gid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.laocai_nendiahinh
+    OWNER to postgres;
+-- Index: idx_laocai_nendiahinh_geom_gist
+
+-- DROP INDEX IF EXISTS public.idx_laocai_nendiahinh_geom_gist;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_nendiahinh_geom_gist
+    ON public.laocai_nendiahinh USING gist
+    (geom)
+    TABLESPACE pg_default;
+-- Index: idx_laocai_nendiahinh_ten_btree
+
+-- DROP INDEX IF EXISTS public.idx_laocai_nendiahinh_ten_btree;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_nendiahinh_ten_btree
+    ON public.laocai_nendiahinh USING btree
+    (ten COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: laocai_nendiahinh_geom_idx
+
+-- DROP INDEX IF EXISTS public.laocai_nendiahinh_geom_idx;
+
+CREATE INDEX IF NOT EXISTS laocai_nendiahinh_geom_idx
+    ON public.laocai_nendiahinh USING gist
+    (geom)
+    TABLESPACE pg_default;
+
+-- Table: public.laocai_nendiahinh_line
+
+-- DROP TABLE IF EXISTS public.laocai_nendiahinh_line;
+
+CREATE TABLE IF NOT EXISTS public.laocai_nendiahinh_line
+(
+    gid integer NOT NULL DEFAULT nextval('laocai_nendiahinh_line_gid_seq'::regclass),
+    id double precision,
+    ma double precision,
+    ten character varying(30) COLLATE pg_catalog."default",
+    geom geometry(MultiLineString,4326),
+    CONSTRAINT laocai_nendiahinh_line_pkey PRIMARY KEY (gid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.laocai_nendiahinh_line
+    OWNER to postgres;
+-- Index: idx_laocai_nendiahinh_line_geom_gist
+
+-- DROP INDEX IF EXISTS public.idx_laocai_nendiahinh_line_geom_gist;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_nendiahinh_line_geom_gist
+    ON public.laocai_nendiahinh_line USING gist
+    (geom)
+    TABLESPACE pg_default;
+-- Index: laocai_nendiahinh_line_geom_idx
+
+-- DROP INDEX IF EXISTS public.laocai_nendiahinh_line_geom_idx;
+
+CREATE INDEX IF NOT EXISTS laocai_nendiahinh_line_geom_idx
+    ON public.laocai_nendiahinh_line USING gist
+    (geom)
+    TABLESPACE pg_default;
+
+-- Table: public.laocai_ranhgioihc
+
+-- DROP TABLE IF EXISTS public.laocai_ranhgioihc;
+
+CREATE TABLE IF NOT EXISTS public.laocai_ranhgioihc
+(
+    gid integer NOT NULL DEFAULT nextval('laocai_ranhgioihc_gid_seq'::regclass),
+    huyen character varying(20) COLLATE pg_catalog."default",
+    xa character varying(20) COLLATE pg_catalog."default",
+    tieukhu character varying(10) COLLATE pg_catalog."default",
+    khoanh character varying(5) COLLATE pg_catalog."default",
+    geom geometry(MultiPolygon,4326),
+    geom_low geometry(MultiPolygon,4326),
+    geom_high geometry(MultiPolygon,4326),
+    CONSTRAINT laocai_ranhgioihc_pkey PRIMARY KEY (gid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.laocai_ranhgioihc
+    OWNER to postgres;
+-- Index: idx_laocai_ranhgioihc_geom_gist
+
+-- DROP INDEX IF EXISTS public.idx_laocai_ranhgioihc_geom_gist;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_ranhgioihc_geom_gist
+    ON public.laocai_ranhgioihc USING gist
+    (geom)
+    TABLESPACE pg_default;
+-- Index: idx_laocai_ranhgioihc_geom_high_gist
+
+-- DROP INDEX IF EXISTS public.idx_laocai_ranhgioihc_geom_high_gist;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_ranhgioihc_geom_high_gist
+    ON public.laocai_ranhgioihc USING gist
+    (geom_high)
+    TABLESPACE pg_default;
+-- Index: idx_laocai_ranhgioihc_geom_low_gist
+
+-- DROP INDEX IF EXISTS public.idx_laocai_ranhgioihc_geom_low_gist;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_ranhgioihc_geom_low_gist
+    ON public.laocai_ranhgioihc USING gist
+    (geom_low)
+    TABLESPACE pg_default;
+-- Index: idx_laocai_ranhgioihc_hierarchy_btree
+
+-- DROP INDEX IF EXISTS public.idx_laocai_ranhgioihc_hierarchy_btree;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_ranhgioihc_hierarchy_btree
+    ON public.laocai_ranhgioihc USING btree
+    (huyen COLLATE pg_catalog."default" ASC NULLS LAST, xa COLLATE pg_catalog."default" ASC NULLS LAST, tieukhu COLLATE pg_catalog."default" ASC NULLS LAST, khoanh COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: laocai_ranhgioihc_geom_idx
+
+-- DROP INDEX IF EXISTS public.laocai_ranhgioihc_geom_idx;
+
+CREATE INDEX IF NOT EXISTS laocai_ranhgioihc_geom_idx
+    ON public.laocai_ranhgioihc USING gist
+    (geom)
+    TABLESPACE pg_default;
+
+-- Table: public.laocai_rg3lr
+
+-- DROP TABLE IF EXISTS public.laocai_rg3lr;
+
+CREATE TABLE IF NOT EXISTS public.laocai_rg3lr
+(
+    gid integer NOT NULL DEFAULT nextval('laocai_rg3lr_gid_seq'::regclass),
+    tt numeric,
+    id numeric,
+    matinh double precision,
+    mahuyen double precision,
+    maxa double precision,
+    xa character varying(100) COLLATE pg_catalog."default",
+    tk character varying(10) COLLATE pg_catalog."default",
+    khoanh character varying(10) COLLATE pg_catalog."default",
+    lo character varying(10) COLLATE pg_catalog."default",
+    thuad double precision,
+    tobando character varying(9) COLLATE pg_catalog."default",
+    diadanh character varying(50) COLLATE pg_catalog."default",
+    dtich double precision,
+    nggocr smallint,
+    ldlr character varying(10) COLLATE pg_catalog."default",
+    maldlr smallint,
+    sldlr character varying(254) COLLATE pg_catalog."default",
+    namtr smallint,
+    captuoi smallint,
+    ktan smallint,
+    nggocrt smallint,
+    thanhrung smallint,
+    mgo double precision,
+    mtr double precision,
+    mgolo double precision,
+    mtnlo double precision,
+    lapdia smallint,
+    malr3 smallint,
+    mdsd character varying(10) COLLATE pg_catalog."default",
+    mamdsd smallint,
+    dtuong smallint,
+    churung character varying(100) COLLATE pg_catalog."default",
+    machur double precision,
+    trchap smallint,
+    quyensd smallint,
+    thoihansd integer,
+    khoan smallint,
+    nqh smallint,
+    nguoink character varying(100) COLLATE pg_catalog."default",
+    nguoitrch character varying(100) COLLATE pg_catalog."default",
+    mangnk double precision,
+    mangtrch double precision,
+    ngsinh smallint,
+    kd numeric,
+    vd numeric,
+    capkd character varying(254) COLLATE pg_catalog."default",
+    capvd character varying(254) COLLATE pg_catalog."default",
+    locu character varying(6) COLLATE pg_catalog."default",
+    vitrithua double precision,
+    tinh character varying(100) COLLATE pg_catalog."default",
+    huyen character varying(100) COLLATE pg_catalog."default",
+    geom geometry(MultiPolygon,4326),
+    geom_simplified_low geometry(MultiPolygon,4326),
+    geom_simplified_medium geometry(MultiPolygon,4326),
+    geom_simplified_high geometry(MultiPolygon,4326),
+    CONSTRAINT laocai_rg3lr_pkey PRIMARY KEY (gid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.laocai_rg3lr
+    OWNER to postgres;
+-- Index: idx_laocai_rg3lr_geom_gist
+
+-- DROP INDEX IF EXISTS public.idx_laocai_rg3lr_geom_gist;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_rg3lr_geom_gist
+    ON public.laocai_rg3lr USING gist
+    (geom)
+    TABLESPACE pg_default;
+-- Index: idx_laocai_rg3lr_geom_high_gist
+
+-- DROP INDEX IF EXISTS public.idx_laocai_rg3lr_geom_high_gist;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_rg3lr_geom_high_gist
+    ON public.laocai_rg3lr USING gist
+    (geom_simplified_high)
+    TABLESPACE pg_default;
+-- Index: idx_laocai_rg3lr_geom_low_gist
+
+-- DROP INDEX IF EXISTS public.idx_laocai_rg3lr_geom_low_gist;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_rg3lr_geom_low_gist
+    ON public.laocai_rg3lr USING gist
+    (geom_simplified_low)
+    TABLESPACE pg_default;
+-- Index: idx_laocai_rg3lr_geom_medium_gist
+
+-- DROP INDEX IF EXISTS public.idx_laocai_rg3lr_geom_medium_gist;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_rg3lr_geom_medium_gist
+    ON public.laocai_rg3lr USING gist
+    (geom_simplified_medium)
+    TABLESPACE pg_default;
+-- Index: idx_laocai_rg3lr_ldlr
+
+-- DROP INDEX IF EXISTS public.idx_laocai_rg3lr_ldlr;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_rg3lr_ldlr
+    ON public.laocai_rg3lr USING btree
+    (ldlr COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default
+    WHERE ldlr IS NOT NULL;
+-- Index: idx_laocai_rg3lr_ldlr_geom
+
+-- DROP INDEX IF EXISTS public.idx_laocai_rg3lr_ldlr_geom;
+
+CREATE INDEX IF NOT EXISTS idx_laocai_rg3lr_ldlr_geom
+    ON public.laocai_rg3lr USING gist
+    (geom)
+    TABLESPACE pg_default
+    WHERE ldlr IS NOT NULL;
+-- Index: laocai_rg3lr_geom_idx
+
+-- DROP INDEX IF EXISTS public.laocai_rg3lr_geom_idx;
+
+CREATE INDEX IF NOT EXISTS laocai_rg3lr_geom_idx
+    ON public.laocai_rg3lr USING gist
+    (geom)
+    TABLESPACE pg_default;
+
+-- Table: public.mat_rung
+
+-- DROP TABLE IF EXISTS public.mat_rung;
+
+CREATE TABLE IF NOT EXISTS public.mat_rung
+(
+    gid integer NOT NULL DEFAULT nextval('mat_rung_gid_seq'::regclass),
+    start_sau character varying(10) COLLATE pg_catalog."default",
+    area double precision,
+    start_dau character varying(10) COLLATE pg_catalog."default",
+    end_sau character varying(10) COLLATE pg_catalog."default",
+    mahuyen character varying(2) COLLATE pg_catalog."default",
+    end_dau character varying(10) COLLATE pg_catalog."default",
+    geom geometry(MultiPolygon,4326),
+    detection_status character varying(20) COLLATE pg_catalog."default" DEFAULT 'Chưa xác minh'::character varying,
+    detection_date date,
+    verified_by integer,
+    verified_area double precision,
+    verification_reason character varying(100) COLLATE pg_catalog."default",
+    verification_notes text COLLATE pg_catalog."default",
+    geom_simplified geometry(MultiPolygon,4326),
+    CONSTRAINT mat_rung_pkey PRIMARY KEY (gid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.mat_rung
+    OWNER to postgres;
+-- Index: idx_mat_rung_composite
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_composite;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_composite
+    ON public.mat_rung USING btree
+    (start_dau COLLATE pg_catalog."default" ASC NULLS LAST, end_sau COLLATE pg_catalog."default" ASC NULLS LAST, mahuyen COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_mat_rung_date_range
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_date_range;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_date_range
+    ON public.mat_rung USING btree
+    (start_dau COLLATE pg_catalog."default" ASC NULLS LAST, end_sau COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_mat_rung_dates
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_dates;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_dates
+    ON public.mat_rung USING btree
+    (start_dau COLLATE pg_catalog."default" ASC NULLS LAST, end_sau COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_mat_rung_end_sau_btree
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_end_sau_btree;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_end_sau_btree
+    ON public.mat_rung USING btree
+    (end_sau COLLATE pg_catalog."default" DESC NULLS FIRST)
+    TABLESPACE pg_default;
+-- Index: idx_mat_rung_end_sau_date
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_end_sau_date;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_end_sau_date
+    ON public.mat_rung USING btree
+    (end_sau COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_mat_rung_geom
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_geom;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_geom
+    ON public.mat_rung USING gist
+    (geom)
+    TABLESPACE pg_default;
+-- Index: idx_mat_rung_geom_gist
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_geom_gist;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_geom_gist
+    ON public.mat_rung USING gist
+    (geom)
+    TABLESPACE pg_default;
+-- Index: idx_mat_rung_geom_gist_optimized
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_geom_gist_optimized;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_geom_gist_optimized
+    ON public.mat_rung USING gist
+    (geom)
+    TABLESPACE pg_default
+    WHERE st_isvalid(geom) AND geom IS NOT NULL;
+-- Index: idx_mat_rung_geom_simplified_gist
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_geom_simplified_gist;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_geom_simplified_gist
+    ON public.mat_rung USING gist
+    (geom_simplified)
+    TABLESPACE pg_default;
+-- Index: idx_mat_rung_mahuyen
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_mahuyen;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_mahuyen
+    ON public.mat_rung USING btree
+    (mahuyen COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_mat_rung_mahuyen_btree
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_mahuyen_btree;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_mahuyen_btree
+    ON public.mat_rung USING btree
+    (mahuyen COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_mat_rung_mahuyen_date
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_mahuyen_date;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_mahuyen_date
+    ON public.mat_rung USING btree
+    (mahuyen COLLATE pg_catalog."default" ASC NULLS LAST, end_sau COLLATE pg_catalog."default" DESC NULLS FIRST)
+    TABLESPACE pg_default;
+-- Index: idx_mat_rung_start_dau_date
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_start_dau_date;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_start_dau_date
+    ON public.mat_rung USING btree
+    (start_dau COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: mat_rung_end_sau_idx
+
+-- DROP INDEX IF EXISTS public.mat_rung_end_sau_idx;
+
+CREATE INDEX IF NOT EXISTS mat_rung_end_sau_idx
+    ON public.mat_rung USING btree
+    (end_sau COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: mat_rung_geom_idx
+
+-- DROP INDEX IF EXISTS public.mat_rung_geom_idx;
+
+CREATE INDEX IF NOT EXISTS mat_rung_geom_idx
+    ON public.mat_rung USING gist
+    (geom)
+    TABLESPACE pg_default;
+-- Index: mat_rung_mahuyen_idx
+
+-- DROP INDEX IF EXISTS public.mat_rung_mahuyen_idx;
+
+CREATE INDEX IF NOT EXISTS mat_rung_mahuyen_idx
+    ON public.mat_rung USING btree
+    (mahuyen COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: mat_rung_start_dau_idx
+
+-- DROP INDEX IF EXISTS public.mat_rung_start_dau_idx;
+
+CREATE INDEX IF NOT EXISTS mat_rung_start_dau_idx
+    ON public.mat_rung USING btree
+    (start_dau COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+-- Trigger: set_area_in_hectares
+
+-- DROP TRIGGER IF EXISTS set_area_in_hectares ON public.mat_rung;
+
+CREATE OR REPLACE TRIGGER set_area_in_hectares
+    BEFORE INSERT OR UPDATE 
+    ON public.mat_rung
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_area_in_hectares();

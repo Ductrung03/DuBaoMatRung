@@ -1,6 +1,7 @@
 const express = require("express");
 const { Pool } = require("pg");
 const router = express.Router();
+const convertTcvn3ToUnicode = require("../utils/convertTcvn3ToUnicode");
 
 const pool = new Pool();
 
@@ -13,135 +14,270 @@ router.get("/", async (req, res) => {
     tk,
     khoanh,
     churung,
-    limit = 1000,  // ✅ Thêm limit mặc định để tránh tải quá nhiều data
+    limit = 1000,
   } = req.query;
 
   try {
-    // ✅ TRƯỜNG HỢP 1: Không có filter gì - lấy dữ liệu mặc định
+    // ✅ TRƯỜNG HỢP 1: Không có filter gì - lấy dữ liệu mặc định với spatial intersection
     if (!fromDate && !toDate && !huyen && !xa && !tk && !khoanh && !churung) {
-      console.log("🔴 Loading toàn bộ dữ liệu mat_rung mặc định...");
+      console.log("🔴 Loading toàn bộ dữ liệu mat_rung với spatial intersection...");
       
       const defaultQuery = `
-        SELECT json_build_object(
-          'type', 'FeatureCollection',
-          'features', COALESCE(json_agg(
-            json_build_object(
-              'type', 'Feature',
-              'geometry', ST_AsGeoJSON(ST_Transform(geom, 4326))::json,
-              'properties', to_jsonb(t) - 'geom'
-            )
-          ), '[]'::json)
-        ) AS geojson
-        FROM (
-          SELECT * FROM mat_rung 
-          WHERE geom IS NOT NULL 
-          ORDER BY gid DESC 
-          LIMIT $1
-        ) AS t;
+        SELECT 
+          m.gid,
+          m.start_sau,
+          m.area,
+          m.start_dau,
+          m.end_sau,
+          m.mahuyen,
+          m.end_dau,
+          m.detection_status,
+          m.detection_date,
+          m.verified_by,
+          m.verified_area,
+          m.verification_reason,
+          m.verification_notes,
+          
+          -- Thông tin từ spatial intersection
+          r.huyen,
+          r.xa,
+          r.tieukhu as tk,
+          r.khoanh,
+          
+          -- Extract tọa độ centroid
+          ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x_coordinate,
+          ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y_coordinate,
+          
+          -- Geometry cho bản đồ
+          ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
+          
+        FROM mat_rung m
+        LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(
+          ST_Transform(m.geom, 4326), 
+          ST_Transform(r.geom, 4326)
+        )
+        WHERE m.geom IS NOT NULL 
+        ORDER BY m.gid DESC 
+        LIMIT $1
       `;
 
       const defaultResult = await pool.query(defaultQuery, [limit]);
-      const matRungGeoJSON = defaultResult.rows[0].geojson;
 
-      console.log(`✅ Loaded ${matRungGeoJSON.features?.length || 0} mat_rung features mặc định`);
+      // ✅ Xây dựng GeoJSON với spatial intersection data
+      const features = defaultResult.rows.map(row => {
+        // Fallback mapping cho huyện nếu không có spatial intersection
+        const huyenMapping = {
+          '01': 'Lào Cai',
+          '02': 'Bát Xát', 
+          '03': 'Mường Khương',
+          '04': 'Si Ma Cai',
+          '05': 'Bắc Hà',
+          '06': 'Bảo Thắng',
+          '07': 'Bảo Yên',
+          '08': 'Sa Pa',
+          '09': 'Văn Bàn'
+        };
+
+        return {
+          type: "Feature",
+          geometry: JSON.parse(row.geometry),
+          properties: {
+            gid: row.gid,
+            start_sau: row.start_sau,
+            area: row.area,
+            start_dau: row.start_dau,
+            end_sau: row.end_sau,
+            mahuyen: row.mahuyen,
+            end_dau: row.end_dau,
+            detection_status: row.detection_status,
+            detection_date: row.detection_date,
+            verified_by: row.verified_by,
+            verified_area: row.verified_area,
+            verification_reason: row.verification_reason,
+            verification_notes: row.verification_notes,
+            
+            // ✅ Thông tin từ spatial intersection (có fallback)
+            huyen: convertTcvn3ToUnicode(row.huyen || huyenMapping[row.mahuyen] || `Huyện ${row.mahuyen}`),
+            xa: convertTcvn3ToUnicode(row.xa || ""),
+            tk: row.tk,
+            khoanh: row.khoanh,
+            
+            // ✅ Tọa độ
+            x_coordinate: row.x_coordinate,
+            y_coordinate: row.y_coordinate
+          }
+        };
+      });
+
+      const matRungGeoJSON = {
+        type: "FeatureCollection",
+        features: features
+      };
+
+      console.log(`✅ Loaded ${matRungGeoJSON.features?.length || 0} mat_rung features với spatial intersection`);
 
       return res.json({
-        message: `✅ Đã tải ${matRungGeoJSON.features?.length || 0} khu vực mất rừng mặc định`,
+        message: `✅ Đã tải ${matRungGeoJSON.features?.length || 0} khu vực mất rừng với thông tin hành chính`,
         mat_rung: matRungGeoJSON,
-        tkk_3lr_cru: { type: "FeatureCollection", features: [] }, // Empty để tương thích
+        tkk_3lr_cru: { type: "FeatureCollection", features: [] },
         isDefault: true,
-        totalLoaded: matRungGeoJSON.features?.length || 0
+        totalLoaded: matRungGeoJSON.features?.length || 0,
+        spatialIntersectionUsed: true
       });
     }
 
-    // ✅ TRƯỜNG HỢP 2: Có filter - logic cũ
+    // ✅ TRƯỜNG HỢP 2: Có filter - sử dụng spatial intersection
     if (!fromDate || !toDate) {
       return res.status(400).json({ 
         message: "Cần có tham số từ ngày và đến ngày khi tìm kiếm có điều kiện." 
       });
     }
 
-    console.log("🔍 Loading dữ liệu mat_rung với filter...");
+    console.log("🔍 Loading dữ liệu mat_rung với filter và spatial intersection...");
 
-    // ========= Truy vấn bảng mat_rung với filter =========
-    const matRungQuery = `
-      SELECT json_build_object(
-        'type', 'FeatureCollection',
-        'features', COALESCE(json_agg(
-          json_build_object(
-            'type', 'Feature',
-            'geometry', ST_AsGeoJSON(ST_Transform(geom, 4326))::json,
-            'properties', to_jsonb(t) - 'geom'
-          )
-        ), '[]'::json)
-      ) AS geojson
-      FROM (
-        SELECT * FROM mat_rung 
-        WHERE start_dau >= $1 AND end_sau <= $2
-        ORDER BY gid DESC
-        LIMIT $3
-      ) AS t;
-    `;
-
-    const matRungResult = await pool.query(matRungQuery, [fromDate, toDate, limit]);
-    const matRungGeoJSON = matRungResult.rows[0].geojson;
-
-    // ========= Truy vấn bảng tlaocai_tkk_3lr_cru =========
+    // ========= Truy vấn với spatial intersection =========
     const conditions = [];
     const params = [];
     let index = 1;
 
+    // Điều kiện cơ bản
+    conditions.push(`m.start_dau >= $${index++}`);
+    conditions.push(`m.end_sau <= $${index++}`);
+    params.push(fromDate, toDate);
+
+    // Điều kiện spatial
     if (huyen) {
-      conditions.push(`huyen = $${index++}`);
+      conditions.push(`r.huyen = $${index++}`);
       params.push(huyen);
     }
     if (xa) {
-      conditions.push(`xa = $${index++}`);
+      conditions.push(`r.xa = $${index++}`);
       params.push(xa);
     }
     if (tk) {
-      conditions.push(`tk = $${index++}`);
+      conditions.push(`r.tieukhu = $${index++}`);
       params.push(tk);
     }
     if (khoanh) {
-      conditions.push(`khoanh = $${index++}`);
+      conditions.push(`r.khoanh = $${index++}`);
       params.push(khoanh);
     }
+
+    // Chủ rừng từ bảng laocai_rg3lr
+    let churungJoin = "";
     if (churung) {
-      conditions.push(`churung ILIKE $${index++}`);
+      churungJoin = `LEFT JOIN laocai_rg3lr t ON ST_Intersects(m.geom, t.geom)`;
+      conditions.push(`t.churung ILIKE $${index++}`);
       params.push(`%${churung}%`);
     }
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+    const whereClause = `WHERE ${conditions.join(" AND ")}`;
 
-    const cruQuery = `
-      SELECT json_build_object(
-        'type', 'FeatureCollection',
-        'features', COALESCE(json_agg(
-          json_build_object(
-            'type', 'Feature',
-            'geometry', ST_AsGeoJSON(ST_Transform(geom, 4326))::json,
-            'properties', to_jsonb(t) - 'geom'
-          )
-        ), '[]'::json)
-      ) AS geojson
-      FROM (
-        SELECT * FROM tlaocai_tkk_3lr_cru t
-        ${whereClause}
-        LIMIT 1000
-      ) AS t;
+    const matRungQuery = `
+      SELECT 
+        m.gid,
+        m.start_sau,
+        m.area,
+        m.start_dau,
+        m.end_sau,
+        m.mahuyen,
+        m.end_dau,
+        m.detection_status,
+        m.detection_date,
+        m.verified_by,
+        m.verified_area,
+        m.verification_reason,
+        m.verification_notes,
+        
+        -- Spatial intersection data
+        r.huyen,
+        r.xa,
+        r.tieukhu as tk,
+        r.khoanh,
+        ${churung ? 't.churung,' : 'NULL as churung,'}
+        
+        -- Coordinates
+        ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x_coordinate,
+        ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y_coordinate,
+        
+        -- Geometry
+        ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
+        
+      FROM mat_rung m
+      LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(
+        ST_Transform(m.geom, 4326), 
+        ST_Transform(r.geom, 4326)
+      )
+      ${churungJoin}
+      ${whereClause}
+      AND m.geom IS NOT NULL
+      ORDER BY m.gid DESC
+      LIMIT $${index++}
     `;
 
-    const cruResult = await pool.query(cruQuery, params);
-    const cruGeoJSON = cruResult.rows[0].geojson;
+    params.push(limit);
 
-    console.log(`✅ Loaded ${matRungGeoJSON.features?.length || 0} mat_rung features với filter`);
+    const matRungResult = await pool.query(matRungQuery, params);
+
+    // Xây dựng GeoJSON với spatial data
+    const matRungFeatures = matRungResult.rows.map(row => {
+      const huyenMapping = {
+        '01': 'Lào Cai',
+        '02': 'Bát Xát', 
+        '03': 'Mường Khương',
+        '04': 'Si Ma Cai',
+        '05': 'Bắc Hà',
+        '06': 'Bảo Thắng',
+        '07': 'Bảo Yên',
+        '08': 'Sa Pa',
+        '09': 'Văn Bàn'
+      };
+
+      return {
+        type: "Feature",
+        geometry: JSON.parse(row.geometry),
+        properties: {
+          gid: row.gid,
+          start_sau: row.start_sau,
+          area: row.area,
+          start_dau: row.start_dau,
+          end_sau: row.end_sau,
+          mahuyen: row.mahuyen,
+          end_dau: row.end_dau,
+          detection_status: row.detection_status,
+          detection_date: row.detection_date,
+          verified_by: row.verified_by,
+          verified_area: row.verified_area,
+          verification_reason: row.verification_reason,
+          verification_notes: row.verification_notes,
+          
+          // Spatial intersection data với fallback
+          huyen: convertTcvn3ToUnicode(row.huyen || huyenMapping[row.mahuyen] || `Huyện ${row.mahuyen}`),
+          xa: convertTcvn3ToUnicode(row.xa || ""),
+          tk: row.tk,
+          khoanh: row.khoanh,
+          churung: convertTcvn3ToUnicode(row.churung || ""),
+          
+          // Coordinates
+          x_coordinate: row.x_coordinate,
+          y_coordinate: row.y_coordinate
+        }
+      };
+    });
+
+    const matRungGeoJSON = {
+      type: "FeatureCollection",
+      features: matRungFeatures
+    };
+
+    console.log(`✅ Loaded ${matRungGeoJSON.features?.length || 0} mat_rung features với filter và spatial intersection`);
 
     res.json({
-      message: "✅ Dữ liệu đã được truy xuất thành công với filter.",
+      message: "✅ Dữ liệu đã được truy xuất thành công với spatial intersection.",
       mat_rung: matRungGeoJSON,
-      tkk_3lr_cru: cruGeoJSON,
+      tkk_3lr_cru: { type: "FeatureCollection", features: [] }, // Để tương thích
       isDefault: false,
+      spatialIntersectionUsed: true,
       filters: {
         fromDate,
         toDate,
@@ -161,53 +297,113 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ ENDPOINT MỚI: Lấy toàn bộ dữ liệu mat_rung (phục vụ cho load mặc định)
+// ✅ ENDPOINT: Lấy toàn bộ dữ liệu mat_rung với spatial intersection
 router.get("/all", async (req, res) => {
   const { limit = 1000 } = req.query;
   
   try {
-    console.log(`🔴 Loading ALL mat_rung data with limit: ${limit}`);
+    console.log(`🔴 Loading ALL mat_rung data với spatial intersection, limit: ${limit}`);
     
     const query = `
-      SELECT json_build_object(
-        'type', 'FeatureCollection',
-        'features', COALESCE(json_agg(
-          json_build_object(
-            'type', 'Feature',
-            'geometry', ST_AsGeoJSON(ST_Transform(geom, 4326))::json,
-            'properties', to_jsonb(t) - 'geom'
-          )
-        ), '[]'::json)
-      ) AS geojson
-      FROM (
-        SELECT 
-          gid,
-          start_sau,
-          area,
-          start_dau,
-          end_sau,
-          mahuyen,
-          end_dau,
-          detection_status
-        FROM mat_rung 
-        WHERE geom IS NOT NULL 
-          AND ST_IsValid(geom)
-        ORDER BY gid DESC 
-        LIMIT $1
-      ) AS t;
+      SELECT 
+        m.gid,
+        m.start_sau,
+        m.area,
+        m.start_dau,
+        m.end_sau,
+        m.mahuyen,
+        m.end_dau,
+        m.detection_status,
+        m.detection_date,
+        m.verified_by,
+        m.verified_area,
+        m.verification_reason,
+        m.verification_notes,
+        
+        -- Spatial intersection
+        r.huyen,
+        r.xa,
+        r.tieukhu as tk,
+        r.khoanh,
+        
+        -- Coordinates
+        ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x_coordinate,
+        ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y_coordinate,
+        
+        -- Geometry
+        ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
+        
+      FROM mat_rung m
+      LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(
+        ST_Transform(m.geom, 4326), 
+        ST_Transform(r.geom, 4326)
+      )
+      WHERE m.geom IS NOT NULL 
+      ORDER BY m.gid DESC 
+      LIMIT $1
     `;
 
     const result = await pool.query(query, [parseInt(limit)]);
-    const geoJSON = result.rows[0].geojson;
 
-    console.log(`✅ Successfully loaded ${geoJSON.features?.length || 0} mat_rung features`);
+    // Xây dựng GeoJSON với spatial data
+    const features = result.rows.map(row => {
+      const huyenMapping = {
+        '01': 'Lào Cai',
+        '02': 'Bát Xát', 
+        '03': 'Mường Khương',
+        '04': 'Si Ma Cai',
+        '05': 'Bắc Hà',
+        '06': 'Bảo Thắng',
+        '07': 'Bảo Yên',
+        '08': 'Sa Pa',
+        '09': 'Văn Bàn'
+      };
+
+      return {
+        type: "Feature",
+        geometry: JSON.parse(row.geometry),
+        properties: {
+          gid: row.gid,
+          start_sau: row.start_sau,
+          area: row.area,
+          start_dau: row.start_dau,
+          end_sau: row.end_sau,
+          mahuyen: row.mahuyen,
+          end_dau: row.end_dau,
+          detection_status: row.detection_status,
+          detection_date: row.detection_date,
+          verified_by: row.verified_by,
+          verified_area: row.verified_area,
+          verification_reason: row.verification_reason,
+          verification_notes: row.verification_notes,
+          
+          // Spatial data với fallback
+          huyen: convertTcvn3ToUnicode(row.huyen || huyenMapping[row.mahuyen] || `Huyện ${row.mahuyen}`),
+          xa: convertTcvn3ToUnicode(row.xa || ""),
+          tk: row.tk,
+          khoanh: row.khoanh,
+          
+          // Coordinates
+          x_coordinate: row.x_coordinate,
+          y_coordinate: row.y_coordinate
+        }
+      };
+    });
+
+    const geoJSON = {
+      type: "FeatureCollection",
+      features: features
+    };
+
+    console.log(`✅ Successfully loaded ${geoJSON.features?.length || 0} mat_rung features với spatial intersection`);
 
     res.json({
       success: true,
-      message: `Đã tải ${geoJSON.features?.length || 0} khu vực mất rừng`,
+      message: `Đã tải ${geoJSON.features?.length || 0} khu vực mất rừng với thông tin hành chính`,
       data: geoJSON,
       total: geoJSON.features?.length || 0,
-      limit: parseInt(limit)
+      limit: parseInt(limit),
+      spatialIntersectionUsed: true
     });
 
   } catch (err) {
@@ -220,7 +416,7 @@ router.get("/all", async (req, res) => {
   }
 });
 
-// ✅ ENDPOINT MỚI: Lấy thống kê dữ liệu mat_rung
+// ✅ ENDPOINT: Lấy thống kê dữ liệu mat_rung
 router.get("/stats", async (req, res) => {
   try {
     console.log("📊 Getting mat_rung statistics...");
@@ -228,12 +424,19 @@ router.get("/stats", async (req, res) => {
     const statsQuery = `
       SELECT 
         COUNT(*) as total_records,
-        COUNT(CASE WHEN geom IS NOT NULL THEN 1 END) as records_with_geometry,
-        MIN(start_dau) as earliest_date,
-        MAX(end_sau) as latest_date,
-        SUM(area) as total_area,
-        COUNT(DISTINCT mahuyen) as unique_districts
-      FROM mat_rung;
+        COUNT(CASE WHEN m.geom IS NOT NULL THEN 1 END) as records_with_geometry,
+        COUNT(CASE WHEN r.gid IS NOT NULL THEN 1 END) as records_with_spatial_data,
+        MIN(m.start_dau) as earliest_date,
+        MAX(m.end_sau) as latest_date,
+        SUM(m.area) as total_area,
+        COUNT(DISTINCT m.mahuyen) as unique_districts,
+        COUNT(DISTINCT r.huyen) as unique_huyen_names,
+        COUNT(DISTINCT r.xa) as unique_xa_names
+      FROM mat_rung m
+      LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(
+        ST_Transform(m.geom, 4326), 
+        ST_Transform(r.geom, 4326)
+      );
     `;
 
     const result = await pool.query(statsQuery);
@@ -241,8 +444,11 @@ router.get("/stats", async (req, res) => {
 
     // Format area thành hectares
     stats.total_area_ha = stats.total_area ? parseFloat((stats.total_area / 10000).toFixed(2)) : 0;
+    stats.spatial_intersection_rate = stats.total_records > 0 
+      ? ((stats.records_with_spatial_data / stats.total_records) * 100).toFixed(2) + '%'
+      : '0%';
 
-    console.log("📊 Mat rung statistics:", stats);
+    console.log("📊 Mat rung statistics with spatial intersection:", stats);
 
     res.json({
       success: true,

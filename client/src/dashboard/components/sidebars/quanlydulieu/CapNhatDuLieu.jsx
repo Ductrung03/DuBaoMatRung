@@ -188,7 +188,7 @@ const CapNhatDuLieu = () => {
           onClick={() => setIsOpen(!isOpen)}
         >
           <div className="flex items-center justify-between">
-            <span>📊 Cập nhật dữ liệu (Enhanced Cache)</span>
+            <span> Cập nhật dữ liệu </span>
             <span className="text-xs">{isOpen ? '▼' : '▶'}</span>
           </div>
         </div>
@@ -196,36 +196,7 @@ const CapNhatDuLieu = () => {
         {isOpen && (
           <div className="flex flex-col gap-3 px-1 pt-3">
             
-            {/* Enhanced Cache Status Component */}
-            <CacheStatusComponent 
-              isOpen={showCacheStatus} 
-              onToggle={() => setShowCacheStatus(!showCacheStatus)}
-            />
 
-            {/* Enhanced Bulk Actions */}
-            <div className="mb-4 p-3 bg-green-50 rounded-md border border-green-200">
-              <button 
-                onClick={handleLoadAllLayers}
-                disabled={globalLoading || currentLoadingLayer}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md text-center flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {globalLoading ? (
-                  <>
-                    <ClipLoader color="#ffffff" size={16} />
-                    <span className="ml-2">Đang tải với cache...</span>
-                  </>
-                ) : (
-                  <>🚀 Tải TẤT CẢ - 5 lớp </>
-                )}
-              </button>
-             
-             
-            </div>
-
-            {/* Individual Layers with enhanced info */}
-            <div className="border-t border-gray-200 pt-3">
-              <h4 className="text-sm font-medium mb-3 text-gray-700">Hoặc tải từng lớp:</h4>
-            </div>
 
             <div className="flex flex-col gap-2">
               {Object.entries(mapLayers).map(([layerKey, layer]) => (
@@ -269,24 +240,8 @@ const CapNhatDuLieu = () => {
               ))}
             </div>
 
-            {/* Enhanced Status Summary */}
-            <div className="mt-4 p-3 bg-gray-50 rounded-md text-xs">
-              <div className="text-gray-700 font-medium mb-2">📈 Tổng quan Enhanced Cache:</div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <span>Đã tải: </span>
-                  <strong className="text-green-600">{Object.values(mapLayers).filter(layer => layer.data).length}/5</strong>
-                </div>
-                <div>
-                  <span>Cache hits: </span>
-                  <strong className="text-blue-600">
-                    {Object.values(mapLayers).filter(layer => layer.data?.fromPersistentCache || layer.data?.fromMemoryCache).length}
-                  </strong>
-                </div>
-              </div>
-              
-              
-            </div>
+           
+            
           </div>
         )}
       </div>

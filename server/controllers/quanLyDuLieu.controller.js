@@ -1,7 +1,7 @@
 const pool = require("../db");
 const convertTcvn3ToUnicode = require("../utils/convertTcvn3ToUnicode");
 
-// ✅ CẬP NHẬT: Tra cứu dữ liệu với spatial intersection giữa mat_rung và laocai_ranhgioihc
+// ✅ CẬP NHẬT: Tra cứu dữ liệu với LEFT JOIN để đảm bảo có dữ liệu
 exports.traCuuDuLieuBaoMatRung = async (req, res) => {
   const { fromDate, toDate, huyen, xa, tieukhu, khoanh, churung, page = 1, limit = 500 } = req.query;
 
@@ -13,7 +13,7 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
   }
 
   try {
-    console.log("🚀 Sử dụng spatial intersection giữa mat_rung và laocai_ranhgioihc");
+    console.log("🚀 Sử dụng LEFT JOIN spatial intersection");
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const queryLimit = Math.min(parseInt(limit), 1000);
@@ -36,74 +36,71 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
 
     const startTime = Date.now();
 
-    // ✅ THAY ĐỔI: Xây dựng WHERE conditions cho bảng laocai_ranhgioihc
-    const ranhgioihcConditions = [];
-    const ranhgioihcParams = [];
-    let ranhgioihcParamIndex = 1;
+    // ✅ XÂY DỰNG ĐIỀU KIỆN WHERE
+    const conditions = [];
+    const queryParams = [];
+    let paramIndex = 1;
 
+    // Điều kiện cho bảng mat_rung (bắt buộc)
+    conditions.push(`m.start_dau::date >= $${paramIndex++}::date`);
+    conditions.push(`m.end_sau::date <= $${paramIndex++}::date`);
+    queryParams.push(fromDate, toDate);
+
+    // Điều kiện cho spatial intersection (tùy chọn)
     if (finalHuyen) {
-      ranhgioihcConditions.push(`r.huyen = $${ranhgioihcParamIndex++}`);
-      ranhgioihcParams.push(finalHuyen);
+      conditions.push(`r.huyen = $${paramIndex++}`);
+      queryParams.push(finalHuyen);
     }
 
     if (xa) {
-      ranhgioihcConditions.push(`r.xa = $${ranhgioihcParamIndex++}`);
-      ranhgioihcParams.push(xa);
+      conditions.push(`r.xa = $${paramIndex++}`);
+      queryParams.push(xa);
     }
 
     if (tieukhu) {
-      ranhgioihcConditions.push(`r.tieukhu = $${ranhgioihcParamIndex++}`);
-      ranhgioihcParams.push(tieukhu);
+      conditions.push(`r.tieukhu = $${paramIndex++}`);
+      queryParams.push(tieukhu);
     }
 
     if (khoanh) {
-      ranhgioihcConditions.push(`r.khoanh = $${ranhgioihcParamIndex++}`);
-      ranhgioihcParams.push(khoanh);
+      conditions.push(`r.khoanh = $${paramIndex++}`);
+      queryParams.push(khoanh);
     }
 
-    // ✅ THAY ĐỔI: Xây dựng WHERE conditions cho bảng mat_rung
-    const matRungConditions = [
-      `m.start_dau::date >= $${ranhgioihcParamIndex++}::date`,
-      `m.end_sau::date <= $${ranhgioihcParamIndex++}::date`
-    ];
-    ranhgioihcParams.push(fromDate, toDate);
-
-    // ✅ XỬ LÝ CHURUNG: Vì churung không có trong laocai_ranhgioihc, ta sẽ join với tlaocai_tkk_3lr_cru
+    // XỬ LÝ CHURUNG từ bảng laocai_rg3lr
     let churungJoin = "";
-    let churungCondition = "";
-    
     if (churung) {
       churungJoin = `
-        LEFT JOIN tlaocai_tkk_3lr_cru t ON ST_Intersects(r.geom, ST_Transform(t.geom, 4326))
+        LEFT JOIN laocai_rg3lr t ON ST_Intersects(m.geom, t.geom)
       `;
-      churungCondition = `AND t.churung ILIKE $${ranhgioihcParamIndex++}`;
-      ranhgioihcParams.push(`%${churung}%`);
+      conditions.push(`t.churung ILIKE $${paramIndex++}`);
+      queryParams.push(`%${churung}%`);
     }
 
-    const ranhgioihcWhereClause = ranhgioihcConditions.length > 0 
-      ? `WHERE ${ranhgioihcConditions.join(" AND ")}` 
-      : "";
+    const whereClause = `WHERE ${conditions.join(" AND ")}`;
 
-    const matRungWhereClause = `WHERE ${matRungConditions.join(" AND ")}`;
-
-    // ✅ TRUY VẤN MỚI: Spatial intersection giữa mat_rung và laocai_ranhgioihc
-    console.log("📊 Counting total records with spatial intersection...");
+    // ✅ TRUY VẤN COUNT đơn giản trước
+    console.log("📊 Counting total records...");
     
     const countQuery = `
       SELECT COUNT(*) as total
       FROM mat_rung m
-      INNER JOIN laocai_ranhgioihc r ON ST_Intersects(m.geom, r.geom)
+      LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(
+        ST_Transform(m.geom, 4326), 
+        ST_Transform(r.geom, 4326)
+      )
       ${churungJoin}
-      ${matRungWhereClause}
-      ${ranhgioihcWhereClause.replace('WHERE', 'AND')}
-      ${churungCondition}
-      AND ST_IsValid(m.geom) AND ST_IsValid(r.geom)
+      ${whereClause}
+      AND m.geom IS NOT NULL
     `;
     
-    const countResult = await pool.query(countQuery, ranhgioihcParams);
+    console.log("📊 Count query:", countQuery);
+    console.log("📊 Query params:", queryParams);
+    
+    const countResult = await pool.query(countQuery, queryParams);
     const totalRecords = parseInt(countResult.rows[0].total);
     
-    console.log(`📊 Total intersecting records found: ${totalRecords}`);
+    console.log(`📊 Total records found: ${totalRecords}`);
 
     if (totalRecords === 0) {
       return res.json({
@@ -119,8 +116,8 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
       });
     }
 
-    // ✅ TRUY VẤN DỮ LIỆU: Lấy dữ liệu với spatial intersection
-    console.log("📊 Fetching data with spatial intersection...");
+    // ✅ TRUY VẤN DỮ LIỆU chính - SỬ DỤNG LEFT JOIN để đảm bảo có dữ liệu
+    console.log("📊 Fetching main data...");
     
     const dataQuery = `
       SELECT 
@@ -129,47 +126,119 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
         m.end_sau,
         m.area,
         m.mahuyen,
+        m.detection_status,
+        m.detection_date,
+        m.verified_by,
+        m.verified_area,
+        m.verification_reason,
+        m.verification_notes,
+        
+        -- Thông tin từ spatial intersection (có thể NULL)
         r.huyen,
         r.xa,
         r.tieukhu as tk,
         r.khoanh,
+        
+        -- Thông tin chủ rừng (có thể NULL)
         ${churung ? 't.churung,' : 'NULL as churung,'}
-        ST_AsGeoJSON(m.geom) as geometry
+        
+        -- Extract tọa độ centroid từ geometry
+        ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x_coordinate,
+        ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y_coordinate,
+        
+        -- Geometry cho hiển thị trên bản đồ
+        ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
+        
       FROM mat_rung m
-      INNER JOIN laocai_ranhgioihc r ON ST_Intersects(m.geom, r.geom)
+      LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(
+        ST_Transform(m.geom, 4326), 
+        ST_Transform(r.geom, 4326)
+      )
       ${churungJoin}
-      ${matRungWhereClause}
-      ${ranhgioihcWhereClause.replace('WHERE', 'AND')}
-      ${churungCondition}
-      AND ST_IsValid(m.geom) AND ST_IsValid(r.geom)
+      ${whereClause}
+      AND m.geom IS NOT NULL
       ORDER BY m.gid DESC
-      LIMIT $${ranhgioihcParamIndex++} OFFSET $${ranhgioihcParamIndex++}
+      LIMIT $${paramIndex++} OFFSET $${paramIndex++}
     `;
 
-    ranhgioihcParams.push(queryLimit, offset);
+    queryParams.push(queryLimit, offset);
 
-    const dataResult = await pool.query(dataQuery, ranhgioihcParams);
+    console.log("📊 Main data query:", dataQuery);
+
+    const dataResult = await pool.query(dataQuery, queryParams);
     const queryTime = Date.now() - startTime;
     
-    console.log(`⏱️ Spatial intersection query executed in ${queryTime}ms`);
+    console.log(`⏱️ Query executed in ${queryTime}ms`);
+    console.log(`📊 Records returned: ${dataResult.rows.length}`);
 
-    // ✅ XÂY DỰNG GEOJSON
-    const features = dataResult.rows.map(row => ({
-      type: "Feature",
-      geometry: JSON.parse(row.geometry),
-      properties: {
-        gid: row.gid,
-        start_dau: row.start_dau,
-        end_sau: row.end_sau,
-        area: row.area,
-        mahuyen: row.mahuyen,
-        huyen: convertTcvn3ToUnicode(row.huyen || ""),
-        xa: convertTcvn3ToUnicode(row.xa || ""),
-        tk: row.tk,
-        khoanh: row.khoanh,
-        churung: convertTcvn3ToUnicode(row.churung || "")
+    // ✅ XÂY DỰNG GEOJSON với đầy đủ thông tin
+    const features = dataResult.rows.map(row => {
+      // Log để debug spatial intersection
+      if (row.huyen) {
+        console.log(`✅ GID ${row.gid} HAS spatial data:`, {
+          huyen: row.huyen,
+          xa: row.xa,
+          tk: row.tk,
+          khoanh: row.khoanh
+        });
+      } else {
+        console.log(`❌ GID ${row.gid} NO spatial data - checking alternative methods`);
+        
+        // Thử lấy thông tin từ mã huyện
+        const huyenMapping = {
+          '01': 'Lào Cai',
+          '02': 'Bát Xát', 
+          '03': 'Mường Khương',
+          '04': 'Si Ma Cai',
+          '05': 'Bắc Hà',
+          '06': 'Bảo Thắng',
+          '07': 'Bảo Yên',
+          '08': 'Sa Pa',
+          '09': 'Văn Bàn'
+        };
+        
+        // Gán giá trị fallback từ mã huyện
+        row.huyen = huyenMapping[row.mahuyen] || `Huyện ${row.mahuyen}`;
+        row.xa = null; // Để NULL nếu không có spatial intersection
+        row.tk = null;
+        row.khoanh = null;
+        
+        console.log(`🔄 Applied fallback for GID ${row.gid}: huyen = ${row.huyen}`);
       }
-    }));
+
+      return {
+        type: "Feature",
+        geometry: JSON.parse(row.geometry),
+        properties: {
+          gid: row.gid,
+          start_dau: row.start_dau,
+          end_sau: row.end_sau,
+          area: row.area,
+          mahuyen: row.mahuyen,
+          
+          // ✅ Thông tin hành chính (có thể có fallback)
+          huyen: convertTcvn3ToUnicode(row.huyen || ""),
+          xa: convertTcvn3ToUnicode(row.xa || ""),
+          tk: row.tk,
+          khoanh: row.khoanh,
+          
+          // ✅ Tọa độ đã extract
+          x_coordinate: row.x_coordinate,
+          y_coordinate: row.y_coordinate,
+          
+          // ✅ Thông tin xác minh
+          detection_status: row.detection_status || 'Chưa xác minh',
+          detection_date: row.detection_date,
+          verified_by: row.verified_by,
+          verified_area: row.verified_area,
+          verification_reason: row.verification_reason,
+          verification_notes: row.verification_notes,
+          
+          // ✅ Chủ rừng (nếu có)
+          churung: convertTcvn3ToUnicode(row.churung || "")
+        }
+      };
+    });
 
     const geojson = {
       type: "FeatureCollection",
@@ -178,7 +247,13 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
 
     const totalPages = Math.ceil(totalRecords / queryLimit);
 
-    console.log(`✅ Spatial intersection query completed: ${features.length} features, ${queryTime}ms`);
+    console.log(`✅ Query completed: ${features.length} features, ${queryTime}ms`);
+
+    // ✅ Thống kê spatial intersection
+    const withSpatialData = features.filter(f => f.properties.huyen && f.properties.xa).length;
+    const withoutSpatialData = features.length - withSpatialData;
+    
+    console.log(`📊 Spatial intersection stats: ${withSpatialData} with data, ${withoutSpatialData} using fallback`);
 
     res.json({
       success: true,
@@ -194,21 +269,23 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
       performance: {
         queryTime: queryTime,
         recordsReturned: features.length,
-        optimizationUsed: "spatial_intersection_mat_rung_ranhgioihc"
+        spatialIntersectionSuccess: withSpatialData,
+        fallbackUsed: withoutSpatialData
       },
       dataSource: {
         intersectionTables: ["mat_rung", "laocai_ranhgioihc"],
-        churungSource: churung ? "tlaocai_tkk_3lr_cru" : null
+        churungSource: churung ? "laocai_rg3lr" : null,
+        coordinatesExtracted: true
       }
     });
 
   } catch (err) {
-    console.error("❌ Lỗi spatial intersection tra cứu:", err.message);
+    console.error("❌ Lỗi truy vấn:", err.message);
     console.error("Stack trace:", err.stack);
     
     res.status(500).json({
       success: false,
-      message: "Lỗi truy vấn dữ liệu spatial intersection",
+      message: "Lỗi truy vấn dữ liệu",
       error: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
   }
@@ -224,16 +301,45 @@ exports.testSpatialIntersection = async (req, res) => {
         COUNT(*) as total_mat_rung,
         COUNT(CASE WHEN r.gid IS NOT NULL THEN 1 END) as intersecting_records,
         COUNT(DISTINCT r.huyen) as unique_huyen,
-        COUNT(DISTINCT r.xa) as unique_xa
+        COUNT(DISTINCT r.xa) as unique_xa,
+        COUNT(DISTINCT r.tieukhu) as unique_tieukhu,
+        COUNT(DISTINCT r.khoanh) as unique_khoanh
       FROM mat_rung m
-      LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(m.geom, r.geom)
-      WHERE ST_IsValid(m.geom) AND ST_IsValid(r.geom)
+      LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(
+        ST_Transform(m.geom, 4326), 
+        ST_Transform(r.geom, 4326)
+      )
+      WHERE m.geom IS NOT NULL
     `;
     
     const result = await pool.query(testQuery);
     const stats = result.rows[0];
     
     console.log("📊 Spatial intersection test results:", stats);
+    
+    // Test mẫu với 5 records
+    const sampleQuery = `
+      SELECT 
+        m.gid,
+        m.area,
+        m.mahuyen,
+        r.huyen,
+        r.xa,
+        r.tieukhu as tk,
+        r.khoanh,
+        ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x_coord,
+        ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y_coord
+      FROM mat_rung m
+      LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(
+        ST_Transform(m.geom, 4326), 
+        ST_Transform(r.geom, 4326)
+      )
+      WHERE m.geom IS NOT NULL
+      ORDER BY m.gid DESC
+      LIMIT 5
+    `;
+    
+    const sampleResult = await pool.query(sampleQuery);
     
     res.json({
       success: true,
@@ -243,10 +349,22 @@ exports.testSpatialIntersection = async (req, res) => {
         intersecting_records: parseInt(stats.intersecting_records),
         unique_huyen: parseInt(stats.unique_huyen),
         unique_xa: parseInt(stats.unique_xa),
+        unique_tieukhu: parseInt(stats.unique_tieukhu),
+        unique_khoanh: parseInt(stats.unique_khoanh),
         intersection_rate: stats.total_mat_rung > 0 
           ? ((stats.intersecting_records / stats.total_mat_rung) * 100).toFixed(2) + '%'
           : '0%'
-      }
+      },
+      sample_data: sampleResult.rows.map(row => ({
+        gid: row.gid,
+        area: row.area,
+        mahuyen: row.mahuyen,
+        huyen: convertTcvn3ToUnicode(row.huyen || "NULL"),
+        xa: convertTcvn3ToUnicode(row.xa || "NULL"),
+        tk: row.tk || "NULL",
+        khoanh: row.khoanh || "NULL",
+        coordinates: row.x_coord && row.y_coord ? `${row.x_coord}, ${row.y_coord}` : "NULL"
+      }))
     });
     
   } catch (err) {

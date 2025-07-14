@@ -14,40 +14,214 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
 
   if (!data || data.length === 0) return null;
 
-  const formatValue = (columnName, value) => {
-    if (columnName === "area" && value !== null) {
-      return `${(value / 10000).toFixed(1)} ha`;
-    }
-
-    if (["start_dau", "end_sau"].includes(columnName) && value) {
-      const date = new Date(value);
-      if (!isNaN(date.getTime())) {
-        return date.toLocaleDateString('vi-VN');
-      }
-    }
-
-    return value !== null ? String(value) : "NULL";
+  // ✅ MAPPING CHÍNH XÁC: Dựa vào spatial intersection query trong controller
+  const columnMapping = {
+    // Cột yêu cầu: cột thực tế từ spatial intersection (controller đã cập nhật)
+    'loCB': 'gid',                    // mat_rung.gid
+    'dtich': 'area',                  // mat_rung.area  
+    'huyen': 'huyen',                 // laocai_ranhgioihc.huyen (TÊN HUYỆN)
+    'xa': 'xa',                       // laocai_ranhgioihc.xa
+    'tk': 'tk',                       // laocai_ranhgioihc.tieukhu AS tk
+    'khoanh': 'khoanh',               // laocai_ranhgioihc.khoanh
+    'X': 'x_coordinate',              // ST_X(ST_Centroid(m.geom)) as x_coordinate
+    'Y': 'y_coordinate',              // ST_Y(ST_Centroid(m.geom)) as y_coordinate
+    'xacminh': 'detection_status',    // mat_rung.detection_status
+    'DtichXM': 'verified_area',       // mat_rung.verified_area
+    'ngnhan': 'verification_reason',  // mat_rung.verification_reason
+    'NguoiXM': 'verified_by',         // mat_rung.verified_by
+    'NgayXM': 'detection_date'        // mat_rung.detection_date
   };
 
-  // Lấy tất cả các cột
-  const allColumns = Object.keys(data[0]);
-  
-  // Lọc bỏ các cột tọa độ không cần hiển thị
-  const columnsToHide = ['x', 'y', 'x_vn2000', 'y_vn2000', 'geom', 'geometry', '_whereCondition', '_originalData'];
-  const columns = allColumns.filter(col => !columnsToHide.includes(col));
+  // ✅ Tên hiển thị cho các cột (Rút ngắn để tránh đè)
+  const getColumnDisplayName = (columnKey) => {
+    const displayNames = {
+      'loCB': 'Lô cảnh báo',
+      'dtich': 'Diện tích', 
+      'huyen': 'Huyện',
+      'xa': 'Xã',
+      'tk': 'Tiểu khu',
+      'khoanh': 'Khoảnh',
+      'X': 'X',
+      'Y': 'Y',
+      'xacminh': 'Trạng thái XM',
+      'DtichXM': 'DT xác minh',
+      'ngnhan': 'Nguyên nhân',
+      'NguoiXM': 'Người XM',
+      'NgayXM': 'Ngày XM'
+    };
+    
+    return displayNames[columnKey] || columnKey;
+  };
 
-  // Sắp xếp các cột theo một thứ tự cụ thể
-  const sortedColumns = [
-    'huyen', 'xa', 'mahuyen', 'maxa', 'area', 'start_dau', 'end_sau', 
-    'tk', 'khoanh', 'lo', 'churung', 'detection_status'
-  ].filter(col => columns.includes(col));
-
-  // Thêm các cột còn lại
-  columns.forEach(col => {
-    if (!sortedColumns.includes(col)) {
-      sortedColumns.push(col);
+  // ✅ Extract tọa độ từ geometry (centroid)
+  const extractCoordinatesFromGeometry = (geometry) => {
+    if (!geometry) return { x: null, y: null };
+    
+    try {
+      // Parse geometry nếu là string
+      const geom = typeof geometry === 'string' ? JSON.parse(geometry) : geometry;
+      
+      if (geom.type === 'MultiPolygon' && geom.coordinates && geom.coordinates[0]) {
+        // Lấy polygon đầu tiên của MultiPolygon
+        const polygon = geom.coordinates[0];
+        if (polygon && polygon[0] && polygon[0].length > 0) {
+          // Tính centroid đơn giản (trung bình các điểm)
+          const coords = polygon[0];
+          let sumX = 0, sumY = 0;
+          coords.forEach(coord => {
+            sumX += coord[0]; // longitude
+            sumY += coord[1]; // latitude
+          });
+          return {
+            x: (sumX / coords.length).toFixed(6),
+            y: (sumY / coords.length).toFixed(6)
+          };
+        }
+      } else if (geom.type === 'Polygon' && geom.coordinates && geom.coordinates[0]) {
+        // Xử lý Polygon đơn
+        const coords = geom.coordinates[0];
+        let sumX = 0, sumY = 0;
+        coords.forEach(coord => {
+          sumX += coord[0];
+          sumY += coord[1]; 
+        });
+        return {
+          x: (sumX / coords.length).toFixed(6),
+          y: (sumY / coords.length).toFixed(6)
+        };
+      }
+    } catch (error) {
+      console.error('Lỗi extract tọa độ:', error);
     }
-  });
+    
+    return { x: null, y: null };
+  };
+
+  // ✅ Lấy giá trị thực từ data theo mapping
+  const getActualValue = (row, columnKey) => {
+    // Tọa độ đã được extract trong controller, không cần extract từ geometry nữa
+    const actualColumnName = columnMapping[columnKey];
+    
+    // Kiểm tra field name chính xác từ spatial intersection
+    if (actualColumnName && row[actualColumnName] !== undefined) {
+      return row[actualColumnName];
+    }
+    
+    // Fallback: thử các tên khác có thể có
+    const fallbackNames = {
+      'loCB': ['gid', 'GID', 'id'],
+      'dtich': ['area', 'AREA', 'dtich'],
+      'huyen': ['huyen', 'HUYEN', 'huyen_name'], // TÊN HUYỆN từ spatial join
+      'xa': ['xa', 'XA', 'xa_name'],
+      'tk': ['tk', 'TK', 'tieukhu', 'TIEUKHU'],
+      'khoanh': ['khoanh', 'KHOANH'],
+      'X': ['x_coordinate', 'X', 'x', 'longitude'],
+      'Y': ['y_coordinate', 'Y', 'y', 'latitude'],
+      'xacminh': ['detection_status', 'DETECTION_STATUS'],
+      'DtichXM': ['verified_area', 'VERIFIED_AREA'],
+      'ngnhan': ['verification_reason', 'VERIFICATION_REASON', 'verification_notes'],
+      'NguoiXM': ['verified_by', 'VERIFIED_BY'],
+      'NgayXM': ['detection_date', 'DETECTION_DATE']
+    };
+    
+    const possibleNames = fallbackNames[columnKey] || [columnKey];
+    for (const name of possibleNames) {
+      if (row[name] !== undefined && row[name] !== null) {
+        return row[name];
+      }
+    }
+    
+    return null;
+  };
+
+  // ✅ Cột hiển thị theo thứ tự yêu cầu
+  const requiredColumns = [
+    'loCB',
+    'dtich', 
+    'huyen',
+    'xa',
+    'tk', 
+    'khoanh',
+    'X',
+    'Y',
+    'xacminh',
+    'DtichXM',
+    'ngnhan',
+    'NguoiXM',
+    'NgayXM'
+  ];
+
+  // ✅ Format giá trị hiển thị
+  const formatValue = (columnKey, row) => {
+    const value = getActualValue(row, columnKey);
+    
+    if (value === null || value === undefined) {
+      return "NULL";
+    }
+
+    // Format đặc biệt theo loại cột
+    switch (columnKey) {
+      case 'dtich':
+      case 'DtichXM':
+        if (typeof value === 'number') {
+          // Nếu giá trị > 1000, có thể là m² cần chuyển sang ha
+          if (value > 1000) {
+            return `${(value / 10000).toFixed(2)} ha`;
+          }
+          return `${parseFloat(value).toFixed(2)} ha`;
+        }
+        return value;
+
+      case 'NgayXM':
+        if (value) {
+          const date = new Date(value);
+          if (!isNaN(date.getTime())) {
+            return date.toLocaleDateString('vi-VN');
+          }
+        }
+        return value || "NULL";
+
+      case 'X':
+      case 'Y':
+        if (value && value !== null) {
+          return parseFloat(value).toFixed(4);
+        }
+        return "NULL";
+
+      case 'xacminh':
+        // Map English status to Vietnamese
+        const statusMap = {
+          'pending': 'Chưa xác minh',
+          'verifying': 'Đang xác minh', 
+          'verified': 'Đã xác minh',
+          'rejected': 'Không xác minh được',
+          'Chưa xác minh': 'Chưa xác minh',
+          'Đang xác minh': 'Đang xác minh',
+          'Đã xác minh': 'Đã xác minh'
+        };
+        return statusMap[value] || value || 'Chưa xác minh';
+
+      case 'loCB':
+        return `CB-${value}`;
+
+      case 'NguoiXM':
+        // Nếu là số (user ID), có thể cần lookup tên
+        if (typeof value === 'number') {
+          return `User ${value}`;
+        }
+        return value || "NULL";
+
+      default:
+        return String(value);
+    }
+  };
+
+  // Debug chỉ trong development
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && data && data.length > 0) {
+      console.log("🔍 Table data loaded:", data.length, "records");
+    }
+  }, [data]);
 
   const skipColumns = ["id", "gid", "geom", "geometry"];
 
@@ -56,44 +230,27 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   };
 
   const createWhereCondition = (row) => {
-    if (row.gid !== undefined)
-      return { field: "gid", value: row.gid, where: `gid = ${row.gid}` };
-    if (row.id !== undefined)
-      return { field: "id", value: row.id, where: `id = ${row.id}` };
+    // Sử dụng giá trị thực từ mapping
+    const gidValue = getActualValue(row, 'loCB');
+    if (gidValue !== null && gidValue !== undefined) {
+      return { field: "gid", value: gidValue, where: `gid = ${gidValue}` };
+    }
 
+    // Fallback logic khác...
     if (tableName === "mat_rung" || tableName.includes("mat_rung")) {
-      if (row.start_dau && row.end_sau && row.mahuyen) {
+      const startDau = row.start_dau || row.START_DAU;
+      const endSau = row.end_sau || row.END_SAU; 
+      const mahuyen = row.mahuyen || row.MAHUYEN;
+      
+      if (startDau && endSau && mahuyen) {
         return {
           table: "mat_rung",
-          where: `start_dau = '${row.start_dau}' AND end_sau = '${row.end_sau}' AND mahuyen = '${row.mahuyen}'`,
-        };
-      }
-    } else if (
-      tableName === "tlaocai_tkk_3lr_cru" ||
-      tableName.includes("tkk")
-    ) {
-      if (row.tk && row.khoanh && row.xa) {
-        return {
-          table: "tlaocai_tkk_3lr_cru",
-          where: `tk = '${row.tk}' AND khoanh = '${row.khoanh}' AND xa = '${row.xa}'`,
+          where: `start_dau = '${startDau}' AND end_sau = '${endSau}' AND mahuyen = '${mahuyen}'`,
         };
       }
     }
 
-    let joinCondition = {};
-
-    if (row.start_dau && row.end_sau) {
-      joinCondition.mat_rung = `start_dau = '${row.start_dau}' AND end_sau = '${row.end_sau}'`;
-      if (row.mahuyen)
-        joinCondition.mat_rung += ` AND mahuyen = '${row.mahuyen}'`;
-    }
-
-    if (row.tk && row.khoanh) {
-      joinCondition.tlaocai_tkk_3lr_cru = `tk = '${row.tk}' AND khoanh = '${row.khoanh}'`;
-      if (row.xa) joinCondition.tlaocai_tkk_3lr_cru += ` AND xa = '${row.xa}'`;
-    }
-
-    return joinCondition;
+    return {};
   };
 
   const startEdit = (rowIndex, rowData) => {
@@ -109,10 +266,11 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     setEditData({});
   };
 
-  const handleInputChange = (columnName, value) => {
+  const handleInputChange = (columnKey, value) => {
+    const actualColumnName = columnMapping[columnKey] || columnKey;
     setEditData({
       ...editData,
-      [columnName]: value,
+      [actualColumnName]: value,
     });
   };
 
@@ -122,76 +280,45 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
       const originalRow = data[editRowIndex];
       const whereCondition = editData._whereCondition || createWhereCondition(originalRow);
 
-      for (const column in editData) {
-        if (column.startsWith("_") || columnsToHide.includes(column)) continue;
+      // Thông báo lưu ý
+      toast.info("💾 Đang cập nhật dữ liệu...");
 
+      for (const columnKey of requiredColumns) {
+        const actualColumnName = columnMapping[columnKey] || columnKey;
+        
         if (
-          isEditableColumn(column) &&
-          editData[column] !== originalRow[column]
+          isEditableColumn(actualColumnName) &&
+          editData[actualColumnName] !== getActualValue(originalRow, columnKey)
         ) {
-          let targetTable, whereClause;
-
-          if (whereCondition.table) {
-            targetTable = whereCondition.table;
-            whereClause = whereCondition.where;
-          }
-          else if (
-            whereCondition.mat_rung ||
-            whereCondition.tlaocai_tkk_3lr_cru
-          ) {
-            if (["start_dau", "end_sau", "mahuyen", "area"].includes(column)) {
-              targetTable = "mat_rung";
-              whereClause = whereCondition.mat_rung;
-            } else if (
-              ["tk", "khoanh", "xa", "huyen", "churung"].includes(column)
-            ) {
-              targetTable = "tlaocai_tkk_3lr_cru";
-              whereClause = whereCondition.tlaocai_tkk_3lr_cru;
-            } else {
-              console.warn(`Không thể xác định bảng cho cột ${column}`);
-              continue;
-            }
-          }
-          else if (whereCondition.field && whereCondition.value !== undefined) {
-            targetTable = tableName;
-            whereClause = whereCondition.where;
-          }
-          else {
-            console.error("Không thể xác định bảng và điều kiện WHERE cho cập nhật");
-            toast.error(`Không thể cập nhật cột ${column}: không xác định được dữ liệu`);
-            continue;
-          }
-
           try {
             const response = await axios.post(
               `${config.API_URL}/api/data/update-with-where`,
               {
-                table: targetTable,
-                column: column,
-                value: editData[column],
-                whereClause: whereClause,
+                table: tableName || "mat_rung",
+                column: actualColumnName,
+                value: editData[actualColumnName],
+                whereClause: whereCondition.where,
               }
             );
 
             if (response.data.success) {
-              toast.success(`Cập nhật cột ${column} thành công!`);
+              toast.success(`✅ Cập nhật ${getColumnDisplayName(columnKey)} thành công!`);
             } else {
-              toast.error(`Lỗi cập nhật cột ${column}: ${response.data.message}`);
+              toast.error(`❌ Lỗi cập nhật ${getColumnDisplayName(columnKey)}: ${response.data.message}`);
             }
           } catch (error) {
-            console.error(`Lỗi khi cập nhật cột ${column}:`, error);
-            toast.error(`Lỗi khi cập nhật cột ${column}: ${error.message}`);
+            console.error(`Lỗi khi cập nhật cột ${actualColumnName}:`, error);
+            toast.error(`❌ Lỗi khi cập nhật ${getColumnDisplayName(columnKey)}: ${error.message}`);
           }
         }
       }
 
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error("Lỗi khi cập nhật dữ liệu:", error);
-      toast.error(
-        "Lỗi khi cập nhật dữ liệu: " +
-          (error.response?.data?.message || error.message)
-      );
+      toast.error("❌ Lỗi khi cập nhật dữ liệu: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -213,54 +340,25 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
 
       setLoading(true);
 
-      let targetTable, whereClause;
-
-      if (whereCondition.table) {
-        targetTable = whereCondition.table;
-        whereClause = whereCondition.where;
-      }
-      else if (whereCondition.mat_rung || whereCondition.tlaocai_tkk_3lr_cru) {
-        if (whereCondition.mat_rung) {
-          targetTable = "mat_rung";
-          whereClause = whereCondition.mat_rung;
-        } else {
-          targetTable = "tlaocai_tkk_3lr_cru";
-          whereClause = whereCondition.tlaocai_tkk_3lr_cru;
+      const response = await axios.post(
+        `${config.API_URL}/api/data/delete-with-where`,
+        {
+          table: tableName || "mat_rung",
+          whereClause: whereCondition.where,
         }
-      }
-      else if (whereCondition.field && whereCondition.value !== undefined) {
-        targetTable = tableName;
-        whereClause = whereCondition.where;
-      }
-      else {
-        console.error("Không thể xác định bảng và điều kiện WHERE cho xóa");
-        toast.error("Không thể xóa dữ liệu: không xác định được bản ghi");
-        setLoading(false);
-        return;
-      }
+      );
 
-      try {
-        const response = await axios.post(
-          `${config.API_URL}/api/data/delete-with-where`,
-          {
-            table: targetTable,
-            whereClause: whereClause,
-          }
-        );
-
-        if (response.data.success) {
-          toast.success("Xóa dữ liệu thành công!");
+      if (response.data.success) {
+        toast.success("✅ Xóa dữ liệu thành công!");
+        setTimeout(() => {
           window.location.reload();
-        } else {
-          toast.error(`Lỗi xóa dữ liệu: ${response.data.message}`);
-        }
-      } catch (error) {
-        console.error("Lỗi khi xóa dữ liệu:", error);
-        toast.error(
-          "Lỗi khi xóa dữ liệu: " +
-            (error.response?.data?.message || error.message)
-        );
+        }, 1000);
+      } else {
+        toast.error(`❌ Lỗi xóa dữ liệu: ${response.data.message}`);
       }
+    } catch (error) {
+      console.error("Lỗi khi xóa dữ liệu:", error);
+      toast.error("❌ Lỗi khi xóa dữ liệu: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -271,25 +369,6 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     if (onRowClick) {
       onRowClick(row);
     }
-  };
-
-  const getColumnDisplayName = (columnName) => {
-    const columnMap = {
-      'huyen': 'Huyện',
-      'xa': 'Xã',
-      'mahuyen': 'Mã huyện',
-      'maxa': 'Mã xã',
-      'area': 'Diện tích',
-      'start_dau': 'Từ ngày',
-      'end_sau': 'Đến ngày',
-      'tk': 'Tiểu khu',
-      'khoanh': 'Khoảnh',
-      'lo': 'Lô',
-      'churung': 'Chủ rừng',
-      'detection_status': 'Trạng thái'
-    };
-    
-    return columnMap[columnName] || columnName;
   };
 
   // Inline styles
@@ -320,7 +399,6 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     overflowY: 'auto',
     maxHeight: '60vh',
     minHeight: '300px',
-    // Custom scrollbar styles for webkit browsers
     scrollbarWidth: 'thin',
     scrollbarColor: '#027e02 #f1f5f9',
   };
@@ -328,7 +406,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   const tableStyle = {
     width: '100%',
     borderCollapse: 'collapse',
-    minWidth: '800px',
+    minWidth: '1600px', // Tăng minWidth để có đủ chỗ cho 13 cột
   };
 
   const headerRowStyle = {
@@ -340,14 +418,16 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   };
 
   const headerCellStyle = {
-    padding: '0.75rem 1rem',
+    padding: '0.75rem 0.5rem',
     textAlign: 'left',
-    fontSize: '0.75rem',
+    fontSize: '0.7rem',
     fontWeight: 'bold',
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
     borderRight: '1px solid #16a34a',
     whiteSpace: 'nowrap',
+    minWidth: '100px', // Đảm bảo width tối thiểu
+    maxWidth: '140px', // Tăng maxWidth
   };
 
   const getRowStyle = (rowIndex) => ({
@@ -370,11 +450,15 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   });
 
   const cellStyle = {
-    padding: '0.75rem 1rem',
-    fontSize: '0.875rem',
+    padding: '0.5rem',
+    fontSize: '0.8rem',
     color: '#111827',
     borderRight: '1px solid #f3f4f6',
-    maxWidth: '200px',
+    minWidth: '100px', // Đảm bảo width tối thiểu
+    maxWidth: '140px', // Tăng maxWidth
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   };
 
   const actionsCellStyle = {
@@ -385,15 +469,16 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     position: 'sticky',
     right: 0,
     borderLeft: '1px solid #e5e7eb',
+    whiteSpace: 'nowrap',
   };
 
   const actionButtonStyle = {
-    padding: '0.5rem',
-    borderRadius: '0.5rem',
+    padding: '0.25rem',
+    borderRadius: '0.25rem',
     transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
     border: '1px solid transparent',
-    minWidth: '36px',
-    height: '36px',
+    minWidth: '28px',
+    height: '28px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -403,10 +488,10 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
 
   const editInputStyle = {
     width: '100%',
-    padding: '0.5rem 0.75rem',
-    fontSize: '0.875rem',
+    padding: '0.25rem 0.5rem',
+    fontSize: '0.75rem',
     border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
+    borderRadius: '0.25rem',
     transition: 'all 0.2s',
   };
 
@@ -450,7 +535,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
       {/* Header */}
       <div style={headerStyle}>
         <h2 className="text-lg sm:text-xl font-bold text-gray-800">
-          Bảng dữ liệu
+          🔍 Bảng dữ liệu xác minh mất rừng ({data.length} bản ghi)
         </h2>
         {isAdmin() && (
           <div className="text-xs sm:text-sm text-gray-600 italic bg-blue-50 p-2 rounded-md border-l-4 border-blue-400">
@@ -474,21 +559,36 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
             {/* Header */}
             <thead>
               <tr style={headerRowStyle}>
-                {sortedColumns.map((col, index) => (
-                  <th key={index} style={headerCellStyle}>
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-sm">
-                        {getColumnDisplayName(col)}
-                      </span>
-                      {col === 'area' && <span className="text-green-200 ml-1">📏</span>}
-                      {col === 'huyen' && <span className="text-blue-200 ml-1">🏛️</span>}
-                      {col === 'xa' && <span className="text-purple-200 ml-1">🏘️</span>}
-                    </div>
-                  </th>
-                ))}
+                {requiredColumns.map((columnKey, index) => {
+                  const fullName = {
+                    'xacminh': 'Trạng thái xác minh',
+                    'DtichXM': 'Diện tích xác minh', 
+                    'NguoiXM': 'Người xác minh',
+                    'NgayXM': 'Ngày xác minh'
+                  }[columnKey] || getColumnDisplayName(columnKey);
+                  
+                  return (
+                    <th key={index} style={headerCellStyle}>
+                      <div className="flex items-center justify-between">
+                        <span 
+                          className="font-semibold text-xs cursor-help" 
+                          title={fullName}
+                        >
+                          {getColumnDisplayName(columnKey)}
+                        </span>
+                        {(columnKey === 'dtich' || columnKey === 'DtichXM') && <span className="text-green-200 ml-1">📏</span>}
+                        {columnKey === 'huyen' && <span className="text-blue-200 ml-1">🏛️</span>}
+                        {columnKey === 'xa' && <span className="text-purple-200 ml-1">🏘️</span>}
+                        {columnKey === 'xacminh' && <span className="text-yellow-200 ml-1">✅</span>}
+                        {(columnKey === 'X' || columnKey === 'Y') && <span className="text-orange-200 ml-1">📍</span>}
+                        {columnKey === 'loCB' && <span className="text-red-200 ml-1">🏷️</span>}
+                      </div>
+                    </th>
+                  );
+                })}
                 {isAdmin() && (
                   <th style={{...headerCellStyle, textAlign: 'center', borderRight: 'none'}}>
-                    <span className="font-semibold text-sm">Thao tác</span>
+                    <span className="font-semibold text-xs">Thao tác</span>
                   </th>
                 )}
               </tr>
@@ -513,48 +613,58 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
                     }
                   }}
                 >
-                  {sortedColumns.map((col, colIndex) => (
-                    <td key={colIndex} style={cellStyle}>
-                      {editRowIndex === rowIndex && isEditableColumn(col) ? (
-                        <input
-                          type="text"
-                          value={
-                            editData[col] !== undefined
-                              ? editData[col]
-                              : row[col] !== null
-                              ? row[col]
-                              : ""
-                          }
-                          onChange={(e) => handleInputChange(col, e.target.value)}
-                          style={editInputStyle}
-                          onClick={(e) => e.stopPropagation()}
-                          placeholder={`Nhập ${getColumnDisplayName(col).toLowerCase()}...`}
-                          onFocus={(e) => {
-                            e.target.style.outline = 'none';
-                            e.target.style.boxShadow = '0 0 0 2px #027e02';
-                            e.target.style.borderColor = '#027e02';
-                          }}
-                          onBlur={(e) => {
-                            e.target.style.boxShadow = 'none';
-                            e.target.style.borderColor = '#d1d5db';
-                          }}
-                        />
-                      ) : (
-                        <div className="flex items-center">
-                          <span 
-                            className={`truncate ${
-                              col === 'area' ? 'text-green-700 font-medium' : ''
-                            } ${
-                              ['start_dau', 'end_sau'].includes(col) ? 'text-blue-700' : ''
-                            }`}
-                            title={formatValue(col, row[col])}
-                          >
-                            {formatValue(col, row[col])}
-                          </span>
-                        </div>
-                      )}
-                    </td>
-                  ))}
+                  {requiredColumns.map((columnKey, colIndex) => {
+                    const actualColumnName = columnMapping[columnKey] || columnKey;
+                    const displayValue = formatValue(columnKey, row);
+                    const isNull = getActualValue(row, columnKey) === null;
+                    
+                    return (
+                      <td key={colIndex} style={cellStyle}>
+                        {editRowIndex === rowIndex && isEditableColumn(actualColumnName) ? (
+                          <input
+                            type="text"
+                            value={
+                              editData[actualColumnName] !== undefined
+                                ? editData[actualColumnName]
+                                : getActualValue(row, columnKey) || ""
+                            }
+                            onChange={(e) => handleInputChange(columnKey, e.target.value)}
+                            style={editInputStyle}
+                            onClick={(e) => e.stopPropagation()}
+                            placeholder={`Nhập ${getColumnDisplayName(columnKey).toLowerCase()}...`}
+                            onFocus={(e) => {
+                              e.target.style.outline = 'none';
+                              e.target.style.boxShadow = '0 0 0 2px #027e02';
+                              e.target.style.borderColor = '#027e02';
+                            }}
+                            onBlur={(e) => {
+                              e.target.style.boxShadow = 'none';
+                              e.target.style.borderColor = '#d1d5db';
+                            }}
+                          />
+                        ) : (
+                          <div className="flex items-center">
+                            <span 
+                              className={`truncate ${
+                                (columnKey === 'dtich' || columnKey === 'DtichXM') ? 'text-green-700 font-medium' : ''
+                              } ${
+                                columnKey === 'NgayXM' ? 'text-blue-700' : ''
+                              } ${
+                                columnKey === 'xacminh' ? 'text-orange-700 font-medium' : ''
+                              } ${
+                                columnKey === 'loCB' ? 'text-red-700 font-medium' : ''
+                              } ${
+                                isNull ? 'text-gray-400 italic' : ''
+                              }`}
+                              title={displayValue}
+                            >
+                              {displayValue}
+                            </span>
+                          </div>
+                        )}
+                      </td>
+                    );
+                  })}
                   
                   {/* Actions column */}
                   {isAdmin() && (
@@ -563,7 +673,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
                       onClick={(e) => e.stopPropagation()}
                     >
                       {editRowIndex === rowIndex ? (
-                        <div className="flex justify-center items-center gap-3">
+                        <div className="flex justify-center items-center gap-1">
                           <button
                             onClick={saveChanges}
                             disabled={loading}
@@ -588,7 +698,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
                               }
                             }}
                           >
-                            <FaSave className="w-4 h-4" />
+                            <FaSave className="w-3 h-3" />
                           </button>
                           <button
                             onClick={cancelEdit}
@@ -608,11 +718,11 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
                               e.target.style.color = '#6b7280';
                             }}
                           >
-                            <FaTimes className="w-4 h-4" />
+                            <FaTimes className="w-3 h-3" />
                           </button>
                         </div>
                       ) : (
-                        <div className="flex justify-center items-center gap-2">
+                        <div className="flex justify-center items-center gap-1">
                           <button
                             onClick={() => startEdit(rowIndex, row)}
                             style={{
@@ -641,7 +751,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
                               }
                             }}
                           >
-                            <FaEdit className="w-4 h-4" />
+                            <FaEdit className="w-3 h-3" />
                           </button>
                           <button
                             onClick={() => handleDelete(row)}
@@ -671,7 +781,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
                               }
                             }}
                           >
-                            <FaTrash className="w-4 h-4" />
+                            <FaTrash className="w-3 h-3" />
                           </button>
                         </div>
                       )}
