@@ -1,4 +1,4 @@
-// server/controllers/layerData.controller.js - FIXED VERSION
+// server/controllers/layerData.controller.js - COMPLETE UPDATED VERSION
 const pool = require("../db");
 const convertTcvn3ToUnicode = require("../utils/convertTcvn3ToUnicode");
 
@@ -571,10 +571,10 @@ exports.getForestTypes = async (req, res) => {
 };
 
 /**
- * WRAPPER function để load deforestation alerts data
+ * ✅ UPDATED: WRAPPER function để load deforestation alerts data với days parameter
  */
 const loadDeforestationAlertsData = async (layerKey, days = 365) => {
-  console.log(`📥 Loading fresh data for ${layerKey} from mat_rung`);
+  console.log(`📥 Loading fresh data for ${layerKey} from mat_rung (${days} days)`);
   
   const query = `
     SELECT 
@@ -588,7 +588,7 @@ const loadDeforestationAlertsData = async (layerKey, days = 365) => {
     FROM mat_rung
     WHERE ST_IsValid(geom)
       AND end_sau::date >= CURRENT_DATE - INTERVAL '${days} days'
-    ORDER BY gid
+    ORDER BY end_sau DESC, gid DESC
   `;
 
   const geojson = await streamLargeDatasetWithProgress(layerKey, 'mat_rung', query, 0.00001, 2000);
@@ -610,15 +610,23 @@ const loadDeforestationAlertsData = async (layerKey, days = 365) => {
     }
   }));
 
+  // Thêm metadata về time range
+  geojson.metadata = {
+    ...geojson.metadata,
+    time_range_days: days,
+    time_range_description: days <= 90 ? `${days} ngày gần nhất` : `${days} ngày gần nhất`,
+    data_source: 'mat_rung_table'
+  };
+
   return geojson;
 };
 
 /**
- * ✅ Lấy dữ liệu lớp dự báo mất rừng mới nhất - FIXED
+ * ✅ Lấy dữ liệu lớp dự báo mất rừng mới nhất - UPDATED với support days param
  */
 exports.getDeforestationAlerts = async (req, res) => {
   const days = parseInt(req.query.days) || 365;
-  const layerKey = `deforestationAlerts`;
+  const layerKey = `deforestationAlerts_${days}d`; // ✅ Cache key khác nhau cho mỗi số ngày
   
   try {
     const geojson = await loadLayerWithCache(layerKey, loadDeforestationAlertsData, layerKey, days);

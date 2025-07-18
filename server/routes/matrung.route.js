@@ -1,3 +1,4 @@
+// server/routes/matrung.route.js - UPDATED FOR 3 MONTHS DEFAULT
 const express = require("express");
 const { Pool } = require("pg");
 const router = express.Router();
@@ -18,9 +19,9 @@ router.get("/", async (req, res) => {
   } = req.query;
 
   try {
-    // ✅ TRƯỜNG HỢP 1: Không có filter gì - lấy dữ liệu mặc định với spatial intersection
+    // ✅ TRƯỜNG HỢP 1: Không có filter gì - lấy dữ liệu 3 THÁNG GẦN NHẤT
     if (!fromDate && !toDate && !huyen && !xa && !tk && !khoanh && !churung) {
-      console.log("🔴 Loading toàn bộ dữ liệu mat_rung với spatial intersection...");
+      console.log("🔴 Loading dữ liệu mat_rung 3 tháng gần nhất với spatial intersection...");
       
       const defaultQuery = `
         SELECT 
@@ -57,7 +58,8 @@ router.get("/", async (req, res) => {
           ST_Transform(r.geom, 4326)
         )
         WHERE m.geom IS NOT NULL 
-        ORDER BY m.gid DESC 
+          AND m.end_sau::date >= CURRENT_DATE - INTERVAL '3 months'
+        ORDER BY m.end_sau DESC, m.gid DESC 
         LIMIT $1
       `;
 
@@ -114,13 +116,14 @@ router.get("/", async (req, res) => {
         features: features
       };
 
-      console.log(`✅ Loaded ${matRungGeoJSON.features?.length || 0} mat_rung features với spatial intersection`);
+      console.log(`✅ Loaded ${matRungGeoJSON.features?.length || 0} mat_rung features (3 tháng gần nhất)`);
 
       return res.json({
-        message: `✅ Đã tải ${matRungGeoJSON.features?.length || 0} khu vực mất rừng với thông tin hành chính`,
+        message: `✅ Đã tải ${matRungGeoJSON.features?.length || 0} khu vực mất rừng (3 tháng gần nhất)`,
         mat_rung: matRungGeoJSON,
         tkk_3lr_cru: { type: "FeatureCollection", features: [] },
         isDefault: true,
+        timeRange: '3_months',
         totalLoaded: matRungGeoJSON.features?.length || 0,
         spatialIntersectionUsed: true
       });
@@ -211,7 +214,7 @@ router.get("/", async (req, res) => {
       ${churungJoin}
       ${whereClause}
       AND m.geom IS NOT NULL
-      ORDER BY m.gid DESC
+      ORDER BY m.end_sau DESC, m.gid DESC
       LIMIT $${index++}
     `;
 
@@ -270,12 +273,12 @@ router.get("/", async (req, res) => {
       features: matRungFeatures
     };
 
-    console.log(`✅ Loaded ${matRungGeoJSON.features?.length || 0} mat_rung features với filter và spatial intersection`);
+    console.log(`✅ Loaded ${matRungGeoJSON.features?.length || 0} mat_rung features với filter`);
 
     res.json({
       message: "✅ Dữ liệu đã được truy xuất thành công với spatial intersection.",
       mat_rung: matRungGeoJSON,
-      tkk_3lr_cru: { type: "FeatureCollection", features: [] }, // Để tương thích
+      tkk_3lr_cru: { type: "FeatureCollection", features: [] },
       isDefault: false,
       spatialIntersectionUsed: true,
       filters: {
@@ -299,10 +302,10 @@ router.get("/", async (req, res) => {
 
 // ✅ ENDPOINT: Lấy toàn bộ dữ liệu mat_rung với spatial intersection
 router.get("/all", async (req, res) => {
-  const { limit = 1000 } = req.query;
+  const { limit = 1000, months = 3 } = req.query; // ✅ THÊM PARAM months
   
   try {
-    console.log(`🔴 Loading ALL mat_rung data với spatial intersection, limit: ${limit}`);
+    console.log(`🔴 Loading mat_rung data ${months} tháng gần nhất, limit: ${limit}`);
     
     const query = `
       SELECT 
@@ -339,7 +342,8 @@ router.get("/all", async (req, res) => {
         ST_Transform(r.geom, 4326)
       )
       WHERE m.geom IS NOT NULL 
-      ORDER BY m.gid DESC 
+        AND m.end_sau::date >= CURRENT_DATE - INTERVAL '${months} months'
+      ORDER BY m.end_sau DESC, m.gid DESC 
       LIMIT $1
     `;
 
@@ -395,14 +399,15 @@ router.get("/all", async (req, res) => {
       features: features
     };
 
-    console.log(`✅ Successfully loaded ${geoJSON.features?.length || 0} mat_rung features với spatial intersection`);
+    console.log(`✅ Successfully loaded ${geoJSON.features?.length || 0} mat_rung features (${months} tháng)`);
 
     res.json({
       success: true,
-      message: `Đã tải ${geoJSON.features?.length || 0} khu vực mất rừng với thông tin hành chính`,
+      message: `Đã tải ${geoJSON.features?.length || 0} khu vực mất rừng (${months} tháng gần nhất)`,
       data: geoJSON,
       total: geoJSON.features?.length || 0,
       limit: parseInt(limit),
+      timeRange: `${months}_months`,
       spatialIntersectionUsed: true
     });
 
@@ -426,6 +431,8 @@ router.get("/stats", async (req, res) => {
         COUNT(*) as total_records,
         COUNT(CASE WHEN m.geom IS NOT NULL THEN 1 END) as records_with_geometry,
         COUNT(CASE WHEN r.gid IS NOT NULL THEN 1 END) as records_with_spatial_data,
+        COUNT(CASE WHEN m.end_sau::date >= CURRENT_DATE - INTERVAL '3 months' THEN 1 END) as recent_3_months,
+        COUNT(CASE WHEN m.end_sau::date >= CURRENT_DATE - INTERVAL '12 months' THEN 1 END) as recent_12_months,
         MIN(m.start_dau) as earliest_date,
         MAX(m.end_sau) as latest_date,
         SUM(m.area) as total_area,
@@ -448,7 +455,7 @@ router.get("/stats", async (req, res) => {
       ? ((stats.records_with_spatial_data / stats.total_records) * 100).toFixed(2) + '%'
       : '0%';
 
-    console.log("📊 Mat rung statistics with spatial intersection:", stats);
+    console.log("📊 Mat rung statistics với thống kê theo thời gian:", stats);
 
     res.json({
       success: true,
