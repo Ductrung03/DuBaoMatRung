@@ -1,3 +1,4 @@
+// client/src/dashboard/pages/Map.jsx - FIXED TABLE DISPLAY
 import React, { useState, useEffect, useRef } from "react";
 import {
   MapContainer,
@@ -791,6 +792,19 @@ const Map = () => {
 
   const layerName = getQueryParam(location.search, "layer");
 
+  // ✅ DEBUG: Log toàn bộ state để xem vấn đề
+  useEffect(() => {
+    console.log("🔍 MAP DEBUG - Current state:", {
+      isDataPage,
+      layerName,
+      loading,
+      geoDataExists: !!geoData,
+      geoDataFeatures: geoData?.features?.length || 0,
+      geoDataType: geoData?.type,
+      currentPath: location.pathname
+    });
+  }, [isDataPage, layerName, loading, geoData, location.pathname]);
+
   // Debug geoData để kiểm tra nó nhận được gì từ backend
   useEffect(() => {
     if (geoData) {
@@ -798,6 +812,7 @@ const Map = () => {
       console.log("Số lượng features:", geoData.features?.length || 0);
       if (geoData.features && geoData.features.length > 0) {
         console.log("Feature đầu tiên:", geoData.features[0]);
+        console.log("Properties của feature đầu tiên:", geoData.features[0].properties);
       }
     }
   }, [geoData]);
@@ -1661,10 +1676,9 @@ useEffect(() => {
         </MapContainer>
       </div>
 
-       {/* ✅ HIỂN THỊ BẢNG DỮ LIỆU MẶC ĐỊNH */}
-      {!layerName &&
-        isDataPage &&
-        (loading ? (
+       {/* ✅ FIXED: HIỂN THỊ BẢNG DỮ LIỆU - BỎ ĐIỀU KIỆN LAYERNAME */}
+      {isDataPage && (
+        loading ? (
           <div className="text-center text-green-700 font-semibold p-3 bg-white rounded-md shadow">
             <div className="animate-spin inline-block w-6 h-6 border-4 border-green-500 border-t-transparent rounded-full mr-2"></div>
             Đang tải dữ liệu... Vui lòng đợi trong giây lát
@@ -1675,23 +1689,42 @@ useEffect(() => {
               {/* Loading overlay cho bảng dữ liệu */}
               {loadingDetails && <LoadingOverlay message={loadingMessage} />}
 
+              <div className="bg-blue-50 p-3 rounded-md mb-3 border-l-4 border-blue-400">
+                <p className="text-blue-800 text-sm">
+                  🔍 <strong>Hiển thị bảng dữ liệu:</strong> {geoData.features.length} khu vực mất rừng
+                </p>
+                <p className="text-blue-600 text-xs mt-1">
+                  💡 <strong>Lưu ý:</strong> Nhấp vào một dòng trong bảng để xem vị trí chính xác trên bản đồ
+                </p>
+              </div>
+
               <Table
                 data={geoData.features.map((f) => f.properties)}
                 onRowClick={handleRowClick}
+                tableName="mat_rung"
               />
             </div>
           )
-        ))}
+        )
+      )}
 
-      {/* Debugging display */}
-      {!loading &&
-        (!geoData || !geoData.features || geoData.features.length === 0) &&
-        Object.values(mapLayers).every((layer) => !layer.data) && (
-          <div className="text-center text-amber-700 font-semibold p-3 bg-amber-50 rounded-md mt-2">
-            ⚠️ Chưa có dữ liệu hiển thị. Hãy sử dụng chức năng "Cập nhật dữ
-            liệu" để tải các lớp bản đồ.
+      {/* ✅ ENHANCED: Thông báo debug khi không có dữ liệu */}
+      {!loading && isDataPage && (!geoData || !geoData.features || geoData.features.length === 0) && (
+        <div className="text-center text-amber-700 font-semibold p-4 bg-amber-50 rounded-md mt-2 border border-amber-200">
+          <h3 className="text-lg mb-2">⚠️ Chưa có dữ liệu hiển thị</h3>
+          <div className="text-sm space-y-1">
+            <p>🔍 <strong>Kiểm tra:</strong></p>
+            <ul className="list-disc list-inside text-left max-w-md mx-auto">
+              <li>Dữ liệu mat_rung đã được load chưa</li>
+              <li>Kết nối với database có ổn định không</li>
+              <li>Có dữ liệu trong 3 tháng gần nhất không</li>
+            </ul>
+            <p className="mt-3 text-blue-600">
+              💡 Thử refresh trang hoặc kiểm tra kết nối mạng
+            </p>
           </div>
-        )}
+        </div>
+      )}
     </div>
   );
 };
