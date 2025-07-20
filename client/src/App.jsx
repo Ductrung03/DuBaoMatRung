@@ -2,7 +2,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./dashboard/pages/Login";
 import MainLayout from "./dashboard/layout/MainLayout";
-import Map from "./dashboard/pages/Map";
+
 import QuanLyDuLieu from "./dashboard/pages/QuanLyDuLieu";
 import ThongKeBaoCaoMatRung from "./dashboard/pages/ThongKeBaoCaoMatRung";
 import { GeoDataProvider } from "./dashboard/contexts/GeoDataContext";
@@ -14,6 +14,7 @@ import QuanLyNguoiDung from "./dashboard/pages/QuanLyNguoiDung";
 import ErrorBoundary from "./dashboard/components/ErrorBoundary";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Map from "./dashboard/pages/Map";
 
 function App() {
   return (
