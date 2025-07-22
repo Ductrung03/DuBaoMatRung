@@ -1,6 +1,9 @@
 // client/src/dashboard/pages/Map/index.jsx
 // 🎯 MỤC ĐÍCH: Map component chính đã được refactor (chỉ ~150 dòng)
 
+
+import { getLayerStyle } from "./utils/mapStyles"; // Import hàm getLayerStyle
+import { toast } from "react-toastify";
 import React, { useEffect, useRef } from "react";
 import { MapContainer, TileLayer, WMSTileLayer } from "react-leaflet";
 import { useLocation } from "react-router-dom";
@@ -90,6 +93,87 @@ const Map = () => {
   // ===================================
   // EFFECTS
   // ===================================
+
+
+  // Thêm useEffect này vào Map component để lắng nghe event zoom
+useEffect(() => {
+  const handleZoomToFeature = (event) => {
+    const { feature } = event.detail;
+    
+    if (feature && feature.geometry && window._leaflet_map) {
+      try {
+        console.log("🔍 Zooming to feature:", feature.properties.gid);
+        
+        // Tạo layer tạm thời từ geometry
+        const geojsonFeature = {
+          type: "Feature",
+          geometry: feature.geometry,
+          properties: feature.properties,
+        };
+
+        const tempLayer = L.geoJSON(geojsonFeature);
+        const bounds = tempLayer.getBounds();
+
+        if (bounds.isValid()) {
+          // Zoom đến feature với animation
+          window._leaflet_map.flyToBounds(bounds, {
+            padding: [50, 50],
+            duration: 2.0,
+            animate: true,
+            maxZoom: 16
+          });
+          
+          // Highlight feature trên map nếu có
+          if (geoJsonLayerRef.current) {
+            geoJsonLayerRef.current.eachLayer((layer) => {
+              if (layer.feature && layer.feature.properties.gid === feature.properties.gid) {
+                // Reset tất cả styles trước
+                geoJsonLayerRef.current.eachLayer((l) => {
+                  const originalStyle = getLayerStyle(l.feature, "mat_rung_default", false);
+                  l.setStyle(originalStyle);
+                });
+                
+                // Apply highlight style
+                const highlightStyle = getLayerStyle(feature, "mat_rung_default", true);
+                layer.setStyle({
+                  ...highlightStyle,
+                  weight: 4,
+                  color: "#ff7800",
+                  fillOpacity: 0.8,
+                  fillColor: "#ff7800"
+                });
+                layer.bringToFront();
+                
+                // Mở popup
+                if (layer.getPopup) {
+                  layer.openPopup();
+                }
+                
+                // Set selected feature
+                setSelectedFeature(feature);
+                
+                console.log("✅ Feature highlighted on map");
+              }
+            });
+          }
+          
+          toast.success(`🗺️ Đã zoom đến lô CB-${feature.properties.gid} trên bản đồ`);
+        }
+      } catch (error) {
+        console.error("❌ Error zooming to feature:", error);
+        toast.error("Không thể zoom đến vị trí trên bản đồ");
+      }
+    }
+  };
+
+  // Thêm event listener
+  window.addEventListener('zoomToFeature', handleZoomToFeature);
+  
+  // Cleanup
+  return () => {
+    window.removeEventListener('zoomToFeature', handleZoomToFeature);
+  };
+}, [geoJsonLayerRef, setSelectedFeature]);
 
   // Debug logging
   useEffect(() => {
