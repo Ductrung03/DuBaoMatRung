@@ -199,7 +199,7 @@ const BaoCaoDuBaoMatRung = () => {
         className="bg-forest-green-primary text-white py-0.2 px-4 rounded-full text-sm font-medium uppercase tracking-wide text-left shadow-md w-full cursor-pointer"
         onClick={() => setIsForecastOpen(!isForecastOpen)}
       >
-        Tra cứu dữ liệu dự báo mất rừng
+        Báo cáo phát hiện sớm mất rừng
       </div>
 
       {isForecastOpen && (
