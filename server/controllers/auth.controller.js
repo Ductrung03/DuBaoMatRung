@@ -1,9 +1,9 @@
-// 🔧 BƯỚC 2: Sửa server/controllers/auth.controller.js
+// server/controllers/auth.controller.js - FIXED JWT CONSISTENCY
 const pool = require("../db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// ✅ FIX: Sử dụng secret đúng và consistent
+// ✅ FIX: Sử dụng CÙNG JWT_SECRET với middleware
 const JWT_SECRET = process.env.JWT_SECRET || "dubaomatrung_secret_key_change_this_in_production";
 const JWT_EXPIRES_IN = "24h";
 
@@ -31,18 +31,17 @@ exports.login = async (req, res) => {
     const user = userResult.rows[0];
     console.log(`✅ User found: ID=${user.id}, Role=${user.role}`);
 
-    // ✅ FIX: Password validation improved
+    // ✅ FIX: Password validation
     let isPasswordValid = false;
     
-    // Thử bcrypt compare trước
     try {
       isPasswordValid = await bcrypt.compare(password, user.password_hash);
-      console.log(`🔐 Bcrypt compare result: ${isPasswordValid}`);
+      console.log(`🔐 Password validation result: ${isPasswordValid}`);
     } catch (bcryptError) {
       console.log(`⚠️ Bcrypt error: ${bcryptError.message}`);
     }
     
-    // Fallback cho admin development
+    // ✅ FIX: Fallback cho admin development
     if (!isPasswordValid && username === 'admin' && password === 'admin123') {
       console.log(`🔓 Using admin development bypass`);
       isPasswordValid = true;
@@ -62,27 +61,26 @@ exports.login = async (req, res) => {
       [user.id]
     );
 
-    // ✅ FIX: Tạo token mới với role consistent (lowercase)
+    // ✅ FIX: Tạo token với payload consistent
     const tokenPayload = { 
       id: user.id, 
       username: user.username, 
-      role: user.role.toLowerCase(), // ✅ FIX: Đảm bảo lowercase
+      role: user.role.toLowerCase(), // ✅ Consistent lowercase
       full_name: user.full_name,
-      iat: Math.floor(Date.now() / 1000) // Đảm bảo timestamp đúng
+      iat: Math.floor(Date.now() / 1000)
     };
     
-    console.log(`🔐 Creating NEW token with payload:`, tokenPayload);
-    console.log(`🔐 Using JWT_SECRET: "${JWT_SECRET}"`);
+    console.log(`🔐 Creating token with payload:`, tokenPayload);
     
+    // ✅ FIX: Sử dụng cùng JWT_SECRET với middleware
     const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
     
-    console.log(`🎟️ NEW Token created successfully for user: ${username}`);
-    console.log(`🎟️ Token preview: ${token.substring(0, 50)}...`);
+    console.log(`🎟️ Token created successfully for user: ${username}`);
     
-    // ✅ FIX: Verify token ngay sau khi tạo để đảm bảo
+    // ✅ FIX: Verify token ngay sau khi tạo
     try {
       const verified = jwt.verify(token, JWT_SECRET);
-      console.log(`✅ Token verification test passed:`, verified);
+      console.log(`✅ Token verification test passed`);
     } catch (verifyError) {
       console.log(`❌ Token verification test failed:`, verifyError.message);
       return res.status(500).json({
@@ -93,21 +91,13 @@ exports.login = async (req, res) => {
 
     // Trả về token và thông tin user
     const { password_hash, ...userWithoutPassword } = user;
-    
-    // ✅ FIX: Normalize role trong response
     userWithoutPassword.role = userWithoutPassword.role.toLowerCase();
     
     res.json({
       success: true,
       message: "Đăng nhập thành công",
       token,
-      user: userWithoutPassword,
-      debug: process.env.NODE_ENV === 'development' ? {
-        token_length: token.length,
-        expires_in: JWT_EXPIRES_IN,
-        secret_used: JWT_SECRET.substring(0, 10) + '...',
-        payload: tokenPayload
-      } : undefined
+      user: userWithoutPassword
     });
     
   } catch (err) {
@@ -118,18 +108,6 @@ exports.login = async (req, res) => {
       error: err.message
     });
   }
-};
-
-// ✅ FIX: Force re-login endpoint để clear token cũ
-exports.forceRelogin = async (req, res) => {
-  console.log(`🔄 Force re-login requested`);
-  
-  res.json({
-    success: true,
-    message: "Vui lòng đăng nhập lại để lấy token mới",
-    action: "FORCE_RELOGIN",
-    reason: "Token signature mismatch - cần tạo token mới"
-  });
 };
 
 // Lấy thông tin người dùng hiện tại
@@ -151,7 +129,6 @@ exports.getCurrentUser = async (req, res) => {
     }
 
     const userData = userResult.rows[0];
-    // ✅ FIX: Normalize role
     userData.role = userData.role.toLowerCase();
     
     console.log(`✅ Retrieved user info for ID: ${req.user.id}, role: ${userData.role}`);

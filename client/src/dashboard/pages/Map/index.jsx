@@ -1,8 +1,5 @@
-// client/src/dashboard/pages/Map/index.jsx
-// 🎯 MỤC ĐÍCH: Map component chính đã được refactor (chỉ ~150 dòng)
-
-
-import { getLayerStyle } from "./utils/mapStyles"; // Import hàm getLayerStyle
+// client/src/dashboard/pages/Map/index.jsx - FIXED ZOOM & HIGHLIGHT
+import { getLayerStyle } from "./utils/mapStyles";
 import { toast } from "react-toastify";
 import React, { useEffect, useRef } from "react";
 import { MapContainer, TileLayer, WMSTileLayer } from "react-leaflet";
@@ -91,89 +88,111 @@ const Map = () => {
   const layerName = getQueryParam(location.search, "layer");
 
   // ===================================
-  // EFFECTS
+  // ENHANCED ZOOM TO FEATURE EVENT HANDLER
   // ===================================
+  useEffect(() => {
+    const handleZoomToFeature = (event) => {
+      const { feature, center, bbox, zoom } = event.detail;
+      
+      if (!feature || !window._leaflet_map) {
+        console.warn("⚠️ Missing feature or map instance for zoom");
+        return;
+      }
 
-
-  // Thêm useEffect này vào Map component để lắng nghe event zoom
-useEffect(() => {
-  const handleZoomToFeature = (event) => {
-    const { feature } = event.detail;
-    
-    if (feature && feature.geometry && window._leaflet_map) {
       try {
-        console.log("🔍 Zooming to feature:", feature.properties.gid);
+        const targetGid = feature.properties.gid;
+        console.log(`🎯 Zooming to CB-${targetGid}:`, { center, bbox, zoom });
         
-        // Tạo layer tạm thời từ geometry
-        const geojsonFeature = {
-          type: "Feature",
-          geometry: feature.geometry,
-          properties: feature.properties,
-        };
-
-        const tempLayer = L.geoJSON(geojsonFeature);
-        const bounds = tempLayer.getBounds();
-
-        if (bounds.isValid()) {
-          // Zoom đến feature với animation
+        // ✅ FIX: Zoom using bbox if available, fallback to center
+        if (bbox && bbox.length === 4) {
+          const [west, south, east, north] = bbox;
+          const bounds = [[south, west], [north, east]];
+          
           window._leaflet_map.flyToBounds(bounds, {
             padding: [50, 50],
             duration: 2.0,
             animate: true,
-            maxZoom: 16
+            maxZoom: zoom || 16
           });
           
-          // Highlight feature trên map nếu có
+          console.log("✅ Zoomed using bbox:", bounds);
+        } else if (center && center.length === 2) {
+          const [lng, lat] = center;
+          window._leaflet_map.flyTo([lat, lng], zoom || 16, {
+            duration: 2.0,
+            animate: true
+          });
+          
+          console.log("✅ Zoomed using center:", [lat, lng]);
+        }
+        
+        // ✅ FIX: Highlight target feature with delay
+        setTimeout(() => {
           if (geoJsonLayerRef.current) {
+            let targetLayer = null;
+            
             geoJsonLayerRef.current.eachLayer((layer) => {
-              if (layer.feature && layer.feature.properties.gid === feature.properties.gid) {
-                // Reset tất cả styles trước
+              if (layer.feature && layer.feature.properties.gid === targetGid) {
+                targetLayer = layer;
+                
+                // Reset all other layers first
                 geoJsonLayerRef.current.eachLayer((l) => {
-                  const originalStyle = getLayerStyle(l.feature, "mat_rung_default", false);
-                  l.setStyle(originalStyle);
+                  if (l !== layer) {
+                    const originalStyle = getLayerStyle(l.feature, "mat_rung_default", false);
+                    l.setStyle(originalStyle);
+                  }
                 });
                 
-                // Apply highlight style
-                const highlightStyle = getLayerStyle(feature, "mat_rung_default", true);
-                layer.setStyle({
-                  ...highlightStyle,
+                // Apply highlight style to target
+                const highlightStyle = {
+                  fillColor: "#ff7800",
+                  color: "#ff0000", 
                   weight: 4,
-                  color: "#ff7800",
                   fillOpacity: 0.8,
-                  fillColor: "#ff7800"
-                });
+                  dashArray: "5, 5"
+                };
+                
+                layer.setStyle(highlightStyle);
                 layer.bringToFront();
                 
-                // Mở popup
+                // Open popup if available
                 if (layer.getPopup) {
                   layer.openPopup();
                 }
                 
-                // Set selected feature
-                setSelectedFeature(feature);
-                
-                console.log("✅ Feature highlighted on map");
+                console.log(`✅ Highlighted CB-${targetGid} on map`);
               }
             });
+            
+            if (targetLayer) {
+              setSelectedFeature(feature);
+              setHighlightedLayerRef(targetLayer);
+            } else {
+              console.warn(`⚠️ Could not find layer for CB-${targetGid}`);
+            }
           }
-          
-          toast.success(`🗺️ Đã zoom đến lô CB-${feature.properties.gid} trên bản đồ`);
-        }
+        }, 1000); // Delay để đảm bảo map đã zoom xong
+        
+        toast.success(`🗺️ Đã zoom đến CB-${targetGid} trên bản đồ`, { autoClose: 3000 });
+
       } catch (error) {
-        console.error("❌ Error zooming to feature:", error);
+        console.error("❌ Error in zoomToFeature:", error);
         toast.error("Không thể zoom đến vị trí trên bản đồ");
       }
-    }
-  };
+    };
 
-  // Thêm event listener
-  window.addEventListener('zoomToFeature', handleZoomToFeature);
-  
-  // Cleanup
-  return () => {
-    window.removeEventListener('zoomToFeature', handleZoomToFeature);
-  };
-}, [geoJsonLayerRef, setSelectedFeature]);
+    // Add event listener
+    window.addEventListener('zoomToFeature', handleZoomToFeature);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('zoomToFeature', handleZoomToFeature);
+    };
+  }, [geoJsonLayerRef, setSelectedFeature, setHighlightedLayerRef]);
+
+  // ===================================
+  // EFFECTS
+  // ===================================
 
   // Debug logging
   useEffect(() => {
@@ -191,21 +210,31 @@ useEffect(() => {
   // Log geoData changes
   useEffect(() => {
     if (geoData) {
-      console.log("📊 Dữ liệu GeoJSON nhận được:", geoData);
-      console.log("📊 Số lượng features:", geoData.features?.length || 0);
+      console.log("📊 Dữ liệu GeoJSON nhận được:", {
+        type: geoData.type,
+        featuresCount: geoData.features?.length || 0,
+        firstFeature: geoData.features?.[0]?.properties
+      });
       
       if (geoData.features && geoData.features.length > 0) {
-        console.log("📊 Feature đầu tiên:", geoData.features[0]);
+        const firstFeature = geoData.features[0];
+        console.log("📊 Feature đầu tiên (target):", {
+          gid: firstFeature.properties.gid,
+          area: firstFeature.properties.area,
+          is_target: firstFeature.properties.is_target,
+          huyen: firstFeature.properties.huyen
+        });
+        
         console.log(`🎉 Hiển thị ${geoData.features.length} khu vực mất rừng trên bản đồ`);
       }
     }
   }, [geoData]);
 
-  // Auto zoom to data when ready
+  // Auto zoom to data when ready (chỉ cho initial load)
   useEffect(() => {
-    if (mapReady && geoData?.features?.length > 0 && window._leaflet_map) {
+    if (mapReady && geoData?.features?.length > 0 && window._leaflet_map && !selectedFeature) {
       try {
-        console.log("🔍 Auto zoom đến dữ liệu...");
+        console.log("🔍 Auto zoom đến dữ liệu initial load...");
         const geoJsonLayer = L.geoJSON(geoData);
         const bounds = geoJsonLayer.getBounds();
 
@@ -221,7 +250,7 @@ useEffect(() => {
         console.error("❌ Lỗi khi auto zoom:", err);
       }
     }
-  }, [mapReady, geoData]);
+  }, [mapReady, geoData, selectedFeature]);
 
   // ===================================
   // RENDER
