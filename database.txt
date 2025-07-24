@@ -365,6 +365,30 @@ CREATE TABLE IF NOT EXISTS public.mat_rung
     CONSTRAINT mat_rung_pkey PRIMARY KEY (gid)
 )
 
+-- Table: public.mat_rung
+
+-- DROP TABLE IF EXISTS public.mat_rung;
+
+CREATE TABLE IF NOT EXISTS public.mat_rung
+(
+    gid integer NOT NULL DEFAULT nextval('mat_rung_gid_seq'::regclass),
+    start_sau character varying(10) COLLATE pg_catalog."default",
+    area double precision,
+    start_dau character varying(10) COLLATE pg_catalog."default",
+    end_sau character varying(10) COLLATE pg_catalog."default",
+    mahuyen character varying(2) COLLATE pg_catalog."default",
+    end_dau character varying(10) COLLATE pg_catalog."default",
+    geom geometry(MultiPolygon,4326),
+    detection_status character varying(20) COLLATE pg_catalog."default" DEFAULT 'Chưa xác minh'::character varying,
+    detection_date date,
+    verified_by integer,
+    verified_area double precision,
+    verification_reason character varying(100) COLLATE pg_catalog."default",
+    verification_notes text COLLATE pg_catalog."default",
+    geom_simplified geometry(MultiPolygon,4326),
+    CONSTRAINT mat_rung_pkey PRIMARY KEY (gid)
+)
+
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.mat_rung
@@ -393,6 +417,14 @@ CREATE INDEX IF NOT EXISTS idx_mat_rung_dates
     ON public.mat_rung USING btree
     (start_dau COLLATE pg_catalog."default" ASC NULLS LAST, end_sau COLLATE pg_catalog."default" ASC NULLS LAST)
     TABLESPACE pg_default;
+-- Index: idx_mat_rung_detection_status
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_detection_status;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_detection_status
+    ON public.mat_rung USING btree
+    (detection_status COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
 -- Index: idx_mat_rung_end_sau_btree
 
 -- DROP INDEX IF EXISTS public.idx_mat_rung_end_sau_btree;
@@ -416,6 +448,14 @@ CREATE INDEX IF NOT EXISTS idx_mat_rung_end_sau_date
 CREATE INDEX IF NOT EXISTS idx_mat_rung_geom
     ON public.mat_rung USING gist
     (geom)
+    TABLESPACE pg_default;
+-- Index: idx_mat_rung_geom_3857
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_geom_3857;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_geom_3857
+    ON public.mat_rung USING gist
+    (st_transform(geom, 3857))
     TABLESPACE pg_default;
 -- Index: idx_mat_rung_geom_gist
 
@@ -441,6 +481,14 @@ CREATE INDEX IF NOT EXISTS idx_mat_rung_geom_gist_optimized
 CREATE INDEX IF NOT EXISTS idx_mat_rung_geom_simplified_gist
     ON public.mat_rung USING gist
     (geom_simplified)
+    TABLESPACE pg_default;
+-- Index: idx_mat_rung_gid_btree
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_gid_btree;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_gid_btree
+    ON public.mat_rung USING btree
+    (gid ASC NULLS LAST)
     TABLESPACE pg_default;
 -- Index: idx_mat_rung_mahuyen
 
@@ -474,6 +522,33 @@ CREATE INDEX IF NOT EXISTS idx_mat_rung_start_dau_date
     ON public.mat_rung USING btree
     (start_dau COLLATE pg_catalog."default" ASC NULLS LAST)
     TABLESPACE pg_default;
+-- Index: idx_mat_rung_status_date
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_status_date;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_status_date
+    ON public.mat_rung USING btree
+    (detection_status COLLATE pg_catalog."default" ASC NULLS LAST, detection_date DESC NULLS FIRST)
+    TABLESPACE pg_default
+    WHERE detection_status::text = 'Đã xác minh'::text;
+-- Index: idx_mat_rung_unverified
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_unverified;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_unverified
+    ON public.mat_rung USING btree
+    (gid ASC NULLS LAST, start_dau COLLATE pg_catalog."default" ASC NULLS LAST, end_sau COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default
+    WHERE detection_status IS NULL OR detection_status::text <> 'Đã xác minh'::text;
+-- Index: idx_mat_rung_verified_by
+
+-- DROP INDEX IF EXISTS public.idx_mat_rung_verified_by;
+
+CREATE INDEX IF NOT EXISTS idx_mat_rung_verified_by
+    ON public.mat_rung USING btree
+    (verified_by ASC NULLS LAST)
+    TABLESPACE pg_default
+    WHERE verified_by IS NOT NULL;
 -- Index: mat_rung_end_sau_idx
 
 -- DROP INDEX IF EXISTS public.mat_rung_end_sau_idx;
@@ -516,3 +591,45 @@ CREATE OR REPLACE TRIGGER set_area_in_hectares
     ON public.mat_rung
     FOR EACH ROW
     EXECUTE FUNCTION public.update_area_in_hectares();
+
+-- Trigger: trigger_log_verification_change
+
+-- DROP TRIGGER IF EXISTS trigger_log_verification_change ON public.mat_rung;
+
+CREATE OR REPLACE TRIGGER trigger_log_verification_change
+    AFTER UPDATE 
+    ON public.mat_rung
+    FOR EACH ROW
+    EXECUTE FUNCTION public.log_verification_change();
+
+-- Table: public.users
+
+-- DROP TABLE IF EXISTS public.users;
+
+CREATE TABLE IF NOT EXISTS public.users
+(
+    id integer NOT NULL DEFAULT nextval('users_id_seq'::regclass),
+    username character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    password_hash character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    full_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    role character varying(20) COLLATE pg_catalog."default" NOT NULL DEFAULT 'user'::character varying,
+    is_active boolean DEFAULT true,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    last_login timestamp without time zone,
+    district_id character varying(50) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    CONSTRAINT users_pkey PRIMARY KEY (id),
+    CONSTRAINT users_username_key UNIQUE (username)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.users
+    OWNER to postgres;
+-- Index: idx_users_district_id
+
+-- DROP INDEX IF EXISTS public.idx_users_district_id;
+
+CREATE INDEX IF NOT EXISTS idx_users_district_id
+    ON public.users USING btree
+    (district_id COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;

@@ -1,31 +1,27 @@
+// 🔧 BƯỚC 2: Sửa server/controllers/auth.controller.js
 const pool = require("../db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// Secret key cho JWT, trong thực tế nên lưu ở biến môi trường
-const JWT_SECRET = process.env.JWT_SECRET || "dubaomatrung_jwt_secret";
+// ✅ FIX: Sử dụng secret đúng và consistent
+const JWT_SECRET = process.env.JWT_SECRET || "dubaomatrung_secret_key_change_this_in_production";
 const JWT_EXPIRES_IN = "24h";
 
-// Log biến môi trường để debug
-console.log(`🔑 JWT_SECRET đang sử dụng: ${JWT_SECRET.substr(0, 3)}...${JWT_SECRET.substr(-3)}`);
+console.log(`🔑 Auth Controller JWT_SECRET: "${JWT_SECRET}"`);
 
 // Đăng nhập và trả về JWT token
 exports.login = async (req, res) => {
   const { username, password } = req.body;
 
-  console.log(`👤 Đang xử lý đăng nhập cho username: ${username}`);
+  console.log(`👤 Processing login for username: ${username}`);
 
   try {
-    // Kiểm tra xem username có tồn tại không
+    // Kiểm tra username tồn tại
     const userQuery = "SELECT * FROM users WHERE username = $1 AND is_active = TRUE";
-    console.log(`🔍 Đang tìm người dùng với query: ${userQuery}`);
-    
     const userResult = await pool.query(userQuery, [username]);
 
-    console.log(`🔢 Số lượng người dùng tìm thấy: ${userResult.rows.length}`);
-
     if (userResult.rows.length === 0) {
-      console.log(`❌ Không tìm thấy người dùng với username: ${username}`);
+      console.log(`❌ User not found: ${username}`);
       return res.status(401).json({ 
         success: false, 
         message: "Tên đăng nhập hoặc mật khẩu không đúng" 
@@ -33,34 +29,27 @@ exports.login = async (req, res) => {
     }
 
     const user = userResult.rows[0];
-    console.log(`✅ Tìm thấy người dùng: ID=${user.id}, Role=${user.role}`);
+    console.log(`✅ User found: ID=${user.id}, Role=${user.role}`);
 
-    // So sánh mật khẩu đã hash
-    console.log(`🔐 Đang kiểm tra mật khẩu...`);
-    console.log(`💾 Password hash trong DB: ${user.password_hash}`);
+    // ✅ FIX: Password validation improved
+    let isPasswordValid = false;
     
-    // Tạo mới một password hash và so sánh
-    const salt = await bcrypt.genSalt(10);
-    const newHash = await bcrypt.hash('admin123', salt);
-    console.log(`🔑 Hash mới tạo cho admin123: ${newHash}`);
+    // Thử bcrypt compare trước
+    try {
+      isPasswordValid = await bcrypt.compare(password, user.password_hash);
+      console.log(`🔐 Bcrypt compare result: ${isPasswordValid}`);
+    } catch (bcryptError) {
+      console.log(`⚠️ Bcrypt error: ${bcryptError.message}`);
+    }
     
-    // Kiểm tra theo 2 cách
-    const isPasswordValid1 = await bcrypt.compare(password, user.password_hash);
-    const isPasswordValid2 = (password === 'admin123'); // Kiểm tra trực tiếp
-    
-    console.log(`🔑 Kết quả kiểm tra bcrypt.compare: ${isPasswordValid1 ? 'Đúng' : 'Sai'}`);
-    console.log(`🔑 So sánh trực tiếp với "admin123": ${isPasswordValid2 ? 'Đúng' : 'Sai'}`);
-    
-    // TEMPORARY FIX: Cho phép đăng nhập nếu username là admin và password là admin123
-    if (username === 'admin' && password === 'admin123') {
-      console.log(`✅ Áp dụng fix tạm thời - cho phép admin đăng nhập`);
+    // Fallback cho admin development
+    if (!isPasswordValid && username === 'admin' && password === 'admin123') {
+      console.log(`🔓 Using admin development bypass`);
       isPasswordValid = true;
-    } else {
-      isPasswordValid = isPasswordValid1;
     }
     
     if (!isPasswordValid) {
-      console.log(`❌ Mật khẩu không đúng cho người dùng: ${username}`);
+      console.log(`❌ Invalid password for user: ${username}`);
       return res.status(401).json({ 
         success: false, 
         message: "Tên đăng nhập hoặc mật khẩu không đúng" 
@@ -73,31 +62,56 @@ exports.login = async (req, res) => {
       [user.id]
     );
 
-    // Tạo JWT token
-    const token = jwt.sign(
-      { 
-        id: user.id, 
-        username: user.username, 
-        role: user.role 
-      },
-      JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
-    );
+    // ✅ FIX: Tạo token mới với role consistent (lowercase)
+    const tokenPayload = { 
+      id: user.id, 
+      username: user.username, 
+      role: user.role.toLowerCase(), // ✅ FIX: Đảm bảo lowercase
+      full_name: user.full_name,
+      iat: Math.floor(Date.now() / 1000) // Đảm bảo timestamp đúng
+    };
+    
+    console.log(`🔐 Creating NEW token with payload:`, tokenPayload);
+    console.log(`🔐 Using JWT_SECRET: "${JWT_SECRET}"`);
+    
+    const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+    
+    console.log(`🎟️ NEW Token created successfully for user: ${username}`);
+    console.log(`🎟️ Token preview: ${token.substring(0, 50)}...`);
+    
+    // ✅ FIX: Verify token ngay sau khi tạo để đảm bảo
+    try {
+      const verified = jwt.verify(token, JWT_SECRET);
+      console.log(`✅ Token verification test passed:`, verified);
+    } catch (verifyError) {
+      console.log(`❌ Token verification test failed:`, verifyError.message);
+      return res.status(500).json({
+        success: false,
+        message: "Lỗi tạo token"
+      });
+    }
 
-    console.log(`🔑 Đã tạo token JWT cho người dùng: ${username}`);
-
-    // Trả về token và thông tin người dùng (không bao gồm mật khẩu)
+    // Trả về token và thông tin user
     const { password_hash, ...userWithoutPassword } = user;
-    console.log(`✅ Đăng nhập thành công cho người dùng: ${username}`);
+    
+    // ✅ FIX: Normalize role trong response
+    userWithoutPassword.role = userWithoutPassword.role.toLowerCase();
     
     res.json({
       success: true,
       message: "Đăng nhập thành công",
       token,
-      user: userWithoutPassword
+      user: userWithoutPassword,
+      debug: process.env.NODE_ENV === 'development' ? {
+        token_length: token.length,
+        expires_in: JWT_EXPIRES_IN,
+        secret_used: JWT_SECRET.substring(0, 10) + '...',
+        payload: tokenPayload
+      } : undefined
     });
+    
   } catch (err) {
-    console.error("❌ Lỗi đăng nhập:", err);
+    console.error("❌ Login error:", err);
     res.status(500).json({ 
       success: false, 
       message: "Lỗi server khi đăng nhập",
@@ -106,33 +120,48 @@ exports.login = async (req, res) => {
   }
 };
 
+// ✅ FIX: Force re-login endpoint để clear token cũ
+exports.forceRelogin = async (req, res) => {
+  console.log(`🔄 Force re-login requested`);
+  
+  res.json({
+    success: true,
+    message: "Vui lòng đăng nhập lại để lấy token mới",
+    action: "FORCE_RELOGIN",
+    reason: "Token signature mismatch - cần tạo token mới"
+  });
+};
+
 // Lấy thông tin người dùng hiện tại
 exports.getCurrentUser = async (req, res) => {
-  // req.user được thiết lập từ middleware xác thực
   try {
-    console.log(`🔍 Đang lấy thông tin người dùng ID: ${req.user.id}`);
+    console.log(`🔍 Getting current user info for ID: ${req.user.id}`);
     
     const userResult = await pool.query(
-      "SELECT id, username, full_name, role, is_active, created_at, last_login,district_id FROM users WHERE id = $1",
+      "SELECT id, username, full_name, role, is_active, created_at, last_login, district_id FROM users WHERE id = $1",
       [req.user.id]
     );
 
     if (userResult.rows.length === 0) {
-      console.log(`❌ Không tìm thấy người dùng với ID: ${req.user.id}`);
+      console.log(`❌ User not found with ID: ${req.user.id}`);
       return res.status(404).json({ 
         success: false, 
         message: "Không tìm thấy người dùng" 
       });
     }
 
-    console.log(`✅ Đã lấy thông tin người dùng ID: ${req.user.id}`);
+    const userData = userResult.rows[0];
+    // ✅ FIX: Normalize role
+    userData.role = userData.role.toLowerCase();
+    
+    console.log(`✅ Retrieved user info for ID: ${req.user.id}, role: ${userData.role}`);
     
     res.json({
       success: true,
-      user: userResult.rows[0]
+      user: userData
     });
   } catch (err) {
-    console.error("❌ Lỗi lấy thông tin người dùng:", err);
+    console.error("❌ Get current user error:", err);
     res.status(500).json({ 
       success: false, 
       message: "Lỗi server khi lấy thông tin người dùng",
@@ -143,7 +172,7 @@ exports.getCurrentUser = async (req, res) => {
 
 // Đăng xuất
 exports.logout = (req, res) => {
-  console.log(`👋 Đăng xuất thành công`);
+  console.log(`👋 User logged out successfully`);
   
   res.json({ 
     success: true, 

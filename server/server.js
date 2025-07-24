@@ -19,6 +19,8 @@ const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const dataRoutes = require("./routes/data.routes");
 const layerDataRoutes = require("./routes/layerData.routes");
+const verificationRoutes = require("./routes/verification.routes");
+const searchRoutes = require("./routes/searchMatRung.routes");
 require("dotenv").config();
 
 // Log biến môi trường khi khởi động
@@ -155,7 +157,266 @@ app.use("/api/dropdown", dataDropdownRoutes);
 app.use("/api/quan-ly-du-lieu", quanlydulieu);
 app.use("/api/bao-cao", baocao);
 app.use("/api/layer-data", layerDataRoutes);
+app.use("/api/search", searchRoutes);
+app.use("/api/verification", verificationRoutes);
 
+app.post("/api/emergency/fix-token", async (req, res) => {
+  try {
+    console.log("🚨 Emergency token fix requested");
+    
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(400).json({
+        success: false,
+        message: "Cần có token cũ để fix"
+      });
+    }
+
+    const oldToken = authHeader.split(" ")[1];
+    
+    // Decode token cũ để lấy user info (không verify)
+    let oldPayload;
+    try {
+      oldPayload = jwt.decode(oldToken);
+      console.log("📋 Old token payload:", oldPayload);
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: "Token cũ không đúng định dạng"
+      });
+    }
+
+    if (!oldPayload || !oldPayload.id) {
+      return res.status(400).json({
+        success: false,
+        message: "Token cũ không có thông tin user"
+      });
+    }
+
+    // Lấy thông tin user từ database
+    const userResult = await pool.query(
+      "SELECT * FROM users WHERE id = $1 AND is_active = TRUE",
+      [oldPayload.id]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User không tồn tại hoặc đã bị vô hiệu hóa"
+      });
+    }
+
+    const user = userResult.rows[0];
+    console.log(`✅ User found for fix: ${user.username}`);
+
+    // Tạo token mới với secret đúng
+    const JWT_SECRET = process.env.JWT_SECRET || "dubaomatrung_secret_key_change_this_in_production";
+    
+    const newTokenPayload = {
+      id: user.id,
+      username: user.username,
+      role: user.role.toLowerCase(), // Fix role
+      full_name: user.full_name,
+      iat: Math.floor(Date.now() / 1000)
+    };
+
+    const newToken = jwt.sign(newTokenPayload, JWT_SECRET, { expiresIn: "24h" });
+    
+    console.log(`🎟️ New token created for emergency fix: ${user.username}`);
+
+    // Verify token mới ngay
+    try {
+      const verified = jwt.verify(newToken, JWT_SECRET);
+      console.log(`✅ New token verification successful`);
+    } catch (verifyErr) {
+      console.log(`❌ New token verification failed: ${verifyErr.message}`);
+      return res.status(500).json({
+        success: false,
+        message: "Lỗi tạo token mới"
+      });
+    }
+
+    // Cập nhật last_login
+    await pool.query(
+      "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1",
+      [user.id]
+    );
+
+    const { password_hash, ...userWithoutPassword } = user;
+    userWithoutPassword.role = userWithoutPassword.role.toLowerCase();
+
+    res.json({
+      success: true,
+      message: "✅ Đã tạo token mới thành công!",
+      token: newToken,
+      user: userWithoutPassword,
+      fix_info: {
+        old_token_preview: oldToken.substring(0, 30) + '...',
+        new_token_preview: newToken.substring(0, 30) + '...',
+        role_fixed: oldPayload.role + ' → ' + newTokenPayload.role,
+        secret_used: JWT_SECRET.substring(0, 10) + '...'
+      }
+    });
+
+  } catch (err) {
+    console.error("❌ Emergency fix error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi khi fix token",
+      error: err.message
+    });
+  }
+});
+
+// ✅ TEST ROUTE để check token hiện tại
+app.get("/api/test-current-token", async (req, res) => {
+  const JWT_SECRETS = [
+    process.env.JWT_SECRET || "dubaomatrung_secret_key_change_this_in_production",
+    "dubaomatrung_jwt_secret",
+    "your_jwt_secret_key"
+  ];
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.json({
+      success: false,
+      message: "Không có token"
+    });
+  }
+
+  const token = authHeader.split(" ")[1];
+  const payload = jwt.decode(token);
+
+  let verificationResults = [];
+  
+  for (let i = 0; i < JWT_SECRETS.length; i++) {
+    try {
+      const verified = jwt.verify(token, JWT_SECRETS[i]);
+      verificationResults.push({
+        secret_index: i,
+        secret_preview: JWT_SECRETS[i].substring(0, 10) + '...',
+        status: 'SUCCESS',
+        verified_payload: verified
+      });
+      break;
+    } catch (err) {
+      verificationResults.push({
+        secret_index: i,
+        secret_preview: JWT_SECRETS[i].substring(0, 10) + '...',
+        status: 'FAILED',
+        error: err.message
+      });
+    }
+  }
+
+  res.json({
+    token_info: {
+      decoded_payload: payload,
+      verification_results: verificationResults,
+      overall_status: verificationResults.some(r => r.status === 'SUCCESS') ? 'VALID' : 'INVALID'
+    },
+    fix_suggestion: verificationResults.every(r => r.status === 'FAILED') 
+      ? "POST /api/emergency/fix-token với Authorization header"
+      : "Token hợp lệ"
+  });
+});
+app.get("/api/debug/jwt", (req, res) => {
+  const JWT_SECRET = process.env.JWT_SECRET || "dubaomatrung_secret_key_change_this_in_production";
+  
+  // Lấy token từ header nếu có
+  const authHeader = req.headers.authorization;
+  let tokenInfo = null;
+  
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.split(" ")[1];
+    
+    try {
+      // Decode without verification để xem payload
+      const decoded = require('jsonwebtoken').decode(token);
+      tokenInfo = {
+        valid: false,
+        payload: decoded,
+        token_preview: token.substring(0, 50) + '...',
+        error: null
+      };
+      
+      // Thử verify
+      const verified = require('jsonwebtoken').verify(token, JWT_SECRET);
+      tokenInfo.valid = true;
+      tokenInfo.verified_payload = verified;
+      
+    } catch (err) {
+      tokenInfo.error = err.message;
+    }
+  }
+  
+  res.json({
+    server_info: {
+      jwt_secret_configured: !!process.env.JWT_SECRET,
+      jwt_secret_length: JWT_SECRET.length,
+      jwt_secret_preview: JWT_SECRET.substring(0, 10) + '...',
+      node_env: process.env.NODE_ENV || 'development',
+      timestamp: new Date().toISOString()
+    },
+    token_info: tokenInfo,
+    instructions: {
+      if_invalid_signature: [
+        "1. Clear browser localStorage",
+        "2. Login again to get new token", 
+        "3. New token will be created with current JWT_SECRET"
+      ],
+      test_login: "POST /api/auth/login with admin/admin123",
+      test_protected: "GET /api/auth/me with Authorization header"
+    }
+  });
+});
+
+// ✅ TEST ENDPOINT để verify token cụ thể
+app.post("/api/debug/verify-token", (req, res) => {
+  const { token } = req.body;
+  const JWT_SECRET = process.env.JWT_SECRET || "dubaomatrung_secret_key_change_this_in_production";
+  
+  if (!token) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide token in request body"
+    });
+  }
+  
+  try {
+    // Decode first
+    const decoded = require('jsonwebtoken').decode(token);
+    console.log("📋 Token payload:", decoded);
+    
+    // Then verify
+    const verified = require('jsonwebtoken').verify(token, JWT_SECRET);
+    console.log("✅ Token verification successful");
+    
+    res.json({
+      success: true,
+      message: "Token is valid",
+      payload: verified,
+      decoded: decoded,
+      server_secret_length: JWT_SECRET.length
+    });
+    
+  } catch (err) {
+    console.log("❌ Token verification failed:", err.message);
+    
+    res.status(401).json({
+      success: false,
+      message: "Token verification failed",
+      error: err.message,
+      error_type: err.name,
+      server_secret_length: JWT_SECRET.length,
+      suggestions: [
+        "Check if token was created with same JWT_SECRET",
+        "Try logging in again to get new token",
+        "Clear browser localStorage and login again"
+      ]
+    });
+  }
+});
 // Test routes
 app.get("/api/test", (req, res) => {
   res.json({ 
