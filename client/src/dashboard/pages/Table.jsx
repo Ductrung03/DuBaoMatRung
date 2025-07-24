@@ -1,4 +1,4 @@
-// client/src/dashboard/pages/Table.jsx - FIXED TARGET HIGHLIGHTING
+// client/src/dashboard/pages/Table.jsx - FIXED VERSION WITH REAL USER NAMES
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -13,11 +13,11 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   const [loading, setLoading] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [highlightedRow, setHighlightedRow] = useState(null);
-  const [targetGid, setTargetGid] = useState(null); // ✅ FIX: Track target GID
+  const [targetGid, setTargetGid] = useState(null);
 
   if (!data || data.length === 0) return null;
 
-  // ✅ MAPPING CHÍNH XÁC với spatial intersection
+  // ✅ MAPPING CHÍNH XÁC với spatial intersection và user info
   const columnMapping = {
     loCB: "gid",
     dtich: "area", 
@@ -30,7 +30,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     xacminh: "detection_status",
     DtichXM: "verified_area",
     ngnhan: "verification_reason",
-    NguoiXM: "verified_by",
+    NguoiXM: "verified_by_name", // ✅ FIX: Đổi thành verified_by_name thay vì verified_by
     NgayXM: "detection_date",
   };
 
@@ -62,7 +62,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
       return row[actualColumnName];
     }
 
-    // Fallback names
+    // Fallback names với user info
     const fallbackNames = {
       loCB: ["gid", "GID", "id"],
       dtich: ["area", "AREA", "dtich"],
@@ -75,7 +75,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
       xacminh: ["detection_status", "DETECTION_STATUS"],
       DtichXM: ["verified_area", "VERIFIED_AREA"],
       ngnhan: ["verification_reason", "VERIFICATION_REASON"],
-      NguoiXM: ["verified_by", "VERIFIED_BY"],
+      NguoiXM: ["verified_by_name", "verified_by_username", "verified_by", "VERIFIED_BY"], // ✅ FIX: Ưu tiên tên thật
       NgayXM: ["detection_date", "DETECTION_DATE"],
     };
 
@@ -95,7 +95,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     "X", "Y", "xacminh", "DtichXM", "ngnhan", "NguoiXM", "NgayXM"
   ];
 
-  // ✅ Format giá trị hiển thị
+  // ✅ Format giá trị hiển thị - FIXED VERSION
   const formatValue = (columnKey, row) => {
     const value = getActualValue(row, columnKey);
 
@@ -146,10 +146,23 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
         return `CB-${value}`;
 
       case "NguoiXM":
-        if (typeof value === "number") {
-          return `User ${value}`;
+        // ✅ FIX: Hiển thị tên thật thay vì "User ID"
+        if (value) {
+          // Nếu có tên thật (verified_by_name)
+          if (typeof value === "string" && value !== "NULL") {
+            return value;
+          }
+          // Nếu chỉ có ID (fallback)
+          if (typeof value === "number") {
+            // Thử lấy từ verified_by_name hoặc verified_by_username trong row
+            const realName = row.verified_by_name || row.verified_by_username;
+            if (realName) {
+              return realName;
+            }
+            return `User ${value}`;
+          }
         }
-        return value || "NULL";
+        return "NULL";
 
       default:
         return String(value);
@@ -160,6 +173,14 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   React.useEffect(() => {
     if (process.env.NODE_ENV === "development" && data && data.length > 0) {
       console.log("🔍 Table data loaded:", data.length, "records");
+      
+      // ✅ FIX: Debug user info trong data
+      const sampleRow = data[0];
+      console.log("📋 Sample row user info:", {
+        verified_by: sampleRow.verified_by,
+        verified_by_name: sampleRow.verified_by_name,
+        verified_by_username: sampleRow.verified_by_username
+      });
       
       // ✅ FIX: Check for target feature (is_target property or first feature)
       const possibleTarget = data.find(row => row.is_target === true) || data[0];
@@ -610,6 +631,9 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
                         {columnKey === "loCB" && (
                           <span className="text-red-200 ml-1">🎯</span>
                         )}
+                        {columnKey === "NguoiXM" && (
+                          <span className="text-blue-200 ml-1">👤</span>
+                        )}
                       </div>
                     </th>
                   );
@@ -675,7 +699,9 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
                                 columnKey === "dtich" || columnKey === "DtichXM" ? "text-green-700 font-medium" : ""
                               } ${columnKey === "NgayXM" ? "text-blue-700" : ""} ${
                                 columnKey === "xacminh" ? "text-orange-700 font-medium" : ""
-                              } ${isNull ? "text-gray-400 italic" : ""}`}
+                              } ${columnKey === "NguoiXM" ? "text-purple-700 font-medium" : ""} ${
+                                isNull ? "text-gray-400 italic" : ""
+                              }`}
                               title={displayValue}
                             >
                               {isTargetCell ? `🎯 ${displayValue}` : displayValue}
@@ -743,12 +769,8 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
             <span className="font-medium">
               📊 Tổng số bản ghi: <span className="text-forest-green-primary font-bold ml-1">{data.length}</span>
             </span>
-            {selectedRow !== null && (
-              <span className="text-blue-600">🎯 Đã chọn hàng #{selectedRow + 1}</span>
-            )}
-            {targetGid && (
-              <span className="text-red-600 font-bold">🔴 Target: CB-{targetGid}</span>
-            )}
+           
+            
           </div>
 
           {editRowIndex !== -1 && (

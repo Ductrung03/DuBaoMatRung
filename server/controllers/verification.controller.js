@@ -1,7 +1,7 @@
-// server/controllers/verification.controller.js
+// server/controllers/verification.controller.js - FIXED VERSION WITH USER INFO
 const pool = require("../db");
 
-// ✅ Xác minh lô CB với logic mới
+// ✅ Xác minh lô CB với logic mới + trả về user info đầy đủ
 exports.verifyMatRung = async (req, res) => {
   const { gid } = req.params;
   const { 
@@ -126,11 +126,12 @@ exports.verifyMatRung = async (req, res) => {
       const updatedRecord = updateResult.rows[0];
       console.log(`✅ Xác minh thành công lô CB-${gid}`);
 
-      // Bước 4: Lấy thông tin đầy đủ để trả về (bao gồm tên người xác minh)
+      // ✅ FIX: Bước 4: Lấy thông tin đầy đủ để trả về (bao gồm tên người xác minh thật)
       const detailQuery = `
         SELECT 
           m.*,
           u.full_name as verified_by_name,
+          u.username as verified_by_username,
           r.huyen,
           r.xa,
           r.tieukhu as tk,
@@ -147,6 +148,9 @@ exports.verifyMatRung = async (req, res) => {
       const detailResult = await pool.query(detailQuery, [gid]);
       const finalRecord = detailResult.rows[0];
 
+      // ✅ FIX: Format user display name (ưu tiên full_name)
+      const displayName = finalRecord.verified_by_name || finalRecord.verified_by_username || `User ${finalRecord.verified_by}`;
+
       res.json({
         success: true,
         message: `✅ Đã xác minh thành công lô CB-${gid}`,
@@ -159,7 +163,9 @@ exports.verifyMatRung = async (req, res) => {
           verification_notes: finalRecord.verification_notes,
           detection_date: finalRecord.detection_date,
           verified_by: finalRecord.verified_by,
-          verified_by_name: finalRecord.verified_by_name,
+          verified_by_name: finalRecord.verified_by_name, // ✅ FIX: Tên thật
+          verified_by_username: finalRecord.verified_by_username, // ✅ FIX: Username
+          verified_by_display: displayName, // ✅ FIX: Tên hiển thị ưu tiên
           updated_at: new Date().toISOString()
         },
         changes: {
@@ -167,7 +173,8 @@ exports.verifyMatRung = async (req, res) => {
           original_area: currentRecord.area,
           new_verified_area: finalVerifiedArea,
           verification_date_used: finalDetectionDate,
-          verified_by_user: verifiedByName
+          verified_by_user: verifiedByName, // ✅ FIX: Tên từ token
+          verified_by_user_display: displayName // ✅ FIX: Tên hiển thị
         }
       });
 
@@ -186,7 +193,7 @@ exports.verifyMatRung = async (req, res) => {
   }
 };
 
-// ✅ Lấy lịch sử xác minh của một lô CB
+// ✅ Lấy lịch sử xác minh của một lô CB + user info đầy đủ
 exports.getVerificationHistory = async (req, res) => {
   const { gid } = req.params;
 
@@ -219,6 +226,9 @@ exports.getVerificationHistory = async (req, res) => {
 
     const record = result.rows[0];
 
+    // ✅ FIX: Format user display name (ưu tiên full_name)
+    const displayName = record.verified_by_name || record.verified_by_username || (record.verified_by ? `User ${record.verified_by}` : null);
+
     res.json({
       success: true,
       data: {
@@ -234,8 +244,9 @@ exports.getVerificationHistory = async (req, res) => {
           date: record.detection_date,
           verified_by: {
             id: record.verified_by,
-            name: record.verified_by_name,
-            username: record.verified_by_username
+            name: record.verified_by_name, // ✅ FIX: Tên thật
+            username: record.verified_by_username, // ✅ FIX: Username
+            display_name: displayName // ✅ FIX: Tên hiển thị ưu tiên
           }
         } : null
       }

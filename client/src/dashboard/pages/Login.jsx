@@ -40,7 +40,7 @@ const Login = () => {
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-lg">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">
-            Phần mềm dự báo mất rừng tỉnh Lào Cai
+            Hệ thống phát hiện sớm mất rừng tỉnh Lào Cai
           </h1>
           <h2 className="mt-2 text-xl text-forest-green-primary font-semibold">Đăng nhập</h2>
         </div>

@@ -1,4 +1,4 @@
-// server/controllers/searchMatRung.controller.js - FIXED VERSION
+// server/controllers/searchMatRung.controller.js - FIXED VERSION WITH USER INFO
 const pool = require("../db");
 const convertTcvn3ToUnicode = require("../utils/convertTcvn3ToUnicode");
 
@@ -17,7 +17,7 @@ exports.searchMatRungById = async (req, res) => {
   try {
     console.log(`🔍 Tìm kiếm lô CB với GID: ${gid}, radius: ${radius}m`);
 
-    // ✅ BƯỚC 1: Tìm lô CB chính với thông tin đầy đủ
+    // ✅ BƯỚC 1: Tìm lô CB chính với thông tin đầy đủ + user info
     const targetQuery = `
       SELECT 
         m.gid,
@@ -34,6 +34,10 @@ exports.searchMatRungById = async (req, res) => {
         m.verification_reason,
         m.verification_notes,
         
+        -- ✅ FIX: Thông tin người xác minh
+        u.full_name as verified_by_name,
+        u.username as verified_by_username,
+        
         -- Thông tin từ spatial intersection
         r.huyen,
         r.xa,
@@ -45,16 +49,14 @@ exports.searchMatRungById = async (req, res) => {
         ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y_coordinate,
         
         -- Geometry cho bản đồ
-        ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry,
-        
-        -- Thông tin người xác minh
-        u.full_name as verified_by_name
+        ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
         
       FROM mat_rung m
       LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(
         ST_Transform(m.geom, 4326), 
         ST_Transform(r.geom, 4326)
       )
+      -- ✅ FIX: LEFT JOIN với bảng users
       LEFT JOIN users u ON m.verified_by = u.id
       WHERE m.gid = $1 AND m.geom IS NOT NULL
     `;
@@ -74,10 +76,11 @@ exports.searchMatRungById = async (req, res) => {
       area: targetFeature.area,
       huyen: targetFeature.huyen,
       xa: targetFeature.xa,
+      verified_by_name: targetFeature.verified_by_name, // ✅ Log user info
       coordinates: `${targetFeature.x_coordinate}, ${targetFeature.y_coordinate}`
     });
 
-    // ✅ BƯỚC 2: Tìm các lô CB xung quanh trong bán kính (OPTIMIZED QUERY)
+    // ✅ BƯỚC 2: Tìm các lô CB xung quanh trong bán kính (OPTIMIZED QUERY + USER INFO)
     const surroundingQuery = `
       WITH target_geom AS (
         SELECT geom FROM mat_rung WHERE gid = $1
@@ -96,6 +99,10 @@ exports.searchMatRungById = async (req, res) => {
         m.verified_area,
         m.verification_reason,
         m.verification_notes,
+        
+        -- ✅ FIX: Thông tin người xác minh
+        u.full_name as verified_by_name,
+        u.username as verified_by_username,
         
         -- Thông tin từ spatial intersection
         r.huyen,
@@ -117,16 +124,14 @@ exports.searchMatRungById = async (req, res) => {
         END as distance_meters,
         
         -- Geometry cho bản đồ
-        ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry,
-        
-        -- Thông tin người xác minh
-        u.full_name as verified_by_name
+        ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
         
       FROM mat_rung m
       LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(
         ST_Transform(m.geom, 4326), 
         ST_Transform(r.geom, 4326)
       )
+      -- ✅ FIX: LEFT JOIN với bảng users
       LEFT JOIN users u ON m.verified_by = u.id,
       target_geom tg
       WHERE m.geom IS NOT NULL 
@@ -145,9 +150,9 @@ exports.searchMatRungById = async (req, res) => {
     `;
 
     const surroundingResult = await pool.query(surroundingQuery, [gid, radius]);
-    console.log(`📍 Tìm thấy ${surroundingResult.rows.length} lô CB (bao gồm target) trong bán kính ${radius}m`);
+    console.log(`📍 Tìm thấy ${surroundingResult.rows.length} lô CB (bao gồm target) trong bán kính ${radius}m với user info`);
 
-    // ✅ BƯỚC 3: Xây dựng GeoJSON với fallback mapping
+    // ✅ BƯỚC 3: Xây dựng GeoJSON với fallback mapping + user info
     const huyenMapping = {
       '01': 'Lào Cai',
       '02': 'Bát Xát', 
@@ -174,10 +179,13 @@ exports.searchMatRungById = async (req, res) => {
         detection_status: row.detection_status || 'Chưa xác minh',
         detection_date: row.detection_date,
         verified_by: row.verified_by,
-        verified_by_name: row.verified_by_name,
         verified_area: row.verified_area,
         verification_reason: row.verification_reason,
         verification_notes: row.verification_notes,
+        
+        // ✅ FIX: Thông tin người xác minh đầy đủ
+        verified_by_name: row.verified_by_name,
+        verified_by_username: row.verified_by_username,
         
         // ✅ Thông tin hành chính với fallback
         huyen: convertTcvn3ToUnicode(
@@ -229,9 +237,10 @@ exports.searchMatRungById = async (req, res) => {
       bbox[2] += padding; // east
       bbox[3] += padding; // north
       
-      console.log(`✅ Search completed for CB-${gid}:`, {
+      console.log(`✅ Search completed for CB-${gid} với user info:`, {
         total_features: features.length,
         surrounding_count: surroundingFeatures.length,
+        target_verified_by: targetFeatureData?.properties?.verified_by_name,
         bbox: bbox
       });
 
@@ -246,7 +255,8 @@ exports.searchMatRungById = async (req, res) => {
           total_features: features.length,
           surrounding_count: surroundingFeatures.length,
           search_radius_meters: parseInt(radius),
-          target_gid: parseInt(gid)
+          target_gid: parseInt(gid),
+          user_info_included: true // ✅ Flag mới
         }
       });
       
@@ -260,7 +270,7 @@ exports.searchMatRungById = async (req, res) => {
         targetCoords[1] + bufferSize   // north
       ];
       
-      console.log(`✅ Search completed for CB-${gid}: chỉ tìm thấy target, không có surrounding`);
+      console.log(`✅ Search completed for CB-${gid} với user info: chỉ tìm thấy target, không có surrounding`);
 
       return res.json({
         success: true,
@@ -273,7 +283,8 @@ exports.searchMatRungById = async (req, res) => {
           total_features: features.length,
           surrounding_count: 0,
           search_radius_meters: parseInt(radius),
-          target_gid: parseInt(gid)
+          target_gid: parseInt(gid),
+          user_info_included: true // ✅ Flag mới
         }
       });
     }
@@ -288,7 +299,21 @@ exports.searchMatRungById = async (req, res) => {
   }
 };
 
-// ✅ Lấy thông tin chi tiết một lô CB để hiển thị form xác minh
+// ✅ THÊM: Helper function để format user display trong verification response
+const formatUserForDisplay = (userId, userName, userUsername) => {
+  if (userName) {
+    return userName; // Tên đầy đủ
+  }
+  if (userUsername) {
+    return userUsername; // Username
+  }
+  if (userId) {
+    return `User ${userId}`; // Fallback
+  }
+  return null;
+};
+
+// ✅ Lấy thông tin chi tiết một lô CB để hiển thị form xác minh + user info
 exports.getMatRungDetail = async (req, res) => {
   const { gid } = req.params;
 
@@ -300,7 +325,7 @@ exports.getMatRungDetail = async (req, res) => {
   }
 
   try {
-    console.log(`📋 Lấy chi tiết lô CB: ${gid}`);
+    console.log(`📋 Lấy chi tiết lô CB với user info: ${gid}`);
 
     const query = `
       SELECT 
@@ -318,6 +343,10 @@ exports.getMatRungDetail = async (req, res) => {
         m.verification_reason,
         m.verification_notes,
         
+        -- ✅ FIX: Thông tin người xác minh đầy đủ
+        u.full_name as verified_by_name,
+        u.username as verified_by_username,
+        
         -- Thông tin từ spatial intersection
         r.huyen,
         r.xa,
@@ -326,17 +355,14 @@ exports.getMatRungDetail = async (req, res) => {
         
         -- Tọa độ centroid
         ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x_coordinate,
-        ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y_coordinate,
-        
-        -- Thông tin người xác minh
-        u.full_name as verified_by_name,
-        u.username as verified_by_username
+        ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y_coordinate
         
       FROM mat_rung m
       LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(
         ST_Transform(m.geom, 4326), 
         ST_Transform(r.geom, 4326)
       )
+      -- ✅ FIX: LEFT JOIN với bảng users
       LEFT JOIN users u ON m.verified_by = u.id
       WHERE m.gid = $1
     `;
@@ -366,7 +392,9 @@ exports.getMatRungDetail = async (req, res) => {
       '09': 'Văn Bàn'
     };
     
-    console.log(`✅ Lấy chi tiết thành công cho CB-${gid}`);
+    console.log(`✅ Lấy chi tiết thành công cho CB-${gid} với user info:`, {
+      verified_by_name: detail.verified_by_name
+    });
     
     res.json({
       success: true,
@@ -380,12 +408,14 @@ exports.getMatRungDetail = async (req, res) => {
         detection_status: detail.detection_status || 'Chưa xác minh',
         detection_date: detail.detection_date,
         verified_by: detail.verified_by,
-        verified_by_name: detail.verified_by_name,
-        verified_by_username: detail.verified_by_username,
         verified_area: detail.verified_area,
         verified_area_ha: detail.verified_area ? (detail.verified_area / 10000).toFixed(2) : null,
         verification_reason: detail.verification_reason,
         verification_notes: detail.verification_notes,
+        
+        // ✅ FIX: Thông tin người xác minh đầy đủ
+        verified_by_name: detail.verified_by_name,
+        verified_by_username: detail.verified_by_username,
         
         // ✅ Thông tin địa hành chính với fallback
         huyen: convertTcvn3ToUnicode(
@@ -402,9 +432,11 @@ exports.getMatRungDetail = async (req, res) => {
         // ✅ Thông tin bổ sung
         is_verified: detail.detection_status === 'Đã xác minh',
         has_verification_info: !!(detail.verification_reason),
+        has_verifier_info: !!(detail.verified_by_name), // ✅ Flag mới
         coordinates_display: detail.x_coordinate && detail.y_coordinate 
           ? `${detail.x_coordinate.toFixed(6)}, ${detail.y_coordinate.toFixed(6)}`
-          : null
+          : null,
+        user_info_included: true // ✅ Flag mới
       }
     });
 

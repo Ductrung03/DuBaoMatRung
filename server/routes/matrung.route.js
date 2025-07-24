@@ -1,4 +1,4 @@
-// server/routes/matrung.route.js - UPDATED FOR 3 MONTHS DEFAULT
+// server/routes/matrung.route.js - FIXED VERSION WITH USER JOIN
 const express = require("express");
 const { Pool } = require("pg");
 const router = express.Router();
@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
   try {
     // ✅ TRƯỜNG HỢP 1: Không có filter gì - lấy dữ liệu 3 THÁNG GẦN NHẤT
     if (!fromDate && !toDate && !huyen && !xa && !tk && !khoanh && !churung) {
-      console.log("🔴 Loading dữ liệu mat_rung 3 tháng gần nhất với spatial intersection...");
+      console.log("🔴 Loading dữ liệu mat_rung 3 tháng gần nhất với spatial intersection và user info...");
       
       const defaultQuery = `
         SELECT 
@@ -38,6 +38,10 @@ router.get("/", async (req, res) => {
           m.verified_area,
           m.verification_reason,
           m.verification_notes,
+          
+          -- ✅ FIX: JOIN với bảng users để lấy tên thật
+          u.full_name as verified_by_name,
+          u.username as verified_by_username,
           
           -- Thông tin từ spatial intersection
           r.huyen,
@@ -57,6 +61,8 @@ router.get("/", async (req, res) => {
           ST_Transform(m.geom, 4326), 
           ST_Transform(r.geom, 4326)
         )
+        -- ✅ FIX: LEFT JOIN với bảng users
+        LEFT JOIN users u ON m.verified_by = u.id
         WHERE m.geom IS NOT NULL 
           AND m.end_sau::date >= CURRENT_DATE - INTERVAL '3 months'
         ORDER BY m.end_sau DESC, m.gid DESC 
@@ -65,7 +71,7 @@ router.get("/", async (req, res) => {
 
       const defaultResult = await pool.query(defaultQuery, [limit]);
 
-      // ✅ Xây dựng GeoJSON với spatial intersection data
+      // ✅ Xây dựng GeoJSON với thông tin user đầy đủ
       const features = defaultResult.rows.map(row => {
         // Fallback mapping cho huyện nếu không có spatial intersection
         const huyenMapping = {
@@ -98,6 +104,10 @@ router.get("/", async (req, res) => {
             verification_reason: row.verification_reason,
             verification_notes: row.verification_notes,
             
+            // ✅ FIX: Thêm thông tin người xác minh đầy đủ
+            verified_by_name: row.verified_by_name,
+            verified_by_username: row.verified_by_username,
+            
             // ✅ Thông tin từ spatial intersection (có fallback)
             huyen: convertTcvn3ToUnicode(row.huyen || huyenMapping[row.mahuyen] || `Huyện ${row.mahuyen}`),
             xa: convertTcvn3ToUnicode(row.xa || ""),
@@ -116,7 +126,7 @@ router.get("/", async (req, res) => {
         features: features
       };
 
-      console.log(`✅ Loaded ${matRungGeoJSON.features?.length || 0} mat_rung features (3 tháng gần nhất)`);
+      console.log(`✅ Loaded ${matRungGeoJSON.features?.length || 0} mat_rung features (3 tháng gần nhất) với user info`);
 
       return res.json({
         message: `✅ Đã tải ${matRungGeoJSON.features?.length || 0} khu vực mất rừng (3 tháng gần nhất)`,
@@ -125,20 +135,21 @@ router.get("/", async (req, res) => {
         isDefault: true,
         timeRange: '3_months',
         totalLoaded: matRungGeoJSON.features?.length || 0,
-        spatialIntersectionUsed: true
+        spatialIntersectionUsed: true,
+        userInfoIncluded: true // ✅ Flag mới
       });
     }
 
-    // ✅ TRƯỜNG HỢP 2: Có filter - sử dụng spatial intersection
+    // ✅ TRƯỜNG HỢP 2: Có filter - sử dụng spatial intersection + user info
     if (!fromDate || !toDate) {
       return res.status(400).json({ 
         message: "Cần có tham số từ ngày và đến ngày khi tìm kiếm có điều kiện." 
       });
     }
 
-    console.log("🔍 Loading dữ liệu mat_rung với filter và spatial intersection...");
+    console.log("🔍 Loading dữ liệu mat_rung với filter, spatial intersection và user info...");
 
-    // ========= Truy vấn với spatial intersection =========
+    // ========= Truy vấn với spatial intersection + user info =========
     const conditions = [];
     const params = [];
     let index = 1;
@@ -192,6 +203,10 @@ router.get("/", async (req, res) => {
         m.verification_reason,
         m.verification_notes,
         
+        -- ✅ FIX: Thông tin người xác minh
+        u.full_name as verified_by_name,
+        u.username as verified_by_username,
+        
         -- Spatial intersection data
         r.huyen,
         r.xa,
@@ -211,6 +226,8 @@ router.get("/", async (req, res) => {
         ST_Transform(m.geom, 4326), 
         ST_Transform(r.geom, 4326)
       )
+      -- ✅ FIX: LEFT JOIN với bảng users
+      LEFT JOIN users u ON m.verified_by = u.id
       ${churungJoin}
       ${whereClause}
       AND m.geom IS NOT NULL
@@ -222,7 +239,7 @@ router.get("/", async (req, res) => {
 
     const matRungResult = await pool.query(matRungQuery, params);
 
-    // Xây dựng GeoJSON với spatial data
+    // Xây dựng GeoJSON với spatial data + user info
     const matRungFeatures = matRungResult.rows.map(row => {
       const huyenMapping = {
         '01': 'Lào Cai',
@@ -254,6 +271,10 @@ router.get("/", async (req, res) => {
           verification_reason: row.verification_reason,
           verification_notes: row.verification_notes,
           
+          // ✅ FIX: Thông tin người xác minh đầy đủ
+          verified_by_name: row.verified_by_name,
+          verified_by_username: row.verified_by_username,
+          
           // Spatial intersection data với fallback
           huyen: convertTcvn3ToUnicode(row.huyen || huyenMapping[row.mahuyen] || `Huyện ${row.mahuyen}`),
           xa: convertTcvn3ToUnicode(row.xa || ""),
@@ -273,14 +294,15 @@ router.get("/", async (req, res) => {
       features: matRungFeatures
     };
 
-    console.log(`✅ Loaded ${matRungGeoJSON.features?.length || 0} mat_rung features với filter`);
+    console.log(`✅ Loaded ${matRungGeoJSON.features?.length || 0} mat_rung features với filter và user info`);
 
     res.json({
-      message: "✅ Dữ liệu đã được truy xuất thành công với spatial intersection.",
+      message: "✅ Dữ liệu đã được truy xuất thành công với spatial intersection và user info.",
       mat_rung: matRungGeoJSON,
       tkk_3lr_cru: { type: "FeatureCollection", features: [] },
       isDefault: false,
       spatialIntersectionUsed: true,
+      userInfoIncluded: true, // ✅ Flag mới
       filters: {
         fromDate,
         toDate,
@@ -300,12 +322,12 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ ENDPOINT: Lấy toàn bộ dữ liệu mat_rung với spatial intersection
+// ✅ ENDPOINT: Lấy toàn bộ dữ liệu mat_rung với spatial intersection + user info
 router.get("/all", async (req, res) => {
-  const { limit = 1000, months = 3 } = req.query; // ✅ THÊM PARAM months
+  const { limit = 1000, months = 3 } = req.query;
   
   try {
-    console.log(`🔴 Loading mat_rung data ${months} tháng gần nhất, limit: ${limit}`);
+    console.log(`🔴 Loading mat_rung data ${months} tháng gần nhất với user info, limit: ${limit}`);
     
     const query = `
       SELECT 
@@ -322,6 +344,10 @@ router.get("/all", async (req, res) => {
         m.verified_area,
         m.verification_reason,
         m.verification_notes,
+        
+        -- ✅ FIX: Thông tin người xác minh
+        u.full_name as verified_by_name,
+        u.username as verified_by_username,
         
         -- Spatial intersection
         r.huyen,
@@ -341,6 +367,8 @@ router.get("/all", async (req, res) => {
         ST_Transform(m.geom, 4326), 
         ST_Transform(r.geom, 4326)
       )
+      -- ✅ FIX: LEFT JOIN với bảng users
+      LEFT JOIN users u ON m.verified_by = u.id
       WHERE m.geom IS NOT NULL 
         AND m.end_sau::date >= CURRENT_DATE - INTERVAL '${months} months'
       ORDER BY m.end_sau DESC, m.gid DESC 
@@ -349,7 +377,7 @@ router.get("/all", async (req, res) => {
 
     const result = await pool.query(query, [parseInt(limit)]);
 
-    // Xây dựng GeoJSON với spatial data
+    // Xây dựng GeoJSON với spatial data + user info
     const features = result.rows.map(row => {
       const huyenMapping = {
         '01': 'Lào Cai',
@@ -381,6 +409,10 @@ router.get("/all", async (req, res) => {
           verification_reason: row.verification_reason,
           verification_notes: row.verification_notes,
           
+          // ✅ FIX: Thông tin người xác minh đầy đủ
+          verified_by_name: row.verified_by_name,
+          verified_by_username: row.verified_by_username,
+          
           // Spatial data với fallback
           huyen: convertTcvn3ToUnicode(row.huyen || huyenMapping[row.mahuyen] || `Huyện ${row.mahuyen}`),
           xa: convertTcvn3ToUnicode(row.xa || ""),
@@ -399,7 +431,7 @@ router.get("/all", async (req, res) => {
       features: features
     };
 
-    console.log(`✅ Successfully loaded ${geoJSON.features?.length || 0} mat_rung features (${months} tháng)`);
+    console.log(`✅ Successfully loaded ${geoJSON.features?.length || 0} mat_rung features (${months} tháng) với user info`);
 
     res.json({
       success: true,
@@ -408,7 +440,8 @@ router.get("/all", async (req, res) => {
       total: geoJSON.features?.length || 0,
       limit: parseInt(limit),
       timeRange: `${months}_months`,
-      spatialIntersectionUsed: true
+      spatialIntersectionUsed: true,
+      userInfoIncluded: true // ✅ Flag mới
     });
 
   } catch (err) {
@@ -421,10 +454,10 @@ router.get("/all", async (req, res) => {
   }
 });
 
-// ✅ ENDPOINT: Lấy thống kê dữ liệu mat_rung
+// ✅ ENDPOINT: Lấy thống kê dữ liệu mat_rung - CẬP NHẬT VỚI USER INFO
 router.get("/stats", async (req, res) => {
   try {
-    console.log("📊 Getting mat_rung statistics...");
+    console.log("📊 Getting mat_rung statistics với user info...");
     
     const statsQuery = `
       SELECT 
@@ -438,12 +471,17 @@ router.get("/stats", async (req, res) => {
         SUM(m.area) as total_area,
         COUNT(DISTINCT m.mahuyen) as unique_districts,
         COUNT(DISTINCT r.huyen) as unique_huyen_names,
-        COUNT(DISTINCT r.xa) as unique_xa_names
+        COUNT(DISTINCT r.xa) as unique_xa_names,
+        -- ✅ FIX: Thống kê về xác minh
+        COUNT(CASE WHEN m.detection_status = 'Đã xác minh' THEN 1 END) as verified_records,
+        COUNT(CASE WHEN m.verified_by IS NOT NULL THEN 1 END) as records_with_verifier,
+        COUNT(DISTINCT m.verified_by) as unique_verifiers
       FROM mat_rung m
       LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(
         ST_Transform(m.geom, 4326), 
         ST_Transform(r.geom, 4326)
-      );
+      )
+      LEFT JOIN users u ON m.verified_by = u.id;
     `;
 
     const result = await pool.query(statsQuery);
@@ -454,8 +492,11 @@ router.get("/stats", async (req, res) => {
     stats.spatial_intersection_rate = stats.total_records > 0 
       ? ((stats.records_with_spatial_data / stats.total_records) * 100).toFixed(2) + '%'
       : '0%';
+    stats.verification_rate = stats.total_records > 0
+      ? ((stats.verified_records / stats.total_records) * 100).toFixed(2) + '%'
+      : '0%';
 
-    console.log("📊 Mat rung statistics với thống kê theo thời gian:", stats);
+    console.log("📊 Mat rung statistics với user info:", stats);
 
     res.json({
       success: true,

@@ -350,15 +350,7 @@ const XacMinhDuBaoMatRung = () => {
 
       {isForecastOpen && (
         <div className="flex flex-col gap-2 px-1 pt-3">
-          {/* User info */}
-          <div className="mb-2 p-2 bg-green-50 border border-green-200 rounded-md">
-            <div className="text-sm font-medium text-green-800">
-              👤 Người xác minh: {user?.full_name || 'Unknown'}
-            </div>
-            <div className="text-xs text-green-600 mt-1">
-              Role: {user?.role === 'admin' ? 'Admin' : 'User'} | ID: {user?.id}
-            </div>
-          </div>
+         
 
           {/* ✅ FIX: Hiển thị thông tin lô được tìm thấy */}
           {selectedRecord && (
@@ -452,13 +444,11 @@ const XacMinhDuBaoMatRung = () => {
                   min="0"
                   value={formData.dienTichThucTe}
                   onChange={(e) => handleInputChange('dienTichThucTe', e.target.value)}
-                  placeholder="Để trống = giữ nguyên"
+                 
                   className="w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   disabled={loading || searchLoading}
                 />
-                <div className="absolute -bottom-5 left-0 text-xs text-gray-500">
-                  💡 Để trống để giữ nguyên
-                </div>
+               
               </div>
             </div>
 
@@ -472,9 +462,7 @@ const XacMinhDuBaoMatRung = () => {
                   readOnly
                   className="w-full border border-gray-300 rounded-md py-0.2 px-2 pr-8 appearance-none bg-gray-100 text-gray-700 cursor-not-allowed"
                 />
-                <div className="absolute -bottom-5 left-0 text-xs text-gray-500">
-                  🔒 Tự động từ tài khoản
-                </div>
+               
               </div>
             </div>
 
@@ -489,9 +477,7 @@ const XacMinhDuBaoMatRung = () => {
                   className="w-full border border-green-400 rounded-md py-0.2 px-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   disabled={loading || searchLoading}
                 />
-                <div className="absolute -bottom-5 left-0 text-xs text-gray-500">
-                  💡 Trống = ngày hiện tại
-                </div>
+               
               </div>
             </div>
 
@@ -526,19 +512,8 @@ const XacMinhDuBaoMatRung = () => {
             )}
           </button>
 
-          {/* Hướng dẫn sử dụng */}
-          <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
-            <div className="text-xs text-yellow-800">
-              <div className="font-medium mb-1">💡 Hướng dẫn sử dụng:</div>
-              <ul className="list-disc list-inside space-y-1">
-                <li>🔍 <strong>Bước 1:</strong> Nhập GID (VD: 3619) và ấn "Tìm"</li>
-                <li>🎯 <strong>Bước 2:</strong> Kiểm tra thông tin CB được tìm thấy</li>
-                <li>📝 <strong>Bước 3:</strong> Chọn nguyên nhân và điền thông tin</li>
-                <li>✅ <strong>Bước 4:</strong> Ấn "Xác minh" để hoàn tất</li>
-                <li>🗺️ <strong>Lưu ý:</strong> Map sẽ zoom đến vị trí CB được tìm</li>
-              </ul>
-            </div>
-          </div>
+         
+          
         </div>
       )}
     </div>
