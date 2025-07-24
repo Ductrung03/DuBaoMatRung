@@ -79,12 +79,3 @@ router.get("/mat-rung/:gid/history", verificationController.getVerificationHisto
 
 module.exports = router;
 
-// ===============================================
-// Thêm vào server/server.js (trong phần routes):
-// ===============================================
-
-// const searchRoutes = require("./routes/searchMatRung.routes");
-// const verificationRoutes = require("./routes/verification.routes");
-
-// app.use("/api/search", searchRoutes);
-// app.use("/api/verification", verificationRoutes);
