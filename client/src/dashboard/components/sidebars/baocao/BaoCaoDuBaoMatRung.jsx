@@ -49,6 +49,9 @@ const BaoCaoDuBaoMatRung = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   
+  // ✅ THÊM: State cho checkbox xác minh
+  const [isXacMinh, setIsXacMinh] = useState(false);
+  
   // Thêm state cho loading
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
@@ -130,6 +133,7 @@ const BaoCaoDuBaoMatRung = () => {
       huyen: selectedHuyen,
       xa: selectedXa,
       type: reportType,
+      xacMinh: isXacMinh ? 'true' : 'false'  // ✅ THÊM: Truyền tham số xác minh
     });
 
     try {
@@ -151,20 +155,20 @@ const BaoCaoDuBaoMatRung = () => {
       
       if (reportType === "Văn bản" || reportType === "Biểu đồ") {
         if (!data.data || (Array.isArray(data.data) && data.data.length === 0)) {
-          toast.info("Không tìm thấy dữ liệu phù hợp với điều kiện tìm kiếm");
+          toast.info(`Không tìm thấy dữ liệu ${isXacMinh ? 'đã xác minh' : ''} phù hợp với điều kiện tìm kiếm`);
           setReportLoading(false);
         } else {
           setReportData(data.data);
           
           // Đợi một chút để trạng thái loading được hiển thị rõ ràng
           setTimeout(() => {
-            // Lưu các tham số vào URL để sử dụng khi xuất báo cáo
+            // ✅ SỬA: Lưu tham số xác minh vào URL
             navigate({
               pathname: "/dashboard/baocao",
-              search: `?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(selectedHuyen)}&xa=${encodeURIComponent(selectedXa)}`
+              search: `?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(selectedHuyen)}&xa=${encodeURIComponent(selectedXa)}&xacMinh=${isXacMinh}`
             });
             
-            toast.success("Đã tạo báo cáo thành công!");
+            toast.success(`Đã tạo báo cáo ${isXacMinh ? 'xác minh' : ''} thành công!`);
             setReportLoading(false);
           }, 1000);
         }
@@ -259,6 +263,22 @@ const BaoCaoDuBaoMatRung = () => {
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* ✅ THÊM: Checkbox Xác minh */}
+            <div className="flex items-center gap-1">
+              <label className="text-sm font-medium w-40">Xác minh</label>
+              <div className="w-36 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="xacMinh"
+                  checked={isXacMinh}
+                  onChange={(e) => setIsXacMinh(e.target.checked)}
+                  className="w-4 h-4 accent-green-600"
+                  disabled={isLoading}
+                />
+              
+              </div>
             </div>
 
             {/* Loại báo cáo */}

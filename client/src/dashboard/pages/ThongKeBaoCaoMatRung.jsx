@@ -32,12 +32,13 @@ const ThongKeBaoCaoMatRung = () => {
   const [loadingMessage, setLoadingMessage] = useState("Đang tạo báo cáo...");
   const location = useLocation();
 
-  // ✅ Lấy thông tin từ URL params
+  // ✅ Lấy thông tin từ URL params - THÊM xacMinh
   const [reportParams, setReportParams] = useState({
     fromDate: '',
     toDate: '',
     huyen: '',
-    xa: ''
+    xa: '',
+    xacMinh: 'false'
   });
 
   useEffect(() => {
@@ -47,8 +48,9 @@ const ThongKeBaoCaoMatRung = () => {
     const toDate = urlParams.get('toDate') || '';
     const huyen = urlParams.get('huyen') || '';
     const xa = urlParams.get('xa') || '';
+    const xacMinh = urlParams.get('xacMinh') || 'false';
     
-    setReportParams({ fromDate, toDate, huyen, xa });
+    setReportParams({ fromDate, toDate, huyen, xa, xacMinh });
   }, [location.search]);
 
   // Hàm format ngày để hiển thị đẹp hơn
@@ -69,11 +71,16 @@ const ThongKeBaoCaoMatRung = () => {
       setIsExportingDocx(true);
       setLoadingMessage("Đang chuẩn bị tải DOCX...");
       
-      // Tạo thẻ a để tải file
-      const exportUrl = `${config.API_URL}/api/bao-cao/export-docx?fromDate=${reportParams.fromDate}&toDate=${reportParams.toDate}&huyen=${encodeURIComponent(reportParams.huyen)}&xa=${encodeURIComponent(reportParams.xa)}`;
+      // ✅ Thêm tham số xacMinh vào URL
+      const exportUrl = `${config.API_URL}/api/bao-cao/export-docx?fromDate=${reportParams.fromDate}&toDate=${reportParams.toDate}&huyen=${encodeURIComponent(reportParams.huyen)}&xa=${encodeURIComponent(reportParams.xa)}&xacMinh=${reportParams.xacMinh}`;
       const link = document.createElement('a');
       link.href = exportUrl;
-      link.setAttribute('download', `bao-cao-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.docx`);
+      
+      // ✅ Tên file khác nhau cho 2 loại báo cáo
+      const fileName = reportParams.xacMinh === 'true' 
+        ? `bao-cao-xac-minh-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.docx`
+        : `bao-cao-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.docx`;
+      link.setAttribute('download', fileName);
       link.setAttribute('target', '_blank');
       
       // Thêm vào DOM, click và xóa
@@ -93,15 +100,15 @@ const ThongKeBaoCaoMatRung = () => {
     }
   };
 
-  // Hàm xử lý xuất PDF - sửa thành mở cửa sổ mới hiển thị HTML
+  // Hàm xử lý xuất PDF
   const handleExportPdf = () => {
     try {
       // Hiển thị loading
       setIsExportingPdf(true);
       setLoadingMessage("Đang chuẩn bị mở trang báo cáo...");
       
-      // Tạo URL cho trang in PDF
-      const exportUrl = `${config.API_URL}/api/bao-cao/export-pdf?fromDate=${reportParams.fromDate}&toDate=${reportParams.toDate}&huyen=${encodeURIComponent(reportParams.huyen)}&xa=${encodeURIComponent(reportParams.xa)}`;
+      // ✅ Thêm tham số xacMinh vào URL
+      const exportUrl = `${config.API_URL}/api/bao-cao/export-pdf?fromDate=${reportParams.fromDate}&toDate=${reportParams.toDate}&huyen=${encodeURIComponent(reportParams.huyen)}&xa=${encodeURIComponent(reportParams.xa)}&xacMinh=${reportParams.xacMinh}`;
       
       // Mở cửa sổ mới
       window.open(exportUrl, '_blank');
@@ -136,11 +143,17 @@ const ThongKeBaoCaoMatRung = () => {
 
   // Kiểm tra nếu reportData là mảng => hiển thị bảng văn bản
   if (Array.isArray(reportData)) {
+    // ✅ Tiêu đề và headers khác nhau cho 2 loại báo cáo
+    const isVerified = reportParams.xacMinh === 'true';
+    const reportTitle = isVerified 
+      ? "BẢNG THỐNG KÊ VỊ TRÍ MẤT RỪNG ĐÃ XÁC MINH "
+      : "BẢNG THỐNG KÊ VỊ TRÍ PHÁT HIỆN SỚM MẤT RỪNG ";
+
     return (
       <div className="p-6 font-sans max-h-[calc(100vh-100px)] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-center text-lg font-bold">
-            THỐNG KÊ KẾT QUẢ DỰ BÁO MẤT RỪNG
+            {reportTitle}
           </h2>
           
           {/* Thêm các nút xuất file */}
@@ -186,7 +199,7 @@ const ThongKeBaoCaoMatRung = () => {
         </div>
         
         <div className="overflow-auto border border-gray-300 rounded shadow px-6 pt-2 pb-6">
-          {/* ✅ SỬA: Hiển thị thông tin từ params thực tế */}
+          {/* Hiển thị thông tin từ params thực tế */}
           <div className="text-sm mb-2">
             <div className="flex justify-between font-semibold">
               <span>Tỉnh: Lào Cai</span>
@@ -196,49 +209,45 @@ const ThongKeBaoCaoMatRung = () => {
                 Đến ngày: {formatDate(reportParams.toDate) || '..........'}
               </span>
             </div>
-            
+            {/* ✅ Hiển thị loại báo cáo */}
+           
           </div>
 
+          {/* ✅ Bảng với headers khác nhau cho 2 loại báo cáo */}
           <table className="w-full border border-black text-sm text-center table-fixed">
             <thead>
               <tr>
                 <th className="border border-black px-2 py-1">TT</th>
-                <th className="border border-black px-2 py-1">Huyện</th>
-                <th className="border border-black px-2 py-1">Mã xã</th>
                 <th className="border border-black px-2 py-1">Xã</th>
-                <th className="border border-black px-2 py-1">X</th>
-                <th className="border border-black px-2 py-1">Y</th>
+                <th className="border border-black px-2 py-1">Lô cảnh báo</th>
                 <th className="border border-black px-2 py-1">Tiểu khu</th>
                 <th className="border border-black px-2 py-1">Khoảnh</th>
-                <th className="border border-black px-2 py-1">Diện tích</th>
-                <th className="border border-black px-2 py-1">Ghi chú</th>
+                <th className="border border-black px-2 py-1">Tọa độ VN-2000<br/>X</th>
+                <th className="border border-black px-2 py-1">Tọa độ VN-2000<br/>Y</th>
+                <th className="border border-black px-2 py-1">Diện tích (ha)</th>
+                {isVerified && (
+                  <th className="border border-black px-2 py-1">Nguyên nhân</th>
+                )}
               </tr>
             </thead>
             <tbody>
               {reportData.map((item, idx) => (
                 <tr key={idx}>
                   <td className="border border-black px-2 py-1">{idx + 1}</td>
+                  <td className="border border-black px-2 py-1">{item.xa || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.gid || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.tk || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.khoanh || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.x || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.y || ""}</td>
                   <td className="border border-black px-2 py-1">
-                    {item.huyen}
+                    {item.area ? (item.area / 10000).toFixed(1) : ""}
                   </td>
-                  <td className="border border-black px-2 py-1">{item.maxa}</td>
-                  <td className="border border-black px-2 py-1">{item.xa}</td>
-                  <td className="border border-black px-2 py-1">
-                    {item.x || ""}
-                  </td>
-                  <td className="border border-black px-2 py-1">
-                    {item.y || ""}
-                  </td>
-                  <td className="border border-black px-2 py-1">{item.tk}</td>
-                  <td className="border border-black px-2 py-1">
-                    {item.khoanh}
-                  </td>
-                  <td className="border border-black px-2 py-1">
-                    {item.area ? (item.area / 10000).toFixed(1) : ""} ha
-                  </td>
-                  <td className="border border-black px-2 py-1">
-                    {item.ghichu || ""}
-                  </td>
+                  {isVerified && (
+                    <td className="border border-black px-2 py-1">
+                      {item.verification_reason || ""}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -251,7 +260,7 @@ const ThongKeBaoCaoMatRung = () => {
             <span className="text-right">
               Lào Cai, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
               <br />
-              <strong>Chi cục trưởng</strong>
+              <strong>Hạt kiểm lâm</strong>
             </span>
           </div>
         </div>
@@ -278,7 +287,7 @@ const ThongKeBaoCaoMatRung = () => {
         THỐNG KÊ KẾT QUẢ DỰ BÁO MẤT RỪNG
       </h2>
 
-      {/* ✅ SỬA: Hiển thị thông tin từ params thực tế */}
+      {/* Hiển thị thông tin từ params thực tế */}
       <div className="text-center text-sm mb-4 bg-gray-50 p-3 rounded">
         <div className="font-semibold">
           Tỉnh: Lào Cai | 
@@ -292,6 +301,10 @@ const ThongKeBaoCaoMatRung = () => {
             {reportParams.xa && `Xã: ${reportParams.xa}`}
           </div>
         )}
+        {/* ✅ Hiển thị loại báo cáo */}
+        <div className="text-sm text-green-600 font-medium mt-1">
+          {reportParams.xacMinh === 'true' ? '✅ Báo cáo xác minh (Loại 2)' : '📊 Báo cáo tổng hợp (Loại 1)'}
+        </div>
       </div>
 
       <div className="flex gap-6">
