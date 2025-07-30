@@ -105,9 +105,9 @@ exports.traCuuDuLieuBaoMatRung = async (req, res) => {
       tk: row.tk || "",
       khoanh: row.khoanh || "",
       
-      // ✅ Tọa độ
-      x: row.x ? parseFloat(parseFloat(row.x).toFixed(2)) : null,
-      y: row.y ? parseFloat(parseFloat(row.y).toFixed(2)) : null,
+      // ✅ TỌA ĐỘ - LÀM TRÒN KHÔNG LẤY SAU DẤU PHẨY
+      x: row.x ? Math.round(parseFloat(row.x)) : null,
+      y: row.y ? Math.round(parseFloat(row.y)) : null,
       
       // ✅ Các field cố định
       maxa: "",

@@ -107,9 +107,9 @@ const getReportData = async (fromDate, toDate, huyen, xa, xacMinh = 'false') => 
     tk: row.tk || "",
     khoanh: row.khoanh || "",
     
-    // ✅ Tọa độ
-    x: row.x ? parseFloat(parseFloat(row.x).toFixed(2)) : null,
-    y: row.y ? parseFloat(parseFloat(row.y).toFixed(2)) : null,
+    // ✅ Tọa độ - LÀM TRÒN KHÔNG LẤY SAU DẤU PHẨY
+    x: row.x ? Math.round(parseFloat(row.x)) : null,
+    y: row.y ? Math.round(parseFloat(row.y)) : null,
     
     // ✅ Các field cố định
     maxa: "",
@@ -166,7 +166,7 @@ exports.exportDocx = async (req, res) => {
   }
 };
 
-// Xuất file PDF
+// ✅ XUẤT PDF - FIXED VERSION
 exports.exportPdf = async (req, res) => {
   try {
     const { fromDate, toDate, huyen, xa, xacMinh = 'false' } = req.query;
@@ -190,7 +190,13 @@ exports.exportPdf = async (req, res) => {
           <meta charset="UTF-8">
           <title>Không có dữ liệu</title>
           <style>
-            body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+            body { 
+              font-family: 'Roboto', 'Arial', sans-serif; 
+              text-align: center; 
+              padding: 50px; 
+              color: #333;
+            }
             .message { font-size: 18px; margin: 20px 0; }
           </style>
         </head>
@@ -208,12 +214,31 @@ exports.exportPdf = async (req, res) => {
 
     const isVerified = xacMinh === 'true';
     const reportTitle = isVerified 
-      ? "BẢNG THỐNG KÊ VỊ TRÍ MẤT RỪNG ĐÃ XÁC MINH (loại 1b)"
-      : "BẢNG THỐNG KÊ VỊ TRÍ PHÁT HIỆN SỚM MẤT RỪNG (loại 1a)";
+      ? "BẢNG THỐNG KÊ VỊ TRÍ MẤT RỪNG ĐÃ XÁC MINH "
+      : "BẢNG THỐNG KÊ VỊ TRÍ PHÁT HIỆN SỚM MẤT RỪNG ";
     
     const tableHeaders = isVerified 
-      ? `<tr><th>TT</th><th>Xã</th><th>Lô cảnh báo</th><th>Tiểu khu</th><th>Khoảnh</th><th>X</th><th>Y</th><th>Diện tích (ha)</th><th>Nguyên nhân</th></tr>`
-      : `<tr><th>TT</th><th>Xã</th><th>Lô cảnh báo</th><th>Tiểu khu</th><th>Khoảnh</th><th>X</th><th>Y</th><th>Diện tích (ha)</th></tr>`;
+      ? `<tr>
+          <th>TT</th>
+          <th>Xã</th>
+          <th>Lô cảnh báo</th>
+          <th>Tiểu khu</th>
+          <th>Khoảnh</th>
+          <th>X</th>
+          <th>Y</th>
+          <th>Diện tích (ha)</th>
+          <th>Nguyên nhân</th>
+        </tr>`
+      : `<tr>
+          <th>TT</th>
+          <th>Xã</th>
+          <th>Lô cảnh báo</th>
+          <th>Tiểu khu</th>
+          <th>Khoảnh</th>
+          <th>X</th>
+          <th>Y</th>
+          <th>Diện tích (ha)</th>
+        </tr>`;
     
     const tableRows = rows.map((item, idx) => {
       const baseRow = `
@@ -234,74 +259,192 @@ exports.exportPdf = async (req, res) => {
       }
     }).join("");
     
+    // ✅ HTML ĐƠN GIẢN VÀ TỐI ƯU - FONT TIẾNG VIỆT
     const html = `
     <!DOCTYPE html>
     <html lang="vi">
     <head>
       <meta charset="UTF-8">
       <title>${reportTitle}</title>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
       <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { text-align: center; font-size: 18px; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #000; padding: 5px; text-align: center; font-size: 12px; }
-        th { background-color: #f2f2f2; font-weight: bold; }
-        .control-panel { position: fixed; top: 10px; right: 10px; background: #f9f9f9; padding: 10px; border-radius: 4px; z-index: 1000; }
-        .control-button { background: #4CAF50; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; margin: 2px; }
-        .control-button.print { background: #2196F3; }
-        @media print { .control-panel { display: none; } }
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        
+        body { 
+          font-family: 'Roboto', 'Times New Roman', serif;
+          margin: 15px;
+          color: #000;
+          line-height: 1.4;
+          background: white;
+        }
+        
+        h1 { 
+          text-align: center; 
+          font-size: 16px; 
+          font-weight: bold;
+          margin-bottom: 15px;
+          color: #000;
+        }
+        
+        .header-info {
+          display: flex; 
+          justify-content: space-between; 
+          margin-bottom: 10px;
+          font-size: 12px;
+        }
+        
+        table { 
+          width: 100%; 
+          border-collapse: collapse; 
+          margin-bottom: 15px;
+          font-size: 11px;
+        }
+        
+        th, td { 
+          border: 1px solid #000; 
+          padding: 4px; 
+          text-align: center;
+          vertical-align: middle;
+        }
+        
+        th { 
+          background-color: #f5f5f5; 
+          font-weight: bold;
+          font-size: 10px;
+        }
+        
+        .footer {
+          display: flex; 
+          justify-content: space-between; 
+          margin-top: 20px;
+          font-size: 12px;
+        }
+        
+        .footer-right {
+          text-align: right;
+        }
+        
+        .control-panel { 
+          position: fixed; 
+          top: 10px; 
+          right: 10px; 
+          background: #fff; 
+          padding: 10px; 
+          border: 2px solid #ccc;
+          border-radius: 5px;
+          z-index: 1000;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .btn { 
+          background: #4CAF50; 
+          color: white; 
+          padding: 8px 16px; 
+          border: none; 
+          border-radius: 4px; 
+          cursor: pointer; 
+          margin: 2px;
+          font-size: 12px;
+        }
+        
+        .btn:hover {
+          background: #45a049;
+        }
+        
+        .btn.print { 
+          background: #2196F3; 
+        }
+        
+        .btn.print:hover {
+          background: #1976D2;
+        }
+        
+        @media print { 
+          .control-panel { 
+            display: none !important; 
+          }
+          
+          body {
+            margin: 0;
+            font-size: 10px;
+          }
+          
+          h1 {
+            font-size: 14px;
+          }
+          
+          table {
+            font-size: 9px;
+          }
+        }
       </style>
     </head>
     <body>
+      <!-- ✅ PANEL ĐƠN GIẢN -->
       <div class="control-panel">
-        <button class="control-button" onclick="downloadPDF()">📄 Tải PDF</button>
-        <button class="control-button print" onclick="window.print()">🖨️ In</button>
-        <div style="font-size: 12px; color: #666; text-align: center;">
-          📊 ${rows.length} khu vực ${isVerified ? '(đã xác minh)' : ''}
+        <button class="btn" onclick="window.print()">🖨️ In PDF</button>
+        <button class="btn print" onclick="downloadPdf()">📥 Tải PDF</button>
+        <div style="font-size: 10px; color: #666; margin-top: 5px;">
+          📊 ${rows.length} khu vực
         </div>
       </div>
       
       <div id="report-content">
         <h1>${reportTitle}</h1>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-          <p>Tỉnh: Lào Cai</p>
-          <p>Từ ngày: ${fromDate} Đến ngày: ${toDate}</p>
+        
+        <div class="header-info">
+          <span><strong>Tỉnh:</strong> Lào Cai</span>
+          <span><strong>Từ ngày:</strong> ${fromDate} <strong>Đến ngày:</strong> ${toDate}</span>
         </div>
         
         <table>
-          <thead>${tableHeaders}</thead>
-          <tbody>${tableRows}</tbody>
+          <thead>
+            ${tableHeaders}
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
         </table>
         
-        <div style="display: flex; justify-content: space-between; margin-top: 30px;">
-          <p><strong>Người tổng hợp</strong></p>
-          <div>
-            <p>Lào Cai, ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}</p>
-            <p style="text-align: center;"><strong>Hạt kiểm lâm</strong></p>
+        <div class="footer">
+          <span><strong>Người tổng hợp</strong></span>
+          <div class="footer-right">
+            <div>Lào Cai, ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}</div>
+            <div style="margin-top: 5px;"><strong>Hạt kiểm lâm</strong></div>
           </div>
         </div>
       </div>
       
+      <!-- ✅ SCRIPT ĐƠN GIẢN - CHỈ SỬ DỤNG WINDOW.PRINT -->
       <script>
-        function downloadPDF() {
-          const { jsPDF } = window.jsPDF;
-          const element = document.getElementById('report-content');
-          
-          html2canvas(element, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-            const imgWidth = canvas.width;
-            const imgHeight = canvas.height;
-            const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-            
-            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth * ratio, imgHeight * ratio);
-            pdf.save('${isVerified ? 'bao-cao-xac-minh' : 'bao-cao'}-mat-rung-${fromDate}-${toDate}.pdf');
-          });
+        function downloadPdf() {
+          // Đơn giản: Chỉ sử dụng window.print() - trình duyệt sẽ tự động xử lý
+          alert('Vui lòng chọn "Lưu thành PDF" trong hộp thoại in sắp hiện ra');
+          setTimeout(() => {
+            window.print();
+          }, 500);
         }
+        
+        // Tự động focus để user có thể Ctrl+P
+        window.addEventListener('load', function() {
+          console.log('📄 Báo cáo đã tải xong. Bạn có thể:');
+          console.log('1. Nhấn Ctrl+P để in');
+          console.log('2. Chọn "Lưu thành PDF" trong hộp thoại in');
+          console.log('3. Nhấn nút "Tải PDF" để được hướng dẫn');
+        });
+        
+        // Keyboard shortcut
+        document.addEventListener('keydown', function(e) {
+          if (e.ctrlKey && e.key === 'p') {
+            e.preventDefault();
+            downloadPdf();
+          }
+        });
       </script>
     </body>
     </html>
@@ -310,7 +453,7 @@ exports.exportPdf = async (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(html);
 
-    console.log(`📄 PDF generated: ${rows.length} records`);
+    console.log(`✅ PDF page generated: ${rows.length} records`);
     
   } catch (err) {
     console.error("❌ Lỗi xuất PDF:", err);

@@ -26,7 +26,7 @@ const ReportLoadingOverlay = ({ message }) => (
 );
 
 const ThongKeBaoCaoMatRung = () => {
-  const { reportData, reportLoading, setReportLoading } = useReport();
+  const { reportData, reportLoading } = useReport();
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Đang tạo báo cáo...");
