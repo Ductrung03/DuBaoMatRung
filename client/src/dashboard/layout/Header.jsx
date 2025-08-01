@@ -1,7 +1,8 @@
+// client/src/dashboard/layout/Header.jsx - FIXED JSX SYNTAX
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { FaUser, FaSignOutAlt, FaUserCog, FaKey } from "react-icons/fa";
+import { FaUser, FaSignOutAlt, FaKey } from "react-icons/fa";
 import ChangePasswordModal from "../components/ChangePasswordModal";
 
 const Header = () => {
@@ -28,6 +29,16 @@ const Header = () => {
 
   const isActive = (path) => currentPath === path;
 
+  // ✅ FIXED: Get permission level display
+  const getPermissionLevelDisplay = (level) => {
+    const levels = {
+      'admin': 'Quản trị viên hệ thống',
+      'province': 'Người dùng cấp tỉnh', 
+      'district': 'Người dùng cấp huyện'
+    };
+    return levels[level] || 'Người dùng';
+  };
+
   return (
     <header className="bg-gradient-to-r from-forest-green-primary from-30% to-forest-green-secondary text-white w-full flex items-center h-16 px-4 shadow-md relative z-40">
       {/* Logo và icon */}
@@ -44,45 +55,47 @@ const Header = () => {
             </div>
           </div>
         </Link>
-        {/* Tiêu đề */}
+        
+        {/* ✅ FIXED: Tiêu đề với navigation links đúng syntax */}
         <div>
           <h1 className="text-xl font-bold uppercase">
             Hệ thống phát hiện sớm mất rừng tỉnh Lào Cai
           </h1>
           <div className="flex gap-8 mt-1">
-            <Link to="/dashboard/dubaomatrung">
-              <a
-                className={`text-base font-semibold hover:underline transition-colors ${
-                  isActive("/dashboard/dubaomatrung")
-                    ? "text-red-600"
-                    : "text-white"
-                }`}
-              >
-                Dự báo mất rừng
-              </a>
+            <Link 
+              to="/dashboard/dubaomatrung"
+              className={`text-base font-semibold hover:underline transition-colors ${
+                isActive("/dashboard/dubaomatrung")
+                  ? "text-red-600"
+                  : "text-white"
+              }`}
+            >
+              Dự báo mất rừng
             </Link>
-            <Link to="/dashboard/quanlydulieu">
-              <a
-                className={`text-base font-semibold hover:underline transition-colors ${
-                  isActive("/dashboard/quanlydulieu")
-                    ? "text-red-600"
-                    : "text-white"
-                }`}
-              >
-                Quản lý dữ liệu
-              </a>
+
+            <Link 
+              to="/dashboard/quanlydulieu"
+              className={`text-base font-semibold hover:underline transition-colors ${
+                isActive("/dashboard/quanlydulieu")
+                  ? "text-red-600"
+                  : "text-white"
+              }`}
+            >
+              Quản lý dữ liệu
             </Link>
-            <Link to="/dashboard/baocao">
-              <a
-                className={`text-base font-semibold hover:underline transition-colors ${
-                  isActive("/dashboard/baocao") ? "text-red-600" : "text-white"
-                }`}
-              >
-                Báo cáo
-              </a>
+
+            <Link 
+              to="/dashboard/baocao"
+              className={`text-base font-semibold hover:underline transition-colors ${
+                isActive("/dashboard/baocao") ? "text-red-600" : "text-white"
+              }`}
+            >
+              Báo cáo
             </Link>
-            {isAdmin() && (<Link to="/dashboard/phathienmatrung">
-              <a
+
+            {isAdmin() && (
+              <Link 
+                to="/dashboard/phathienmatrung"
                 className={`text-base font-semibold hover:underline transition-colors ${
                   isActive("/dashboard/phathienmatrung")
                     ? "text-red-600"
@@ -90,20 +103,19 @@ const Header = () => {
                 }`}
               >
                 Phát hiện mất rừng
-              </a>
-            </Link>)}
+              </Link>
+            )}
             
             {isAdmin() && (
-              <Link to="/dashboard/quanlynguoidung">
-                <a
-                  className={`text-base font-semibold hover:underline transition-colors ${
-                    isActive("/dashboard/quanlynguoidung")
-                      ? "text-red-600"
-                      : "text-white"
-                  }`}
-                >
-                  Quản lý người dùng
-                </a>
+              <Link 
+                to="/dashboard/quanlynguoidung"
+                className={`text-base font-semibold hover:underline transition-colors ${
+                  isActive("/dashboard/quanlynguoidung")
+                    ? "text-red-600"
+                    : "text-white"
+                }`}
+              >
+                Quản lý người dùng
               </Link>
             )}
           </div>
@@ -123,13 +135,13 @@ const Header = () => {
             <div className="ml-2 text-sm">
               <div className="font-semibold">{user.full_name}</div>
               <div className="text-xs opacity-80">
-                {user.role === "admin" ? "Quản trị viên" : "Người dùng"}
+                {getPermissionLevelDisplay(user.permission_level || user.role)}
               </div>
             </div>
           )}
         </div>
 
-        {/* User Menu với z-index cực cao */}
+        {/* ✅ SIMPLIFIED USER MENU - Chỉ còn Đổi mật khẩu và Đăng xuất */}
         {showUserMenu && (
           <div 
             className="user-menu-dropdown absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1"
@@ -148,17 +160,6 @@ const Header = () => {
               Đăng nhập với{" "}
               <span className="font-semibold">{user?.username}</span>
             </div>
-
-            {isAdmin() && (
-              <Link
-                to="/dashboard/quanlynguoidung"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center transition-colors"
-                onClick={() => setShowUserMenu(false)}
-              >
-                <FaUserCog className="mr-2" />
-                Quản lý người dùng
-              </Link>
-            )}
 
             <button
               onClick={() => {
@@ -186,7 +187,6 @@ const Header = () => {
       <ChangePasswordModal
         isOpen={showPasswordModal}
         onClose={() => setShowPasswordModal(false)}
-        style={{ zIndex: 100000 }}
       />
     </header>
   );

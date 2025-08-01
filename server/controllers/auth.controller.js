@@ -1,23 +1,33 @@
-// server/controllers/auth.controller.js - FIXED JWT CONSISTENCY
+// server/controllers/auth.controller.js - UPDATED WITH NEW PERMISSION SYSTEM
 const pool = require("../db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// ✅ FIX: Sử dụng CÙNG JWT_SECRET với middleware
 const JWT_SECRET = process.env.JWT_SECRET || "dubaomatrung_secret_key_change_this_in_production";
 const JWT_EXPIRES_IN = "24h";
 
 console.log(`🔑 Auth Controller JWT_SECRET: "${JWT_SECRET}"`);
 
-// Đăng nhập và trả về JWT token
+// ✅ UPDATED: Đăng nhập với hệ thống phân quyền mới
 exports.login = async (req, res) => {
   const { username, password } = req.body;
 
   console.log(`👤 Processing login for username: ${username}`);
 
   try {
-    // Kiểm tra username tồn tại
-    const userQuery = "SELECT * FROM users WHERE username = $1 AND is_active = TRUE";
+    // ✅ UPDATED: Kiểm tra username tồn tại với các field mới
+    const userQuery = `
+      SELECT 
+        id, username, password_hash, full_name, position, organization,
+        permission_level, district_id, is_active, created_at, last_login,
+        -- Backward compatibility
+        CASE 
+          WHEN permission_level = 'admin' THEN 'admin'
+          ELSE 'user'
+        END as role
+      FROM users 
+      WHERE username = $1 AND is_active = TRUE
+    `;
     const userResult = await pool.query(userQuery, [username]);
 
     if (userResult.rows.length === 0) {
@@ -29,9 +39,9 @@ exports.login = async (req, res) => {
     }
 
     const user = userResult.rows[0];
-    console.log(`✅ User found: ID=${user.id}, Role=${user.role}`);
+    console.log(`✅ User found: ID=${user.id}, Permission=${user.permission_level}`);
 
-    // ✅ FIX: Password validation
+    // Password validation
     let isPasswordValid = false;
     
     try {
@@ -41,7 +51,7 @@ exports.login = async (req, res) => {
       console.log(`⚠️ Bcrypt error: ${bcryptError.message}`);
     }
     
-    // ✅ FIX: Fallback cho admin development
+    // Fallback cho admin development
     if (!isPasswordValid && username === 'admin' && password === 'admin123') {
       console.log(`🔓 Using admin development bypass`);
       isPasswordValid = true;
@@ -61,23 +71,26 @@ exports.login = async (req, res) => {
       [user.id]
     );
 
-    // ✅ FIX: Tạo token với payload consistent
+    // ✅ UPDATED: Tạo token với payload mới
     const tokenPayload = { 
       id: user.id, 
       username: user.username, 
-      role: user.role.toLowerCase(), // ✅ Consistent lowercase
+      role: user.role.toLowerCase(), // Backward compatibility
+      permission_level: user.permission_level,
       full_name: user.full_name,
+      position: user.position,
+      organization: user.organization,
+      district_id: user.district_id,
       iat: Math.floor(Date.now() / 1000)
     };
     
     console.log(`🔐 Creating token with payload:`, tokenPayload);
     
-    // ✅ FIX: Sử dụng cùng JWT_SECRET với middleware
     const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
     
     console.log(`🎟️ Token created successfully for user: ${username}`);
     
-    // ✅ FIX: Verify token ngay sau khi tạo
+    // Verify token ngay sau khi tạo
     try {
       const verified = jwt.verify(token, JWT_SECRET);
       console.log(`✅ Token verification test passed`);
@@ -89,7 +102,7 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Trả về token và thông tin user
+    // ✅ UPDATED: Trả về token và thông tin user mới
     const { password_hash, ...userWithoutPassword } = user;
     userWithoutPassword.role = userWithoutPassword.role.toLowerCase();
     
@@ -110,15 +123,23 @@ exports.login = async (req, res) => {
   }
 };
 
-// Lấy thông tin người dùng hiện tại
+// ✅ UPDATED: Lấy thông tin người dùng hiện tại với các field mới
 exports.getCurrentUser = async (req, res) => {
   try {
     console.log(`🔍 Getting current user info for ID: ${req.user.id}`);
     
-    const userResult = await pool.query(
-      "SELECT id, username, full_name, role, is_active, created_at, last_login, district_id FROM users WHERE id = $1",
-      [req.user.id]
-    );
+    const userResult = await pool.query(`
+      SELECT 
+        id, username, full_name, position, organization,
+        permission_level, district_id, is_active, created_at, last_login,
+        -- Backward compatibility
+        CASE 
+          WHEN permission_level = 'admin' THEN 'admin'
+          ELSE 'user'
+        END as role
+      FROM users 
+      WHERE id = $1
+    `, [req.user.id]);
 
     if (userResult.rows.length === 0) {
       console.log(`❌ User not found with ID: ${req.user.id}`);
@@ -131,7 +152,7 @@ exports.getCurrentUser = async (req, res) => {
     const userData = userResult.rows[0];
     userData.role = userData.role.toLowerCase();
     
-    console.log(`✅ Retrieved user info for ID: ${req.user.id}, role: ${userData.role}`);
+    console.log(`✅ Retrieved user info for ID: ${req.user.id}, permission: ${userData.permission_level}`);
     
     res.json({
       success: true,
@@ -147,7 +168,7 @@ exports.getCurrentUser = async (req, res) => {
   }
 };
 
-// Đăng xuất
+// Đăng xuất (giữ nguyên)
 exports.logout = (req, res) => {
   console.log(`👋 User logged out successfully`);
   

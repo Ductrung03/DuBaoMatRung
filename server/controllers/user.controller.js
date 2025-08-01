@@ -1,3 +1,4 @@
+// server/controllers/user.controller.js - UPDATED WITH NEW FIELDS
 const pool = require("../db");
 const bcrypt = require("bcryptjs");
 const convertTcvn3ToUnicode = require("../utils/convertTcvn3ToUnicode");
@@ -8,12 +9,22 @@ const hashPassword = async (password) => {
   return bcrypt.hash(password, salt);
 };
 
-// Lấy danh sách tất cả người dùng (không bao gồm mật khẩu)
+// ✅ UPDATED: Lấy danh sách tất cả người dùng với các field mới
 exports.getAllUsers = async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT id, username, full_name, role, district_id, is_active, created_at, last_login FROM users ORDER BY created_at DESC"
-    );
+    const result = await pool.query(`
+      SELECT 
+        id, username, full_name, position, organization, 
+        permission_level, district_id, is_active, 
+        created_at, last_login,
+        -- Backward compatibility
+        CASE 
+          WHEN permission_level = 'admin' THEN 'admin'
+          ELSE 'user'
+        END as role
+      FROM users 
+      ORDER BY created_at DESC
+    `);
 
     // Thêm xử lý để hiển thị tên huyện Unicode nếu cần
     const usersWithDistrictName = result.rows.map(user => ({
@@ -34,31 +45,32 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// Tạo người dùng mới
-// Sửa hàm createUser trong file server/controllers/user.controller.js
-
+// ✅ UPDATED: Tạo người dùng mới với các field mới
 exports.createUser = async (req, res) => {
   const {
     username,
     password,
     full_name,
-    role = "user",
+    position,
+    organization,
+    permission_level = "district",
     district_id = null,
   } = req.body;
 
   // Kiểm tra dữ liệu đầu vào
-  if (!username || !password || !full_name) {
+  if (!username || !password || !full_name || !position || !organization) {
     return res.status(400).json({
       success: false,
       message: "Vui lòng nhập đầy đủ thông tin người dùng",
     });
   }
 
-  // In ra thông tin debug
   console.log("📋 Dữ liệu tạo người dùng:", {
     username,
     full_name,
-    role,
+    position,
+    organization,
+    permission_level,
     district_id: district_id || "null",
   });
 
@@ -79,29 +91,30 @@ exports.createUser = async (req, res) => {
     // Băm mật khẩu
     const password_hash = await hashPassword(password);
 
-    // Thêm người dùng vào database
-    // Sử dụng cú pháp SQL chuẩn hơn với tên cột rõ ràng
+    // ✅ UPDATED: Thêm người dùng với các field mới
     const query = `
-      INSERT INTO users (username, password_hash, full_name, role, district_id) 
-      VALUES ($1, $2, $3, $4, $5) 
-      RETURNING id, username, full_name, role, district_id, is_active, created_at
+      INSERT INTO users (
+        username, password_hash, full_name, position, organization, 
+        permission_level, district_id,
+        role
+      ) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+      RETURNING id, username, full_name, position, organization, 
+                permission_level, district_id, is_active, created_at
     `;
 
-    console.log("📋 SQL Query:", query);
-    console.log("📋 Parameters:", [
-      username,
-      "***",
-      full_name,
-      role,
-      district_id,
-    ]);
+    // Set role for backward compatibility
+    const role = permission_level === 'admin' ? 'admin' : 'user';
 
     const result = await pool.query(query, [
       username,
       password_hash,
       full_name,
-      role,
+      position,
+      organization,
+      permission_level,
       district_id,
+      role
     ]);
 
     console.log("✅ Kết quả tạo người dùng:", result.rows[0]);
@@ -121,43 +134,60 @@ exports.createUser = async (req, res) => {
   }
 };
 
-// Cập nhật thông tin người dùng
+// ✅ UPDATED: Cập nhật thông tin người dùng với các field mới
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
-  const { full_name, role, is_active, password, district_id } = req.body;
+  const { 
+    full_name, 
+    position, 
+    organization, 
+    permission_level, 
+    district_id, 
+    is_active = true, 
+    password 
+  } = req.body;
 
   try {
-    // In ra dữ liệu nhận được để debug
     console.log("📋 Dữ liệu cập nhật người dùng:", {
       id,
       full_name,
-      role,
-      is_active,
+      position,
+      organization,
+      permission_level,
       district_id,
+      is_active,
       password: password ? "***" : undefined,
     });
 
     let query, params;
+
+    // Set role for backward compatibility
+    const role = permission_level === 'admin' ? 'admin' : 'user';
 
     if (password) {
       // Nếu có mật khẩu mới, cập nhật cả mật khẩu
       const password_hash = await hashPassword(password);
       query = `
         UPDATE users 
-        SET full_name = $1, role = $2, is_active = $3, password_hash = $4, district_id = $5
-        WHERE id = $6 
-        RETURNING id, username, full_name, role, district_id, is_active, created_at, last_login
+        SET full_name = $1, position = $2, organization = $3, 
+            permission_level = $4, district_id = $5, is_active = $6, 
+            password_hash = $7, role = $8
+        WHERE id = $9 
+        RETURNING id, username, full_name, position, organization, 
+                  permission_level, district_id, is_active, created_at, last_login
       `;
-      params = [full_name, role, is_active, password_hash, district_id, id];
+      params = [full_name, position, organization, permission_level, district_id, is_active, password_hash, role, id];
     } else {
       // Không cập nhật mật khẩu
       query = `
         UPDATE users 
-        SET full_name = $1, role = $2, is_active = $3, district_id = $4
-        WHERE id = $5 
-        RETURNING id, username, full_name, role, district_id, is_active, created_at, last_login
+        SET full_name = $1, position = $2, organization = $3, 
+            permission_level = $4, district_id = $5, is_active = $6, role = $7
+        WHERE id = $8 
+        RETURNING id, username, full_name, position, organization, 
+                  permission_level, district_id, is_active, created_at, last_login
       `;
-      params = [full_name, role, is_active, district_id, id];
+      params = [full_name, position, organization, permission_level, district_id, is_active, role, id];
     }
 
     console.log("📋 Query cập nhật:", query);
@@ -189,14 +219,14 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// Xóa người dùng
+// ✅ CHANGED: Xóa người dùng thật sự (thay vì vô hiệu hóa)
 exports.deleteUser = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Không xóa người dùng thật sự, chỉ đặt is_active = false
+    // Xóa người dùng thật sự
     const result = await pool.query(
-      "UPDATE users SET is_active = FALSE WHERE id = $1 RETURNING id",
+      "DELETE FROM users WHERE id = $1 RETURNING id, username, full_name",
       [id]
     );
 
@@ -207,12 +237,25 @@ exports.deleteUser = async (req, res) => {
       });
     }
 
+    const deletedUser = result.rows[0];
+    console.log("✅ Đã xóa người dùng:", deletedUser);
+
     res.json({
       success: true,
-      message: "Vô hiệu hóa người dùng thành công",
+      message: `Đã xóa người dùng: ${deletedUser.full_name}`,
+      data: deletedUser
     });
   } catch (err) {
     console.error("❌ Lỗi xóa người dùng:", err);
+    
+    // Kiểm tra nếu lỗi do ràng buộc khóa ngoại
+    if (err.code === '23503') {
+      return res.status(400).json({
+        success: false,
+        message: "Không thể xóa người dùng này vì đang có dữ liệu liên quan trong hệ thống",
+      });
+    }
+    
     res.status(500).json({
       success: false,
       message: "Lỗi server khi xóa người dùng",
@@ -220,7 +263,7 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-// Kích hoạt lại người dùng đã bị vô hiệu hóa
+// Kích hoạt lại người dùng đã bị vô hiệu hóa (giữ nguyên)
 exports.activateUser = async (req, res) => {
   const { id } = req.params;
 
@@ -250,7 +293,7 @@ exports.activateUser = async (req, res) => {
   }
 };
 
-// Đổi mật khẩu
+// Đổi mật khẩu (giữ nguyên)
 exports.changePassword = async (req, res) => {
   const { id } = req.params;
   const { old_password, new_password } = req.body;

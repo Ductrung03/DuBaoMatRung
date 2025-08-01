@@ -14,34 +14,50 @@ export const useAuth = () => useContext(AuthContext);
 // Provider để bọc quanh app
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token")); // ✅ FIX: Dùng localStorage thay vì sessionStorage
+  const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Log API URL for debugging
   console.log("🔍 API URL từ config:", config.API_URL);
 
-  // ✅ FIX: Setup axios interceptor để handle 401 tự động
+  // ✅ FIXED: Setup axios interceptor để handle token và 401 tự động
   useEffect(() => {
-    // Request interceptor để thêm token
+    // Request interceptor để thêm token vào mọi request
     const requestInterceptor = axios.interceptors.request.use(
       (config) => {
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+        const currentToken = localStorage.getItem("token");
+        if (currentToken) {
+          config.headers.Authorization = `Bearer ${currentToken}`;
         }
+        console.log(`📤 Request: ${config.method?.toUpperCase()} ${config.url}`, {
+          hasToken: !!currentToken,
+          tokenPreview: currentToken ? currentToken.substring(0, 20) + '...' : 'none'
+        });
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => {
+        console.error("❌ Request interceptor error:", error);
+        return Promise.reject(error);
+      }
     );
 
-    // Response interceptor để handle 401
+    // Response interceptor để handle 401 và các lỗi khác
     const responseInterceptor = axios.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        console.log(`✅ Response: ${response.config.method?.toUpperCase()} ${response.config.url} - ${response.status}`);
+        return response;
+      },
       (error) => {
+        console.error(`❌ Response error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
+          status: error.response?.status,
+          message: error.response?.data?.message,
+          hasToken: !!error.config?.headers?.Authorization
+        });
+
         if (error.response?.status === 401) {
-          console.log("🚨 401 Unauthorized - Token invalid, logging out...");
+          console.log("🚨 401 Unauthorized - Clearing auth data and redirecting to login");
           
-          // Clear token và user data
+          // Clear all auth data
           setToken(null);
           setUser(null);
           localStorage.removeItem("token");
@@ -57,25 +73,35 @@ export const AuthProvider = ({ children }) => {
       }
     );
 
-    // Cleanup interceptors
+    // Cleanup interceptors khi component unmount
     return () => {
       axios.interceptors.request.eject(requestInterceptor);
       axios.interceptors.response.eject(responseInterceptor);
     };
-  }, [token, navigate]);
+  }, [navigate]);
 
-  // ✅ FIX: Kiểm tra token khi component mount
+  // ✅ FIXED: Kiểm tra token khi component mount
   useEffect(() => {
     const checkLoggedIn = async () => {
-      if (token) {
+      const currentToken = localStorage.getItem("token");
+      
+      if (currentToken) {
         try {
           console.log("🔍 Verifying existing token...");
-          const res = await axios.get(`${config.API_URL}/api/auth/me`);
+          
+          // Set token vào state trước khi verify
+          setToken(currentToken);
+          
+          const res = await axios.get(`${config.API_URL}/api/auth/me`, {
+            headers: {
+              Authorization: `Bearer ${currentToken}`
+            }
+          });
           
           console.log("✅ Token valid, user data:", res.data.user);
           setUser(res.data.user);
           
-          // ✅ FIX: Lưu user data vào localStorage
+          // Lưu user data vào localStorage
           localStorage.setItem("user", JSON.stringify(res.data.user));
           
         } catch (err) {
@@ -87,16 +113,23 @@ export const AuthProvider = ({ children }) => {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
           
-          // Don't show error toast here to avoid spam
+          // Only show error if it's not a network issue
+          if (err.response?.status === 401) {
+            console.log("🔄 Token invalid, will redirect to login");
+          } else {
+            console.error("🌐 Network or server error during token verification");
+          }
         }
+      } else {
+        console.log("📝 No token found in localStorage");
       }
       setLoading(false);
     };
 
     checkLoggedIn();
-  }, [token]);
+  }, []);
 
-  // ✅ FIX: Đăng nhập with better error handling
+  // ✅ FIXED: Đăng nhập with better error handling
   const login = async (username, password) => {
     try {
       setLoading(true);
@@ -110,13 +143,13 @@ export const AuthProvider = ({ children }) => {
 
       console.log("✅ Login successful:", res.data);
       
-      // ✅ FIX: Lưu token và user data
+      // Lưu token và user data
       const { token: newToken, user: userData } = res.data;
       
       setToken(newToken);
       setUser(userData);
       
-      // ✅ FIX: Lưu vào localStorage
+      // Lưu vào localStorage
       localStorage.setItem("token", newToken);
       localStorage.setItem("user", JSON.stringify(userData));
       
@@ -133,6 +166,8 @@ export const AuthProvider = ({ children }) => {
         errorMessage = "Tên đăng nhập hoặc mật khẩu không đúng";
       } else if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
+      } else if (err.code === 'NETWORK_ERROR' || err.message === 'Network Error') {
+        errorMessage = "Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.";
       }
       
       toast.error(errorMessage);
@@ -143,7 +178,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ✅ FIX: Đăng xuất with cleanup
+  // ✅ FIXED: Đăng xuất with cleanup
   const logout = async () => {
     try {
       console.log("👋 Logging out user...");
@@ -172,7 +207,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Kiểm tra vai trò
-  const isAdmin = () => user && user.role === "admin";
+  const isAdmin = () => {
+    return user && (user.role === "admin" || user.permission_level === "admin");
+  };
   
   // Lấy mã huyện của người dùng (TCVN3)
   const getUserDistrictId = () => user?.district_id || null;

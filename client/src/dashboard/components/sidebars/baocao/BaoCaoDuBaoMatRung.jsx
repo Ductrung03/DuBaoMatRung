@@ -45,8 +45,8 @@ const BaoCaoDuBaoMatRung = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [reportType, setReportType] = useState("");
-  const [chartData, setChartData] = useState(null);
-  const [openDropdown, setOpenDropdown] = useState(null);
+  const [chartData] = useState(null);
+  const [, setOpenDropdown] = useState(null);
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   
   // ✅ THÊM: State cho checkbox xác minh
@@ -58,7 +58,7 @@ const BaoCaoDuBaoMatRung = () => {
 
   const { setReportData, setReportLoading } = useReport();
   const navigate = useNavigate();
-  const { user, isAdmin } = useAuth();
+  useAuth();
 
   useEffect(() => {
     // Hàm này sẽ được thực hiện khi danh sách huyện thay đổi hoặc khi có huyện được chọn

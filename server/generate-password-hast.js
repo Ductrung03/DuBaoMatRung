@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 
 // Tạo password hash cho admin123 
 async function generateHash() {
-  const password = 'admin123';
+  const password = 'Admin@123#./';
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
   

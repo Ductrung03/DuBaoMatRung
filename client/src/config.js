@@ -141,6 +141,7 @@ export const useTokenFix = () => {
         toast.error("❌ " + result.message);
         return false;
       }
+    // eslint-disable-next-line no-unused-vars
     } catch (error) {
       toast.error("❌ Lỗi khi fix token");
       return false;
@@ -171,5 +172,35 @@ if (typeof window !== 'undefined') {
   
   console.log("💡 Available commands:");
   console.log("• fixTokenNow() - Fix token và reload page");
+}
+// Thêm vào cuối file config.js
+
+// ✅ DEBUG: Check current auth status
+if (typeof window !== 'undefined') {
+  window.checkAuthStatus = () => {
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    
+    console.log("🔍 Current Auth Status:");
+    console.log("Token exists:", !!token);
+    console.log("Token preview:", token ? token.substring(0, 30) + '...' : 'none');
+    console.log("User data:", user ? JSON.parse(user) : 'none');
+    
+    if (token) {
+      // Try to decode JWT manually (without verification)
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log("Token payload:", payload);
+        console.log("Token expires:", new Date(payload.exp * 1000));
+        console.log("Token expired:", Date.now() > payload.exp * 1000);
+      } catch (e) {
+        console.log("Cannot decode token:", e.message);
+      }
+    }
+    
+    return { token, user: user ? JSON.parse(user) : null };
+  };
+  
+  console.log("💡 Debug command available: checkAuthStatus()");
 }
 export default config;

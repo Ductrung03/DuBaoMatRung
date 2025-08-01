@@ -1,110 +1,131 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+// client/src/dashboard/pages/Login.jsx - WITH PASSWORD TOGGLE
+import React, { useState } from "react";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { ClipLoader } from 'react-spinners';
+import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { ClipLoader } from "react-spinners";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const { login, user, loading } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [showPassword, setShowPassword] = useState(false); // ✅ NEW: Password visibility
+  const { user, login, loading } = useAuth();
 
-  // Nếu đã đăng nhập, chuyển hướng đến trang dashboard hoặc trang đã lưu trước đó
-  useEffect(() => {
-    if (user) {
-      const from = location.state?.from?.pathname || "/dashboard";
-      navigate(from, { replace: true });
-    }
-  }, [user, navigate, location]);
+  // Nếu đã đăng nhập thì redirect về dashboard
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    await login(username, password);
+  };
 
-    if (!username || !password) {
-      setError("Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu");
-      return;
-    }
-
-    try {
-      await login(username, password);
-    } catch (err) {
-      setError("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập.");
-    }
+  // ✅ NEW: Toggle password visibility
+  const togglePasswordVisibility = () => {
+    setShowPassword(prev => !prev);
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-lg">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center px-4">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header */}
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <div className="mx-auto h-20 w-20 bg-green-600 rounded-full flex items-center justify-center mb-4">
+            <div className="grid grid-cols-2 grid-rows-2 gap-1">
+              <div className="w-3 h-3 bg-white rounded-sm"></div>
+              <div className="w-3 h-3 bg-white rounded-sm"></div>
+              <div className="w-3 h-3 bg-white rounded-sm"></div>
+              <div className="w-3 h-3 bg-white rounded-sm"></div>
+            </div>
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900">
+            Đăng nhập hệ thống
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
             Hệ thống phát hiện sớm mất rừng tỉnh Lào Cai
-          </h1>
-          <h2 className="mt-2 text-xl text-forest-green-primary font-semibold">Đăng nhập</h2>
+          </p>
         </div>
 
-        {error && (
-          <div className="p-3 text-red-700 bg-red-100 rounded-md">
-            {error}
-          </div>
-        )}
-
+        {/* Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Tên đăng nhập
-            </label>
-            <input
-              id="username"
-              name="username"
-              type="text"
-              autoComplete="username"
-              required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-forest-green-primary"
-            />
+          <div className="space-y-4">
+            {/* Username */}
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                Tên đăng nhập
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaUser className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900"
+                  placeholder="Nhập tên đăng nhập"
+                />
+              </div>
+            </div>
+
+            {/* ✅ UPDATED: Password with toggle */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                Mật khẩu
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaLock className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900"
+                  placeholder="Nhập mật khẩu"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Mật khẩu
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-forest-green-primary"
-            />
-          </div>
-
+          {/* Submit Button */}
           <div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-forest-green-primary hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-green-primary"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? (
-                <>
-                  <ClipLoader color="#ffffff" size={20} />
-                  <span className="ml-2">Đang xử lý...</span>
-                </>
+                <div className="flex items-center">
+                  <ClipLoader color="#ffffff" size={20} className="mr-2" />
+                  Đang đăng nhập...
+                </div>
               ) : (
                 "Đăng nhập"
               )}
             </button>
+          </div>
+
+          {/* Demo credentials info */}
+          <div className="text-center">
+            <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-md">
+              <strong>Tài khoản demo:</strong><br />
+              Admin: admin / admin123
+            </div>
           </div>
         </form>
       </div>

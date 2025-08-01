@@ -365,7 +365,7 @@ app.get("/api/debug/jwt", (req, res) => {
         "2. Login again to get new token", 
         "3. New token will be created with current JWT_SECRET"
       ],
-      test_login: "POST /api/auth/login with admin/admin123",
+      test_login: "POST /api/auth/login with admin/Admin@123#./",
       test_protected: "GET /api/auth/me with Authorization header"
     }
   });

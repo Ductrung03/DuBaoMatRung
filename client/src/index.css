@@ -526,3 +526,42 @@ div[data-testid="toast-container"],
 .fixed.inset-0.bg-white {
   z-index: 50002 !important;
 }
+
+/* ✅ Password Toggle Button Styles */
+.password-toggle-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+  color: #374151;
+}
+
+.password-toggle-btn:focus {
+  outline: none;
+  color: #2563eb;
+}
+
+/* ✅ Password Input with Toggle */
+.password-input-container {
+  position: relative;
+}
+
+.password-input-container input {
+  padding-right: 40px !important;
+}
+
+/* ✅ Responsive password toggle */
+@media (max-width: 768px) {
+  .password-toggle-btn {
+    padding: 0 8px;
+  }
+}
