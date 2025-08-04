@@ -1,4 +1,4 @@
-// client/src/dashboard/pages/Map/index.jsx - FIXED VERSION FOR ALL PAGES
+// client/src/dashboard/pages/Map/index.jsx - FIXED TABLE DISPLAY FOR ALL PAGES
 import { getLayerStyle } from "./utils/mapStyles";
 import { toast } from "react-toastify";
 import React, { useEffect, useRef } from "react";
@@ -86,7 +86,7 @@ const Map = () => {
   // ===================================
   const layerName = getQueryParam(location.search, "layer");
 
-  // ✅ DETERMINE MAP HEIGHT: Shorter for pages with table, taller for pages without data
+  // ✅ FIX: Luôn hiển thị table khi có dữ liệu, không phụ thuộc vào trang
   const shouldShowTable = geoData?.features?.length > 0;
   const mapHeight = shouldShowTable 
     ? "h-[40vh] md:h-[50vh]"  // Shorter when table is shown
@@ -208,7 +208,9 @@ const Map = () => {
       geoDataFeatures: geoData?.features?.length || 0,
       geoDataType: geoData?.type,
       currentPath: location.pathname,
-      shouldShowTable
+      shouldShowTable,
+      // ✅ FIX: Log để debug table display
+      tableWillShow: shouldShowTable
     });
   }, [layerName, loading, geoData, location.pathname, shouldShowTable]);
 
@@ -223,14 +225,13 @@ const Map = () => {
       
       if (geoData.features && geoData.features.length > 0) {
         const firstFeature = geoData.features[0];
-        console.log("📊 Feature đầu tiên (target):", {
+        console.log("📊 Feature đầu tiên:", {
           gid: firstFeature.properties.gid,
           area: firstFeature.properties.area,
-          is_target: firstFeature.properties.is_target,
           huyen: firstFeature.properties.huyen
         });
         
-        console.log(`🎉 Hiển thị ${geoData.features.length} khu vực mất rừng trên bản đồ`);
+        console.log(`🎉 Sẽ hiển thị ${geoData.features.length} khu vực mất rừng trên bản đồ và bảng`);
       }
     }
   }, [geoData]);
@@ -335,7 +336,13 @@ const Map = () => {
         </MapContainer>
       </div>
 
-      {/* ✅ FIXED: Table Display - Hiển thị cho TẤT CẢ TRANG */}
+      {/* ✅ FIX: Table Display - Luôn render khi có dữ liệu, không phụ thuộc trang */}
+      {console.log("🔍 About to render TableDisplay:", { 
+        hasGeoData: !!geoData, 
+        featuresLength: geoData?.features?.length,
+        shouldShowTable
+      })}
+      
       <TableDisplay
         loading={loading}
         geoData={geoData}

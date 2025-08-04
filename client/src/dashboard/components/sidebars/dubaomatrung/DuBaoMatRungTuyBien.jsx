@@ -1,20 +1,51 @@
 import React, { useState, useEffect } from "react";
 import Select from "../../Select";
 import { useAuth } from "../../../contexts/AuthContext";
+import { useGeoData } from "../../../contexts/GeoDataContext";
 import config from "../../../../config";
 import DistrictDropdown from "../../DistrictDropdown";
+import { toast } from "react-toastify";
 
 const DuBaoMatRungTuyBien = () => {
-  useAuth();
+  const { isAdmin, getUserDistrictId } = useAuth();
+  const { setGeoData, setLoading } = useGeoData();
+  
   const [xaList, setXaList] = useState([]);
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   const [isInputOpen, setInputOpen] = useState(true);
   const [selectedHuyen, setSelectedHuyen] = useState("");
   const [selectedXa, setSelectedXa] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoadingState] = useState(false);
+
+  // ✅ THÊM: State cho các input date của giao diện cũ
+  const [kyTruocStart, setKyTruocStart] = useState("");
+  const [kyTruocEnd, setKyTruocEnd] = useState("");
+  const [kySauStart, setKySauStart] = useState("");
+  const [kySauEnd, setKySauEnd] = useState("");
 
   // Trạng thái mở cho từng dropdown
   const [openDropdown, setOpenDropdown] = useState(null);
+
+  useEffect(() => {
+    // Auto-fill huyện cho user cấp huyện
+    if (!isAdmin() && getUserDistrictId()) {
+      const districtMapping = {
+        '01': 'Lào Cai',
+        '02': 'Bát Xát', 
+        '03': 'Mường Khương',
+        '04': 'Si Ma Cai',
+        '05': 'Bắc Hà',
+        '06': 'Bảo Thắng',
+        '07': 'Bảo Yên',
+        '08': 'Sa Pa',
+        '09': 'Văn Bàn'
+      };
+      const districtName = districtMapping[getUserDistrictId()];
+      if (districtName) {
+        setSelectedHuyen(districtName);
+      }
+    }
+  }, [isAdmin, getUserDistrictId]);
 
   useEffect(() => {
     // Khi huyện thay đổi, tải danh sách xã tương ứng
@@ -22,7 +53,7 @@ const DuBaoMatRungTuyBien = () => {
       if (!selectedHuyen) return;
       
       try {
-        setLoading(true);
+        setLoadingState(true);
         const res = await fetch(
           `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(selectedHuyen)}`
         );
@@ -32,7 +63,7 @@ const DuBaoMatRungTuyBien = () => {
         console.error("Lỗi khi tải danh sách xã:", err);
         setXaList([]);
       } finally {
-        setLoading(false);
+        setLoadingState(false);
       }
     };
     
@@ -49,6 +80,94 @@ const DuBaoMatRungTuyBien = () => {
     setSelectedXa(e.target.value);
   };
 
+  // ✅ THÊM: Hàm xử lý phân tích với logic của giao diện cũ
+  const handleAnalyze = async () => {
+    try {
+      // ✅ Xác định khoảng thời gian để phân tích
+      let fromDate = "";
+      let toDate = "";
+
+      // Logic: Nếu có cả kỳ trước và kỳ sau, lấy từ kỳ trước đến kỳ sau
+      // Nếu chỉ có một kỳ, sử dụng kỳ đó
+      if (kyTruocStart && kySauEnd) {
+        fromDate = kyTruocStart;
+        toDate = kySauEnd;
+      } else if (kyTruocStart && kyTruocEnd) {
+        fromDate = kyTruocStart;
+        toDate = kyTruocEnd;
+      } else if (kySauStart && kySauEnd) {
+        fromDate = kySauStart;
+        toDate = kySauEnd;
+      } else {
+        toast.warning("Vui lòng chọn ít nhất một khoảng thời gian (kỳ trước hoặc kỳ sau)");
+        return;
+      }
+
+      // Kiểm tra quyền truy cập cho admin
+      if (isAdmin() && !selectedHuyen) {
+        toast.warning("Vui lòng chọn huyện");
+        return;
+      }
+
+      console.log("🔮 Dự báo tùy biến với tham số:", {
+        fromDate,
+        toDate, 
+        huyen: selectedHuyen,
+        xa: selectedXa
+      });
+
+      setLoading(true);
+      setLoadingState(true);
+
+      // ✅ Gọi API tra cứu dữ liệu với tham số đã xác định
+      const queryParams = new URLSearchParams({
+        fromDate,
+        toDate,
+        huyen: selectedHuyen,
+        xa: selectedXa
+      });
+
+      const res = await fetch(
+        `${config.API_URL}/api/quan-ly-du-lieu/tra-cuu-du-lieu-bao-mat-rung?${queryParams.toString()}`
+      );
+
+      if (!res.ok) {
+        const errData = await res.json();
+        toast.error(errData.message || "Lỗi khi truy vấn dữ liệu");
+        return;
+      }
+
+      const data = await res.json();
+
+      if (!data.success) {
+        toast.error(data.message || "Lỗi từ backend");
+        return;
+      }
+
+      if (!data.data || data.data.features.length === 0) {
+        toast.warning("Không có dữ liệu phù hợp trong khoảng thời gian này");
+        setGeoData({ type: "FeatureCollection", features: [] });
+        return;
+      }
+
+      // ✅ Set dữ liệu để hiển thị trên bản đồ và bảng
+      setGeoData(data.data);
+      
+      toast.success(`✅ Phân tích hoàn tất: tìm thấy ${data.data.features.length} khu vực mất rừng`, {
+        autoClose: 3000
+      });
+
+      console.log("✅ Dự báo tùy biến hoàn thành:", data.data.features.length, "features");
+
+    } catch (err) {
+      console.error("❌ Lỗi dự báo tùy biến:", err);
+      toast.error(`Lỗi khi thực hiện phân tích: ${err.message}`);
+    } finally {
+      setLoading(false);
+      setLoadingState(false);
+    }
+  };
+
   // Hàm xử lý khi dropdown focus hoặc blur
   const handleDropdownToggle = (dropdownName, isOpen) => {
     setOpenDropdown(isOpen ? dropdownName : null);
@@ -62,6 +181,7 @@ const DuBaoMatRungTuyBien = () => {
       >
         Dự báo mất rừng tùy biến
       </div>
+      
       {isForecastOpen && (
         <div className="flex flex-col gap-2 pt-3">
           <div
@@ -85,6 +205,7 @@ const DuBaoMatRungTuyBien = () => {
                       value={selectedHuyen}
                       onChange={handleHuyenChange}
                       isLoading={loading}
+                      disabled={!isAdmin()} // ✅ Lock cho user cấp huyện
                       onFocus={() => handleDropdownToggle("huyen", true)}
                       onBlur={() => handleDropdownToggle("huyen", false)}
                     />
@@ -117,6 +238,8 @@ const DuBaoMatRungTuyBien = () => {
                   <label className="text-sm">Ngày bắt đầu</label>
                   <input
                     type="date"
+                    value={kyTruocStart}
+                    onChange={(e) => setKyTruocStart(e.target.value)}
                     className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
@@ -124,6 +247,8 @@ const DuBaoMatRungTuyBien = () => {
                   <label className="text-sm">Ngày kết thúc</label>
                   <input
                     type="date"
+                    value={kyTruocEnd}
+                    onChange={(e) => setKyTruocEnd(e.target.value)}
                     className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
@@ -132,6 +257,8 @@ const DuBaoMatRungTuyBien = () => {
                   <label className="text-sm">Ngày bắt đầu</label>
                   <input
                     type="date"
+                    value={kySauStart}
+                    onChange={(e) => setKySauStart(e.target.value)}
                     className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
@@ -139,6 +266,8 @@ const DuBaoMatRungTuyBien = () => {
                   <label className="text-sm">Ngày kết thúc</label>
                   <input
                     type="date"
+                    value={kySauEnd}
+                    onChange={(e) => setKySauEnd(e.target.value)}
                     className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
@@ -146,12 +275,15 @@ const DuBaoMatRungTuyBien = () => {
                   Diện tích phát hiện tối thiểu:
                 </div>
               </div>
-              <button className="w-36 bg-forest-green-gray hover:bg-green-200 text-black-800 font-medium py-0.5 px-3 rounded-full text-center mt-2 self-center">
-                Phân tích
+              <button 
+                onClick={handleAnalyze}
+                disabled={loading}
+                className="w-36 bg-forest-green-gray hover:bg-green-200 text-black-800 font-medium py-0.5 px-3 rounded-full text-center mt-2 self-center disabled:opacity-50"
+              >
+                {loading ? "Đang phân tích..." : "Phân tích"}
               </button>
             </div>
           )}
-          
         </div>
       )}
     </div>

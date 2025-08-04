@@ -10,7 +10,7 @@ const TableDisplay = ({
   loadingMessage, 
   onRowClick 
 }) => {
-  // ✅ REMOVED: isDataPage restriction - Hiển thị table cho tất cả trang
+  // ✅ REMOVED: Không còn kiểm tra trang nào nữa - Hiển thị table cho TẤT CẢ trang
 
   // Hiển thị loading
   if (loading) {
@@ -47,17 +47,8 @@ const TableDisplay = ({
     );
   }
 
-  // ✅ UPDATED: Chỉ hiển thị thông báo khi không có dữ liệu (optional)
-  return (
-    <div className="text-center text-gray-500 font-medium p-4 bg-gray-50 rounded-md mt-2 border border-gray-200">
-      <div className="text-sm">
-        <p>📊 <strong>Chưa có dữ liệu hiển thị</strong></p>
-        <p className="text-xs mt-1 text-gray-400">
-          Sử dụng các tính năng ở sidebar bên trái để tải dữ liệu
-        </p>
-      </div>
-    </div>
-  );
+  // Thông báo khi không có dữ liệu (chỉ hiển thị khi cần thiết)
+  return null; // ✅ Không hiển thị thông báo "chưa có dữ liệu" để tránh làm rối UI
 };
 
 export default TableDisplay;
