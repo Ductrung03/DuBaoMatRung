@@ -5,11 +5,10 @@ import config from "../../../../config";
 import DistrictDropdown from "../../DistrictDropdown";
 
 const DuBaoMatRungTuyBien = () => {
-  const { user, isAdmin } = useAuth();
+  useAuth();
   const [xaList, setXaList] = useState([]);
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   const [isInputOpen, setInputOpen] = useState(true);
-  const [isDownloadOpen, setDownloadOpen] = useState(true);
   const [selectedHuyen, setSelectedHuyen] = useState("");
   const [selectedXa, setSelectedXa] = useState("");
   const [loading, setLoading] = useState(false);
@@ -152,42 +151,7 @@ const DuBaoMatRungTuyBien = () => {
               </button>
             </div>
           )}
-          <div
-            className="bg-forest-green-gray py-2=0.2 px-3 rounded-md flex justify-between items-center cursor-pointer relative"
-            onClick={() => setDownloadOpen(!isDownloadOpen)}
-          >
-            <span className="text-sm font-medium">Tải xuống</span>
-            <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-              <Select isOpen={isDownloadOpen} />
-            </div>
-          </div>
-          {isDownloadOpen && (
-            <div className="px-2 py-2">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm">Lọc mây</span>
-                <div className="flex gap-2">
-                  <button className="bg-forest-green-gray hover:bg-green-200 text-black-800 text-sm py-1 px-4 rounded-md">
-                    Kỳ trước
-                  </button>
-                  <button className="bg-forest-green-gray hover:bg-green-200 text-black-800 text-sm py-1 px-4 rounded-md">
-                    Kỳ sau
-                  </button>
-                </div>
-              </div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm">NDVI</span>
-                <button className="bg-forest-green-gray hover:bg-green-200 text-black-800 text-sm py-1 px-4 rounded-md">
-                  Xuất
-                </button>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Kết quả dự báo mất rừng</span>
-                <button className="bg-forest-green-gray hover:bg-green-200 text-black-800 text-sm py-1 px-4 rounded-md">
-                  Xuất
-                </button>
-              </div>
-            </div>
-          )}
+          
         </div>
       )}
     </div>

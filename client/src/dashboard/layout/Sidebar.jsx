@@ -13,7 +13,7 @@ import ImportShapefile from "../components/sidebars/phathienmatrung/ImportShapef
 const Sidebar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
-  const [geoData, setGeoData] = useState(null);
+  const [, setGeoData] = useState(null);
   
   const pathAfterDashboard = currentPath.replace("/dashboard", "").replace(/^\//, "");
 

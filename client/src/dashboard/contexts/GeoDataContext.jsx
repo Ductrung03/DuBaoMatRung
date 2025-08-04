@@ -133,11 +133,7 @@ export const GeoDataProvider = ({ children }) => {
 
       // Gọi API để lấy dữ liệu mat_rung 3 tháng gần nhất
       const response = await axios.get(`${config.API_URL}/api/mat-rung`, {
-        params: {
-          // Không truyền fromDate, toDate để lấy dữ liệu mặc định
-          // Backend sẽ tự động lấy dữ liệu với limit mặc định
-          limit: 1000 // Giới hạn 1000 records
-        }
+       
       });
 
       if (response.data && response.data.mat_rung) {
@@ -321,25 +317,215 @@ export const GeoDataProvider = ({ children }) => {
       setLayerLoading(layerKey, false);
     }
   };
+// Thêm vào client/src/dashboard/contexts/GeoDataContext.jsx - AUTO FORECAST FUNCTIONS
 
-  return (
-    <GeoDataContext.Provider value={{ 
-      geoData, 
-      setGeoData, 
-      loading, 
-      setLoading,
-      mapLayers,
-      updateLayerData,
-      toggleLayerVisibility,
-      setLayerLoading,
-      clearAllLayers,
-      getLayersStats,
-      loadDefaultMatRungData,
-      refreshDefaultData,
-      loadSingleLayer,        // ✅ Export cho các nút tải riêng lẻ
-      loadAllDefaultLayers    // ✅ Export cho refresh toàn bộ
-    }}>
-      {children}
-    </GeoDataContext.Provider>
-  );
+// ✅ HÀM MỚI: Load dữ liệu dự báo tự động
+const loadAutoForecastData = async (year, month, period) => {
+  try {
+    console.log(`🔮 Loading auto forecast data: ${period} tháng ${month}/${year}`);
+    setLoading(true);
+
+    // Tính toán khoảng thời gian (logic tương tự component)
+    const calculateDateRange = (year, month, period) => {
+      const yearInt = parseInt(year);
+      const monthInt = parseInt(month);
+      
+      if (period === "Trước ngày 15") {
+        let fromMonth = monthInt - 1;
+        let fromYear = yearInt;
+        
+        if (fromMonth === 0) {
+          fromMonth = 12;
+          fromYear = yearInt - 1;
+        }
+        
+        const fromDate = `${fromYear}-${fromMonth.toString().padStart(2, '0')}-15`;
+        const toDate = `${yearInt}-${month.padStart(2, '0')}-15`;
+        
+        return { fromDate, toDate };
+      } else {
+        const fromDate = `${yearInt}-${month.padStart(2, '0')}-01`;
+        const lastDay = new Date(yearInt, monthInt, 0).getDate();
+        const toDate = `${yearInt}-${month.padStart(2, '0')}-${lastDay.toString().padStart(2, '0')}`;
+        
+        return { fromDate, toDate };
+      }
+    };
+
+    const { fromDate, toDate } = calculateDateRange(year, month, period);
+
+    const response = await axios.post(`${config.API_URL}/api/mat-rung/auto-forecast`, {
+      year,
+      month,
+      period,
+      fromDate,
+      toDate
+    }, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      timeout: 60000 // 1 phút timeout
+    });
+
+    if (response.data.success && response.data.data) {
+      const forecastData = {
+        ...response.data.data,
+        loadType: 'auto_forecast',
+        loadTimestamp: new Date().toISOString(),
+        forecastMetadata: response.data.metadata || {}
+      };
+
+      // Set dữ liệu vào context
+      setGeoData(forecastData);
+      
+      console.log(`✅ Auto forecast loaded: ${forecastData.features?.length || 0} features`);
+      
+      return {
+        success: true,
+        data: forecastData,
+        summary: response.data.summary || {}
+      };
+    } else {
+      return {
+        success: false,
+        message: response.data.message || 'Không có dữ liệu trong khoảng thời gian này'
+      };
+    }
+
+  } catch (error) {
+    console.error(`❌ Error loading auto forecast:`, error);
+    return {
+      success: false,
+      message: error.message || 'Lỗi khi tải dữ liệu dự báo tự động'
+    };
+  } finally {
+    setLoading(false);
+  }
 };
+
+// ✅ HÀM MỚI: Lấy preview thống kê trước khi load
+const getAutoForecastPreview = async (year, month, period) => {
+  try {
+    const calculateDateRange = (year, month, period) => {
+      const yearInt = parseInt(year);
+      const monthInt = parseInt(month);
+      
+      if (period === "Trước ngày 15") {
+        let fromMonth = monthInt - 1;
+        let fromYear = yearInt;
+        
+        if (fromMonth === 0) {
+          fromMonth = 12;
+          fromYear = yearInt - 1;
+        }
+        
+        const fromDate = `${fromYear}-${fromMonth.toString().padStart(2, '0')}-15`;
+        const toDate = `${yearInt}-${month.padStart(2, '0')}-15`;
+        
+        return { fromDate, toDate };
+      } else {
+        const fromDate = `${yearInt}-${month.padStart(2, '0')}-01`;
+        const lastDay = new Date(yearInt, monthInt, 0).getDate();
+        const toDate = `${yearInt}-${month.padStart(2, '0')}-${lastDay.toString().padStart(2, '0')}`;
+        
+        return { fromDate, toDate };
+      }
+    };
+
+    const { fromDate, toDate } = calculateDateRange(year, month, period);
+
+    const response = await axios.post(`${config.API_URL}/api/mat-rung/forecast-preview`, {
+      year,
+      month,
+      period,
+      fromDate,
+      toDate
+    }, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      timeout: 10000 // 10 giây timeout cho preview
+    });
+
+    return response.data;
+
+  } catch (error) {
+    console.error(`❌ Error getting forecast preview:`, error);
+    return {
+      success: false,
+      message: error.message || 'Lỗi khi lấy thông tin preview'
+    };
+  }
+};
+
+// ✅ HÀM MỚI: Clear dữ liệu và reset về mặc định
+const resetToDefaultData = async () => {
+  try {
+    console.log("🔄 Resetting to default data...");
+    setLoading(true);
+    
+    // Load lại dữ liệu mặc định (3 tháng gần nhất)
+    await loadDefaultMatRungData();
+    
+    console.log("✅ Reset to default completed");
+    return { success: true };
+    
+  } catch (error) {
+    console.error("❌ Error resetting to default:", error);
+    return { success: false, message: error.message };
+  } finally {
+    setLoading(false);
+  }
+};
+
+// ✅ HÀM MỚI: Get current data info
+const getCurrentDataInfo = () => {
+  if (!geoData || !geoData.features) {
+    return null;
+  }
+
+  const features = geoData.features;
+  const metadata = geoData.metadata || geoData.forecastMetadata || {};
+  
+  return {
+    type: geoData.loadType || 'unknown',
+    totalFeatures: features.length,
+    totalArea: features.reduce((sum, f) => sum + (f.properties.area || 0), 0),
+    totalAreaHa: Math.round((features.reduce((sum, f) => sum + (f.properties.area || 0), 0) / 10000) * 100) / 100,
+    loadTimestamp: geoData.loadTimestamp,
+    isAutoForecast: geoData.loadType === 'auto_forecast',
+    forecastInfo: metadata.forecast_info || null,
+    dateRange: {
+      earliest: features.length > 0 ? Math.min(...features.map(f => new Date(f.properties.end_sau).getTime())) : null,
+      latest: features.length > 0 ? Math.max(...features.map(f => new Date(f.properties.end_sau).getTime())) : null
+    }
+  };
+};
+
+// ✅ EXPORT CÁC HÀM MỚI trong GeoDataContext.Provider value
+return (
+  <GeoDataContext.Provider value={{ 
+    geoData, 
+    setGeoData, 
+    loading, 
+    setLoading,
+    mapLayers,
+    updateLayerData,
+    toggleLayerVisibility,
+    setLayerLoading,
+    clearAllLayers,
+    getLayersStats,
+    loadDefaultMatRungData,
+    refreshDefaultData,
+    loadSingleLayer,
+    loadAllDefaultLayers,
+    
+    // ✅ NEW AUTO FORECAST FUNCTIONS
+    loadAutoForecastData,
+    getAutoForecastPreview,  
+    resetToDefaultData,
+    getCurrentDataInfo
+  }}>
+    {children}
+  </GeoDataContext.Provider>
+);};

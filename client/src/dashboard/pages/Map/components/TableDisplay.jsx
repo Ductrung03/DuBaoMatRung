@@ -1,17 +1,16 @@
+// client/src/dashboard/pages/Map/components/TableDisplay.jsx - FIXED VERSION
 import React from "react";
 import Table from "../../Table";
 import LoadingOverlay from "./LoadingOverlay";
 
 const TableDisplay = ({ 
-  isDataPage, 
   loading, 
   geoData, 
   loadingDetails, 
   loadingMessage, 
   onRowClick 
 }) => {
-  // Chỉ hiển thị khi ở trang quản lý dữ liệu
-  if (!isDataPage) return null;
+  // ✅ REMOVED: isDataPage restriction - Hiển thị table cho tất cả trang
 
   // Hiển thị loading
   if (loading) {
@@ -23,7 +22,7 @@ const TableDisplay = ({
     );
   }
 
-  // Hiển thị bảng dữ liệu
+  // Hiển thị bảng dữ liệu khi có dữ liệu
   if (geoData?.features?.length > 0) {
     return (
       <div className="relative">
@@ -48,19 +47,13 @@ const TableDisplay = ({
     );
   }
 
-  // Hiển thị thông báo không có dữ liệu
+  // ✅ UPDATED: Chỉ hiển thị thông báo khi không có dữ liệu (optional)
   return (
-    <div className="text-center text-amber-700 font-semibold p-4 bg-amber-50 rounded-md mt-2 border border-amber-200">
-      <h3 className="text-lg mb-2">⚠️ Chưa có dữ liệu hiển thị</h3>
-      <div className="text-sm space-y-1">
-        <p>🔍 <strong>Kiểm tra:</strong></p>
-        <ul className="list-disc list-inside text-left max-w-md mx-auto">
-          <li>Dữ liệu mat_rung đã được load chưa</li>
-          <li>Kết nối với database có ổn định không</li>
-          <li>Có dữ liệu trong 3 tháng gần nhất không</li>
-        </ul>
-        <p className="mt-3 text-blue-600">
-          💡 Thử refresh trang hoặc kiểm tra kết nối mạng
+    <div className="text-center text-gray-500 font-medium p-4 bg-gray-50 rounded-md mt-2 border border-gray-200">
+      <div className="text-sm">
+        <p>📊 <strong>Chưa có dữ liệu hiển thị</strong></p>
+        <p className="text-xs mt-1 text-gray-400">
+          Sử dụng các tính năng ở sidebar bên trái để tải dữ liệu
         </p>
       </div>
     </div>

@@ -12,6 +12,7 @@ const CapNhatDuLieu = () => {
   const [loadingAll, setLoadingAll] = useState(false);
 
   // ✅ HÀM MỚI: Load tất cả layers (trừ forestTypes)
+  // eslint-disable-next-line no-unused-vars
   const handleLoadAllLayers = async () => {
     setLoadingAll(true);
     
@@ -33,24 +34,6 @@ const CapNhatDuLieu = () => {
   };
 
   // Get enhanced status indicator
-  const getStatusIndicator = (layerKey) => {
-    const layer = mapLayers[layerKey];
-    
-    if (layer.loading) return <span className="text-yellow-600">⏳ Đang tải...</span>;
-    if (layer.data) {
-      let status = <span className="text-green-600">✅ Đã tải</span>;
-      
-      // Hiển thị nguồn dữ liệu
-      if (layer.data.autoLoaded) {
-        status = <span className="text-blue-600">🚀 Tự động</span>;
-      } else if (layer.data.loadStrategy === 'manual_load') {
-        status = <span className="text-green-600">✅ Thủ công</span>;
-      }
-      
-      return status;
-    }
-    return <span className="text-gray-500">➖ Chưa tải</span>;
-  };
 
   return (
     <div>

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./dashboard/pages/Login";
 import MainLayout from "./dashboard/layout/MainLayout";
 
+
 import QuanLyDuLieu from "./dashboard/pages/QuanLyDuLieu";
 import ThongKeBaoCaoMatRung from "./dashboard/pages/ThongKeBaoCaoMatRung";
 import { GeoDataProvider } from "./dashboard/contexts/GeoDataContext";
@@ -15,6 +16,7 @@ import ErrorBoundary from "./dashboard/components/ErrorBoundary";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Map from "./dashboard/pages/Map";
+import DuBaoMatRung from "./dashboard/pages/DuBaoMatRung";
 
 function App() {
   return (
@@ -35,7 +37,7 @@ function App() {
                   }
                 >
                   <Route path="" element={<Map />} />
-                  <Route path="dubaomatrung" element={<Map />} />
+                  <Route path="dubaomatrung" element={<DuBaoMatRung />} />
                   <Route path="quanlydulieu" element={<QuanLyDuLieu />} />
                   <Route 
                     path="phathienmatrung" 

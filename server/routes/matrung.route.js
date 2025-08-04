@@ -66,10 +66,10 @@ router.get("/", async (req, res) => {
         WHERE m.geom IS NOT NULL 
           AND m.end_sau::date >= CURRENT_DATE - INTERVAL '3 months'
         ORDER BY m.end_sau DESC, m.gid DESC 
-        LIMIT $1
+       
       `;
 
-      const defaultResult = await pool.query(defaultQuery, [limit]);
+      const defaultResult = await pool.query(defaultQuery);
 
       // ✅ Xây dựng GeoJSON với thông tin user đầy đủ
       const features = defaultResult.rows.map(row => {
@@ -508,6 +508,286 @@ router.get("/stats", async (req, res) => {
     res.status(500).json({ 
       success: false,
       message: "Lỗi server khi lấy thống kê",
+      error: err.message 
+    });
+  }
+});
+
+
+// Thêm vào server/routes/matrung.route.js - AUTO FORECAST ENDPOINT
+
+// ✅ ENDPOINT: Dự báo mất rừng tự động với logic phức tạp
+router.post("/auto-forecast", async (req, res) => {
+  const { year, month, period, fromDate, toDate } = req.body;
+  
+  try {
+    console.log(`🔮 Auto forecast request:`, {
+      year, month, period,
+      dateRange: `${fromDate} → ${toDate}`
+    });
+
+    // Validate input
+    if (!year || !month || !period || !fromDate || !toDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Thiếu thông tin năm, tháng, kỳ hoặc khoảng thời gian"
+      });
+    }
+
+    // ✅ QUERY TỐI ƯU với spatial intersection và user info
+    const query = `
+      SELECT 
+        m.gid,
+        m.start_sau,
+        m.area,
+        m.start_dau,
+        m.end_sau,
+        m.mahuyen,
+        m.end_dau,
+        m.detection_status,
+        m.detection_date,
+        m.verified_by,
+        m.verified_area,
+        m.verification_reason,
+        m.verification_notes,
+        
+        -- User info
+        u.full_name as verified_by_name,
+        u.username as verified_by_username,
+        
+        -- Spatial intersection với ranh giới hành chính
+        r.huyen,
+        r.xa,
+        r.tieukhu as tk,
+        r.khoanh,
+        
+        -- Tọa độ centroid
+        ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x_coordinate,
+        ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y_coordinate,
+        
+        -- Geometry cho bản đồ
+        ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
+        
+      FROM mat_rung m
+      LEFT JOIN laocai_ranhgioihc r ON ST_Intersects(
+        ST_Transform(m.geom, 4326), 
+        ST_Transform(r.geom, 4326)
+      )
+      LEFT JOIN users u ON m.verified_by = u.id
+      WHERE m.geom IS NOT NULL 
+        AND m.end_sau::date >= $1::date
+        AND m.end_sau::date <= $2::date
+      ORDER BY m.end_sau DESC, m.gid DESC
+      LIMIT 5000
+    `;
+
+    console.log(`📊 Executing auto forecast query: ${fromDate} to ${toDate}`);
+    const startTime = Date.now();
+    
+    const result = await pool.query(query, [fromDate, toDate]);
+    const queryTime = Date.now() - startTime;
+    
+    console.log(`✅ Query completed in ${queryTime}ms, found ${result.rows.length} records`);
+
+    if (result.rows.length === 0) {
+      return res.json({
+        success: true,
+        message: `Không có dữ liệu mất rừng trong khoảng ${fromDate} đến ${toDate}`,
+        data: {
+          type: "FeatureCollection",
+          features: []
+        },
+        metadata: {
+          query_time_ms: queryTime,
+          date_range: { from: fromDate, to: toDate },
+          period_type: period,
+          total_features: 0
+        }
+      });
+    }
+
+    // ✅ XÂY DỰNG GEOJSON với thông tin phong phú
+    const features = result.rows.map(row => {
+      // Fallback mapping cho huyện
+      const huyenMapping = {
+        '01': 'Lào Cai',
+        '02': 'Bát Xát', 
+        '03': 'Mường Khương',
+        '04': 'Si Ma Cai',
+        '05': 'Bắc Hà',
+        '06': 'Bảo Thắng',
+        '07': 'Bảo Yên',
+        '08': 'Sa Pa',
+        '09': 'Văn Bàn'
+      };
+
+      return {
+        type: "Feature",
+        geometry: JSON.parse(row.geometry),
+        properties: {
+          gid: row.gid,
+          start_sau: row.start_sau,
+          area: row.area,
+          start_dau: row.start_dau,
+          end_sau: row.end_sau,
+          mahuyen: row.mahuyen,
+          end_dau: row.end_dau,
+          detection_status: row.detection_status,
+          detection_date: row.detection_date,
+          verified_by: row.verified_by,
+          verified_area: row.verified_area,
+          verification_reason: row.verification_reason,
+          verification_notes: row.verification_notes,
+          
+          // User info
+          verified_by_name: row.verified_by_name,
+          verified_by_username: row.verified_by_username,
+          
+          // Spatial intersection data
+          huyen: convertTcvn3ToUnicode(row.huyen || huyenMapping[row.mahuyen] || `Huyện ${row.mahuyen}`),
+          xa: convertTcvn3ToUnicode(row.xa || ""),
+          tk: row.tk,
+          khoanh: row.khoanh,
+          
+          // Coordinates
+          x_coordinate: row.x_coordinate,
+          y_coordinate: row.y_coordinate,
+          
+          // ✅ AUTO FORECAST METADATA
+          forecast_period: period,
+          forecast_year: parseInt(year),
+          forecast_month: parseInt(month),
+          is_auto_forecast: true
+        }
+      };
+    });
+
+    // ✅ TÍNH TOÁN THỐNG KÊ
+    const totalArea = features.reduce((sum, f) => sum + (f.properties.area || 0), 0);
+    const areaByDistrict = {};
+    const statusCount = {};
+    
+    features.forEach(feature => {
+      const district = feature.properties.huyen;
+      const status = feature.properties.detection_status || 'Chưa xác minh';
+      
+      areaByDistrict[district] = (areaByDistrict[district] || 0) + (feature.properties.area || 0);
+      statusCount[status] = (statusCount[status] || 0) + 1;
+    });
+
+    // ✅ KẾT QUẢ PHONG PHÚ
+    const geoJSON = {
+      type: "FeatureCollection",
+      features: features,
+      
+      // Metadata chi tiết
+      metadata: {
+        forecast_info: {
+          year: parseInt(year),
+          month: parseInt(month),
+          period: period,
+          date_range: { from: fromDate, to: toDate },
+          period_description: period === "Trước ngày 15" 
+            ? `Từ 15 tháng ${month === "01" ? "12" : (parseInt(month) - 1).toString().padStart(2, '0')} đến 15 tháng ${month}`
+            : `Toàn bộ tháng ${month}`,
+          generated_at: new Date().toISOString()
+        },
+        
+        statistics: {
+          total_features: features.length,
+          total_area_m2: totalArea,
+          total_area_ha: Math.round((totalArea / 10000) * 100) / 100,
+          area_by_district: Object.entries(areaByDistrict).map(([district, area]) => ({
+            district,
+            area_m2: area,
+            area_ha: Math.round((area / 10000) * 100) / 100
+          })).sort((a, b) => b.area_ha - a.area_ha),
+          status_breakdown: statusCount
+        },
+        
+        performance: {
+          query_time_ms: queryTime,
+          load_strategy: 'auto_forecast_optimized',
+          spatial_intersection_used: true,
+          user_info_included: true
+        }
+      }
+    };
+
+    console.log(`🎯 Auto forecast completed:`, {
+      features: features.length,
+      totalAreaHa: Math.round((totalArea / 10000) * 100) / 100,
+      topDistricts: Object.entries(areaByDistrict).slice(0, 3)
+    });
+
+    res.json({
+      success: true,
+      message: `✅ Dự báo tự động hoàn tất: ${features.length} khu vực mất rừng`,
+      data: geoJSON,
+      summary: {
+        period: `${period} tháng ${month}/${year}`,
+        total_features: features.length,
+        total_area_ha: Math.round((totalArea / 10000) * 100) / 100,
+        date_range: `${fromDate} → ${toDate}`,
+        query_time: `${queryTime}ms`
+      }
+    });
+
+  } catch (err) {
+    console.error("❌ Lỗi auto forecast:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Lỗi server khi thực hiện dự báo tự động",
+      error: err.message 
+    });
+  }
+});
+
+// ✅ ENDPOINT: Lấy thống kê theo kỳ để preview
+router.post("/forecast-preview", async (req, res) => {
+  const { year, month, period, fromDate, toDate } = req.body;
+  
+  try {
+    // Chỉ đếm số lượng, không lấy geometry để nhanh hơn
+    const countQuery = `
+      SELECT 
+        COUNT(*) as total_count,
+        SUM(m.area) as total_area,
+        COUNT(CASE WHEN m.detection_status = 'Đã xác minh' THEN 1 END) as verified_count,
+        MIN(m.end_sau) as earliest_date,
+        MAX(m.end_sau) as latest_date
+      FROM mat_rung m
+      WHERE m.geom IS NOT NULL 
+        AND m.end_sau::date >= $1::date
+        AND m.end_sau::date <= $2::date
+    `;
+
+    const result = await pool.query(countQuery, [fromDate, toDate]);
+    const stats = result.rows[0];
+
+    res.json({
+      success: true,
+      preview: {
+        period: `${period} tháng ${month}/${year}`,
+        date_range: `${fromDate} → ${toDate}`,
+        estimated_features: parseInt(stats.total_count),
+        estimated_area_ha: stats.total_area ? Math.round((stats.total_area / 10000) * 100) / 100 : 0,
+        verified_count: parseInt(stats.verified_count),
+        verification_rate: stats.total_count > 0 
+          ? Math.round((stats.verified_count / stats.total_count) * 100) 
+          : 0,
+        date_range_actual: {
+          earliest: stats.earliest_date,
+          latest: stats.latest_date
+        }
+      }
+    });
+
+  } catch (err) {
+    console.error("❌ Lỗi forecast preview:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Lỗi khi tạo preview",
       error: err.message 
     });
   }

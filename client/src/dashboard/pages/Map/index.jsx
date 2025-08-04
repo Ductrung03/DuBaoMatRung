@@ -1,4 +1,4 @@
-// client/src/dashboard/pages/Map/index.jsx - FIXED ZOOM & HIGHLIGHT
+// client/src/dashboard/pages/Map/index.jsx - FIXED VERSION FOR ALL PAGES
 import { getLayerStyle } from "./utils/mapStyles";
 import { toast } from "react-toastify";
 import React, { useEffect, useRef } from "react";
@@ -84,8 +84,13 @@ const Map = () => {
   // ===================================
   // DERIVED STATE
   // ===================================
-  const isDataPage = location.pathname === "/dashboard/quanlydulieu";
   const layerName = getQueryParam(location.search, "layer");
+
+  // ✅ DETERMINE MAP HEIGHT: Shorter for pages with table, taller for pages without data
+  const shouldShowTable = geoData?.features?.length > 0;
+  const mapHeight = shouldShowTable 
+    ? "h-[40vh] md:h-[50vh]"  // Shorter when table is shown
+    : "h-[60vh] md:h-[calc(100vh-150px)]"; // Taller when no table
 
   // ===================================
   // ENHANCED ZOOM TO FEATURE EVENT HANDLER
@@ -197,15 +202,15 @@ const Map = () => {
   // Debug logging
   useEffect(() => {
     console.log("🔍 MAP DEBUG - Current state:", {
-      isDataPage,
       layerName,
       loading,
       geoDataExists: !!geoData,
       geoDataFeatures: geoData?.features?.length || 0,
       geoDataType: geoData?.type,
       currentPath: location.pathname,
+      shouldShowTable
     });
-  }, [isDataPage, layerName, loading, geoData, location.pathname]);
+  }, [layerName, loading, geoData, location.pathname, shouldShowTable]);
 
   // Log geoData changes
   useEffect(() => {
@@ -263,7 +268,7 @@ const Map = () => {
       </h2>
 
       {/* Map Container */}
-      <div className={`flex justify-center items-center ${isDataPage ? "mb-2 md:mb-5" : ""} relative`}>
+      <div className={`flex justify-center items-center ${shouldShowTable ? "mb-2 md:mb-5" : ""} relative`}>
         
         {/* Loading Overlay */}
         {loading && (
@@ -274,11 +279,7 @@ const Map = () => {
         <MapContainer
           center={MAP_CONFIG.center}
           zoom={MAP_CONFIG.defaultZoom}
-          className={`w-full rounded-xl shadow-lg ${
-            isDataPage
-              ? "h-[40vh] md:h-[50vh]"
-              : "h-[50vh] md:h-[calc(100vh-150px)]"
-          }`}
+          className={`w-full rounded-xl shadow-lg ${mapHeight}`}
           whenCreated={(mapInstance) => {
             console.log("🗺️ Map instance created");
             window._leaflet_map = mapInstance;
@@ -334,9 +335,8 @@ const Map = () => {
         </MapContainer>
       </div>
 
-      {/* Table Display */}
+      {/* ✅ FIXED: Table Display - Hiển thị cho TẤT CẢ TRANG */}
       <TableDisplay
-        isDataPage={isDataPage}
         loading={loading}
         geoData={geoData}
         loadingDetails={loadingDetails}
