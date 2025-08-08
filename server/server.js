@@ -59,32 +59,35 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(setCspHeaders);
 
 // 2. Then configure CORS with ALL required headers
+// Cập nhật phần CORS trong server.js
 app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://localhost:3000', 
     'https://dubaomatrung-frontend.onrender.com',
+    // Thêm IP công khai của server
+    'http://103.57.223.237',
+    'http://103.57.223.237:5173',
+    'http://103.57.223.237:3000',
     // Thêm domains cho Google Earth Engine
     'https://earthengine.googleapis.com',
     'https://ee-phathiensommatrung.projects.earthengine.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  // ✅ FIX: Add ALL headers that might be sent by frontend
   allowedHeaders: [
     'Origin', 
     'X-Requested-With', 
     'Content-Type', 
     'Accept', 
     'Authorization',
-    'Cache-Control',  // ✅ This was missing!
+    'Cache-Control',
     'Pragma',
     'Expires',
     'If-Modified-Since',
     'If-None-Match',
     'X-Cache-Control'
   ],
-  // ✅ Also expose headers for frontend to read
   exposedHeaders: [
     'Cache-Control',
     'ETag',
@@ -524,24 +527,24 @@ const port = process.env.PORT || 3000;
 
 // Hàm async để xử lý dynamic import
 const startServer = async () => {
-  app.listen(port, async () => {
-    console.log(`🚀 Backend chạy tại http://localhost:${port}`);
-    console.log(`📚 API Docs tại http://localhost:${port}/api-docs`);
-    console.log(`🧪 Test Iframe tại http://localhost:${port}/api/test-iframe`);
+  app.listen(port, '0.0.0.0', async () => {  // Thêm '0.0.0.0' ở đây
+    console.log(`🚀 Backend chạy tại http://0.0.0.0:${port}`);
+    console.log(`🌐 Truy cập công khai tại http://103.57.223.237:${port}`);
+    console.log(`📚 API Docs tại http://103.57.223.237:${port}/api-docs`);
+    console.log(`🧪 Test Iframe tại http://103.57.223.237:${port}/api/test-iframe`);
     console.log(`🌍 Google Earth Engine iframe support: ENABLED`);
     console.log(`🔒 Content Security Policy: CONFIGURED`);
     console.log(`🔧 CORS Cache-Control headers: FIXED`);
     
     // Không chạy open() trên môi trường production
-    // Thêm điều kiện kiểm tra DISPLAY (GUI environment)
-if (process.env.NODE_ENV !== 'production' && process.env.DISPLAY) {
-  try {
-    const { default: open } = await import('open');
-    await open(`http://localhost:${port}/api-docs`);
-  } catch (err) {
-    console.log("⚠️ Không thể mở trình duyệt tự động:", err.message);
-  }
-}
+    if (process.env.NODE_ENV !== 'production' && process.env.DISPLAY) {
+      try {
+        const { default: open } = await import('open');
+        await open(`http://localhost:${port}/api-docs`);
+      } catch (err) {
+        console.log("⚠️ Không thể mở trình duyệt tự động:", err.message);
+      }
+    }
   });
 };
 
