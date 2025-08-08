@@ -95,9 +95,22 @@ const BaoCaoDuBaoMatRung = () => {
     setSelectedXa(e.target.value);
   };
 
-  const handleDropdownToggle = (dropdownName, isOpen) => {
-    setOpenDropdown(isOpen ? dropdownName : null);
-  };
+  const timeoutRef = useRef(null);
+
+const handleDropdownToggle = (dropdownName, isOpen) => {
+  if (timeoutRef.current) {
+    clearTimeout(timeoutRef.current);
+  }
+  
+  if (!isOpen) {
+    // Delay việc đóng dropdown để tránh xung đột
+    timeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 100);
+  } else {
+    setOpenDropdown(dropdownName);
+  }
+};
 
   const handleBaoCao = async () => {
     // Kiểm tra thông tin nhập vào - phải điền đầy đủ tất cả các trường
