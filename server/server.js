@@ -533,15 +533,15 @@ const startServer = async () => {
     console.log(`🔧 CORS Cache-Control headers: FIXED`);
     
     // Không chạy open() trên môi trường production
-    if (process.env.NODE_ENV !== 'production') {
-      try {
-        // Sử dụng dynamic import thay vì require
-        const { default: open } = await import('open');
-        await open(`http://localhost:${port}/api-docs`);
-      } catch (err) {
-        console.log("⚠️ Không thể mở trình duyệt tự động:", err.message);
-      }
-    }
+    // Thêm điều kiện kiểm tra DISPLAY (GUI environment)
+if (process.env.NODE_ENV !== 'production' && process.env.DISPLAY) {
+  try {
+    const { default: open } = await import('open');
+    await open(`http://localhost:${port}/api-docs`);
+  } catch (err) {
+    console.log("⚠️ Không thể mở trình duyệt tự động:", err.message);
+  }
+}
   });
 };
 
