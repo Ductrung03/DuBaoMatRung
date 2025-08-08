@@ -1,5 +1,5 @@
 // client/src/dashboard/components/MapLegendControl.jsx
-// Component chú thích và control cho bản đồ - Thiết kế theo ảnh mẫu
+// Component chú thích và control cho bản đồ - Đã sửa lỗi không cuộn được
 
 import React, { useEffect } from "react";
 import { useMap } from "react-leaflet";
@@ -24,6 +24,9 @@ const MapLegendControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
         max-width: 350px;
         font-family: Arial, sans-serif;
         font-size: 12px;
+        max-height: 70vh;
+        display: flex;
+        flex-direction: column;
       ">
         <!-- Header -->
         <div style="
@@ -34,6 +37,7 @@ const MapLegendControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
           display: flex;
           align-items: center;
           cursor: pointer;
+          flex-shrink: 0;
         " id="legend-header">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-right: 8px;">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V6.618a1 1 0 01.553-.894L9 3l6 3 6-3v13l-6 3-6-3z" />
@@ -44,8 +48,16 @@ const MapLegendControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
           </svg>
         </div>
 
-        <!-- Content -->
-        <div id="legend-content" style="max-height: 600px; overflow-y: auto; padding: 12px;">
+        <!-- Content - Đã sửa để có thể cuộn -->
+        <div id="legend-content" style="
+          flex: 1;
+          overflow-y: auto;
+          overflow-x: hidden;
+          padding: 12px;
+          max-height: calc(70vh - 60px);
+          scrollbar-width: thin;
+          scrollbar-color: #ccc #f1f1f1;
+        ">
           
           <!-- 1. Lớp ranh giới hành chính -->
           <div class="legend-layer" style="margin-bottom: 12px;">
@@ -166,13 +178,26 @@ const MapLegendControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
               <div style="display: flex; align-items: center;">
                 <div style="width: 12px; height: 12px; background: linear-gradient(45deg, #ff6b35, #ff8c42); 
                            margin-right: 8px; border-radius: 2px;"></div>
-                <span>Lớ có khả năng mất rừng</span>
+                <span>Lớp có khả năng mất rừng</span>
               </div>
             </div>
           </div>
 
           <!-- Chọn loại bản đồ nền -->
-          <div style="border-top: 1px solid #eee; padding-top: 12px; margin-top: 12px;">
+          <div style="
+            border-top: 1px solid #eee; 
+            padding-top: 12px; 
+            margin-top: 12px;
+            position: sticky;
+            bottom: 0;
+            background: white;
+            margin-left: -12px;
+            margin-right: -12px;
+            margin-bottom: -12px;
+            padding-left: 12px;
+            padding-right: 12px;
+            padding-bottom: 12px;
+          ">
             <div style="font-weight: bold; margin-bottom: 8px; color: #555; font-size: 11px;">BẢN ĐỒ NỀN</div>
             <div style="display: flex; gap: 6px;">
               <button class="map-type-btn" data-type="normal" style="
@@ -188,12 +213,34 @@ const MapLegendControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
 
         </div>
       </div>
+
+      <style>
+        /* Custom scrollbar styles */
+        .map-legend-control #legend-content::-webkit-scrollbar {
+          width: 6px;
+        }
+        .map-legend-control #legend-content::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 3px;
+        }
+        .map-legend-control #legend-content::-webkit-scrollbar-thumb {
+          background: #ccc;
+          border-radius: 3px;
+        }
+        .map-legend-control #legend-content::-webkit-scrollbar-thumb:hover {
+          background: #bbb;
+        }
+      </style>
     `;
     };
 
     // Tạo HTML ban đầu
     container.innerHTML = createLegendHTML();
     container.className = "leaflet-control leaflet-bar";
+
+    // Prevent map events from bubbling when interacting with the legend
+    L.DomEvent.disableClickPropagation(container);
+    L.DomEvent.disableScrollPropagation(container);
 
     // Hàm cập nhật lại legend khi mapLayers thay đổi
     const updateLegend = () => {
@@ -283,7 +330,7 @@ const MapLegendControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
     return () => {
       map.removeControl(control);
     };
-  }, [map, setMapType, mapLayers, toggleLayerVisibility]); // Dependencies để re-render khi mapLayers thay đổi
+  }, [map, setMapType, mapLayers, toggleLayerVisibility]);
 
   return null;
 };

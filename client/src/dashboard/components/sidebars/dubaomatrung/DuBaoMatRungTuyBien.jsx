@@ -271,17 +271,9 @@ const DuBaoMatRungTuyBien = () => {
                     className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
-                <div className="font-medium text-sm mb-1">
-                  Diện tích phát hiện tối thiểu:
-                </div>
+                
               </div>
-              <button 
-                onClick={handleAnalyze}
-                disabled={loading}
-                className="w-36 bg-forest-green-gray hover:bg-green-200 text-black-800 font-medium py-0.5 px-3 rounded-full text-center mt-2 self-center disabled:opacity-50"
-              >
-                {loading ? "Đang phân tích..." : "Phân tích"}
-              </button>
+              
             </div>
           )}
         </div>
