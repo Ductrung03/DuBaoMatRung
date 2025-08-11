@@ -61,7 +61,7 @@ const TraCuuAnhVeTinh = () => {
         className="bg-forest-green-primary text-white py-0.2 px-4 rounded-full text-sm font-medium uppercase tracking-wide text-left shadow-md w-full cursor-pointer"
         onClick={() => setIsForecastOpen(!isForecastOpen)}
       >
-        Tra cứu dữ ảnh vệ tinh
+        Tra cứu dữ liệu ảnh vệ tinh
       </div>
 
       {isForecastOpen && (

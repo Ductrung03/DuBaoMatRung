@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Select from "../../Select";
 import { Bar } from "react-chartjs-2";
 import {

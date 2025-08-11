@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { ClipLoader } from 'react-spinners';
-import { FaCloudSun, FaImage, FaListAlt, FaExclamationTriangle, FaRedo, FaExternalLinkAlt } from "react-icons/fa";
+import { FaCloudSun, FaImage, FaListAlt, FaExclamationTriangle, FaRedo, FaExternalLinkAlt, FaExpand } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 export default function PhatHienMatRung() {
@@ -10,10 +10,12 @@ export default function PhatHienMatRung() {
   const [activeTab, setActiveTab] = useState("phantich");
   const [error, setError] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const iframeRef = useRef(null);
+  const containerRef = useRef(null);
   const location = useLocation();
   
-  // Timeout để detect iframe loading issues
+  // ✅ BỎ TIMEOUT - Để iframe tự load
   const [loadTimeout, setLoadTimeout] = useState(null);
   
   useEffect(() => {
@@ -43,14 +45,14 @@ export default function PhatHienMatRung() {
       clearTimeout(loadTimeout);
     }
     
-    // Set timeout để detect loading issues
+    // ✅ TĂNG TIMEOUT LÊN 60 GIÂY thay vì bỏ hoàn toàn
     const timeout = setTimeout(() => {
       if (loading) {
-        console.warn(`⚠️ Iframe loading timeout for ${activeTab}`);
-        setError("TIMEOUT");
-        setLoading(false);
+        console.warn(`⚠️ Iframe loading timeout for ${activeTab} after 60 seconds`);
+        // ✅ KHÔNG SET ERROR - chỉ log warning
+        console.log("💡 Continuing to wait for iframe to load...");
       }
-    }, 15000); // 15 seconds timeout
+    }, 60000); // 60 seconds timeout
     
     setLoadTimeout(timeout);
   };
@@ -128,9 +130,9 @@ export default function PhatHienMatRung() {
     
     console.log(`🔄 Retry attempt ${newRetryCount} for ${activeTab}`);
     
-    if (newRetryCount <= 3) {
+    if (newRetryCount <= 5) { // Tăng số lần retry
       loadIframe();
-      toast.info(`🔄 Đang thử lại... (${newRetryCount}/3)`, {
+      toast.info(`🔄 Đang thử lại... (${newRetryCount}/5)`, {
         autoClose: 2000
       });
     } else {
@@ -148,28 +150,128 @@ export default function PhatHienMatRung() {
       autoClose: 3000
     });
   };
+
+  // ✅ THÊM FULLSCREEN SUPPORT
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      containerRef.current?.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+        toast.info("📺 Đã chuyển sang chế độ toàn màn hình");
+      }).catch(err => {
+        console.error("Error entering fullscreen:", err);
+        toast.error("Không thể chuyển sang chế độ toàn màn hình");
+      });
+    } else {
+      document.exitFullscreen().then(() => {
+        setIsFullscreen(false);
+        toast.info("🪟 Đã thoát chế độ toàn màn hình");
+      });
+    }
+  };
+
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
   
   const currentConfig = getTabConfig();
 
   return (
-    <div className="w-full h-screen flex flex-col bg-gray-50">
+    <div 
+      ref={containerRef}
+      className={`w-full h-screen flex flex-col bg-gray-50 ${isFullscreen ? 'fullscreen-container' : ''}`}
+    >
       
       {/* Header với tab navigation */}
-      <div className="bg-white shadow-sm border-b border-gray-200 px-4 py-3">
-       
+      <div className="bg-white shadow-sm border-b border-gray-200 px-4 py-3 flex-shrink-0">
+        {/* Tab buttons */}
+        <div className="flex gap-2 mb-2">
+          <button
+            onClick={() => handleChangeTab("phantich")}
+            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${
+              activeTab === "phantich"
+                ? "bg-green-600 text-white shadow-md"
+                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+            }`}
+          >
+            <FaListAlt className="mr-2" />
+            Phân tích mất rừng
+          </button>
+          
+          <button
+            onClick={() => handleChangeTab("locmay")}
+            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${
+              activeTab === "locmay"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+            }`}
+          >
+            <FaCloudSun className="mr-2" />
+            Lọc mây
+          </button>
+          
+          <button
+            onClick={() => handleChangeTab("xulyanh")}
+            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${
+              activeTab === "xulyanh"
+                ? "bg-purple-600 text-white shadow-md"
+                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+            }`}
+          >
+            <FaImage className="mr-2" />
+            Xử lý ảnh
+          </button>
+
+          {/* ✅ THÊM NÚT FULLSCREEN */}
+          <button
+            onClick={toggleFullscreen}
+            className="flex items-center px-4 py-2 rounded-lg font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all ml-auto"
+            title={isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
+          >
+            <FaExpand className="mr-2" />
+            {isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
+          </button>
+        </div>
         
         {/* Current tab info */}
-        <div className="mt-2 flex items-center">
-          <span className="mr-2">{currentConfig.icon}</span>
-          <h1 className="text-lg font-semibold text-gray-800">{currentConfig.title}</h1>
-          <span className="ml-2 text-sm text-gray-500">• {currentConfig.description}</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <span className="mr-2">{currentConfig.icon}</span>
+            <h1 className="text-lg font-semibold text-gray-800">{currentConfig.title}</h1>
+            <span className="ml-2 text-sm text-gray-500">• {currentConfig.description}</span>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={handleRetry}
+              disabled={retryCount > 5}
+              className="flex items-center px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600 disabled:opacity-50 transition-colors"
+            >
+              <FaRedo className="mr-1" />
+              Tải lại
+            </button>
+            
+            <button
+              onClick={handleOpenInNewTab}
+              className="flex items-center px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              <FaExternalLinkAlt className="mr-1" />
+              Tab mới
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Main content area */}
       <div className="relative flex-1 overflow-hidden">
         
-        {/* Loading overlay */}
+        {/* Loading overlay - CHỈ HIỂN THỊ TRONG 10 GIÂY ĐẦU */}
         {loading && !error && (
           <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
             <div className="flex flex-col items-center max-w-md mx-4 text-center">
@@ -180,14 +282,14 @@ export default function PhatHienMatRung() {
               <p className="mt-2 text-sm text-gray-600">
                 {currentConfig.description}
               </p>
+              <p className="mt-2 text-xs text-gray-500">
+                💡 Có thể mất 1-2 phút để tải hoàn toàn
+              </p>
               {retryCount > 0 && (
                 <p className="mt-2 text-xs text-orange-600">
-                  Lần thử: {retryCount}/3
+                  Lần thử: {retryCount}/5
                 </p>
               )}
-              <div className="mt-4 text-xs text-gray-500">
-                💡 Nếu tải lâu, hãy thử mở trong tab mới hoặc kiểm tra kết nối mạng
-              </div>
             </div>
           </div>
         )}
@@ -223,11 +325,11 @@ export default function PhatHienMatRung() {
               <div className="flex flex-col sm:flex-row gap-2 w-full">
                 <button
                   onClick={handleRetry}
-                  disabled={retryCount > 3}
+                  disabled={retryCount > 5}
                   className="flex-1 flex items-center justify-center px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <FaRedo className="mr-2" />
-                  {retryCount > 3 ? "Đã hết lượt thử" : `Thử lại (${retryCount}/3)`}
+                  {retryCount > 5 ? "Đã hết lượt thử" : `Thử lại (${retryCount}/5)`}
                 </button>
                 
                 <button
@@ -238,49 +340,46 @@ export default function PhatHienMatRung() {
                   Mở tab mới
                 </button>
               </div>
-              
-              <div className="mt-4 p-3 bg-yellow-50 rounded-md text-xs text-yellow-800">
-                <p className="font-medium mb-1">💡 Mẹo khắc phục:</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Tắt ad blocker nếu có</li>
-                  <li>Kiểm tra kết nối mạng</li>
-                  <li>Thử mở trong tab mới</li>
-                  <li>Refresh toàn bộ trang</li>
-                </ul>
-              </div>
             </div>
           </div>
         )}
         
-        {/* Main iframe */}
+        {/* ✅ MAIN IFRAME với CSS tối ưu cho scroll */}
         {!error && (
           <iframe
             ref={iframeRef}
             src={currentConfig.url}
             title={currentConfig.title}
-            width="100%"
-            height="100%"
-            frameBorder="0"
+            className="w-full h-full border-0"
             onLoad={handleIframeLoad}
             onError={handleIframeError}
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+            // ✅ BỎ SANDBOX hoặc cấu hình nhẹ hơn để cho phép scroll
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
             style={{ 
               border: "none",
-              display: loading ? "none" : "block"
+              display: "block", // Luôn hiển thị, không ẩn khi loading
+              opacity: loading ? 0.3 : 1, // Làm mờ khi loading thay vì ẩn
+              transition: "opacity 0.3s ease",
+              // ✅ CSS để iframe có thể scroll trong mọi trường hợp
+              overflow: "auto",
+              WebkitOverflowScrolling: "touch", // iOS smooth scrolling
+              scrollBehavior: "smooth"
             }}
-            // Security và compatibility attributes
-            allow="geolocation; camera; microphone; encrypted-media; fullscreen"
+            // ✅ Thêm các attributes để tối ưu scrolling
+            allow="geolocation; camera; microphone; encrypted-media; fullscreen; autoplay"
             referrerPolicy="strict-origin-when-cross-origin"
+            loading="eager"
           />
         )}
       </div>
       
       {/* Footer info */}
-      <div className="bg-gray-800 text-white px-4 py-2 text-xs">
+      <div className="bg-gray-800 text-white px-4 py-2 text-xs flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <span className="mr-2">🌍</span>
             <span>Google Earth Engine Application</span>
+            {loading && <span className="ml-2 text-yellow-300">• Đang tải...</span>}
           </div>
           <div className="flex items-center space-x-4">
             <span>Powered by Google Earth Engine</span>
@@ -289,6 +388,38 @@ export default function PhatHienMatRung() {
           </div>
         </div>
       </div>
+
+      {/* ✅ CSS STYLES CHO FULLSCREEN */}
+      <style jsx>{`
+        .fullscreen-container {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          z-index: 999999 !important;
+          background: white;
+        }
+
+        .fullscreen-container iframe {
+          width: 100% !important;
+          height: calc(100vh - 120px) !important; /* Trừ header và footer */
+        }
+
+        /* ✅ Tối ưu scroll cho iframe */
+        iframe {
+          -webkit-overflow-scrolling: touch;
+          overflow: auto !important;
+        }
+
+        /* ✅ Đảm bảo iframe có thể scroll khi zoom */
+        @media screen and (min-resolution: 150dpi) {
+          iframe {
+            transform-origin: 0 0;
+            zoom: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 }
