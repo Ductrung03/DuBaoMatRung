@@ -120,7 +120,13 @@ const Login = () => {
             </button>
           </div>
 
-         
+          {/* Demo credentials info */}
+          <div className="text-center">
+            <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-md">
+              <strong>Tài khoản demo:</strong><br />
+              Admin: admin / admin123
+            </div>
+          </div>
         </form>
       </div>
     </div>
