@@ -1,5 +1,5 @@
 const config = {
-  API_URL: import.meta.env.VITE_API_URL || "http://localhost:3000"
+  API_URL: import.meta.env.VITE_API_URL || "http://localhost:3000" ||  "http://103.57.223.237:3000"
 };
 
 // Log để debug
