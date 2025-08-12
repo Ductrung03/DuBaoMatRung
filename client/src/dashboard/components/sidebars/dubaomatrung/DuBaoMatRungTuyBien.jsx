@@ -273,7 +273,13 @@ const DuBaoMatRungTuyBien = () => {
                 </div>
                 
               </div>
-              
+              <button 
+                onClick={handleAnalyze}
+                disabled={loading}
+                className="w-36 bg-forest-green-gray hover:bg-green-200 text-black-800 font-medium py-0.5 px-3 rounded-full text-center mt-2 self-center disabled:opacity-50"
+              >
+                {loading ? "Đang phân tích..." : "Phân tích"}
+              </button>
             </div>
           )}
         </div>
