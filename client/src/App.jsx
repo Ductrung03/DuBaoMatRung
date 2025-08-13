@@ -17,6 +17,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Map from "./dashboard/pages/Map";
 import DuBaoMatRung from "./dashboard/pages/DuBaoMatRung";
+import Dashboard from "./dashboard/pages/Dashboard";
 
 function App() {
   return (
@@ -36,7 +37,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 >
-                  <Route path="" element={<Map />} />
+                  <Route path="" element={<Dashboard />} />
                   <Route path="dubaomatrung" element={<DuBaoMatRung />} />
                   <Route path="quanlydulieu" element={<QuanLyDuLieu />} />
                   <Route 
