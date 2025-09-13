@@ -1,15 +1,18 @@
 const express = require('express');
 const { exec } = require('child_process');
 const crypto = require('crypto');
+const path = require('path');
 const app = express();
 
-// Webhook secret (thiết lập trong GitHub)
-const WEBHOOK_SECRET = 'your-webhook-secret-here';
+// Webhook secret (để trống nếu không dùng, hoặc set trong GitHub)
+const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || '';
 
 app.use(express.json());
 
-// Verify GitHub webhook signature
+// Verify GitHub webhook signature (chỉ khi có secret)
 function verifySignature(payload, signature) {
+  if (!WEBHOOK_SECRET) return true; // Skip verification nếu không có secret
+  
   const hmac = crypto.createHmac('sha256', WEBHOOK_SECRET);
   const digest = 'sha256=' + hmac.update(payload).digest('hex');
   return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest));
@@ -31,8 +34,14 @@ app.post('/webhook', (req, res) => {
   if (req.body.ref === 'refs/heads/main') {
     console.log('🚀 Push to main detected, starting auto-update...');
     
+    // Sửa path để dynamic
+    const projectDir = path.dirname(__filename);
+    const updateScript = path.join(projectDir, 'update.bat');
+    
+    console.log(`📍 Running update script: ${updateScript}`);
+    
     // Chạy script update
-    exec('C:\\dubaomatrung\\update.bat', (error, stdout, stderr) => {
+    exec(`"${updateScript}"`, { cwd: projectDir }, (error, stdout, stderr) => {
       if (error) {
         console.error(`❌ Update failed: ${error}`);
         return res.status(500).send('Update failed');
@@ -74,8 +83,8 @@ app.get('/status', (req, res) => {
 });
 
 const PORT = 9000;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🎣 Webhook server running on port ${PORT}`);
-  console.log(`📡 Webhook URL: http://YOUR_SERVER_IP:${PORT}/webhook`);
-  console.log(`📊 Status URL: http://YOUR_SERVER_IP:${PORT}/status`);
+  console.log(`📡 Webhook URL: http://103.56.161.239:${PORT}/webhook`);
+  console.log(`📊 Status URL: http://103.56.161.239:${PORT}/status`);
 });
