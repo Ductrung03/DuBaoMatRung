@@ -49,6 +49,8 @@ services:
     build: 
       context: ./client
       dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://103.56.161.239:3000
     container_name: forest-frontend
     ports:
       - "80:80"
