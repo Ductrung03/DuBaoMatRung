@@ -88,3 +88,14 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`📡 Webhook URL: http://103.56.161.239:${PORT}/webhook`);
   console.log(`📊 Status URL: http://103.56.161.239:${PORT}/status`);
 });
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('📴 Webhook server shutting down...');
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  console.log('📴 Webhook server shutting down...');
+  process.exit(0);
+});
