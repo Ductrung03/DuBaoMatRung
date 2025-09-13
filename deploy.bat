@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-title DuBaoMatRung - One Click Deploy
+title DuBaoMatRung - One Click Deploy (DEBUG)
 
 echo.
 echo ==========================================
@@ -74,47 +74,64 @@ if not exist .env (
 REM Build Frontend
 echo 🏗️ Building Frontend...
 npm run build
+echo 🔍 DEBUG: Build completed with exit code: %ERRORLEVEL%
 if errorlevel 1 (
     echo ❌ Lỗi build Frontend
     pause
     exit /b 1
 )
 echo ✅ Build Frontend thành công
+echo 🔍 DEBUG: Moving to project directory...
 
 REM Quay về thư mục gốc
 cd /d "%PROJECT_DIR%"
+echo 🔍 DEBUG: Current directory: %CD%
 
 REM Tạo thư mục logs
 if not exist logs mkdir logs
+echo 🔍 DEBUG: Logs directory created/exists
 
 echo.
 echo 🔄 Bước 2: Dừng services cũ (nếu có)...
+echo 🔍 DEBUG: About to stop PM2 services...
 pm2 stop all >nul 2>&1
 pm2 delete all >nul 2>&1
+echo 🔍 DEBUG: PM2 services stopped and deleted
 
 echo.
 echo 🚀 Bước 3: Khởi động services...
+echo 🔍 DEBUG: About to start services...
 
 REM Start Backend
 echo 🔧 Khởi động Backend...
+echo 🔍 DEBUG: Backend path: "%BACKEND_DIR%\server.js"
 pm2 start "%BACKEND_DIR%\server.js" --name "dubaomatrung-backend" --log-date-format="YYYY-MM-DD HH:mm:ss" --error "%PROJECT_DIR%logs\backend-error.log" --output "%PROJECT_DIR%logs\backend-out.log"
+echo 🔍 DEBUG: Backend started with exit code: %ERRORLEVEL%
 
 REM Đợi Backend khởi động
+echo 🔍 DEBUG: Waiting 3 seconds for backend...
 timeout /t 3 /nobreak >nul
 
 REM Start Frontend với static server
 echo 🎨 Khởi động Frontend...
+echo 🔍 DEBUG: Static server path: "%PROJECT_DIR%simple-static-server.js"
 pm2 start "%PROJECT_DIR%simple-static-server.js" --name "dubaomatrung-frontend" --log-date-format="YYYY-MM-DD HH:mm:ss" --error "%PROJECT_DIR%logs\frontend-error.log" --output "%PROJECT_DIR%logs\frontend-out.log"
+echo 🔍 DEBUG: Frontend started with exit code: %ERRORLEVEL%
 
 REM Đợi Frontend khởi động
+echo 🔍 DEBUG: Waiting 2 seconds for frontend...
 timeout /t 2 /nobreak >nul
 
 REM Start Webhook Server
 echo 🎣 Khởi động Webhook Server...
+echo 🔍 DEBUG: Webhook path: "%PROJECT_DIR%webhook-server.js"
 pm2 start "%PROJECT_DIR%webhook-server.js" --name "dubaomatrung-webhook" --log-date-format="YYYY-MM-DD HH:mm:ss" --error "%PROJECT_DIR%logs\webhook-error.log" --output "%PROJECT_DIR%logs\webhook-out.log"
+echo 🔍 DEBUG: Webhook started with exit code: %ERRORLEVEL%
 
 REM Save PM2 config
+echo 🔍 DEBUG: Saving PM2 configuration...
 pm2 save
+echo 🔍 DEBUG: PM2 config saved with exit code: %ERRORLEVEL%
 
 echo.
 echo ==========================================
@@ -140,6 +157,7 @@ echo ==========================================
 echo.
 
 REM Hiển thị status
+echo 🔍 DEBUG: Showing PM2 status...
 pm2 status
 
 echo.
