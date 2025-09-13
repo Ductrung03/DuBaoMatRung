@@ -1,80 +1,86 @@
 @echo off
-echo ========================================
-echo 🔄 DUBAOMATRUNG AUTO UPDATE SCRIPT  
-echo ========================================
+chcp 65001 >nul
+title DuBaoMatRung - Update Server
 
-:: Set variables
-set PROJECT_DIR=C:\dubaomatrung
-set BACKEND_DIR=%PROJECT_DIR%\server
-set FRONTEND_DIR=%PROJECT_DIR%\client
+echo.
+echo ==========================================
+echo      🔄 DUBAOMATRUNG UPDATE SERVER
+echo ==========================================
+echo.
 
-:: Colors
-set GREEN=[92m
-set RED=[91m
-set YELLOW=[93m
-set NC=[0m
+set PROJECT_DIR=%~dp0
+set FRONTEND_DIR=%PROJECT_DIR%client
 
-echo %YELLOW%⏹️ Bước 1: Dừng services...%NC%
-pm2 stop ecosystem.config.js
-echo %GREEN%✅ Đã dừng services%NC%
+echo 📍 Dự án tại: %PROJECT_DIR%
+echo.
 
-echo %YELLOW%📡 Bước 2: Pull code mới từ Git...%NC%
-cd /d %PROJECT_DIR%
-git stash
+echo ⏹️ Bước 1: Dừng services tạm thời...
+pm2 stop all
+
+echo.
+echo 📡 Bước 2: Pull code mới từ Git...
 git pull origin main
-if %errorlevel% neq 0 (
-    echo %RED%❌ Lỗi pull code%NC%
-    pm2 start ecosystem.config.js
+if errorlevel 1 (
+    echo ❌ Lỗi pull code. Khởi động lại services cũ...
+    pm2 start all
+    pause
     exit /b 1
 )
-echo %GREEN%✅ Pull code thành công%NC%
+echo ✅ Pull code thành công
 
-echo %YELLOW%🔧 Bước 3: Update Backend...%NC%
-cd /d %BACKEND_DIR%
+echo.
+echo 🔧 Bước 3: Kiểm tra và update dependencies...
 
-:: Kiểm tra xem có thay đổi package.json không
-git diff HEAD~1 package.json > nul
-if %errorlevel% equ 0 (
-    echo %YELLOW%📦 Detected package.json changes, updating dependencies...%NC%
+REM Kiểm tra Backend có thay đổi package.json không
+git diff HEAD~1 server/package.json >nul 2>&1
+if not errorlevel 1 (
+    echo 📦 Backend package.json thay đổi, updating...
+    cd /d "%PROJECT_DIR%server"
     npm install
-)
-echo %GREEN%✅ Backend updated%NC%
-
-echo %YELLOW%🎨 Bước 4: Update & Build Frontend...%NC%
-cd /d %FRONTEND_DIR%
-
-:: Kiểm tra thay đổi package.json
-git diff HEAD~1 package.json > nul  
-if %errorlevel% equ 0 (
-    echo %YELLOW%📦 Detected package.json changes, updating dependencies...%NC%
-    npm install
+    cd /d "%PROJECT_DIR%"
 )
 
-:: Build lại frontend
+REM Kiểm tra Frontend có thay đổi package.json không  
+git diff HEAD~1 client/package.json >nul 2>&1
+if not errorlevel 1 (
+    echo 📦 Frontend package.json thay đổi, updating...
+    cd /d "%FRONTEND_DIR%"
+    npm install
+    cd /d "%PROJECT_DIR%"
+)
+
+echo.
+echo 🏗️ Bước 4: Build lại Frontend...
+cd /d "%FRONTEND_DIR%"
 npm run build
-if %errorlevel% neq 0 (
-    echo %RED%❌ Lỗi build frontend%NC%
+if errorlevel 1 (
+    echo ❌ Lỗi build Frontend
+    cd /d "%PROJECT_DIR%"
+    pm2 start all
+    pause
     exit /b 1
 )
-echo %GREEN%✅ Frontend built successfully%NC%
+cd /d "%PROJECT_DIR%"
+echo ✅ Build Frontend thành công
 
-echo %YELLOW%🚀 Bước 5: Restart services...%NC%
-cd /d %PROJECT_DIR%
-pm2 start ecosystem.config.js
+echo.
+echo 🚀 Bước 5: Khởi động lại services...
+pm2 restart all
 pm2 save
 
-echo %GREEN%
-echo ========================================
-echo ✅ UPDATE THÀNH CÔNG!  
-echo ========================================
-echo 🌐 Backend: http://localhost:3000
-echo 🎨 Frontend: http://localhost:5173
-echo 📊 Status: pm2 status
-echo ========================================
-echo %NC%
-
-:: Hiển thị status và logs
-pm2 status
 echo.
-echo %YELLOW%📝 Recent logs:%NC%
-pm2 logs --lines 10
+echo ==========================================
+echo          ✅ UPDATE THÀNH CÔNG!
+echo ==========================================
+echo.
+echo 🌐 NGƯỜI DÙNG TRUY CẬP TẠI:
+echo    Frontend: http://103.56.161.239:5173
+echo    Backend:  http://103.56.161.239:3000
+echo ==========================================
+echo.
+
+pm2 status
+
+echo.
+echo 🎯 Update hoàn tất! Nhấn phím bất kỳ để đóng...
+pause >nul

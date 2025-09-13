@@ -1,160 +1,141 @@
 @echo off
-echo ========================================
-echo 🚀 DUBAOMATRUNG AUTO DEPLOY SCRIPT
-echo ========================================
+chcp 65001 >nul
+title DuBaoMatRung - One Click Deploy
 
-:: Set variables
-set PROJECT_DIR=C:\dubaomatrung
-set REPO_URL=https://github.com/Ductrung03/DuBaoMatRung.git
-set BACKEND_DIR=%PROJECT_DIR%\server
-set FRONTEND_DIR=%PROJECT_DIR%\client
+echo.
+echo ==========================================
+echo    🚀 DUBAOMATRUNG AUTO START SERVER
+echo ==========================================
+echo.
 
-:: Colors for output
-set GREEN=[92m
-set RED=[91m
-set YELLOW=[93m
-set NC=[0m
+set PROJECT_DIR=%~dp0
+set BACKEND_DIR=%PROJECT_DIR%server
+set FRONTEND_DIR=%PROJECT_DIR%client
 
-echo %YELLOW%📦 Bước 1: Tạo thư mục dự án...%NC%
-if not exist %PROJECT_DIR% (
-    mkdir %PROJECT_DIR%
-    echo %GREEN%✅ Đã tạo thư mục %PROJECT_DIR%%NC%
+echo 📍 Dự án tại: %PROJECT_DIR%
+echo.
+
+echo 🔧 Bước 1: Kiểm tra và cài đặt dependencies...
+echo.
+
+REM Kiểm tra Backend
+cd /d "%BACKEND_DIR%"
+if not exist node_modules (
+    echo 📦 Cài đặt Backend dependencies...
+    npm install
+    if errorlevel 1 (
+        echo ❌ Lỗi cài đặt Backend
+        pause
+        exit /b 1
+    )
 ) else (
-    echo %GREEN%✅ Thư mục đã tồn tại%NC%
+    echo ✅ Backend dependencies đã có
 )
 
-cd /d %PROJECT_DIR%
+REM Tạo .env cho backend nếu chưa có
+if not exist .env (
+    echo 📝 Tạo file .env cho Backend...
+    (
+        echo PGHOST=localhost
+        echo PGPORT=5432
+        echo PGUSER=postgres
+        echo PGPASSWORD=4
+        echo PGDATABASE=geodb
+        echo GEOSERVER_USER=admin
+        echo GEOSERVER_PASS=geoserver
+        echo JWT_SECRET=dubaomatrung_secret_key_change_this_in_production
+        echo PORT=3000
+        echo HOST=0.0.0.0
+    ) > .env
+    echo ✅ Đã tạo .env cho Backend
+)
 
-echo %YELLOW%📡 Bước 2: Clone/Pull code từ Git...%NC%
-if not exist .git (
-    git clone %REPO_URL% .
-    echo %GREEN%✅ Clone repository thành công%NC%
+REM Kiểm tra Frontend
+cd /d "%FRONTEND_DIR%"
+if not exist node_modules (
+    echo 📦 Cài đặt Frontend dependencies...
+    npm install
+    if errorlevel 1 (
+        echo ❌ Lỗi cài đặt Frontend
+        pause
+        exit /b 1
+    )
 ) else (
-    git pull origin main
-    echo %GREEN%✅ Pull code mới thành công%NC%
+    echo ✅ Frontend dependencies đã có
 )
 
-echo %YELLOW%🔧 Bước 3: Setup Backend...%NC%
-cd /d %BACKEND_DIR%
-
-:: Copy .env cho backend
+REM Tạo .env cho frontend nếu chưa có
 if not exist .env (
-    echo PGHOST=localhost> .env
-    echo PGPORT=5432>> .env
-    echo PGUSER=postgres>> .env
-    echo PGPASSWORD=4>> .env
-    echo PGDATABASE=geodb>> .env
-    echo GEOSERVER_USER=admin>> .env
-    echo GEOSERVER_PASS=geoserver>> .env
-    echo JWT_SECRET=dubaomatrung_secret_key_change_this_in_production>> .env
-    echo PORT=3000>> .env
-    echo HOST=0.0.0.0>> .env
-    echo %GREEN%✅ Đã tạo file .env cho backend%NC%
+    echo 📝 Tạo file .env cho Frontend...
+    echo VITE_API_URL=http://103.56.161.239:3000 > .env
+    echo ✅ Đã tạo .env cho Frontend
 )
 
-:: Install dependencies
-npm install
-if %errorlevel% neq 0 (
-    echo %RED%❌ Lỗi cài đặt dependencies backend%NC%
-    exit /b 1
-)
-echo %GREEN%✅ Cài đặt dependencies backend thành công%NC%
-
-echo %YELLOW%🎨 Bước 4: Setup Frontend...%NC%
-cd /d %FRONTEND_DIR%
-
-:: Copy .env cho frontend  
-if not exist .env (
-    echo VITE_API_URL=http://103.56.161.239:3000> .env
-    echo %GREEN%✅ Đã tạo file .env cho frontend%NC%
-)
-
-:: Install dependencies và build
-npm install
-if %errorlevel% neq 0 (
-    echo %RED%❌ Lỗi cài đặt dependencies frontend%NC%
-    exit /b 1
-)
-
+REM Build Frontend
+echo 🏗️ Building Frontend...
 npm run build
-if %errorlevel% neq 0 (
-    echo %RED%❌ Lỗi build frontend%NC%
+if errorlevel 1 (
+    echo ❌ Lỗi build Frontend
+    pause
     exit /b 1
 )
-echo %GREEN%✅ Build frontend thành công%NC%
+echo ✅ Build Frontend thành công
 
-echo %YELLOW%⚙️ Bước 5: Cấu hình PM2...%NC%
-cd /d %PROJECT_DIR%
+REM Quay về thư mục gốc
+cd /d "%PROJECT_DIR%"
 
-:: Tạo ecosystem.config.js
-(
-echo module.exports = {
-echo   apps: [
-echo     {
-echo       name: 'dubaomatrung-backend',
-echo       script: './server/server.js',
-echo       cwd: '%PROJECT_DIR%',
-echo       instances: 1,
-echo       autorestart: true,
-echo       watch: false,
-echo       max_memory_restart: '1G',
-echo       env: {
-echo         NODE_ENV: 'production',
-echo         PORT: 3000
-echo       },
-echo       error_file: './logs/backend-err.log',
-echo       out_file: './logs/backend-out.log',
-echo       log_file: './logs/backend-combined.log',
-echo       time: true
-echo     },
-echo     {
-echo       name: 'dubaomatrung-frontend',
-echo       script: 'serve',
-echo       args: '-s dist -l 5173',
-echo       cwd: '%FRONTEND_DIR%',
-echo       instances: 1,
-echo       autorestart: true,
-echo       watch: false,
-echo       max_memory_restart: '512M',
-echo       env: {
-echo         NODE_ENV: 'production'
-echo       },
-echo       error_file: './logs/frontend-err.log',
-echo       out_file: './logs/frontend-out.log',
-echo       log_file: './logs/frontend-combined.log',
-echo       time: true
-echo     }
-echo   ]
-echo };
-) > ecosystem.config.js
+REM Cài serve nếu chưa có
+npm list -g serve >nul 2>&1
+if errorlevel 1 (
+    echo 📦 Cài đặt serve...
+    npm install -g serve
+)
 
-:: Tạo thư mục logs
+REM Tạo thư mục logs
 if not exist logs mkdir logs
 
-:: Cài serve globally nếu chưa có
-npm list -g serve >nul 2>&1 || npm install -g serve
+echo.
+echo 🔄 Bước 2: Dừng services cũ (nếu có)...
+pm2 stop all >nul 2>&1
+pm2 delete all >nul 2>&1
 
-echo %YELLOW%🚀 Bước 6: Start services với PM2...%NC%
+echo.
+echo 🚀 Bước 3: Khởi động services...
 
-:: Stop các service cũ (nếu có)
-pm2 stop ecosystem.config.js >nul 2>&1
-pm2 delete ecosystem.config.js >nul 2>&1
+REM Start Backend
+echo 🔧 Khởi động Backend...
+pm2 start "%BACKEND_DIR%\server.js" --name "dubaomatrung-backend" --log-date-format="YYYY-MM-DD HH:mm:ss" --error "%PROJECT_DIR%logs\backend-error.log" --output "%PROJECT_DIR%logs\backend-out.log"
 
-:: Start services mới
-pm2 start ecosystem.config.js
+REM Đợi Backend khởi động
+timeout /t 3 /nobreak >nul
+
+REM Start Frontend
+echo 🎨 Khởi động Frontend...
+pm2 start serve --name "dubaomatrung-frontend" -- -s "%FRONTEND_DIR%\dist" -l 5173 --log-date-format="YYYY-MM-DD HH:mm:ss" --error "%PROJECT_DIR%logs\frontend-error.log" --output "%PROJECT_DIR%logs\frontend-out.log"
+
+REM Save PM2 config
 pm2 save
-pm2 startup
 
-echo %GREEN%
-echo ========================================
-echo ✅ DEPLOY THÀNH CÔNG!
-echo ========================================
-echo 🌐 Backend: http://localhost:3000
-echo 🎨 Frontend: http://localhost:5173
-echo 📊 PM2 Dashboard: pm2 monit
-echo 📝 Logs: pm2 logs
-echo ========================================
-echo %NC%
+echo.
+echo ==========================================
+echo           ✅ DEPLOY THÀNH CÔNG!
+echo ==========================================
+echo.
+echo 🌐 NGƯỜI DÙNG TRUY CẬP TẠI:
+echo    Frontend: http://103.56.161.239:5173
+echo    Backend:  http://103.56.161.239:3000
+echo.
+echo 📊 QUẢN LÝ SERVER:
+echo    pm2 status     - Xem trạng thái
+echo    pm2 logs       - Xem logs
+echo    pm2 monit      - Monitor real-time
+echo    pm2 restart all - Khởi động lại
+echo ==========================================
+echo.
 
-:: Hiển thị status
+REM Hiển thị status
 pm2 status
+
+echo.
+echo 🎯 Server đang chạy! Nhấn phím bất kỳ để đóng...
+pause >nul
