@@ -1,0 +1,111 @@
+name: Deploy to Windows Server
+
+on:
+  push:
+    branches: [ main, production ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgis/postgis:13-3.1
+        env:
+          POSTGRES_PASSWORD: "4"
+          POSTGRES_DB: geodb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: |
+          client/package-lock.json
+          server/package-lock.json
+
+    # Test Backend
+    - name: Install backend dependencies
+      run: cd server && npm ci
+
+    - name: Run backend tests
+      run: cd server && npm test
+      env:
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_NAME: geodb
+        DB_USER: postgres
+        DB_PASSWORD: "4"
+
+    # Test Frontend
+    - name: Install frontend dependencies
+      run: cd client && npm ci
+
+    - name: Build frontend
+      run: cd client && npm run build
+
+    - name: Run frontend tests
+      run: cd client && npm test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Create deployment package
+      run: |
+        mkdir -p deploy
+        cp -r . deploy/
+        cd deploy
+        zip -r ../deployment.zip . -x "*.git*" "node_modules/*" ".env*"
+
+    - name: Deploy to Windows Server
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.WINDOWS_SERVER_HOST }}
+        username: ${{ secrets.WINDOWS_SERVER_USER }}
+        key: ${{ secrets.WINDOWS_SERVER_SSH_KEY }}
+        port: 22
+        script: |
+          # Dừng services hiện tại
+          cd /opt/forest-app
+          docker-compose -f docker-compose.prod.yml down
+          
+          # Backup database
+          docker-compose -f docker-compose.prod.yml exec -T postgres pg_dump -U forestuser forest_management > backups/backup_$(date +%Y%m%d_%H%M%S).sql
+          
+          # Update source code
+          git fetch origin
+          git reset --hard origin/main
+          
+          # Rebuild và restart
+          docker-compose -f docker-compose.prod.yml build --no-cache
+          docker-compose -f docker-compose.prod.yml up -d
+          
+          # Verify deployment
+          sleep 30
+          curl -f http://localhost:3000/api/health || exit 1
+          curl -f http://localhost:80 || exit 1
+          
+          echo "✅ Deployment completed successfully!"
+
+    - name: Notify deployment result
+      uses: 8398a7/action-slack@v3
+      if: always()
+      with:
+        status: ${{ job.status }}
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        text: "Deployment to Windows Server: ${{ job.status }}"
