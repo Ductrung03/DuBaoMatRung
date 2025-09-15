@@ -64,6 +64,9 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://localhost:3000', 
+        'http://localhost:4173',    // ← THÊM dòng này
+    'http://localhost:5174',    // ← THÊM dòng này  
+    'http://localhost:8080',    // ← THÊM dòng này
     'https://dubaomatrung-frontend.onrender.com',
     // Thêm IP công khai của server
     'http://103.57.223.237',
