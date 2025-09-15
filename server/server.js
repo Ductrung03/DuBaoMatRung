@@ -64,15 +64,18 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://localhost:3000', 
-        'http://localhost:4173',    // ← THÊM dòng này
-    'http://localhost:5174',    // ← THÊM dòng này  
-    'http://localhost:8080',    // ← THÊM dòng này
+    'http://localhost:4173',
     'https://dubaomatrung-frontend.onrender.com',
-    // Thêm IP công khai của server
-    'http://103.57.223.237',
-    'http://103.57.223.237:5173',
-    'http://103.57.223.237:3000',
-    // Thêm domains cho Google Earth Engine
+    // ✅ THÊM IP ĐÚNG CỦA SERVER
+    'http://103.56.161.239',           // ← Server IP
+    'http://103.56.161.239:5173',      // ← Frontend URL
+    'http://103.56.161.239:3000',      // ← Backend URL
+    'http://103.56.161.239:4173',
+    'http://103.56.161.239:8080',
+    // ✅ Thêm HTTPS
+    'https://103.56.161.239',
+    'https://103.56.161.239:5173',
+    // Google Earth Engine
     'https://earthengine.googleapis.com',
     'https://ee-phathiensommatrung.projects.earthengine.app'
   ],
@@ -86,19 +89,9 @@ app.use(cors({
     'Authorization',
     'Cache-Control',
     'Pragma',
-    'Expires',
-    'If-Modified-Since',
-    'If-None-Match',
-    'X-Cache-Control'
+    'Expires'
   ],
-  exposedHeaders: [
-    'Cache-Control',
-    'ETag',
-    'Last-Modified',
-    'X-Cache-Status'
-  ],
-  optionsSuccessStatus: 200,
-  preflightContinue: false
+  optionsSuccessStatus: 200
 }));
 
 // 3. Handle preflight requests explicitly
