@@ -68,7 +68,7 @@ const SmartMapLayer = ({ layerKey, layerConfig, visible, onError }) => {
       
       // Gọi viewport API tối ưu
       const response = await axios.get(
-        `${config.API_URL}/api/layer-data/${layerConfig.endpoint}-viewport`,
+        `/api/layer-data/${layerConfig.endpoint}-viewport`,
         {
           params: { bbox, zoom },
           headers: {

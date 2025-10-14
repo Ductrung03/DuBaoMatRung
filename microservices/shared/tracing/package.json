@@ -1,0 +1,23 @@
+{
+  "name": "@dubaomatrung/tracing",
+  "version": "1.0.0",
+  "description": "Distributed tracing with Jaeger for DuBaoMatRung microservices",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "jaeger",
+    "opentelemetry",
+    "tracing",
+    "microservices"
+  ],
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/sdk-node": "^0.52.1",
+    "@opentelemetry/auto-instrumentations-node": "^0.48.0",
+    "@opentelemetry/exporter-jaeger": "^1.25.1"
+  },
+  "author": "LuckyBoiz",
+  "license": "MIT"
+}

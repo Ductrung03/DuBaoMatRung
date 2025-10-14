@@ -1,0 +1,85 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 10
+      name: "Ramp up load"
+    - duration: 180
+      arrivalRate: 20
+      name: "Sustained load"
+  processor: "../helpers/auth-helpers.js"
+  variables:
+    admin_username: "admin"
+    admin_password: "Admin@123#"
+
+scenarios:
+  # Scenario 1: Health check monitoring
+  - name: "Health Check"
+    weight: 10
+    flow:
+      - get:
+          url: "/health"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - hasProperty: status
+
+  # Scenario 2: Authentication flow
+  - name: "User Authentication"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "{{ admin_username }}"
+            password: "{{ admin_password }}"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+          expect:
+            - statusCode: 200
+            - hasProperty: token
+
+      - get:
+          url: "/api/auth/me"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Scenario 3: Get mat rung statistics
+  - name: "Mat Rung Stats"
+    weight: 25
+    flow:
+      - get:
+          url: "/api/mat-rung/stats"
+          expect:
+            - statusCode: 200
+            - contentType: json
+
+  # Scenario 4: Query mat rung with filters
+  - name: "Query Mat Rung"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/mat-rung?limit=10"
+          expect:
+            - statusCode: 200
+            - contentType: json
+
+  # Scenario 5: Get dropdown data
+  - name: "Dropdown Data"
+    weight: 15
+    flow:
+      - get:
+          url: "/api/dropdown/huyen"
+          expect:
+            - statusCode: 200
+
+      - get:
+          url: "/api/dropdown/xa?huyen=Thành phố Lào Cai"
+          expect:
+            - statusCode: 200

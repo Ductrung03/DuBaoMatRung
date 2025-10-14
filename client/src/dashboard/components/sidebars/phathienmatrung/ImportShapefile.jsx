@@ -44,22 +44,18 @@ const ImportShapefile = () => {
     if (!url || url.trim() === "") {
       return { valid: false, message: "Vui lòng nhập URL từ Google Earth Engine" };
     }
-    
+
     if (!url.includes("earthengine.googleapis.com")) {
       return { valid: false, message: "URL phải từ domain earthengine.googleapis.com" };
     }
-    
-    if (!url.includes(":getFeatures")) {
-      return { valid: false, message: "URL phải có định dạng :getFeatures ở cuối" };
-    }
-    
+
     // Kiểm tra định dạng URL cơ bản
     try {
       new URL(url);
     } catch {
       return { valid: false, message: "URL không đúng định dạng" };
     }
-    
+
     return { valid: true, message: "" };
   };
 
@@ -75,9 +71,12 @@ const ImportShapefile = () => {
     setLoadingMessage("Đang kiểm tra URL và tải dữ liệu...");
     setUploadProgress(10);
 
+    // ✅ Khai báo progressInterval ở scope rộng hơn để có thể truy cập trong catch block
+    let progressInterval = null;
+
     try {
       // Simulate progress steps
-      const progressInterval = setInterval(() => {
+      progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
           const newProgress = prev + 5;
           
@@ -101,10 +100,17 @@ const ImportShapefile = () => {
       console.log("🔄 Gửi request import với URL:", zipUrl);
 
       const response = await axios.post(
-        `${config.API_URL}/api/import-gee-url`,
+        `/api/import-gee-url`,
         { zipUrl },
         {
           timeout: 300000, // 5 phút timeout
+          onUploadProgress: (progressEvent) => {
+            // Hiển thị progress khi upload
+            if (progressEvent.total) {
+              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              console.log(`Upload progress: ${percentCompleted}%`);
+            }
+          }
         }
       );
 
@@ -147,16 +153,27 @@ const ImportShapefile = () => {
 
     } catch (err) {
       console.error("❌ Lỗi import:", err);
-      
+      // ✅ Kiểm tra null trước khi clear interval
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
+
       // Xử lý các loại lỗi khác nhau
       let errorMessage = "Có lỗi xảy ra khi import dữ liệu";
-      
-      if (err.code === 'ECONNABORTED') {
-        errorMessage = "⏱️ Hết thời gian chờ. Vui lòng thử lại với URL khác hoặc kiểm tra kết nối mạng.";
+
+      if (err.code === 'ECONNABORTED' || err.message.includes('timeout')) {
+        errorMessage = "⏱️ Hết thời gian chờ khi tải dữ liệu từ Google Earth Engine. Đây có thể do:\n" +
+                      "• Dữ liệu quá lớn (hơn 100MB)\n" +
+                      "• Kết nối mạng chậm\n" +
+                      "• Google Earth Engine phản hồi chậm\n\n" +
+                      "💡 Gợi ý:\n" +
+                      "• Giảm kích thước dữ liệu trên Google Earth Engine\n" +
+                      "• Thử lại sau vài phút\n" +
+                      "• Kiểm tra kết nối mạng";
       } else if (err.response) {
         const status = err.response.status;
         const responseData = err.response.data;
-        
+
         if (responseData && responseData.message) {
           errorMessage = responseData.message;
         } else {
@@ -173,21 +190,34 @@ const ImportShapefile = () => {
             case 404:
               errorMessage = "❓ Không tìm thấy dữ liệu. URL có thể đã bị xóa hoặc không tồn tại.";
               break;
+            case 408:
+              errorMessage = "⏱️ Server timeout. Dữ liệu quá lớn hoặc mất quá nhiều thời gian xử lý.\n\n" +
+                            "💡 Gợi ý:\n" +
+                            "• Giảm số lượng features trên Google Earth Engine\n" +
+                            "• Chia nhỏ dữ liệu thành nhiều phần\n" +
+                            "• Thử lại sau vài phút";
+              break;
             case 500:
               errorMessage = "🔧 Lỗi server. Vui lòng thử lại sau hoặc liên hệ quản trị viên.";
+              break;
+            case 503:
+              errorMessage = "🔧 Service không khả dụng. Vui lòng thử lại sau.";
               break;
             default:
               errorMessage = `❌ Lỗi ${status}: ${err.response.statusText}`;
           }
         }
       } else if (err.request) {
-        errorMessage = "🌐 Không thể kết nối đến server. Kiểm tra kết nối mạng.";
+        errorMessage = "🌐 Không thể kết nối đến server. Kiểm tra kết nối mạng hoặc liên hệ quản trị viên.";
       }
-      
+
       toast.error(errorMessage, {
-        autoClose: 8000, // Hiển thị lâu hơn cho thông báo lỗi
+        autoClose: 10000, // Hiển thị lâu hơn cho thông báo lỗi chi tiết
+        style: {
+          whiteSpace: 'pre-line' // Cho phép xuống dòng trong thông báo
+        }
       });
-      
+
     } finally {
       setTimeout(() => {
         setLoading(false);
@@ -242,13 +272,13 @@ const ImportShapefile = () => {
 
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              URL từ Google Earth Engine
+              URL tải file ZIP Shapefile
             </label>
             <input
               type="text"
               value={zipUrl}
               onChange={handleUrlChange}
-              placeholder="Dán URL từ Google Earth Engine (có chứa :getFeatures)"
+              placeholder="Dán URL download ZIP shapefile từ Google Drive hoặc GEE"
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-forest-green-primary focus:border-forest-green-primary"
               disabled={loading}
             />
@@ -258,13 +288,28 @@ const ImportShapefile = () => {
               <div className="flex items-start">
                 <FaInfoCircle className="text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
                 <div className="text-xs text-blue-700">
-                  <p className="font-medium mb-1">Hướng dẫn lấy URL:</p>
-                  <ol className="list-decimal list-inside space-y-1">
-                    <li>Truy cập Google Earth Engine Code Editor</li>
-                    <li>Xuất dữ liệu và chọn "Export to Drive" hoặc "Export to Cloud"</li>
-                    <li>Copy URL có chứa ":getFeatures" ở cuối</li>
-                    <li>Dán URL vào ô trên và nhấn "Tải & Import"</li>
+                  <p className="font-medium mb-1">📦 Hướng dẫn xuất và import dữ liệu từ Google Earth Engine:</p>
+                  <ol className="list-decimal list-inside space-y-1 ml-1">
+                    <li><strong>Xuất Shapefile ZIP từ GEE:</strong>
+                      <ul className="list-disc list-inside ml-4 mt-1">
+                        <li>Chạy script phát hiện mất rừng trên GEE</li>
+                        <li>Sử dụng Export.table.toDrive() hoặc Export.table.toCloudStorage()</li>
+                        <li>Format: 'SHP' (Shapefile)</li>
+                        <li>Chờ task hoàn thành và tải file ZIP về</li>
+                      </ul>
+                    </li>
+                    <li className="mt-2"><strong>Lấy URL download ZIP:</strong>
+                      <ul className="list-disc list-inside ml-4 mt-1">
+                        <li>Mở Google Drive (nếu dùng toDrive)</li>
+                        <li>Click phải vào file ZIP → "Get link"</li>
+                        <li>Đảm bảo link có quyền "Anyone with the link"</li>
+                        <li>Copy URL và dán vào ô trên</li>
+                      </ul>
+                    </li>
                   </ol>
+                  <p className="mt-2 text-green-700 font-medium">
+                    ✅ Hệ thống sẽ tự động: Download ZIP → Giải nén → Parse shapefile → Import vào database
+                  </p>
                 </div>
               </div>
             </div>
@@ -272,15 +317,15 @@ const ImportShapefile = () => {
             {/* Validation feedback */}
             {zipUrl && (
               <div className="mt-2">
-                {zipUrl.includes("earthengine.googleapis.com") && zipUrl.includes(":getFeatures") ? (
+                {zipUrl.includes("earthengine.googleapis.com") || zipUrl.includes("drive.google.com") || zipUrl.includes("storage.googleapis.com") ? (
                   <div className="flex items-center text-green-600 text-xs">
                     <FaInfoCircle className="mr-1" />
-                    URL hợp lệ
+                    URL hợp lệ - Sẵn sàng tải xuống
                   </div>
                 ) : (
-                  <div className="flex items-center text-red-600 text-xs">
+                  <div className="flex items-center text-orange-600 text-xs">
                     <FaExclamationTriangle className="mr-1" />
-                    URL chưa đúng định dạng Google Earth Engine
+                    URL nên từ Google Earth Engine, Google Drive hoặc Cloud Storage
                   </div>
                 )}
               </div>

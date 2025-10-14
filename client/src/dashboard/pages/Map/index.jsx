@@ -12,7 +12,7 @@ import LoadingOverlay from "./components/LoadingOverlay";
 import MapUpdater from "./components/MapUpdater";
 import MapLayers from "./components/MapLayers";
 import TableDisplay from "./components/TableDisplay";
-import MapLegendControl from "../../components/MapLegendControl";
+import MapLayerLegend from "../../components/MapLayerLegend";
 
 // Hooks
 import { useMapState } from "./hooks/useMapState";
@@ -327,9 +327,8 @@ const Map = () => {
             />
           )}
 
-          {/* Map Legend Control */}
-          <MapLegendControl
-            setMapType={setMapType}
+          {/* Map Layer Legend Control */}
+          <MapLayerLegend
             mapLayers={mapLayers}
             toggleLayerVisibility={toggleLayerVisibility}
           />

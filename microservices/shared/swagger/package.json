@@ -1,0 +1,10 @@
+{
+  "name": "@dubaomatrung/shared-swagger",
+  "version": "1.0.0",
+  "description": "Shared Swagger configuration for DuBaoMatRung microservices",
+  "main": "index.js",
+  "dependencies": {
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
+  }
+}

@@ -1,0 +1,11 @@
+[0;32m[2025-10-06 20:55:28][0m ==========================================
+[0;32m[2025-10-06 20:55:28][0m DuBaoMatRung Database Migration
+[0;32m[2025-10-06 20:55:28][0m ==========================================
+[0;34m[2025-10-06 20:55:28] INFO:[0m OLD DB: localhost:5432/geodb
+[0;34m[2025-10-06 20:55:28] INFO:[0m NEW DB: localhost:5433/{auth_db,gis_db,admin_db}
+[0;34m[2025-10-06 20:55:28] INFO:[0m Log file: /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/migrations/logs/migration-20251006-205528.log
+[0;32m[2025-10-06 20:55:28][0m 
+[0;32m[2025-10-06 20:55:28][0m 📍 Step 1: Checking OLD database...
+[0;34m[2025-10-06 20:55:28] INFO:[0m Checking connection to OLD database (localhost:5432/geodb)...
+[0;31m[2025-10-06 20:55:28] ERROR:[0m ❌ Cannot connect to OLD database
+[0;31m[2025-10-06 20:55:28] ERROR:[0m Cannot connect to OLD database. Please check configuration.

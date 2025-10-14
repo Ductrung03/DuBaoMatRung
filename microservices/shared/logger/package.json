@@ -1,0 +1,9 @@
+{
+  "name": "@dubaomatrung/logger",
+  "version": "1.0.0",
+  "description": "Shared logging utility for microservices",
+  "main": "index.js",
+  "dependencies": {
+    "winston": "^3.11.0"
+  }
+}

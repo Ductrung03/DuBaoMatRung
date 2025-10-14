@@ -1,5 +1,42 @@
 {
+  "name": "dubaomatrung",
+  "version": "2.0.0",
+  "description": "Hệ thống phát hiện sớm và dự báo mất rừng - Forest Monitoring & Prediction System",
+  "private": true,
+  "workspaces": [
+    "client",
+    "microservices"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd microservices && npm run dev",
+    "dev:frontend": "cd client && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd microservices && docker-compose build",
+    "build:frontend": "cd client && npm run build",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "clean": "npm run clean:backend && npm run clean:frontend",
+    "clean:backend": "cd microservices && docker-compose down -v",
+    "clean:frontend": "cd client && rm -rf dist node_modules",
+    "deploy:staging": "cd microservices && npm run staging",
+    "deploy:prod": "cd microservices && npm run prod"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "author": "LuckyBoiz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luckyboiz/dubaomatrung.git"
+  },
   "dependencies": {
-    "express": "^5.1.0"
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   }
 }

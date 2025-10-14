@@ -142,7 +142,7 @@ export const getAdministrativeStyle = (feature, isSelected = false) => {
   const boundaryLevel = feature.properties.boundary_level || "unknown";
   const style = BOUNDARY_STYLES[boundaryLevel] || BOUNDARY_STYLES.unknown;
 
-  console.log(`🎨 Applied administrative style for ${boundaryLevel}:`, style);
+
 
   return {
     ...DEFAULT_LAYER_STYLES.base,
@@ -163,7 +163,7 @@ export const getForestTypesStyle = (feature, isSelected = false) => {
   const forestFunction = feature.properties.forest_function;
   const forestColor = getForestTypeColor(forestFunction);
 
-  console.log(`🌲 Applied forest color: ${forestColor} for function: ${forestFunction}`);
+
 
   return {
     ...DEFAULT_LAYER_STYLES.base,
@@ -183,7 +183,6 @@ export const getForestManagementStyle = (feature, isSelected = false) => {
   const chuQuanLy = feature.properties.chuquanly || "";
   const managementColor = getForestManagementColor(chuQuanLy);
 
-  console.log(`🏢 Applied management color: ${managementColor} for: ${chuQuanLy}`);
 
   return {
     ...DEFAULT_LAYER_STYLES.base,
@@ -235,8 +234,6 @@ export const getDeforestationStyle = (feature, isSelected = false) => {
   const daysSince = feature.properties.days_since;
   const deforestationColor = getDeforestationAlertColor(alertLevel, daysSince);
 
-  console.log(`⚠️ Applied deforestation color: ${deforestationColor} for level: ${alertLevel}, days: ${daysSince}`);
-
   return {
     ...DEFAULT_LAYER_STYLES.base,
     color: isSelected ? "#ff7800" : "#1f2937",
@@ -252,10 +249,6 @@ export const getDeforestationStyle = (feature, isSelected = false) => {
 // HÀM CHÍNH: LẤY STYLE CHO LAYER
 // ===================================
 export const getLayerStyle = (feature, layerType, isSelected = false) => {
-  console.log(`🎨 Getting style for layerType: ${layerType}`, {
-    layerType,
-    feature: feature?.properties,
-  });
 
   switch (layerType) {
     case "administrative":

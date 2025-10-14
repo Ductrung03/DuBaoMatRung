@@ -19,7 +19,7 @@ const CacheStatusComponent = ({ isOpen = false, onToggle }) => {
   const loadCacheStatus = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${config.API_URL}/api/layer-data/server-cache/status`);
+      const response = await axios.get(`/api/layer-data/server-cache/status`);
       setCacheStatus(response.data);
       setLastRefresh(new Date());
       console.log("📊 Cache status loaded:", response.data);
@@ -36,7 +36,7 @@ const CacheStatusComponent = ({ isOpen = false, onToggle }) => {
     
     try {
       setLoading(true);
-      await axios.post(`${config.API_URL}/api/layer-data/server-cache/clear`);
+      await axios.post(`/api/layer-data/server-cache/clear`);
       toast.success("🗑️ Đã xóa toàn bộ cache!");
       await loadCacheStatus();
     } catch (error) {
@@ -52,7 +52,7 @@ const CacheStatusComponent = ({ isOpen = false, onToggle }) => {
     
     try {
       setLoading(true);
-      await axios.post(`${config.API_URL}/api/layer-data/server-cache/rebuild`);
+      await axios.post(`/api/layer-data/server-cache/rebuild`);
       toast.success("🔄 Đã khởi động rebuild cache!");
       await loadCacheStatus();
     } catch (error) {

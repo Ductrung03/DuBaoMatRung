@@ -53,7 +53,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
 
     setLoading(true);
     try {
-      await axios.put(`${config.API_URL}/api/users/${user.id}/change-password`, {
+      await axios.put(`/api/users/${user.id}/change-password`, {
         old_password: formData.old_password,
         new_password: formData.new_password
       });

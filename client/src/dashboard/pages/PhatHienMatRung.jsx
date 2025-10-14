@@ -390,7 +390,7 @@ export default function PhatHienMatRung() {
       </div>
 
       {/* ✅ CSS STYLES CHO FULLSCREEN */}
-      <style jsx>{`
+      <style>{`
         .fullscreen-container {
           position: fixed !important;
           top: 0 !important;

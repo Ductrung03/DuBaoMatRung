@@ -72,7 +72,7 @@ const ThongKeBaoCaoMatRung = () => {
       setLoadingMessage("Đang chuẩn bị tải DOCX...");
       
       // ✅ Thêm tham số xacMinh vào URL
-      const exportUrl = `${config.API_URL}/api/bao-cao/export-docx?fromDate=${reportParams.fromDate}&toDate=${reportParams.toDate}&huyen=${encodeURIComponent(reportParams.huyen)}&xa=${encodeURIComponent(reportParams.xa)}&xacMinh=${reportParams.xacMinh}`;
+      const exportUrl = `/api/bao-cao/export-docx?fromDate=${reportParams.fromDate}&toDate=${reportParams.toDate}&huyen=${encodeURIComponent(reportParams.huyen)}&xa=${encodeURIComponent(reportParams.xa)}&xacMinh=${reportParams.xacMinh}`;
       const link = document.createElement('a');
       link.href = exportUrl;
       
@@ -108,7 +108,7 @@ const ThongKeBaoCaoMatRung = () => {
       setLoadingMessage("Đang chuẩn bị mở trang báo cáo...");
       
       // ✅ Thêm tham số xacMinh vào URL
-      const exportUrl = `${config.API_URL}/api/bao-cao/export-pdf?fromDate=${reportParams.fromDate}&toDate=${reportParams.toDate}&huyen=${encodeURIComponent(reportParams.huyen)}&xa=${encodeURIComponent(reportParams.xa)}&xacMinh=${reportParams.xacMinh}`;
+      const exportUrl = `/api/bao-cao/export-pdf?fromDate=${reportParams.fromDate}&toDate=${reportParams.toDate}&huyen=${encodeURIComponent(reportParams.huyen)}&xa=${encodeURIComponent(reportParams.xa)}&xacMinh=${reportParams.xacMinh}`;
       
       // Mở cửa sổ mới
       window.open(exportUrl, '_blank');
@@ -234,18 +234,18 @@ const ThongKeBaoCaoMatRung = () => {
               {reportData.map((item, idx) => (
                 <tr key={idx}>
                   <td className="border border-black px-2 py-1">{idx + 1}</td>
-                  <td className="border border-black px-2 py-1">{item.xa || ""}</td>
-                  <td className="border border-black px-2 py-1">{item.gid || ""}</td>
-                  <td className="border border-black px-2 py-1">{item.tk || ""}</td>
-                  <td className="border border-black px-2 py-1">{item.khoanh || ""}</td>
-                  <td className="border border-black px-2 py-1">{item.x || ""}</td>
-                  <td className="border border-black px-2 py-1">{item.y || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.properties.xa || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.properties.gid || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.properties.tk || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.properties.khoanh || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.properties.x || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.properties.y || ""}</td>
                   <td className="border border-black px-2 py-1">
-                    {item.area ? (item.area / 10000).toFixed(1) : ""}
+                    {item.properties.area ? (item.properties.area / 10000).toFixed(1) : ""}
                   </td>
                   {isVerified && (
                     <td className="border border-black px-2 py-1">
-                      {item.verification_reason || ""}
+                      {item.properties.verification_reason || ""}
                     </td>
                   )}
                 </tr>

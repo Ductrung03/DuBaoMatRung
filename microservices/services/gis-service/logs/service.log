@@ -1,0 +1,28 @@
+
+> gis-service@1.0.0 dev
+> npx nodemon src/index.js
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `node src/index.js`[39m
+2025-10-13 18:23:16 [gis-service] [32minfo[39m: Database connection test successful {"database":"gis_db"}
+2025-10-13 18:23:16 [gis-service] [32minfo[39m: Database pool initialized successfully
+2025-10-13 18:23:16 [gis-service-auth] [32minfo[39m: Database connection test successful {"database":"auth_db"}
+2025-10-13 18:23:16 [gis-service-auth] [32minfo[39m: Database pool initialized successfully
+2025-10-13 18:23:16 [gis-service] [32minfo[39m: Redis client connected
+2025-10-13 18:23:16 [gis-service] [32minfo[39m: Redis client ready
+2025-10-13 18:23:16 [gis-service] [32minfo[39m: Redis manager initialized successfully
+2025-10-13 18:23:16 [gis-service] [32minfo[39m: GIS Service running on port 3003
+2025-10-13 18:23:16 [gis-service] [32minfo[39m: PostGIS database (gis_db) connected
+2025-10-13 18:23:16 [gis-service] [32minfo[39m: Auth database (auth_db) connected
+2025-10-13 18:23:16 [gis-service] [32minfo[39m: Redis cache connected
+2025-10-13 18:23:17 [gis-service] [32minfo[39m: GET /health {"ip":"127.0.0.1"}
+2025-10-13 18:23:51 [gis-service] [32minfo[39m: GET /api/layer-data/deforestation-alerts {"ip":"127.0.0.1"}
+2025-10-13 18:23:51 [layer-controller] [32minfo[39m: Cache hit for layer data {"layerName":"deforestation-alerts"}
+2025-10-13 18:31:19 [gis-service] [32minfo[39m: GET /api/layer-data/deforestation-alerts {"ip":"127.0.0.1"}
+2025-10-13 18:31:19 [layer-controller] [32minfo[39m: Cache hit for layer data {"layerName":"deforestation-alerts"}
+2025-10-13 18:40:03 [gis-service] [32minfo[39m: GET /api/layer-data/deforestation-alerts {"ip":"127.0.0.1"}
+2025-10-13 18:40:03 [layer-controller] [32minfo[39m: Cache hit for layer data {"layerName":"deforestation-alerts"}
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m

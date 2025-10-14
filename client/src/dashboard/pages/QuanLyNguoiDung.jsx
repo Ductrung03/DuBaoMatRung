@@ -17,6 +17,8 @@ import config from "../../config";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+import { getDistricts } from "../../utils/adminService.js";
+
 const QuanLyNguoiDung = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
@@ -76,85 +78,60 @@ const QuanLyNguoiDung = () => {
   };
 
   // Lấy danh sách người dùng và huyện khi component mount
-  // Cập nhật function fetchInitialData trong QuanLyNguoiDung.jsx
-
-// Lấy danh sách người dùng và huyện khi component mount
-useEffect(() => {
-  const fetchInitialData = async () => {
-    try {
-      setLoading(true);
-      
-      // ✅ FIXED: Check if user is authenticated first
-      const currentToken = localStorage.getItem("token");
-      if (!currentToken) {
-        console.log("❌ No token found, redirecting to login");
-        navigate("/login");
-        return;
-      }
-
-      console.log("🔄 Fetching initial data for QuanLyNguoiDung...");
-
-      // ✅ FIXED: Fetch users and districts with better error handling
+  useEffect(() => {
+    const fetchInitialData = async () => {
       try {
-        console.log("📤 Fetching users...");
-        const usersRes = await axios.get(`${config.API_URL}/api/users`, {
-          headers: {
-            Authorization: `Bearer ${currentToken}`
-          },
-          timeout: 10000 // 10 second timeout
-        });
+        setLoading(true);
         
-        console.log("✅ Users fetched successfully:", usersRes.data);
-        setUsers(usersRes.data.data || []);
-        setFilteredUsers(usersRes.data.data || []);
-        
-      } catch (userError) {
-        console.error("❌ Error fetching users:", userError);
-        
-        if (userError.response?.status === 401) {
-          toast.error("Bạn không có quyền truy cập quản lý người dùng");
-          navigate("/dashboard");
+        const currentToken = localStorage.getItem("token");
+        if (!currentToken) {
+          navigate("/login");
           return;
-        } else if (userError.response?.status === 403) {
-          toast.error("Bạn không có quyền admin để truy cập chức năng này");
-          navigate("/dashboard");
-          return;
-        } else {
-          toast.error("Không thể tải danh sách người dùng");
         }
-      }
 
-      // ✅ FIXED: Fetch districts separately
-      try {
-        console.log("📤 Fetching districts...");
-        const huyenRes = await axios.get(`${config.API_URL}/api/dropdown/huyen`, {
-          timeout: 10000 // 10 second timeout
-        });
-        
-        console.log("✅ Districts fetched successfully:", huyenRes.data);
-        setHuyenList(huyenRes.data || []);
-        
-      } catch (districtError) {
-        console.error("❌ Error fetching districts:", districtError);
-        toast.warning("Không thể tải danh sách huyện, một số tính năng có thể bị hạn chế");
-        setHuyenList([]);
-      }
+        // Fetch users and districts in parallel
+        const [usersResponse, districtsResponse] = await Promise.allSettled([
+          axios.get(`/api/users`, {
+            headers: { Authorization: `Bearer ${currentToken}` },
+            timeout: 10000
+          }),
+          getDistricts()
+        ]);
 
-    } catch (err) {
-      console.error("❌ General error in fetchInitialData:", err);
-      
-      if (err.code === 'NETWORK_ERROR' || err.message === 'Network Error') {
-        toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-      } else {
+        // Handle users response
+        if (usersResponse.status === 'fulfilled') {
+          setUsers(usersResponse.value.data.data || []);
+          setFilteredUsers(usersResponse.value.data.data || []);
+        } else {
+          console.error("❌ Error fetching users:", usersResponse.reason);
+          const error = usersResponse.reason;
+          if (error.response?.status === 401 || error.response?.status === 403) {
+            toast.error("Bạn không có quyền truy cập quản lý người dùng");
+            navigate("/dashboard");
+          } else {
+            toast.error("Không thể tải danh sách người dùng");
+          }
+        }
+
+        // Handle districts response
+        if (districtsResponse.status === 'fulfilled') {
+          setHuyenList(districtsResponse.value || []);
+        } else {
+          console.error("❌ Error fetching districts:", districtsResponse.reason);
+          toast.warning("Không thể tải danh sách huyện, một số tính năng có thể bị hạn chế");
+          setHuyenList([]);
+        }
+
+      } catch (err) {
+        console.error("❌ General error in fetchInitialData:", err);
         toast.error("Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.");
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchInitialData();
-}, [navigate]); // ✅ Add navigate to dependencies
+    fetchInitialData();
+  }, [navigate]); // ✅ Add navigate to dependencies
 
   // Áp dụng bộ lọc khi thay đổi
   useEffect(() => {
@@ -198,7 +175,7 @@ useEffect(() => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${config.API_URL}/api/users`);
+      const res = await axios.get(`/api/users`);
       setUsers(res.data.data);
     } catch (err) {
       console.error("Lỗi lấy danh sách người dùng:", err);
@@ -311,11 +288,11 @@ useEffect(() => {
         }
 
         // Thêm người dùng mới
-        await axios.post(`${config.API_URL}/api/users`, formData);
+        await axios.post(`/api/users`, formData);
         toast.success("Thêm người dùng thành công!");
       } else if (modalMode === "edit") {
         // Cập nhật người dùng
-        await axios.put(`${config.API_URL}/api/users/${selectedUser.id}`, {
+        await axios.put(`/api/users/${selectedUser.id}`, {
           full_name: formData.full_name,
           position: formData.position,
           organization: formData.organization,
@@ -332,7 +309,7 @@ useEffect(() => {
           return;
         }
 
-        await axios.put(`${config.API_URL}/api/users/${selectedUser.id}/change-password`, {
+        await axios.put(`/api/users/${selectedUser.id}/change-password`, {
           old_password: passwordForm.old_password,
           new_password: passwordForm.new_password,
         });
@@ -355,7 +332,7 @@ useEffect(() => {
     }
 
     try {
-      await axios.delete(`${config.API_URL}/api/users/${user.id}`);
+      await axios.delete(`/api/users/${user.id}`);
       toast.success(`Đã xóa người dùng: ${user.full_name}`);
       fetchUsers();
     } catch (err) {

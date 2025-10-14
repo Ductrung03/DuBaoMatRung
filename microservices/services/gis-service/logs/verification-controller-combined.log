@@ -1,0 +1,10 @@
+{"gid":"780","level":"info","message":"Verifying mat rung by ID","service":"verification-controller","timestamp":"2025-10-12 21:59:10","userId":"1","verification_reason":"Khai thác rừng trái phép"}
+{"error":"relation \"users\" does not exist","gid":"780","level":"error","message":"Error verifying mat rung by ID","service":"verification-controller","timestamp":"2025-10-12 21:59:10"}
+{"gid":"780","level":"info","message":"Verifying mat rung by ID","service":"verification-controller","timestamp":"2025-10-12 22:07:35","userId":"1","verification_reason":"Chuyển đổi mục đích sử dụng đất"}
+{"area_changed":null,"gid":"780","level":"info","message":"Mat rung verified successfully","service":"verification-controller","timestamp":"2025-10-12 22:07:35","userId":"1","verification_reason":"Chuyển đổi mục đích sử dụng đất"}
+{"gid":"780","level":"info","message":"Verifying mat rung by ID","service":"verification-controller","timestamp":"2025-10-12 22:08:45","userId":"1","verification_reason":"Khai thác khoáng sản"}
+{"area_changed":true,"gid":"780","level":"info","message":"Mat rung verified successfully","service":"verification-controller","timestamp":"2025-10-12 22:08:45","userId":"1","verification_reason":"Khai thác khoáng sản"}
+{"gid":"780","level":"info","message":"Verifying mat rung by ID","service":"verification-controller","timestamp":"2025-10-12 22:12:10","userId":"1","verification_reason":"Cháy rừng"}
+{"area_changed":true,"gid":"780","level":"info","message":"Mat rung verified successfully","service":"verification-controller","timestamp":"2025-10-12 22:12:10","userId":"1","verification_reason":"Cháy rừng"}
+{"gid":"780","level":"info","message":"Verifying mat rung by ID","service":"verification-controller","timestamp":"2025-10-12 22:13:11","userId":"1","verification_reason":"Cháy rừng"}
+{"area_changed":true,"gid":"780","level":"info","message":"Mat rung verified successfully","service":"verification-controller","timestamp":"2025-10-12 22:13:11","userId":"1","verification_reason":"Cháy rừng"}

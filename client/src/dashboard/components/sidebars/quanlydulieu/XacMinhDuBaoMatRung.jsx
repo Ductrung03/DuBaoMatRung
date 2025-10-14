@@ -1,12 +1,13 @@
 // client/src/dashboard/components/sidebars/quanlydulieu/XacMinhDuBaoMatRung.jsx - FIXED SEARCH LOGIC
 import React, { useState } from "react";
-import Select from "../../Select";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 import { useGeoData } from "../../../contexts/GeoDataContext";
 import { useAuth } from "../../../contexts/AuthContext";
 import config from "../../../../config";
+import Dropdown from "../../../../components/Dropdown";
+ // Import the generic Dropdown
 
 const XacMinhDuBaoMatRung = () => {
   const { geoData, setGeoData } = useGeoData();
@@ -24,7 +25,6 @@ const XacMinhDuBaoMatRung = () => {
   ];
 
   const [isForecastOpen, setIsForecastOpen] = useState(true);
-  const [openDropdown, setOpenDropdown] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   
@@ -56,7 +56,7 @@ const XacMinhDuBaoMatRung = () => {
 
       // ✅ FIX: Gọi API search đã được sửa
       const response = await axios.get(
-        `${config.API_URL}/api/search/mat-rung/${gidToSearch}`,
+        `/api/search/mat-rung/${gidToSearch}`,
         {
           params: { radius: 10000 }, // Tăng radius lên 10km để tìm nhiều hơn
           headers: {
@@ -202,7 +202,7 @@ const XacMinhDuBaoMatRung = () => {
 
       // Gọi API xác minh
       const response = await axios.post(
-        `${config.API_URL}/api/verification/mat-rung/${gid}/verify`,
+        `/api/verification/mat-rung/${gid}/verify`,
         verificationData,
         {
           headers: {
@@ -213,8 +213,9 @@ const XacMinhDuBaoMatRung = () => {
       );
 
       if (response.data.success) {
-        const { data: updatedData, changes } = response.data;
-        
+        const updatedData = response.data.data;
+        const changes = response.data.meta?.changes || {};
+
         console.log("✅ Xác minh thành công CB-" + gid, updatedData);
 
         // ✅ FIX: Cập nhật dữ liệu local ngay lập tức
@@ -246,13 +247,17 @@ const XacMinhDuBaoMatRung = () => {
 
         // Hiển thị thông báo chi tiết
         let successMessage = `✅ Đã xác minh thành công CB-${gid}!`;
-        if (changes.area_changed) {
+        if (changes && changes.area_changed) {
           successMessage += `\n📏 Diện tích: ${(changes.original_area / 10000).toFixed(2)} ha → ${(changes.new_verified_area / 10000).toFixed(2)} ha`;
-        } else {
+        } else if (changes && changes.original_area) {
           successMessage += `\n📏 Diện tích: Giữ nguyên ${(changes.original_area / 10000).toFixed(2)} ha`;
         }
-        successMessage += `\n📅 Ngày: ${changes.verification_date_used}`;
-        successMessage += `\n👤 Người XM: ${changes.verified_by_user}`;
+        if (changes && changes.verification_date_used) {
+          successMessage += `\n📅 Ngày: ${changes.verification_date_used}`;
+        }
+        if (changes && changes.verified_by_user) {
+          successMessage += `\n👤 Người XM: ${changes.verified_by_user}`;
+        }
 
         toast.success(successMessage, { autoClose: 5000 });
         
@@ -311,9 +316,12 @@ const XacMinhDuBaoMatRung = () => {
     }));
   };
 
-  // Hàm xử lý dropdown
-  const handleDropdownToggle = (dropdownName, isOpen) => {
-    setOpenDropdown(isOpen ? dropdownName : null);
+  // Hàm xử lý thay đổi nguyên nhân
+  const handleNguyenNhanChange = (value) => {
+    setFormData(prev => ({
+      ...prev,
+      nguyenNhan: value
+    }));
   };
 
   return (
@@ -411,25 +419,16 @@ const XacMinhDuBaoMatRung = () => {
             {/* Nguyên nhân */}
             <div className="flex items-center gap-1">
               <label className="text-sm font-medium w-40">Nguyên nhân *</label>
-              <div className="relative w-36">
-                <select
-                  value={formData.nguyenNhan}
-                  onChange={(e) => handleInputChange('nguyenNhan', e.target.value)}
-                  className="w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                  onFocus={() => handleDropdownToggle("nguyennhan", true)}
-                  onBlur={() => handleDropdownToggle("nguyennhan", false)}
-                  disabled={loading || searchLoading}
-                  required
-                >
-                  <option value="">Chọn nguyên nhân</option>
-                  {nguyenNhanList.map((nn, idx) => (
-                    <option key={idx} value={nn}>
-                      {nn}
-                    </option>
-                  ))}
-                </select>
-                <Select isOpen={openDropdown === "nguyennhan"} />
-              </div>
+              <Dropdown
+                selectedValue={formData.nguyenNhan}
+                onValueChange={handleNguyenNhanChange}
+                options={nguyenNhanList.map(nn => ({ value: nn, label: nn }))}
+                placeholder="Chọn nguyên nhân"
+                disabled={loading || searchLoading}
+                loading={loading || searchLoading}
+                className="w-36"
+                selectClassName="w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              />
             </div>
 
             {/* Diện tích thực tế */}

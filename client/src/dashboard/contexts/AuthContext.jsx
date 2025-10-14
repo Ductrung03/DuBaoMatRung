@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }) => {
           // Set token vào state trước khi verify
           setToken(currentToken);
           
-          const res = await axios.get(`${config.API_URL}/api/auth/me`, {
+          const res = await axios.get(`/api/auth/me`, {
             headers: {
               Authorization: `Bearer ${currentToken}`
             }
@@ -136,7 +136,7 @@ export const AuthProvider = ({ children }) => {
       
       console.log(`🔄 Attempting login for: ${username}`);
       
-      const res = await axios.post(`${config.API_URL}/api/auth/login`, {
+      const res = await axios.post(`/api/auth/login`, {
         username,
         password,
       });
@@ -186,7 +186,7 @@ export const AuthProvider = ({ children }) => {
       // Call logout API if token exists
       if (token) {
         try {
-          await axios.post(`${config.API_URL}/api/auth/logout`);
+          await axios.post(`/api/auth/logout`);
         } catch (err) {
           console.warn("⚠️ Logout API call failed (may be token invalid):", err);
         }
@@ -206,9 +206,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Kiểm tra vai trò
+  // Kiểm tra vai trò - CHỈ KIỂM TRA ROLE, KHÔNG CẦN PERMISSION_LEVEL
   const isAdmin = () => {
-    return user && (user.role === "admin" || user.permission_level === "admin");
+    return user && user.role === "admin";
   };
   
   // Lấy mã huyện của người dùng (TCVN3)

@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 
 import { toast } from "react-toastify";
 import { useGeoData } from "../../../contexts/GeoDataContext";
-import Select from "../../Select";
+import Dropdown from "../../../../components/Dropdown";
+
 
 const DuBaoMatRungTuDong = () => {
   const { 
@@ -19,9 +20,6 @@ const DuBaoMatRungTuDong = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [, setPreviewData] = useState(null);
   const [, setShowPreview] = useState(false);
-
-  // Trạng thái mở cho từng dropdown
-  const [openDropdown, setOpenDropdown] = useState(null);
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
@@ -54,18 +52,37 @@ const DuBaoMatRungTuDong = () => {
       if (result.success) {
         const count = result.data.features?.length || 0;
         const totalAreaHa = result.summary?.total_area_ha || 0;
-        
+
         toast.success(
-          `✅ Dự báo hoàn tất: ${count} khu vực mất rừng (${totalAreaHa} ha) ${periodDescription}/${selectedYear}`,
-          { autoClose: 5000 }
+          `✅ Dự báo hoàn tất: ${count} khu vực mất rừng (${totalAreaHa} ha) ${periodDescription}/${selectedYear}. Xem bảng dữ liệu bên dưới bản đồ!`,
+          { autoClose: 5000, position: "top-center" }
         );
-        
+
         console.log(`✅ Auto forecast completed:`, {
           period: `${periodDescription}/${selectedYear}`,
           features: count,
           totalArea: `${totalAreaHa} ha`
         });
-        
+
+        // ✅ Tự động scroll xuống để user thấy bảng dữ liệu
+        setTimeout(() => {
+          const mapElement = document.querySelector('.leaflet-container');
+          if (mapElement) {
+            mapElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+
+            // Scroll thêm một chút để thấy cả table
+            setTimeout(() => {
+              window.scrollBy({
+                top: 100,
+                behavior: 'smooth'
+              });
+            }, 500);
+          }
+        }, 300);
+
       } else {
         toast.warning(`⚠️ ${result.message || 'Không có dữ liệu trong khoảng thời gian này'}`);
       }
@@ -106,10 +123,10 @@ const DuBaoMatRungTuDong = () => {
     try {
       const result = await getAutoForecastPreview(selectedYear, selectedMonth, selectedPeriod);
       
-      if (result.success) {
-        setPreviewData(result.preview);
+      if (result.success && result.data) {
+        setPreviewData(result.data);
         setShowPreview(true);
-        toast.success(`📊 Preview: ${result.preview.estimated_features} khu vực (${result.preview.estimated_area_ha} ha)`);
+        toast.success(`📊 Preview: ${result.data.total_features} khu vực (${result.data.total_area_ha} ha)`);
       } else {
         toast.warning("⚠️ Không thể lấy thông tin preview");
       }
@@ -132,10 +149,7 @@ const DuBaoMatRungTuDong = () => {
 
   // ✅ LẤY THÔNG TIN DỮ LIỆU HIỆN TẠI
 
-  // Hàm xử lý khi dropdown focus hoặc blur
-  const handleDropdownToggle = (dropdownName, isOpen) => {
-    setOpenDropdown(isOpen ? dropdownName : null);
-  };
+
 
   // ✅ ENHANCED PREVIEW LOGIC
 
@@ -168,61 +182,46 @@ const DuBaoMatRungTuDong = () => {
             {/* Năm */}
             <div className="flex items-center gap-0.5">
               <label className="text-sm font-medium w-20">Năm</label>
-              <div className="relative w-36">
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
-                  className="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                  onFocus={() => handleDropdownToggle("year", true)}
-                  onBlur={() => handleDropdownToggle("year", false)}
-                >
-                  {years.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-                <Select isOpen={openDropdown === "year"} />
-              </div>
+              <Dropdown
+                selectedValue={selectedYear}
+                onValueChange={setSelectedYear}
+                options={years.map(year => ({ value: year.toString(), label: year.toString() }))}
+                placeholder="Chọn năm"
+                disabled={isProcessing || loading}
+                loading={isProcessing || loading}
+                className="w-36"
+                selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              />
             </div>
 
             {/* Tháng */}
             <div className="flex items-center gap-0.5">
               <label className="text-sm font-medium w-20">Tháng</label>
-              <div className="relative w-36">
-                <select
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                  onFocus={() => handleDropdownToggle("month", true)}
-                  onBlur={() => handleDropdownToggle("month", false)}
-                >
-                  {months.map((month) => (
-                    <option key={month.value} value={month.value}>
-                      {month.label}
-                    </option>
-                  ))}
-                </select>
-                <Select isOpen={openDropdown === "month"} />
-              </div>
+              <Dropdown
+                selectedValue={selectedMonth}
+                onValueChange={setSelectedMonth}
+                options={months}
+                placeholder="Chọn tháng"
+                disabled={isProcessing || loading}
+                loading={isProcessing || loading}
+                className="w-36"
+                selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              />
             </div>
 
             {/* Kỳ */}
             <div className="flex items-center gap-0.5">
               <label className="text-sm font-medium w-20">Kỳ</label>
-              <div className="relative w-36">
-                <select
-                  value={selectedPeriod}
-                  onChange={(e) => setSelectedPeriod(e.target.value)}
-                  className="w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                  onFocus={() => handleDropdownToggle("period", true)}
-                  onBlur={() => handleDropdownToggle("period", false)}
-                >
-                  <option value="Trước ngày 15">Trước ngày 15</option>
-                  <option value="Sau ngày 15">Sau ngày 15</option>
-                </select>
-                <Select isOpen={openDropdown === "period"} />
-              </div>
+              <Dropdown
+                selectedValue={selectedPeriod}
+                onValueChange={setSelectedPeriod}
+                options={[{ value: "Trước ngày 15", label: "Trước ngày 15" }, { value: "Sau ngày 15", label: "Sau ngày 15" }]}
+                placeholder="Chọn kỳ"
+                disabled={isProcessing || loading}
+                loading={isProcessing || loading}
+                className="w-36"
+                selectClassName="w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              />
             </div>
           </div>
 

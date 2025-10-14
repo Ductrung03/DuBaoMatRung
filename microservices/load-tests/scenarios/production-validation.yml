@@ -1,0 +1,173 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    # Production-like load pattern
+    - duration: 300
+      arrivalRate: 15
+      name: "Business hours - moderate load"
+    - duration: 180
+      arrivalRate: 30
+      name: "Peak hours"
+    - duration: 300
+      arrivalRate: 15
+      name: "Post-peak moderate load"
+  processor: "../helpers/auth-helpers.js"
+  ensure:
+    # Performance thresholds
+    maxErrorRate: 1  # Max 1% error rate
+    p95: 500         # 95th percentile response time < 500ms
+    p99: 1000        # 99th percentile response time < 1s
+
+scenarios:
+  # Typical user workflow 1: View and query data
+  - name: "View Data Workflow"
+    weight: 35
+    flow:
+      # Login
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "admin"
+            password: "Admin@123#"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+          expect:
+            - statusCode: 200
+
+      # View statistics
+      - get:
+          url: "/api/mat-rung/stats"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+      # Load dropdown data
+      - get:
+          url: "/api/dropdown/huyen"
+          expect:
+            - statusCode: 200
+
+      # Query mat rung data
+      - get:
+          url: "/api/mat-rung?limit=20"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+      # Search functionality
+      - get:
+          url: "/api/search/mat-rung?limit=10"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Typical user workflow 2: Verification process
+  - name: "Verification Workflow"
+    weight: 25
+    flow:
+      # Login
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "admin"
+            password: "Admin@123#"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+
+      # Get unverified mat rung
+      - get:
+          url: "/api/mat-rung?status=Chưa xác minh&limit=1"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          capture:
+            - json: "$.data.features[0].properties.gid"
+              as: "matRungGid"
+
+      # Note: Actual verification would require valid GID
+      # In load test, we just test the endpoint availability
+      - think: 2
+
+  # Typical user workflow 3: Report generation
+  - name: "Report Workflow"
+    weight: 15
+    flow:
+      # Login
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "admin"
+            password: "Admin@123#"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+
+      # Get data for report
+      - get:
+          url: "/api/mat-rung?limit=50"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+
+      # Get statistics for report
+      - get:
+          url: "/api/bao-cao/stats"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+
+  # Typical user workflow 4: Administrative tasks
+  - name: "Admin Workflow"
+    weight: 15
+    flow:
+      # Login as admin
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "admin"
+            password: "Admin@123#"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+
+      # Get users list
+      - get:
+          url: "/api/users?page=1&limit=20"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+
+      # Get administrative boundaries
+      - get:
+          url: "/api/hanhchinh"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+
+      # Get layer data
+      - get:
+          url: "/api/layer-data?layer=tieukhu"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+
+  # Public/unauthenticated access
+  - name: "Public Access"
+    weight: 10
+    flow:
+      # Health check
+      - get:
+          url: "/health"
+          expect:
+            - statusCode: 200
+
+      # Public stats
+      - get:
+          url: "/api/mat-rung/stats"
+          expect:
+            - statusCode: 200
+
+      # Public dropdown
+      - get:
+          url: "/api/dropdown/huyen"
+          expect:
+            - statusCode: 200

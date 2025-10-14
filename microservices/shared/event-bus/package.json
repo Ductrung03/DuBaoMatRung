@@ -1,0 +1,23 @@
+{
+  "name": "@dubaomatrung/event-bus",
+  "version": "1.0.0",
+  "description": "Event-driven communication using RabbitMQ for DuBaoMatRung microservices",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "rabbitmq",
+    "event-bus",
+    "microservices",
+    "pub-sub"
+  ],
+  "dependencies": {
+    "amqplib": "^0.10.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "author": "LuckyBoiz",
+  "license": "MIT"
+}

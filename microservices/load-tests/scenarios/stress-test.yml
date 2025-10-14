@@ -1,0 +1,120 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    # Gradual ramp up
+    - duration: 60
+      arrivalRate: 10
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 50
+      name: "Ramp to moderate load"
+    - duration: 180
+      arrivalRate: 100
+      name: "High load"
+    - duration: 240
+      arrivalRate: 200
+      name: "Stress level"
+    - duration: 120
+      arrivalRate: 300
+      name: "Peak stress"
+    - duration: 60
+      arrivalRate: 50
+      name: "Cool down"
+  processor: "../helpers/auth-helpers.js"
+  variables:
+    admin_username: "admin"
+    admin_password: "Admin@123#"
+  plugins:
+    expect: {}
+    metrics-by-endpoint: {}
+
+scenarios:
+  # Heavy read scenario
+  - name: "Heavy Read Operations"
+    weight: 40
+    flow:
+      # Get all mat rung data
+      - get:
+          url: "/api/mat-rung/all?limit=100"
+          expect:
+            - statusCode: 200
+
+      # Get stats
+      - get:
+          url: "/api/mat-rung/stats"
+          expect:
+            - statusCode: 200
+
+      # Search
+      - get:
+          url: "/api/search/mat-rung?limit=50"
+          expect:
+            - statusCode: 200
+
+  # Authenticated operations
+  - name: "Authenticated Heavy Operations"
+    weight: 30
+    flow:
+      # Login
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "{{ admin_username }}"
+            password: "{{ admin_password }}"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+          expect:
+            - statusCode: 200
+
+      # Query with authentication
+      - get:
+          url: "/api/mat-rung?limit=50"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+      # Get user info
+      - get:
+          url: "/api/auth/me"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Mixed operations
+  - name: "Mixed Operations"
+    weight: 20
+    flow:
+      # Health check
+      - get:
+          url: "/health"
+
+      # Dropdown data (cached)
+      - get:
+          url: "/api/dropdown/huyen"
+
+      # Stats (cached)
+      - get:
+          url: "/api/mat-rung/stats"
+
+      # Layer data
+      - get:
+          url: "/api/layer-data?layer=ranhgioihc"
+
+  # Database intensive operations
+  - name: "Database Intensive"
+    weight: 10
+    flow:
+      # Complex spatial query
+      - get:
+          url: "/api/mat-rung?huyen=Thành phố Lào Cai&status=Chưa xác minh&limit=100"
+          expect:
+            - statusCode: 200
+
+      # Get administrative boundaries
+      - get:
+          url: "/api/hanhchinh"
+          expect:
+            - statusCode: 200

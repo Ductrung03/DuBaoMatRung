@@ -1,0 +1,66 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    # Normal load
+    - duration: 60
+      arrivalRate: 10
+      name: "Normal load"
+
+    # Sudden spike
+    - duration: 30
+      arrivalRate: 500
+      name: "Spike - 500 req/sec"
+
+    # Back to normal
+    - duration: 60
+      arrivalRate: 10
+      name: "Recovery"
+
+    # Another spike
+    - duration: 30
+      arrivalRate: 1000
+      name: "Spike - 1000 req/sec"
+
+    # Final recovery
+    - duration: 60
+      arrivalRate: 10
+      name: "Final recovery"
+
+  processor: "../helpers/auth-helpers.js"
+
+scenarios:
+  # Read-heavy spike
+  - name: "Spike Read Operations"
+    weight: 60
+    flow:
+      - get:
+          url: "/api/mat-rung/stats"
+
+      - get:
+          url: "/api/dropdown/huyen"
+
+      - get:
+          url: "/api/mat-rung?limit=10"
+
+  # Mixed operations spike
+  - name: "Spike Mixed Operations"
+    weight: 30
+    flow:
+      - get:
+          url: "/health"
+
+      - get:
+          url: "/api/search/mat-rung?limit=5"
+
+      - get:
+          url: "/api/layer-data?layer=ranhgioihc"
+
+  # Authentication spike
+  - name: "Spike Authentication"
+    weight: 10
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "admin"
+            password: "Admin@123#"

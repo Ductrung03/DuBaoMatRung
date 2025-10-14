@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import Select from "../../Select";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useGeoData } from "../../../contexts/GeoDataContext";
 import config from "../../../../config";
 import DistrictDropdown from "../../DistrictDropdown";
 import { toast } from "react-toastify";
+import { getCommunes } from "../../../../utils/adminService.js";
+import Dropdown from "../../../../components/Dropdown"; // Import the generic Dropdown
 
 const DuBaoMatRungTuyBien = () => {
-  const { isAdmin, getUserDistrictId } = useAuth();
+  const { isAdmin, user } = useAuth();
   const { setGeoData, setLoading } = useGeoData();
   
   const [xaList, setXaList] = useState([]);
@@ -17,78 +18,55 @@ const DuBaoMatRungTuyBien = () => {
   const [selectedXa, setSelectedXa] = useState("");
   const [loading, setLoadingState] = useState(false);
 
-  // ✅ THÊM: State cho các input date của giao diện cũ
   const [kyTruocStart, setKyTruocStart] = useState("");
   const [kyTruocEnd, setKyTruocEnd] = useState("");
   const [kySauStart, setKySauStart] = useState("");
   const [kySauEnd, setKySauEnd] = useState("");
 
-  // Trạng thái mở cho từng dropdown
-  const [openDropdown, setOpenDropdown] = useState(null);
-
   useEffect(() => {
     // Auto-fill huyện cho user cấp huyện
-    if (!isAdmin() && getUserDistrictId()) {
-      const districtMapping = {
-        '01': 'Lào Cai',
-        '02': 'Bát Xát', 
-        '03': 'Mường Khương',
-        '04': 'Si Ma Cai',
-        '05': 'Bắc Hà',
-        '06': 'Bảo Thắng',
-        '07': 'Bảo Yên',
-        '08': 'Sa Pa',
-        '09': 'Văn Bàn'
-      };
-      const districtName = districtMapping[getUserDistrictId()];
-      if (districtName) {
-        setSelectedHuyen(districtName);
-      }
+    if (!isAdmin() && user?.district_id) {
+      setSelectedHuyen(user.district_id);
     }
-  }, [isAdmin, getUserDistrictId]);
+  }, [isAdmin, user]);
 
   useEffect(() => {
-    // Khi huyện thay đổi, tải danh sách xã tương ứng
     const fetchXaList = async () => {
-      if (!selectedHuyen) return;
-      
+      if (!selectedHuyen) {
+        setXaList([]);
+        return;
+      }
+
       try {
         setLoadingState(true);
-        const res = await fetch(
-          `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(selectedHuyen)}`
-        );
-        const data = await res.json();
-        setXaList(data);
+        const communes = await getCommunes(selectedHuyen);
+        setXaList(communes);
       } catch (err) {
         console.error("Lỗi khi tải danh sách xã:", err);
+        toast.error("Lỗi khi tải danh sách xã");
         setXaList([]);
       } finally {
         setLoadingState(false);
       }
     };
-    
+
     fetchXaList();
   }, [selectedHuyen]);
 
-  const handleHuyenChange = (e) => {
-    const huyen = e.target.value;
-    setSelectedHuyen(huyen);
-    setSelectedXa(""); // Reset xã khi thay đổi huyện
+  const handleHuyenChange = (value) => {
+    setSelectedHuyen(value);
+    setSelectedXa("");
   };
 
-  const handleXaChange = (e) => {
-    setSelectedXa(e.target.value);
+  const handleXaChange = (value) => {
+    setSelectedXa(value);
   };
 
-  // ✅ THÊM: Hàm xử lý phân tích với logic của giao diện cũ
   const handleAnalyze = async () => {
     try {
-      // ✅ Xác định khoảng thời gian để phân tích
       let fromDate = "";
       let toDate = "";
 
-      // Logic: Nếu có cả kỳ trước và kỳ sau, lấy từ kỳ trước đến kỳ sau
-      // Nếu chỉ có một kỳ, sử dụng kỳ đó
       if (kyTruocStart && kySauEnd) {
         fromDate = kyTruocStart;
         toDate = kySauEnd;
@@ -103,7 +81,6 @@ const DuBaoMatRungTuyBien = () => {
         return;
       }
 
-      // Kiểm tra quyền truy cập cho admin
       if (isAdmin() && !selectedHuyen) {
         toast.warning("Vui lòng chọn huyện");
         return;
@@ -119,16 +96,14 @@ const DuBaoMatRungTuyBien = () => {
       setLoading(true);
       setLoadingState(true);
 
-      // ✅ Gọi API tra cứu dữ liệu với tham số đã xác định
-      const queryParams = new URLSearchParams({
-        fromDate,
-        toDate,
-        huyen: selectedHuyen,
-        xa: selectedXa
-      });
+      const queryParams = new URLSearchParams();
+      queryParams.append('fromDate', fromDate);
+      queryParams.append('toDate', toDate);
+      if (selectedHuyen) queryParams.append('huyen', selectedHuyen);
+      if (selectedXa) queryParams.append('xa', selectedXa);
 
       const res = await fetch(
-        `${config.API_URL}/api/quan-ly-du-lieu/tra-cuu-du-lieu-bao-mat-rung?${queryParams.toString()}`
+        `/api/mat-rung?${queryParams.toString()}`
       );
 
       if (!res.ok) {
@@ -150,14 +125,34 @@ const DuBaoMatRungTuyBien = () => {
         return;
       }
 
-      // ✅ Set dữ liệu để hiển thị trên bản đồ và bảng
       setGeoData(data.data);
-      
-      toast.success(`✅ Phân tích hoàn tất: tìm thấy ${data.data.features.length} khu vực mất rừng`, {
-        autoClose: 3000
-      });
+
+      toast.success(
+        `✅ Phân tích hoàn tất: tìm thấy ${data.data.features.length} khu vực mất rừng! Xem bảng dữ liệu bên dưới bản đồ.`,
+        {
+          autoClose: 5000,
+          position: "top-center"
+        }
+      );
 
       console.log("✅ Dự báo tùy biến hoàn thành:", data.data.features.length, "features");
+
+      setTimeout(() => {
+        const mapElement = document.querySelector('.leaflet-container');
+        if (mapElement) {
+          mapElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+
+          setTimeout(() => {
+            window.scrollBy({
+              top: 100,
+              behavior: 'smooth'
+            });
+          }, 500);
+        }
+      }, 300);
 
     } catch (err) {
       console.error("❌ Lỗi dự báo tùy biến:", err);
@@ -166,11 +161,6 @@ const DuBaoMatRungTuyBien = () => {
       setLoading(false);
       setLoadingState(false);
     }
-  };
-
-  // Hàm xử lý khi dropdown focus hoặc blur
-  const handleDropdownToggle = (dropdownName, isOpen) => {
-    setOpenDropdown(isOpen ? dropdownName : null);
   };
   
   return (
@@ -190,7 +180,7 @@ const DuBaoMatRungTuyBien = () => {
           >
             <span className="text-sm font-medium">Lựa chọn đầu vào</span>
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-              <Select isOpen={isInputOpen} />
+              {/* Replaced with generic Dropdown, no longer needs Select component */}
             </div>
           </div>
 
@@ -206,31 +196,21 @@ const DuBaoMatRungTuyBien = () => {
                       onChange={handleHuyenChange}
                       isLoading={loading}
                       disabled={!isAdmin()} // ✅ Lock cho user cấp huyện
-                      onFocus={() => handleDropdownToggle("huyen", true)}
-                      onBlur={() => handleDropdownToggle("huyen", false)}
                     />
                   </div>
                 </div>
                 <div className="flex items-center justify-between mb-2 pl-4">
                   <label className="text-sm">Xã</label>
-                  <div className="relative w-36">
-                    <select
-                      value={selectedXa}
-                      onChange={handleXaChange}
-                      disabled={loading}
-                      className="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                      onFocus={() => handleDropdownToggle("xa", true)}
-                      onBlur={() => handleDropdownToggle("xa", false)}
-                    >
-                      <option value="">Chọn xã</option>
-                      {xaList.map((xa, index) => (
-                        <option key={index} value={xa.value}>
-                          {xa.label}
-                        </option>
-                      ))}
-                    </select>
-                    <Select isOpen={openDropdown === "xa"} />
-                  </div>
+                  <Dropdown
+                    selectedValue={selectedXa}
+                    onValueChange={handleXaChange}
+                    options={xaList}
+                    placeholder="Chọn xã"
+                    disabled={loading}
+                    loading={loading}
+                    className="w-36"
+                    selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                  />
                 </div>
 
                 <div className="font-medium text-sm mb-1">Kỳ trước:</div>

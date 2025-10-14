@@ -1,0 +1,25 @@
+{
+  "name": "@dubaomatrung/shared",
+  "version": "1.0.0",
+  "description": "Shared utilities and libraries for DuBaoMatRung microservices",
+  "private": true,
+  "workspaces": [
+    "database",
+    "logger",
+    "redis",
+    "errors",
+    "utils",
+    "validators"
+  ],
+  "scripts": {
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "author": "LuckyBoiz",
+  "license": "MIT",
+  "dependencies": {
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "vietnamese-conversion": "^1.0.0"
+  }
+}

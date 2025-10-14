@@ -1,0 +1,481 @@
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:06:53"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:06:53"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:09:39"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:09:39"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:19:10"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:19:10"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:20:16"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:20:16"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 14:20:17"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 14:20:17"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:23:35"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:23:35"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 14:23:36"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 14:23:36"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 14:23:36"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 14:23:36"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-07 14:23:37"}
+{"error":"column \"ngay_phat_hien\" does not exist","level":"error","message":"Error loading layer data","service":"layer-controller","timestamp":"2025-10-07 14:23:37"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:23:45"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:23:45"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 14:23:45"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 14:23:45"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 14:23:46"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 14:23:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-07 14:23:46"}
+{"error":"column \"ngay_phat_hien\" does not exist","level":"error","message":"Error loading layer data","service":"layer-controller","timestamp":"2025-10-07 14:23:46"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:53:30"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 14:53:30"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 14:53:30"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 14:53:30"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 14:53:31"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 14:53:31"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-07 14:53:31"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 15:02:57"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 15:02:57"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 15:02:57"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 15:02:57"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 15:02:58"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 15:02:58"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-07 15:02:59"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 15:20:12"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 15:20:12"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 15:20:12"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 15:20:12"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 15:20:13"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 15:20:13"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-07 15:20:13"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 15:21:08"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 15:21:08"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 15:21:09"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 15:21:09"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 15:21:09"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 15:21:09"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-07 15:21:10"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:15:48"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:15:48"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:15:49"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:15:49"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:15:49"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:15:49"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-07 20:15:50"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:21:43"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:21:43"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:21:43"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:21:43"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:21:44"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:21:44"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-07 20:21:45"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:25:52"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:25:52"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:25:53"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:25:53"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:25:53"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:25:53"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-07 20:25:54"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:26:08"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:26:08"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:26:09"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:26:09"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:26:09"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:26:09"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-07 20:26:10"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:46:31"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:46:31"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:46:31"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:46:31"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:46:32"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:46:32"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-07 20:46:33"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:51:46"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:51:46"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:51:47"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:51:47"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:51:47"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:51:47"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:51:49"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-07 20:51:49"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:51:50"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-07 20:51:50"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:51:50"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-07 20:51:50"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-07 20:51:51"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 07:21:54"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 07:21:54"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 07:21:54"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 07:21:54"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 07:21:55"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 07:21:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-08 07:21:55"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 07:25:40"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 07:25:40"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 07:25:40"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 07:25:40"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 07:25:41"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 07:25:41"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 07:25:41"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 07:40:20"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 07:40:20"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 07:42:04"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 07:42:04"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 07:42:04"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 07:42:04"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 07:42:05"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 07:42:05"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 07:42:05"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 07:44:21"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 07:44:21"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 07:44:22"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 07:44:22"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 07:44:23"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 07:44:23"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 07:44:23"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 07:45:17"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 07:45:17"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 07:45:17"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 07:45:17"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 07:45:18"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 07:45:18"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 07:45:18"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:09:59"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:09:59"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:16:15"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:16:15"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:16:16"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:16:16"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:16:16"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:16:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 08:16:17"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:17:17"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:17:17"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:17:18"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:17:18"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:17:18"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:17:18"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 08:17:19"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:22:49"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:22:49"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:25:32"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:25:32"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:25:32"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:25:32"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:25:33"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:25:33"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-08 08:25:33"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:27:55"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:27:55"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:27:55"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:27:55"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:27:56"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:27:56"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 08:27:56"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:39:29"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:39:29"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:39:29"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:39:29"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:39:30"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:39:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 08:39:30"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:41:00"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:41:00"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:41:00"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:41:00"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:41:01"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:41:01"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 08:41:01"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:43:44"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:43:44"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:43:45"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:43:45"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:43:46"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:43:46"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:43:46"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:43:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 08:43:47"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:47:21"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:47:21"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:47:22"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:47:22"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:48:43"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:48:43"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:48:44"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:48:44"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:48:44"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:48:44"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 08:48:45"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:49:15"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:49:15"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:54:18"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:54:18"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:54:18"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:54:18"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:54:19"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:54:19"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 08:54:19"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:54:36"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:54:36"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:54:37"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:54:37"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:54:38"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:54:38"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:54:47"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:54:47"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:54:48"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:54:48"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:54:49"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:54:49"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:57:10"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:57:10"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:57:10"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:57:10"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:57:11"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:57:11"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 08:57:11"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:59:07"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:59:07"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:59:08"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:59:08"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:59:08"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:59:08"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 08:59:09"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:59:21"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:59:22"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:59:22"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:59:22"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:59:23"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:59:23"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 08:59:23"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:59:30"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 08:59:30"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:59:30"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 08:59:30"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:59:31"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 08:59:31"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 08:59:31"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 09:03:00"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 09:03:00"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 09:03:01"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 09:03:01"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 09:03:02"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 09:03:02"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 09:03:02"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 09:05:38"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 09:05:38"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 09:05:39"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-08 09:05:39"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 09:05:39"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-08 09:05:39"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-08 09:05:40"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 09:05:51"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-08 09:05:51"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-09 14:54:50"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-09 14:54:50"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-09 14:54:51"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-09 14:54:51"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-09 14:54:51"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-09 14:54:51"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-09 14:54:52"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-09 14:55:02"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-09 14:55:02"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-09 14:55:06"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-09 14:55:06"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-09 14:55:10"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-09 14:55:10"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-09 14:55:17"}
+{"layerName":"forest-types","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"forest-types","timestamp":"2025-10-09 14:55:20"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"forest-types","timestamp":"2025-10-09 14:55:20"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-09 14:55:27"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-09 14:55:27"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-09 14:55:28"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-09 14:55:28"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-09 14:55:30"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-09 14:55:30"}
+{"layerName":"forest-types","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"forest-types","timestamp":"2025-10-09 14:55:34"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"forest-types","timestamp":"2025-10-09 14:55:34"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-09 15:02:10"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-09 15:02:10"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-09 15:02:11"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-09 15:02:11"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-09 15:02:11"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-09 15:02:11"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-09 15:02:12"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-09 15:36:56"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-09 15:36:56"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-09 15:36:56"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-09 15:36:56"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-09 15:36:57"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-09 15:36:57"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-09 15:36:57"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-10 17:42:11"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-10 17:42:11"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-10 17:42:11"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-10 17:42:11"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-10 17:42:12"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-10 17:42:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-10 17:42:12"}
+{"layerName":"forest-types","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"forest-types","timestamp":"2025-10-10 17:42:56"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"forest-types","timestamp":"2025-10-10 17:42:56"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-10 17:43:02"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-10 17:43:02"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-10 17:43:06"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-10 17:43:06"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-10 17:43:48"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-10 17:43:48"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-10 17:43:48"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-10 17:43:48"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-10 17:43:49"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-10 17:43:49"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-10 17:43:49"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-10 17:44:54"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-10 17:44:54"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-10 17:44:54"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-10 17:44:54"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-10 17:44:55"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-10 17:44:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-10 17:44:55"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-11 22:59:53"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-11 22:59:53"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-11 22:59:53"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-11 22:59:53"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-11 22:59:54"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-11 22:59:54"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-11 22:59:54"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-11 23:02:56"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-11 23:02:56"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-11 23:02:56"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-11 23:02:56"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-11 23:02:57"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-11 23:02:57"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-11 23:02:57"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-11 23:04:09"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-11 23:04:09"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-11 23:04:10"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-11 23:04:10"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-11 23:04:10"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-11 23:04:10"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-11 23:04:11"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-11 23:19:11"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-11 23:19:11"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-11 23:19:12"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-11 23:19:12"}
+{"layerName":"terrain","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-11 23:19:12"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_terrain","timestamp":"2025-10-11 23:19:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-11 23:19:13"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-11 23:20:00"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_ranhgioihc","timestamp":"2025-10-11 23:20:00"}
+{"layerName":"forest-management","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-11 23:20:05"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"laocai_rg3lr","timestamp":"2025-10-11 23:20:05"}
+{"layerName":"terrain-line","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"terrain-line","timestamp":"2025-10-11 23:20:14"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"terrain-line","timestamp":"2025-10-11 23:20:14"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-12 12:21:38"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 12:24:28"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 12:36:25"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 12:36:42"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 12:47:56"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 12:57:44"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 13:00:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 13:04:49"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 13:14:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-12 17:44:50"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-12 21:30:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 21:41:26"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 21:47:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 21:58:59"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 22:08:19"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 22:11:49"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 22:12:47"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 22:13:31"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 22:22:19"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-12 22:22:37"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 22:26:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-12 22:51:39"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-12 22:52:28"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 22:52:32"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 22:56:53"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 23:01:37"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 23:03:54"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 23:04:35"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 23:05:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 23:05:48"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 23:08:51"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 23:13:10"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 23:13:19"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-12 23:15:06"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-13 07:05:45"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 07:16:04"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 07:22:39"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 07:59:18"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-13 08:18:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 08:23:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 08:26:34"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-13 08:26:53"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-13 08:37:29"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 08:37:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 08:38:53"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-13 08:39:32"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 08:40:01"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 08:40:33"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 08:40:36"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 08:41:03"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 08:42:26"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 08:43:22"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-13 08:44:47"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 08:46:10"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-13 08:46:18"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 08:51:06"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 08:51:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-13 13:25:50"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 13:37:44"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 13:44:02"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 13:44:45"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 14:16:28"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 14:16:43"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 14:21:50"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-13 16:44:04"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 16:53:33"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 16:55:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 16:57:17"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 16:59:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 17:02:08"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 17:02:48"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 17:05:50"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 17:11:06"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 17:22:19"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 17:22:49"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 17:25:10"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 17:25:54"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-13 18:08:48"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 18:10:54"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 18:11:09"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 18:19:35"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 18:23:51"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 18:31:19"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 18:40:03"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 18:40:35"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 18:40:45"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-13 19:46:38"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 19:49:40"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 19:57:37"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 19:59:00"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 20:04:43"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 20:05:34"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-13 20:09:42"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-14 00:17:31"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-14 14:03:34"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 14:30:07"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 14:35:05"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 14:35:17"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-14 15:16:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 15:43:10"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 15:47:43"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 15:54:27"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 16:07:19"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 16:12:13"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"mat_rung","timestamp":"2025-10-14 16:37:27"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 16:42:35"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 16:44:02"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 16:54:09"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 16:58:13"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 17:01:47"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 17:05:50"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-10-14 17:06:56"}

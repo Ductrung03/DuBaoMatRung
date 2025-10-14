@@ -1,0 +1,19 @@
+{
+  "name": "mapserver-service",
+  "version": "1.0.0",
+  "description": "MapServer WMS/WFS Service for static layers",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "npx nodemon src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "winston": "^3.17.0",
+    "compression": "^1.7.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

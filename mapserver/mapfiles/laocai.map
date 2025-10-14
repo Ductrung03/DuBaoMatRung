@@ -1,0 +1,654 @@
+MAP
+  NAME "LaoCai_GIS"
+  STATUS ON
+  SIZE 800 600
+  EXTENT 103.5 21.8 104.5 23.0
+  UNITS DD
+  SHAPEPATH "/tmp"
+  IMAGECOLOR 255 255 255
+
+  # Web settings
+  WEB
+    METADATA
+      "wms_title"           "Lao Cai GIS Services"
+      "wms_onlineresource"  "http://localhost/cgi-bin/mapserv?map=/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/mapserver/mapfiles/laocai.map&"
+      "wms_srs"             "EPSG:4326 EPSG:3857 EPSG:32648"
+      "wms_enable_request"  "*"
+      "wfs_title"           "Lao Cai WFS Service"
+      "wfs_onlineresource"  "http://localhost/cgi-bin/mapserv?map=/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/mapserver/mapfiles/laocai.map&"
+      "wfs_srs"             "EPSG:4326 EPSG:3857"
+      "wfs_enable_request"  "*"
+      "ows_enable_request"  "*"
+    END
+    IMAGEPATH "/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/mapserver/tmp/"
+    IMAGEURL "/tmp/"
+  END
+
+  # Projection
+  PROJECTION
+    "init=epsg:4326"
+  END
+
+  #=============================================================================
+  # LAYER 1: Ranh Giới Hành Chính (Administrative Boundaries)
+  # Phân chia theo cấp: Huyện > Xã > Tiểu khu > Khoảnh
+  #=============================================================================
+  LAYER
+    NAME "ranhgioihc"
+    TYPE LINE
+    STATUS ON
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    DATA "geom FROM laocai_ranhgioihc USING UNIQUE gid USING SRID=4326"
+
+    PROCESSING "CLOSE_CONNECTION=DEFER"
+
+    METADATA
+      "wms_title"             "Ranh Giới Hành Chính"
+      "wms_abstract"          "Administrative boundaries of Lao Cai"
+      "wms_srs"               "EPSG:4326 EPSG:3857"
+      "wms_extent"            "103.5 21.8 104.5 23.0"
+      "wfs_title"             "Ranh Giới Hành Chính"
+      "wfs_srs"               "EPSG:4326 EPSG:3857"
+      "gml_include_items"     "all"
+      "gml_featureid"         "gid"
+      "wms_include_items"     "all"
+    END
+
+    PROJECTION
+      "init=epsg:4326"
+    END
+
+    # Ranh giới Huyện (có huyen, không có xa)
+    CLASS
+      NAME "Ranh giới huyện"
+      EXPRESSION ([huyen] != '' AND [xa] = '')
+      STYLE
+        COLOR 0 0 0
+        WIDTH 3
+        LINECAP butt
+        PATTERN 10 5 END
+        OPACITY 100
+      END
+    END
+
+    # Ranh giới Xã (có xa, không có tieukhu)
+    CLASS
+      NAME "Ranh giới xã"
+      EXPRESSION ([xa] != '' AND [tieukhu] = '')
+      STYLE
+        COLOR 50 50 50
+        WIDTH 2
+        LINECAP butt
+        PATTERN 5 3 END
+        OPACITY 90
+      END
+    END
+
+    # Ranh giới Tiểu khu (có tieukhu, không có khoanh)
+    CLASS
+      NAME "Ranh giới tiểu khu"
+      EXPRESSION ([tieukhu] != '' AND [khoanh] = '')
+      STYLE
+        COLOR 80 80 80
+        WIDTH 1.5
+        LINECAP butt
+        PATTERN 8 2 2 2 END
+        OPACITY 80
+      END
+    END
+
+    # Ranh giới Khoảnh (có khoanh)
+    CLASS
+      NAME "Ranh giới khoảnh"
+      EXPRESSION ([khoanh] != '')
+      STYLE
+        COLOR 120 120 120
+        WIDTH 1
+        LINECAP butt
+        PATTERN 3 2 END
+        OPACITY 70
+      END
+    END
+
+    # Default - Ranh giới tỉnh (không có gì)
+    CLASS
+      NAME "Ranh giới tỉnh"
+      STYLE
+        COLOR 0 0 0
+        WIDTH 4
+        OPACITY 100
+      END
+    END
+
+    TOLERANCE 10
+    TOLERANCEUNITS pixels
+  END
+
+  #=============================================================================
+  # LAYER 2: 3 Loại Rừng (Forest Types)
+  # Phân loại theo malr3: 1=Đặc dụng, 2=Phòng hộ, 3=Sản xuất, 4=Đất khác
+  #=============================================================================
+  LAYER
+    NAME "rg3lr"
+    TYPE POLYGON
+    STATUS ON
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    DATA "geom FROM laocai_rg3lr USING UNIQUE gid USING SRID=4326"
+
+    PROCESSING "CLOSE_CONNECTION=DEFER"
+
+    METADATA
+      "wms_title"             "3 Loại Rừng"
+      "wms_abstract"          "Forest classification by 3 types in Lao Cai"
+      "wms_srs"               "EPSG:4326 EPSG:3857"
+      "wms_extent"            "103.5 21.8 104.5 23.0"
+      "wfs_title"             "3 Loại Rừng"
+      "wfs_srs"               "EPSG:4326 EPSG:3857"
+      "gml_include_items"     "all"
+      "gml_featureid"         "gid"
+      "wms_include_items"     "all"
+    END
+
+    PROJECTION
+      "init=epsg:4326"
+    END
+
+    # Classification by malr3 (3 loại rừng)
+    CLASSITEM "malr3"
+
+    CLASS
+      NAME "Rừng đặc dụng"
+      EXPRESSION "1"
+      STYLE
+        COLOR 0 100 0
+        OPACITY 80
+      END
+      STYLE
+        OUTLINECOLOR 0 70 0
+        WIDTH 1
+        OPACITY 90
+      END
+    END
+
+    CLASS
+      NAME "Rừng phòng hộ"
+      EXPRESSION "2"
+      STYLE
+        COLOR 255 140 0
+        OPACITY 80
+      END
+      STYLE
+        OUTLINECOLOR 200 100 0
+        WIDTH 1
+        OPACITY 90
+      END
+    END
+
+    CLASS
+      NAME "Rừng sản xuất"
+      EXPRESSION "3"
+      STYLE
+        COLOR 152 251 152
+        OPACITY 80
+      END
+      STYLE
+        OUTLINECOLOR 100 200 100
+        WIDTH 1
+        OPACITY 90
+      END
+    END
+
+    CLASS
+      NAME "Đất chưa có rừng"
+      EXPRESSION "4"
+      STYLE
+        COLOR 245 222 179
+        OPACITY 60
+      END
+      STYLE
+        OUTLINECOLOR 210 180 140
+        WIDTH 0.5
+        OPACITY 70
+      END
+    END
+
+    CLASS
+      NAME "Khác"
+      STYLE
+        COLOR 220 220 220
+        OPACITY 50
+      END
+      STYLE
+        OUTLINECOLOR 150 150 150
+        WIDTH 0.5
+        OPACITY 70
+      END
+    END
+
+    TOLERANCE 10
+    TOLERANCEUNITS pixels
+  END
+
+  #=============================================================================
+  # LAYER 3: Nền Địa Hình (Terrain Polygon)
+  #=============================================================================
+  LAYER
+    NAME "nendiahinh"
+    TYPE POLYGON
+    STATUS ON
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    DATA "geom FROM laocai_nendiahinh USING UNIQUE gid USING SRID=4326"
+
+    PROCESSING "CLOSE_CONNECTION=DEFER"
+
+    METADATA
+      "wms_title"             "Nền Địa Hình"
+      "wms_abstract"          "Terrain base layer of Lao Cai"
+      "wms_srs"               "EPSG:4326 EPSG:3857"
+      "wms_extent"            "103.5 21.8 104.5 23.0"
+      "wfs_title"             "Nền Địa Hình"
+      "wfs_srs"               "EPSG:4326 EPSG:3857"
+      "gml_include_items"     "all"
+      "gml_featureid"         "gid"
+      "wms_include_items"     "all"
+    END
+
+    PROJECTION
+      "init=epsg:4326"
+    END
+
+    CLASS
+      NAME "Địa hình"
+      STYLE
+        COLOR 245 222 179
+        OPACITY 60
+      END
+      STYLE
+        OUTLINECOLOR 160 82 45
+        WIDTH 1
+        OPACITY 80
+      END
+    END
+
+    TOLERANCE 10
+    TOLERANCEUNITS pixels
+  END
+
+  #=============================================================================
+  # LAYER 3B: Địa Hình, Thủy Văn, Giao Thông (Line Features)
+  # Bao gồm: Đường đồng mức, sông suối, giao thông
+  #=============================================================================
+  LAYER
+    NAME "nendiahinh_line"
+    TYPE LINE
+    STATUS ON
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    DATA "geom FROM laocai_nendiahinh_line USING UNIQUE gid USING SRID=4236"
+
+    PROCESSING "CLOSE_CONNECTION=DEFER"
+
+    METADATA
+      "wms_title"             "Địa Hình - Thủy Văn - Giao Thông"
+      "wms_abstract"          "Terrain lines, rivers, and roads"
+      "wms_srs"               "EPSG:4326 EPSG:3857"
+      "wms_extent"            "103.5 21.8 104.5 23.0"
+      "wfs_title"             "Địa Hình Line"
+      "wfs_srs"               "EPSG:4326 EPSG:3857"
+      "gml_include_items"     "all"
+      "gml_featureid"         "gid"
+      "wms_include_items"     "all"
+    END
+
+    PROJECTION
+      "init=epsg:4326"
+    END
+
+    # Giao thông - Đường quốc lộ
+    CLASS
+      NAME "Đường quốc lộ"
+      EXPRESSION ("[ten]" ~* "quốc lộ")
+      STYLE
+        COLOR 255 0 0
+        WIDTH 3
+        OPACITY 90
+      END
+    END
+
+    # Giao thông - Đường tỉnh lộ
+    CLASS
+      NAME "Đường tỉnh lộ"
+      EXPRESSION ("[ten]" ~* "tỉnh lộ")
+      STYLE
+        COLOR 255 140 0
+        WIDTH 2.5
+        OPACITY 85
+      END
+    END
+
+    # Giao thông - Đường sắt
+    CLASS
+      NAME "Đường sắt"
+      EXPRESSION ("[ten]" ~* "sắt")
+      STYLE
+        COLOR 0 0 0
+        WIDTH 2
+        PATTERN 8 4 END
+        OPACITY 90
+      END
+    END
+
+    # Thủy văn - Sông suối lớn (2 nét)
+    CLASS
+      NAME "Sông suối lớn"
+      EXPRESSION ("[ten]" ~* "2 nét" OR "[ten]" ~* "Sông")
+      STYLE
+        COLOR 0 112 192
+        WIDTH 3
+        OPACITY 85
+      END
+    END
+
+    # Thủy văn - Suối nhỏ (1 nét)
+    CLASS
+      NAME "Suối"
+      EXPRESSION ("[ten]" ~* "suèi|suối|khe")
+      STYLE
+        COLOR 64 164 223
+        WIDTH 1.5
+        OPACITY 80
+      END
+    END
+
+    # Đường đồng mức (nếu có)
+    CLASS
+      NAME "Đường đồng mức"
+      EXPRESSION ("[ten]" ~* "đồng mức")
+      STYLE
+        COLOR 139 69 19
+        WIDTH 0.5
+        OPACITY 70
+      END
+    END
+
+    # Default - các đối tượng khác
+    CLASS
+      NAME "Khác"
+      STYLE
+        COLOR 128 128 128
+        WIDTH 1
+        OPACITY 60
+      END
+    END
+
+    TOLERANCE 10
+    TOLERANCEUNITS pixels
+  END
+
+  #=============================================================================
+  # LAYER 4: Chủ Quản Lý (Management Authority)
+  #=============================================================================
+  LAYER
+    NAME "chuquanly"
+    TYPE POLYGON
+    STATUS ON
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    DATA "geom_simplified FROM laocai_chuquanly USING UNIQUE gid USING SRID=4326"
+
+    PROCESSING "CLOSE_CONNECTION=DEFER"
+
+    METADATA
+      "wms_title"             "Chủ Quản Lý Rừng"
+      "wms_abstract"          "Forest management authority in Lao Cai"
+      "wms_srs"               "EPSG:4326 EPSG:3857"
+      "wms_extent"            "103.5 21.8 104.5 23.0"
+      "wfs_title"             "Chủ Quản Lý Rừng"
+      "wfs_srs"               "EPSG:4326 EPSG:3857"
+      "gml_include_items"     "all"
+      "gml_featureid"         "gid"
+      "wms_include_items"     "all"
+    END
+
+    PROJECTION
+      "init=epsg:4326"
+    END
+
+    CLASS
+      NAME "Đơn vị quản lý"
+      STYLE
+        COLOR 173 216 230
+        OPACITY 60
+      END
+      STYLE
+        OUTLINECOLOR 30 144 255
+        WIDTH 2
+        OPACITY 85
+      END
+    END
+
+    TOLERANCE 10
+    TOLERANCEUNITS pixels
+  END
+
+  #=============================================================================
+  # LAYER 5: Huyện (District Boundaries)
+  #=============================================================================
+  LAYER
+    NAME "huyen"
+    TYPE POLYGON
+    STATUS ON
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    DATA "geom FROM laocai_huyen USING UNIQUE gid USING SRID=4326"
+
+    PROCESSING "CLOSE_CONNECTION=DEFER"
+
+    METADATA
+      "wms_title"             "Ranh Giới Huyện"
+      "wms_abstract"          "District boundaries of Lao Cai"
+      "wms_srs"               "EPSG:4326 EPSG:3857"
+      "wms_extent"            "103.5 21.8 104.5 23.0"
+      "wfs_title"             "Ranh Giới Huyện"
+      "wfs_srs"               "EPSG:4326 EPSG:3857"
+      "gml_include_items"     "all"
+      "gml_featureid"         "gid"
+      "wms_include_items"     "all"
+    END
+
+    PROJECTION
+      "init=epsg:4326"
+    END
+
+    CLASS
+      NAME "Huyện"
+      STYLE
+        OUTLINECOLOR 128 0 128
+        WIDTH 3
+        OPACITY 95
+      END
+      STYLE
+        COLOR 230 230 250
+        OPACITY 30
+      END
+    END
+
+    TOLERANCE 10
+    TOLERANCEUNITS pixels
+  END
+
+  #=============================================================================
+  # LAYER 6: Hiện Trạng Rừng (Forest Status/Coverage)
+  # Phân loại theo ldlr - TOP loại phổ biến nhất
+  # RTG=Rừng trồng giàu, TXN=Trồng xen nghèo, DT1=Đất trống 1, DTR=Đất trống rừng
+  #=============================================================================
+  LAYER
+    NAME "hientrangrung"
+    TYPE POLYGON
+    STATUS ON
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    DATA "geom FROM laocai_rg3lr USING UNIQUE gid USING SRID=4326"
+
+    PROCESSING "CLOSE_CONNECTION=DEFER"
+
+    METADATA
+      "wms_title"             "Hiện Trạng Rừng"
+      "wms_abstract"          "Current forest status in Lao Cai (by ldlr)"
+      "wms_srs"               "EPSG:4326 EPSG:3857"
+      "wms_extent"            "103.5 21.8 104.5 23.0"
+      "wfs_title"             "Hiện Trạng Rừng"
+      "wfs_srs"               "EPSG:4326 EPSG:3857"
+      "gml_include_items"     "all"
+      "gml_featureid"         "gid"
+      "wms_include_items"     "all"
+    END
+
+    PROJECTION
+      "init=epsg:4326"
+    END
+
+    CLASSITEM "ldlr"
+
+    # Rừng trồng giàu (RTG) - 94,028 records
+    CLASS
+      NAME "Rừng trồng giàu (RTG)"
+      EXPRESSION "RTG"
+      STYLE
+        COLOR 34 139 34
+        OPACITY 75
+      END
+      STYLE
+        OUTLINECOLOR 0 100 0
+        WIDTH 0.5
+        OPACITY 85
+      END
+    END
+
+    # Trồng xen nghèo (TXN) - 30,882 records
+    CLASS
+      NAME "Trồng xen nghèo (TXN)"
+      EXPRESSION "TXN"
+      STYLE
+        COLOR 107 142 35
+        OPACITY 75
+      END
+      STYLE
+        OUTLINECOLOR 85 107 47
+        WIDTH 0.5
+        OPACITY 85
+      END
+    END
+
+    # Rừng trồng khác (RTK) - 14,339 records
+    CLASS
+      NAME "Rừng trồng khác (RTK)"
+      EXPRESSION "RTK"
+      STYLE
+        COLOR 124 252 0
+        OPACITY 70
+      END
+      STYLE
+        OUTLINECOLOR 85 180 0
+        WIDTH 0.5
+        OPACITY 80
+      END
+    END
+
+    # Đất trống loại 1 (DT1) - 26,810 records
+    CLASS
+      NAME "Đất trống loại 1 (DT1)"
+      EXPRESSION "DT1"
+      STYLE
+        COLOR 244 164 96
+        OPACITY 65
+      END
+      STYLE
+        OUTLINECOLOR 210 105 30
+        WIDTH 0.3
+        OPACITY 75
+      END
+    END
+
+    # Đất trống rừng (DTR) - 20,513 records
+    CLASS
+      NAME "Đất trống rừng (DTR)"
+      EXPRESSION "DTR"
+      STYLE
+        COLOR 255 222 173
+        OPACITY 65
+      END
+      STYLE
+        OUTLINECOLOR 222 184 135
+        WIDTH 0.3
+        OPACITY 75
+      END
+    END
+
+    # Đất trống loại 2 (DT2) - 7,751 records
+    CLASS
+      NAME "Đất trống loại 2 (DT2)"
+      EXPRESSION "DT2"
+      STYLE
+        COLOR 250 235 215
+        OPACITY 60
+      END
+      STYLE
+        OUTLINECOLOR 210 180 140
+        WIDTH 0.3
+        OPACITY 70
+      END
+    END
+
+    # Đất nông nghiệp (DNN) - 8,694 records
+    CLASS
+      NAME "Đất nông nghiệp (DNN)"
+      EXPRESSION "DNN"
+      STYLE
+        COLOR 255 250 205
+        OPACITY 60
+      END
+      STYLE
+        OUTLINECOLOR 189 183 107
+        WIDTH 0.3
+        OPACITY 70
+      END
+    END
+
+    # Trồng xen khác (TXK) - 7,596 records
+    CLASS
+      NAME "Trồng xen khác (TXK)"
+      EXPRESSION "TXK"
+      STYLE
+        COLOR 143 188 143
+        OPACITY 70
+      END
+      STYLE
+        OUTLINECOLOR 85 107 47
+        WIDTH 0.5
+        OPACITY 80
+      END
+    END
+
+    # Các loại còn lại
+    CLASS
+      NAME "Loại khác"
+      STYLE
+        COLOR 211 211 211
+        OPACITY 50
+      END
+      STYLE
+        OUTLINECOLOR 169 169 169
+        WIDTH 0.3
+        OPACITY 65
+      END
+    END
+
+    TOLERANCE 10
+    TOLERANCEUNITS pixels
+  END
+
+END

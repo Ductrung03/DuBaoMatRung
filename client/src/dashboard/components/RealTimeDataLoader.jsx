@@ -28,7 +28,7 @@ const RealTimeDataLoader = ({
     
     const pollProgress = async () => {
       try {
-        const response = await axios.get(`${config.API_URL}/api/layer-data/progress/${layerKey}`);
+        const response = await axios.get(`/api/layer-data/progress/${layerKey}`);
         const progressData = response.data;
         
         setProgress(progressData);

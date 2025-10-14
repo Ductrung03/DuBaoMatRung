@@ -29,14 +29,20 @@ const Header = () => {
 
   const isActive = (path) => currentPath === path;
 
-  // ✅ FIXED: Get permission level display
-  const getPermissionLevelDisplay = (level) => {
+  // ✅ FIXED: Get permission level display - ƯU TIÊN ROLE TRƯỚC
+  const getPermissionLevelDisplay = () => {
+    // Ưu tiên kiểm tra role === 'admin' trước
+    if (user?.role === 'admin') {
+      return 'Quản trị viên hệ thống';
+    }
+
+    // Nếu không phải admin, check permission_level
     const levels = {
-      'admin': 'Quản trị viên hệ thống',
-      'province': 'Người dùng cấp tỉnh', 
+      'national': 'Người dùng cấp quốc gia',
+      'province': 'Người dùng cấp tỉnh',
       'district': 'Người dùng cấp huyện'
     };
-    return levels[level] || 'Người dùng';
+    return levels[user?.permission_level] || 'Người dùng';
   };
 
   return (
@@ -135,7 +141,7 @@ const Header = () => {
             <div className="ml-2 text-sm">
               <div className="font-semibold">{user.full_name}</div>
               <div className="text-xs opacity-80">
-                {getPermissionLevelDisplay(user.permission_level || user.role)}
+                {getPermissionLevelDisplay()}
               </div>
             </div>
           )}

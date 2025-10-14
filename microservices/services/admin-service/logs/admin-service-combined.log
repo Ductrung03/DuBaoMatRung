@@ -1,0 +1,1052 @@
+{"code":"ECONNREFUSED","level":"error","message":"","service":"admin-service","timestamp":"2025-10-07 13:51:14"}
+{"date":"Tue Oct 07 2025 13:51:14 GMT+0700 (Indochina Time)","error":{"code":"ECONNREFUSED"},"level":"error","message":"unhandledRejection: (no error message)\nAggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/index.js:44:3)","os":{"loadavg":[1.44,1.85,1.99],"uptime":24355.24},"process":{"argv":["/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/index.js"],"cwd":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service","execPath":"/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","gid":1000,"memoryUsage":{"arrayBuffers":106870,"external":3444883,"heapTotal":30277632,"heapUsed":19117752,"rss":75677696},"pid":185373,"uid":1000,"version":"v20.19.5"},"rejection":true,"service":"admin-service","stack":"AggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/index.js:44:3)","timestamp":"2025-10-07 13:51:14","trace":[{"column":11,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js","function":null,"line":45,"method":null,"native":false},{"column":5,"file":"node:internal/process/task_queues","function":"process.processTicksAndRejections","line":95,"method":"processTicksAndRejections","native":false},{"column":22,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.testConnection","line":61,"method":"testConnection","native":false},{"column":5,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.initialize","line":53,"method":"initialize","native":false},{"column":3,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/index.js","function":"async startServer","line":44,"method":null,"native":false}]}
+{"date":"Tue Oct 07 2025 13:51:14 GMT+0700 (Indochina Time)","error":{"code":"ECONNREFUSED"},"level":"error","message":"unhandledRejection: (no error message)\nAggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/index.js:44:3)","os":{"loadavg":[1.44,1.85,1.99],"uptime":24355.24},"process":{"argv":["/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/index.js"],"cwd":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service","execPath":"/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","gid":1000,"memoryUsage":{"arrayBuffers":131446,"external":3469459,"heapTotal":30277632,"heapUsed":19303688,"rss":75939840},"pid":185373,"uid":1000,"version":"v20.19.5"},"rejection":true,"service":"admin-service","stack":"AggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/index.js:44:3)","timestamp":"2025-10-07 13:51:14","trace":[{"column":11,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js","function":null,"line":45,"method":null,"native":false},{"column":5,"file":"node:internal/process/task_queues","function":"process.processTicksAndRejections","line":95,"method":"processTicksAndRejections","native":false},{"column":22,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.testConnection","line":61,"method":"testConnection","native":false},{"column":5,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.initialize","line":53,"method":"initialize","native":false},{"column":3,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/index.js","function":"async startServer","line":44,"method":null,"native":false}]}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T06:59:12.326Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 13:59:12"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 13:59:12"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 13:59:12"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 13:59:12"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 13:59:12"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T07:03:13.045Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 14:03:13"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 14:03:13"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 14:03:13"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 14:03:13"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 14:03:13"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T07:06:23.467Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 14:06:23"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 14:06:23"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 14:06:23"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 14:06:23"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 14:06:23"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T07:12:02.747Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 14:12:02"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 14:12:02"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 14:12:02"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 14:12:02"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 14:12:02"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T07:18:47.669Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 14:18:47"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 14:18:47"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 14:18:47"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 14:18:47"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 14:18:47"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T07:21:38.872Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 14:21:38"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 14:21:38"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T07:23:28.200Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 14:23:28"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 14:23:28"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 14:23:28"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 14:23:28"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 14:23:28"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T07:53:18.609Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 14:53:18"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 14:53:18"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 14:53:18"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 14:53:18"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 14:53:18"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T08:02:54.795Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 15:02:54"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 15:02:54"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 15:02:54"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 15:02:54"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 15:02:54"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T08:20:07.144Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 15:20:07"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 15:20:07"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 15:20:07"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 15:20:07"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 15:20:07"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T08:20:52.335Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 15:20:52"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 15:20:52"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 15:20:52"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 15:20:52"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 15:20:52"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T13:15:33.847Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 20:15:33"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 20:15:33"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 20:15:33"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 20:15:33"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 20:15:33"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T13:23:15.028Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 20:23:15"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 20:23:15"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 20:23:15"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 20:23:15"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 20:23:15"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T13:25:28.840Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 20:25:28"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 20:25:28"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 20:25:28"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 20:25:28"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 20:25:28"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T13:25:50.749Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 20:25:50"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 20:25:50"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 20:25:50"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 20:25:50"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T13:44:58.522Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 20:44:58"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 20:44:58"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 20:44:58"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 20:44:58"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 20:44:58"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T13:51:41.516Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 20:51:41"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 20:51:41"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 20:51:41"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-07 20:51:41"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 20:51:41"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T16:25:42.219Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 23:25:42"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 23:25:42"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 23:25:42"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-07 23:25:42"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T16:26:15.410Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 23:26:15"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 23:26:15"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 23:26:15"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T16:30:42.622Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 23:30:42"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 23:30:42"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 23:30:42"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-07T16:31:51.696Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-07 23:31:51"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-07 23:31:51"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-07 23:31:51"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"admin-service","timestamp":"2025-10-08 07:15:39"}
+{"error":"","level":"error","message":"Failed to start admin service","service":"admin-service","timestamp":"2025-10-08 07:15:39"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T00:17:27.833Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 07:17:27"}
+{"level":"error","message":"connect ECONNREFUSED 127.0.0.1:6379","service":"admin-service","timestamp":"2025-10-08 07:17:27"}
+{"error":"connect ECONNREFUSED 127.0.0.1:6379","level":"error","message":"Failed to start admin service","service":"admin-service","timestamp":"2025-10-08 07:17:27"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T00:17:55.468Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 07:17:55"}
+{"level":"error","message":"connect ECONNREFUSED 127.0.0.1:6379","service":"admin-service","timestamp":"2025-10-08 07:17:55"}
+{"error":"connect ECONNREFUSED 127.0.0.1:6379","level":"error","message":"Failed to start admin service","service":"admin-service","timestamp":"2025-10-08 07:17:55"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T00:20:30.888Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 07:20:30"}
+{"level":"error","message":"connect ECONNREFUSED 127.0.0.1:6379","service":"admin-service","timestamp":"2025-10-08 07:20:30"}
+{"error":"connect ECONNREFUSED 127.0.0.1:6379","level":"error","message":"Failed to start admin service","service":"admin-service","timestamp":"2025-10-08 07:20:30"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T00:21:29.590Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 07:21:29"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 07:21:29"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 07:21:29"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 07:21:29"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 07:21:29"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T00:25:36.256Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 07:25:36"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 07:25:36"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 07:25:36"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 07:25:36"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 07:25:36"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T00:39:46.914Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 07:39:46"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 07:39:46"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 07:39:46"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 07:39:46"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 07:39:46"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T00:45:11.254Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 07:45:11"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 07:45:11"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T00:45:33.388Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 07:45:33"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 07:45:33"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 07:45:33"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:03:01.291Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:03:01"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:03:01"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:03:01"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:09:06.616Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:09:06"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:09:06"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 08:09:06"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:09:06"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:09:06"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:15:50.882Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:15:50"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:15:50"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:16:13.764Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:16:13"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:16:13"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:22:18.618Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:22:18"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:22:18"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:22:18"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 08:22:18"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:22:18"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:24:44.778Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:24:44"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:24:44"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:24:44"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-08 08:24:44"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:25:19.216Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:25:19"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:25:19"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-08 08:25:19"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:27:49.170Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:27:49"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:27:49"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 08:27:49"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:27:49"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:27:49"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:34:07.810Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:34:07"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:34:07"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:34:07"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 08:34:07"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:34:07"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:38:43.860Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:38:43"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:38:43"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n    at listenInCluster (node:net:1997:12)\n    at node:net:2206:7\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)","syscall":"listen","timestamp":"2025-10-08 08:38:43"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:39:21.204Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:39:21"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:39:21"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:39:21"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 08:39:21"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:39:21"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:39:36.955Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:39:36"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:39:36"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n    at listenInCluster (node:net:1997:12)\n    at node:net:2206:7\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)","syscall":"listen","timestamp":"2025-10-08 08:39:36"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:40:13.078Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:40:13"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:40:13"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 08:40:13"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:40:13"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:40:13"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:40:35.799Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:40:35"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:40:35"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-08 08:40:35"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:40:53.190Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:40:53"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:40:53"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:40:53"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 08:40:53"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:40:53"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:42:29.131Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:42:29"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:42:29"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 08:42:29"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:42:29"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:42:29"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:43:24.460Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:43:24"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:43:24"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:43:24"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-08 08:43:24"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:43:38.191Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:43:38"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:43:38"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 08:43:38"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:43:38"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:43:38"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:48:32.641Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:48:32"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:48:32"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 08:48:32"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:48:32"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:48:32"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T01:54:12.470Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:54:12"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 08:54:12"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 08:54:12"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 08:54:12"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 08:54:12"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T02:02:35.033Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:02:35"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 09:02:35"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 09:02:35"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 09:02:35"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:02:35"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T02:02:47.621Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:02:47"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 09:02:47"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 09:02:47"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 09:02:47"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:02:47"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T02:16:21.606Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:16:21"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 09:16:21"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 09:16:21"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 09:16:21"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:16:21"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T02:19:30.803Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:19:30"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 09:19:30"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 09:19:30"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 09:19:30"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:19:30"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T02:20:34.537Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:20:34"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 09:20:34"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 09:20:34"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 09:20:34"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:20:34"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T02:20:45.042Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:20:45"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 09:20:45"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 09:20:45"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 09:20:45"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:20:45"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T02:21:32.718Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:21:32"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 09:21:32"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 09:21:32"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 09:21:32"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 09:21:32"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T03:07:39.864Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 10:07:39"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 10:07:39"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 10:07:39"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 10:07:39"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 10:07:39"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T03:09:12.468Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 10:09:12"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 10:09:12"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 10:09:12"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 10:09:12"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 10:09:12"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T03:10:08.515Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 10:10:08"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 10:10:08"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 10:10:08"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 10:10:08"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 10:10:08"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T03:12:34.563Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 10:12:34"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 10:12:34"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 10:12:34"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 10:12:34"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 10:12:34"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T03:16:48.247Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 10:16:48"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 10:16:48"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 10:16:48"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 10:16:48"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 10:16:48"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T07:08:48.693Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 14:08:48"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 14:08:48"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 14:08:48"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 14:08:48"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 14:08:48"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-08T09:46:24.210Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-08 16:46:24"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-08 16:46:24"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-08 16:46:24"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-08 16:46:24"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-08 16:46:24"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"admin-service","timestamp":"2025-10-09 08:15:24"}
+{"error":"","level":"error","message":"Failed to start admin service","service":"admin-service","timestamp":"2025-10-09 08:15:24"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T01:15:55.867Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 08:15:55"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 08:15:55"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 08:15:55"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-09 08:15:55"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-09 08:15:55"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T01:16:24.143Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 08:16:24"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 08:16:24"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 08:16:24"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-09 08:16:24"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-09 08:16:24"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T07:10:04.840Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:10:04"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 14:10:04"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-09 14:10:04"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 14:10:04"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:10:04"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T07:28:35.273Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:28:35"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 14:28:35"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-09 14:28:35"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 14:28:35"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:28:35"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T07:37:19.873Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:37:19"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 14:37:19"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-09 14:37:19"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T07:37:59.199Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:37:59"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 14:37:59"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-09 14:37:59"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T07:39:41.776Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:39:41"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 14:39:41"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-09 14:39:41"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 14:39:41"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:39:41"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T07:39:42.132Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:39:42"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 14:39:42"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 14:39:42"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-09 14:39:42"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T07:40:28.160Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:40:28"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 14:40:28"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-09 14:40:28"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 14:40:28"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:40:28"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T07:42:37.675Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:42:37"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 14:42:37"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 14:42:37"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-09 14:42:37"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:42:37"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T07:43:35.723Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:43:35"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 14:43:35"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-09 14:43:35"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 14:43:35"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:43:35"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T07:51:03.589Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:51:03"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 14:51:03"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 14:51:03"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-09 14:51:03"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:51:03"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T07:53:23.422Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:53:23"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 14:53:23"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 14:53:23"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-09 14:53:23"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-09 14:53:23"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T08:35:02.961Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 15:35:02"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 15:35:02"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 15:35:02"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-09 15:35:02"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-09 15:35:02"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T08:36:53.882Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 15:36:53"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 15:36:53"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 15:36:53"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-09 15:36:53"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-09 15:36:53"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-09T08:41:19.004Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-09 15:41:19"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-09 15:41:19"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-09 15:41:19"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-09 15:41:19"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-09 15:41:19"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-10T07:43:52.739Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-10 14:43:52"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-10 14:43:52"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-10 14:43:52"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-10 14:43:52"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-10 14:43:52"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-10T10:28:28.918Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-10 17:28:28"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-10 17:28:28"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-10 17:28:28"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-10 17:28:28"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-10 17:28:28"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-11T15:37:42.107Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-11 22:37:42"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-11 22:37:42"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-11 22:37:42"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-11 22:37:42"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-11 22:37:42"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-11T16:02:42.248Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-11 23:02:42"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-11 23:02:42"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-11 23:02:42"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-11 23:02:42"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-11 23:02:42"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-11T16:06:15.006Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-11 23:06:15"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-11 23:06:15"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-11 23:06:15"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-11 23:06:15"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-11 23:06:15"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-11T16:19:06.948Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-11 23:19:06"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-11 23:19:06"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-11 23:19:06"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-11 23:19:06"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-11 23:19:06"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-11T16:20:49.407Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-11 23:20:49"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-11 23:20:49"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T05:21:29.196Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:21:29"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 12:21:29"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 12:21:29"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 12:21:29"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:21:29"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T05:24:25.264Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:24:25"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 12:24:25"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 12:24:25"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 12:24:25"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:24:25"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T05:33:50.601Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:33:50"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 12:33:50"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 12:33:50"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 12:33:50"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:33:50"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T05:34:13.002Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:34:13"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 12:34:13"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 12:34:13"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 12:34:13"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:34:13"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T05:35:40.937Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:35:40"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 12:35:40"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 12:35:40"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 12:35:40"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:35:40"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T05:47:40.681Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:47:40"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 12:47:40"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 12:47:40"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 12:47:40"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:47:40"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T05:47:51.153Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:47:51"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 12:47:51"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 12:47:51"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 12:47:51"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:47:51"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T05:57:38.108Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:57:38"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 12:57:38"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 12:57:38"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 12:57:38"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 12:57:38"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T06:00:54.366Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 13:00:54"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 13:00:54"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 13:00:54"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 13:00:54"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 13:00:54"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T06:04:42.759Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 13:04:42"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 13:04:42"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 13:04:42"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 13:04:42"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 13:04:42"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T06:16:50.204Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 13:16:50"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 13:16:50"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 13:16:50"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 13:16:50"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 13:16:50"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T10:39:41.884Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 17:39:41"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 17:39:41"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 17:39:41"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 17:39:41"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 17:39:41"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T10:41:55.726Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 17:41:55"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 17:41:55"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 17:41:55"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-12 17:41:55"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T10:42:09.932Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 17:42:09"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 17:42:09"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 17:42:09"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-12 17:42:09"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T10:44:40.467Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 17:44:40"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 17:44:40"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 17:44:40"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 17:44:40"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 17:44:40"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T14:39:37.854Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 21:39:37"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 21:39:37"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 21:39:37"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 21:39:37"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 21:39:37"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T14:40:55.784Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 21:40:55"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 21:40:55"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-12 21:40:55"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T14:41:15.442Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 21:41:15"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 21:41:15"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 21:41:15"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 21:41:15"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 21:41:15"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T14:45:51.019Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 21:45:51"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 21:45:51"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 21:45:51"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 21:45:51"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 21:45:51"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T14:46:48.602Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 21:46:48"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 21:46:48"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 21:46:48"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 21:46:48"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 21:46:48"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T14:57:05.812Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 21:57:05"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 21:57:05"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 21:57:05"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 21:57:05"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 21:57:05"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T14:58:33.588Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 21:58:33"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 21:58:33"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 21:58:33"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 21:58:33"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 21:58:33"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T15:07:56.851Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 22:07:56"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 22:07:56"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 22:07:56"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 22:07:56"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 22:07:56"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T15:11:27.919Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 22:11:27"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 22:11:27"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 22:11:27"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 22:11:27"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 22:11:27"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T15:19:16.414Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 22:19:16"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 22:19:16"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-12 22:19:16"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T15:19:49.130Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 22:19:49"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 22:19:49"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 22:19:49"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-12 22:19:49"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T15:20:42.973Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 22:20:42"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 22:20:42"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 22:20:42"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 22:20:42"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 22:20:42"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T15:22:03.706Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 22:22:03"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 22:22:03"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 22:22:03"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 22:22:03"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 22:22:03"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T15:52:08.200Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 22:52:08"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 22:52:08"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 22:52:08"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 22:52:08"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 22:52:08"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T16:02:36.870Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 23:02:36"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 23:02:36"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 23:02:36"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 23:02:36"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 23:02:36"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T16:04:58.996Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 23:04:58"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 23:04:59"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 23:04:59"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 23:04:59"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 23:04:59"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T16:10:50.161Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 23:10:50"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 23:10:50"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 23:10:50"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 23:10:50"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 23:10:50"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-12T16:21:02.533Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-12 23:21:02"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-12 23:21:02"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-12 23:21:02"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-12 23:21:02"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-12 23:21:02"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T00:05:24.446Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 07:05:24"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 07:05:24"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 07:05:24"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 07:05:24"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 07:05:24"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T00:15:58.017Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 07:15:58"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 07:15:58"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 07:15:58"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 07:15:58"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 07:15:58"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T00:22:35.923Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 07:22:35"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 07:22:35"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 07:22:35"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 07:22:35"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 07:22:35"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T00:59:11.253Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 07:59:11"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 07:59:11"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 07:59:11"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 07:59:11"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 07:59:11"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T01:18:52.135Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 08:18:52"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 08:18:52"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 08:18:52"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 08:18:52"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 08:18:52"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T01:23:41.236Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 08:23:41"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 08:23:41"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 08:23:41"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 08:23:41"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 08:23:41"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T01:39:13.822Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 08:39:13"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 08:39:13"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 08:39:13"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 08:39:13"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 08:39:13"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T01:42:00.679Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 08:42:00"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 08:42:00"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-13 08:42:00"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T01:45:48.379Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 08:45:48"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 08:45:48"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 08:45:48"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 08:45:48"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 08:45:48"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T01:50:39.414Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 08:50:39"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 08:50:39"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 08:50:39"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 08:50:39"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 08:50:39"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T02:04:07.868Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 09:04:07"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 09:04:07"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 09:04:07"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 09:04:07"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 09:04:07"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"admin-service","timestamp":"2025-10-13 13:24:46"}
+{"error":"","level":"error","message":"Failed to start admin service","service":"admin-service","timestamp":"2025-10-13 13:24:46"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T06:25:13.253Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 13:25:13"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 13:25:13"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 13:25:13"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 13:25:13"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 13:25:13"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T06:32:53.790Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 13:32:53"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 13:32:53"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 13:32:53"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 13:32:53"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 13:32:53"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T06:35:37.145Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 13:35:37"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 13:35:37"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 13:35:37"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 13:35:37"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 13:35:37"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T06:44:40.652Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 13:44:40"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 13:44:40"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 13:44:40"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 13:44:40"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 13:44:40"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T07:16:39.662Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 14:16:39"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 14:16:39"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 14:16:39"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 14:16:39"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 14:16:39"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T07:19:55.170Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 14:19:55"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 14:19:55"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 14:19:55"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 14:19:55"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 14:19:55"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T07:21:33.817Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 14:21:33"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 14:21:33"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 14:21:33"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-13 14:21:33"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T07:21:46.513Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 14:21:46"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 14:21:46"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 14:21:46"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 14:21:46"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 14:21:46"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T07:26:18.907Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 14:26:18"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 14:26:18"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 14:26:18"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 14:26:18"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 14:26:18"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T09:40:22.235Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 16:40:22"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 16:40:22"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 16:40:22"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 16:40:22"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 16:40:22"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T09:52:08.971Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 16:52:08"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 16:52:08"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 16:52:08"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 16:52:08"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 16:52:08"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T10:02:43.022Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 17:02:43"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 17:02:43"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 17:02:43"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 17:02:43"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 17:02:43"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T10:22:27.785Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 17:22:27"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 17:22:27"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 17:22:27"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 17:22:27"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 17:22:27"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T10:22:44.107Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 17:22:44"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 17:22:44"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 17:22:44"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 17:22:44"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 17:22:44"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T10:25:46.659Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 17:25:46"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 17:25:46"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 17:25:46"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 17:25:46"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 17:25:46"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T10:29:13.020Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 17:29:13"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 17:29:13"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-13 17:29:13"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T10:29:52.223Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 17:29:52"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 17:29:52"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 17:29:52"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-13 17:29:52"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T10:30:09.978Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 17:30:09"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 17:30:09"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 17:30:09"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 17:30:09"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 17:30:09"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:03:38.913Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:03:38"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:03:38"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:03:38"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 18:03:38"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:03:38"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:08:18.526Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:08:18"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:08:18"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:08:18"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-13 18:08:18"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:08:36.655Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:08:36"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:08:36"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:08:36"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 18:08:36"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:08:36"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:11:03.787Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:11:03"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:11:03"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:11:03"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 18:11:03"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:11:03"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:13:13.737Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:13:13"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:13:13"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:13:13"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 18:13:13"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:13:13"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:15:01.951Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:15:01"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:15:01"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:15:01"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 18:15:01"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:15:01"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:17:06.450Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:17:06"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:17:06"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:17:06"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 18:17:06"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:17:06"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:19:10.732Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:19:10"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:19:10"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:19:10"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-13 18:19:10"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:19:28.533Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:19:28"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:19:28"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:19:28"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 18:19:28"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:19:28"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:23:20.806Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:23:20"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:23:20"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:23:20"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 18:23:20"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:23:20"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:38:43.544Z"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:38:43.570Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:38:43"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:38:43"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:38:43"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 18:38:43"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:38:43"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:38:48.643Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:38:48"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:38:48"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:38:48"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 18:38:48"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:38:48"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:38:57.807Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:38:57"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:38:57"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:38:57"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 18:38:57"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:38:57"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:39:04.526Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:39:04"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:39:04"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:39:04"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 18:39:04"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:39:04"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:40:16.408Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:40:16"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:40:16"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:40:16"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-13 18:40:16"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T11:40:30.191Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:40:30"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 18:40:30"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 18:40:30"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 18:40:30"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 18:40:30"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T12:57:30.598Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 19:57:30"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 19:57:30"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 19:57:30"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 19:57:30"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 19:57:30"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T13:00:59.942Z"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T13:00:59.942Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 20:00:59"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 20:00:59"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 20:00:59"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 20:00:59"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 20:00:59"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 20:00:59"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 20:00:59"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 20:00:59"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-13 20:00:59"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T13:01:18.542Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 20:01:18"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 20:01:18"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 20:01:18"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 20:01:18"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 20:01:18"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T13:01:18.562Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 20:01:18"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 20:01:18"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 20:01:18"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-13 20:01:18"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T13:04:37.303Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 20:04:37"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 20:04:37"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 20:04:37"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 20:04:37"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 20:04:37"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T16:32:30.606Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 23:32:30"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 23:32:30"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 23:32:30"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 23:32:30"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 23:32:30"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T16:41:33.039Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-13 23:41:33"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-13 23:41:33"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-13 23:41:33"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-13 23:41:33"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-13 23:41:33"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T17:17:22.966Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-14 00:17:22"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-14 00:17:22"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-14 00:17:22"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-14 00:17:22"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-14 00:17:22"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-13T17:18:05.008Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-14 00:18:05"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-14 00:18:05"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-14 00:18:05"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-14 00:18:05"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-14 00:18:05"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-14T02:00:53.871Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-14 09:00:53"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-14 09:00:53"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-14 09:00:53"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-14 09:00:53"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-14 09:00:53"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-14T06:40:14.950Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-14 13:40:14"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-14 13:40:14"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-14 13:40:14"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-14 13:40:14"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-14 13:40:14"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-14T07:04:19.229Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-14 14:04:19"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-14 14:04:19"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-14 14:04:19"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-14 14:04:19"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-14 14:04:19"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-14T07:29:21.956Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-14 14:29:21"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-14 14:29:21"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-14 14:29:21"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-14 14:29:21"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-14T07:29:41.562Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-14 14:29:41"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-14 14:29:41"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-14 14:29:41"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-14 14:29:41"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-14 14:29:41"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-14T07:35:12.600Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-14 14:35:12"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-14 14:35:12"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-14 14:35:12"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-14 14:35:12"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-14 14:35:12"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-14T07:37:29.947Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-14 14:37:29"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-14 14:37:29"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-14 14:37:29"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-14 14:37:29"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-14T08:16:45.706Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-14 15:16:45"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-14 15:16:45"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-14 15:16:45"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-14 15:16:45"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-14 15:16:45"}
+{"code":"42P01","level":"error","message":"relation \"chuc_nang_rung\" does not exist","query":"SELECT id, ten FROM chuc_nang_rung ORDER BY ten","service":"admin-service","timestamp":"2025-10-14 15:17:03"}
+{"level":"error","message":"relation \"chuc_nang_rung\" does not exist","method":"GET","name":"error","path":"/api/dropdown/chucnangrung","service":"admin-service","stack":"error: relation \"chuc_nang_rung\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async exports.getChucNangRung (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/controllers/admin.controller.js:239:20)","statusCode":500,"timestamp":"2025-10-14 15:17:03"}
+{"code":"42P01","level":"error","message":"relation \"trang_thai_xac_minh\" does not exist","query":"SELECT id, ten FROM trang_thai_xac_minh ORDER BY id","service":"admin-service","timestamp":"2025-10-14 15:17:03"}
+{"level":"error","message":"relation \"trang_thai_xac_minh\" does not exist","method":"GET","name":"error","path":"/api/dropdown/trangthaixacminh","service":"admin-service","stack":"error: relation \"trang_thai_xac_minh\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async exports.getTrangThaiXacMinh (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/controllers/admin.controller.js:269:20)","statusCode":500,"timestamp":"2025-10-14 15:17:03"}
+{"code":"42P01","level":"error","message":"relation \"nguyen_nhan\" does not exist","query":"SELECT id, ten FROM nguyen_nhan ORDER BY ten","service":"admin-service","timestamp":"2025-10-14 15:17:03"}
+{"level":"error","message":"relation \"nguyen_nhan\" does not exist","method":"GET","name":"error","path":"/api/dropdown/nguyennhan","service":"admin-service","stack":"error: relation \"nguyen_nhan\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async exports.getNguyenNhan (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/controllers/admin.controller.js:299:20)","statusCode":500,"timestamp":"2025-10-14 15:17:03"}
+{"code":"42P01","level":"error","message":"relation \"trang_thai_xac_minh\" does not exist","query":"SELECT id, ten FROM trang_thai_xac_minh ORDER BY id","service":"admin-service","timestamp":"2025-10-14 15:17:04"}
+{"level":"error","message":"relation \"trang_thai_xac_minh\" does not exist","method":"GET","name":"error","path":"/api/dropdown/trangthaixacminh","service":"admin-service","stack":"error: relation \"trang_thai_xac_minh\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async exports.getTrangThaiXacMinh (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/controllers/admin.controller.js:269:20)","statusCode":500,"timestamp":"2025-10-14 15:17:04"}
+{"code":"42P01","level":"error","message":"relation \"chuc_nang_rung\" does not exist","query":"SELECT id, ten FROM chuc_nang_rung ORDER BY ten","service":"admin-service","timestamp":"2025-10-14 15:17:04"}
+{"code":"42P01","level":"error","message":"relation \"nguyen_nhan\" does not exist","query":"SELECT id, ten FROM nguyen_nhan ORDER BY ten","service":"admin-service","timestamp":"2025-10-14 15:17:04"}
+{"level":"error","message":"relation \"chuc_nang_rung\" does not exist","method":"GET","name":"error","path":"/api/dropdown/chucnangrung","service":"admin-service","stack":"error: relation \"chuc_nang_rung\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async exports.getChucNangRung (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/controllers/admin.controller.js:239:20)","statusCode":500,"timestamp":"2025-10-14 15:17:04"}
+{"level":"error","message":"relation \"nguyen_nhan\" does not exist","method":"GET","name":"error","path":"/api/dropdown/nguyennhan","service":"admin-service","stack":"error: relation \"nguyen_nhan\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async exports.getNguyenNhan (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/admin-service/src/controllers/admin.controller.js:299:20)","statusCode":500,"timestamp":"2025-10-14 15:17:04"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-14T08:41:14.222Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-14 15:41:14"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-14 15:41:14"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-14 15:41:14"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-14 15:41:14"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-14 15:41:14"}

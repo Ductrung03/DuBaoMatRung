@@ -262,7 +262,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
         ) {
           try {
             const response = await axios.post(
-              `${config.API_URL}/api/data/update-with-where`,
+              `/api/data/update-with-where`,
               {
                 table: tableName || "mat_rung",
                 column: actualColumnName,
@@ -311,7 +311,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
       setLoading(true);
 
       const response = await axios.post(
-        `${config.API_URL}/api/data/delete-with-where`,
+        `/api/data/delete-with-where`,
         {
           table: tableName || "mat_rung",
           whereClause: whereCondition.where,

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import Select from "../../Select";
 import { useAuth } from "../../../contexts/AuthContext";
 import config from "../../../../config";
 import DistrictDropdown from "../../DistrictDropdown";
+import { getCommunes } from "../../../../utils/adminService";
+import { toast } from "react-toastify";
+import Dropdown from "../../../../components/Dropdown"; // Import the generic Dropdown
 
 const TraCuuAnhVeTinh = () => {
   const [xaList, setXaList] = useState([]);
@@ -11,26 +13,23 @@ const TraCuuAnhVeTinh = () => {
   const [loading, setLoading] = useState(false);
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   
-  // Trạng thái mở cho từng dropdown
-  const [openDropdown, setOpenDropdown] = useState(null);
-  
   const { user, isAdmin } = useAuth();
 
   useEffect(() => {
-    // Khi huyện thay đổi, tải danh sách xã tương ứng
     const fetchXaList = async () => {
-      if (!selectedHuyen) return;
+      if (!selectedHuyen) {
+        setXaList([]);
+        return;
+      }
       
       try {
         setLoading(true);
-        const res = await fetch(
-          `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(selectedHuyen)}`
-        );
-        const data = await res.json();
-        setXaList(data);
+        const communes = await getCommunes(selectedHuyen);
+        setXaList(communes);
       } catch (err) {
         console.error("Lỗi lấy xã:", err);
-        setLoading(false);
+        toast.error("Lỗi khi tải danh sách xã");
+        setXaList([]);
       } finally {
         setLoading(false);
       }
@@ -39,19 +38,13 @@ const TraCuuAnhVeTinh = () => {
     fetchXaList();
   }, [selectedHuyen]);
 
-  const handleHuyenChange = (e) => {
-    const huyen = e.target.value;
-    setSelectedHuyen(huyen);
-    setSelectedXa(""); // Reset xã khi thay đổi huyện
+  const handleHuyenChange = (value) => {
+    setSelectedHuyen(value);
+    setSelectedXa("");
   };
 
-  const handleXaChange = (e) => {
-    setSelectedXa(e.target.value);
-  };
-
-  // Hàm xử lý khi dropdown focus hoặc blur
-  const handleDropdownToggle = (dropdownName, isOpen) => {
-    setOpenDropdown(isOpen ? dropdownName : null);
+  const handleXaChange = (value) => {
+    setSelectedXa(value);
   };
 
   return (
@@ -87,8 +80,6 @@ const TraCuuAnhVeTinh = () => {
                   value={selectedHuyen}
                   onChange={handleHuyenChange}
                   isLoading={loading}
-                  onFocus={() => handleDropdownToggle("huyen", true)}
-                  onBlur={() => handleDropdownToggle("huyen", false)}
                 />
               </div>
             </div>
@@ -96,24 +87,16 @@ const TraCuuAnhVeTinh = () => {
             {/* Xã */}
             <div className="flex items-center gap-1">
               <label className="text-sm font-medium w-40">Xã</label>
-              <div className="relative w-36">
-                <select
-                  value={selectedXa}
-                  onChange={handleXaChange}
-                  disabled={loading}
-                  className="w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                  onFocus={() => handleDropdownToggle("xa", true)}
-                  onBlur={() => handleDropdownToggle("xa", false)}
-                >
-                  <option value="">Chọn xã</option>
-                  {xaList.map((xa, index) => (
-                    <option key={index} value={xa.value}>
-                      {xa.label}
-                    </option>
-                  ))}
-                </select>
-                <Select isOpen={openDropdown === "xa"} />
-              </div>
+              <Dropdown
+                selectedValue={selectedXa}
+                onValueChange={handleXaChange}
+                options={xaList}
+                placeholder="Chọn xã"
+                disabled={loading}
+                loading={loading}
+                className="w-36"
+                selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              />
             </div>
           </div>
 

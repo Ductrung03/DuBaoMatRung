@@ -1,0 +1,25 @@
+{
+  "name": "dubaomatrung-load-tests",
+  "version": "1.0.0",
+  "description": "Load testing suite for DuBaoMatRung microservices",
+  "scripts": {
+    "test": "artillery run scenarios/basic-load.yml",
+    "test:auth": "artillery run scenarios/auth-load.yml",
+    "test:gis": "artillery run scenarios/gis-load.yml",
+    "test:full": "artillery run scenarios/full-system.yml",
+    "test:spike": "artillery run scenarios/spike-test.yml",
+    "test:stress": "artillery run scenarios/stress-test.yml",
+    "test:production": "artillery run scenarios/production-validation.yml",
+    "report": "artillery report"
+  },
+  "devDependencies": {
+    "artillery": "^2.0.0"
+  },
+  "keywords": [
+    "load-testing",
+    "performance",
+    "artillery"
+  ],
+  "author": "DuBaoMatRung Team",
+  "license": "MIT"
+}

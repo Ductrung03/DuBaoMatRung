@@ -1,0 +1,25 @@
+{
+  "name": "gis-service",
+  "version": "1.0.0",
+  "description": "GIS Data & Spatial Operations Service",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "npx nodemon src/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "axios": "^1.8.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "multer": "^1.4.5-lts.2",
+    "ogr2ogr": "^6.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.10"
+  }
+}

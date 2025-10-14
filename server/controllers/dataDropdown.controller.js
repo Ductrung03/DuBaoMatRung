@@ -1,33 +1,9 @@
 const pool = require("../db");
-const convertTcvn3ToUnicode = require("../utils/convertTcvn3ToUnicode");
+const { convertTcvn3ToUnicode } = require("../utils/encoding");
+const cache = require("../utils/cache");
+const { getCacheKey, getCachedData, setCachedData } = require("../utils/cacheUtils");
 
-// In-memory cache with TTL
-const cache = new Map();
-const CACHE_TTL = 99999999999999999 * 60 * 1000; // 10 phút
-
-function getCacheKey(type, param) {
-  return `${type}_${param || 'all'}`;
-}
-
-function getCachedData(key) {
-  const cached = cache.get(key);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    console.log(`📋 Cache HIT for ${key}`);
-    return cached.data;
-  }
-  console.log(`📋 Cache MISS for ${key}`);
-  return null;
-}
-
-function setCachedData(key, data) {
-  cache.set(key, {
-    data: data,
-    timestamp: Date.now()
-  });
-  console.log(`📋 Cache SET for ${key}`);
-}
-
-// ✅ CẬP NHẬT: Lấy huyện từ bảng laocai_ranhgioihc
+// ✅ CẬP NHẬT: Lấy danh sách huyện từ bảng laocai_ranhgioihc
 exports.getHuyen = async (req, res) => {
   try {
     const cacheKey = getCacheKey('huyen');
@@ -40,7 +16,7 @@ exports.getHuyen = async (req, res) => {
     console.log("🚀 Fetching huyen from laocai_ranhgioihc...");
     
     const huyenQuery = `
-      SELECT DISTINCT huyen
+      SELECT DISTINCT huyen 
       FROM laocai_ranhgioihc 
       WHERE huyen IS NOT NULL AND trim(huyen) != ''
       ORDER BY huyen
@@ -66,6 +42,7 @@ exports.getHuyen = async (req, res) => {
 // ✅ CẬP NHẬT: Lấy xã từ bảng laocai_ranhgioihc theo huyện
 exports.getXaByHuyen = async (req, res) => {
   const { huyen } = req.query;
+  
   console.log("🎯 Huyện FE truyền lên:", huyen);
   
   if (!huyen) {
@@ -110,12 +87,14 @@ exports.getXaByHuyen = async (req, res) => {
 exports.getTieuKhuByXa = async (req, res) => {
   const { xa } = req.query;
   
+  console.log("🎯 Xã FE truyền lên:", xa);
+  
   if (!xa) {
     return res.status(400).json({ error: "Thiếu tham số xã" });
   }
 
   try {
-    const cacheKey = getCacheKey('tk', xa);
+    const cacheKey = getCacheKey('tieukhu', xa);
     const cached = getCachedData(cacheKey);
     
     if (cached) {
@@ -182,7 +161,112 @@ exports.getAllKhoanh = async (req, res) => {
   }
 };
 
-// ✅ GIỮ NGUYÊN: Chủ rừng vẫn từ bảng tlaocai_tkk_3lr_cru (vì laocai_ranhgioihc không có trường này)
+// ✅ CẬP NHẬT: Lấy chức năng rừng từ bảng chuc_nang_rung
+exports.getChucNangRung = async (req, res) => {
+  try {
+    const cacheKey = getCacheKey('chucnangrung');
+    const cached = getCachedData(cacheKey);
+    
+    if (cached) {
+      return res.json(cached);
+    }
+
+    console.log("🚀 Fetching chucnangrung from chuc_nang_rung...");
+    
+    const query = `
+      SELECT id as value, ten as label
+      FROM chuc_nang_rung
+      ORDER BY label
+    `;
+    
+    const result = await pool.query(query);
+    
+    const data = result.rows.map(row => ({
+      value: row.value.toString(),
+      label: row.label
+    }));
+
+    setCachedData(cacheKey, data);
+    console.log(`✅ Loaded ${data.length} chucnangrung options`);
+    
+    res.json(data);
+  } catch (error) {
+    console.error("❌ Lỗi lấy danh sách chức năng rừng:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// ✅ CẬP NHẬT: Lấy trạng thái xác minh từ bảng trang_thai_xac_minh
+exports.getTrangThaiXacMinh = async (req, res) => {
+  try {
+    const cacheKey = getCacheKey('trangthaixacminh');
+    const cached = getCachedData(cacheKey);
+    
+    if (cached) {
+      return res.json(cached);
+    }
+
+    console.log("🚀 Fetching trangthaixacminh from trang_thai_xac_minh...");
+    
+    const query = `
+      SELECT id as value, ten as label
+      FROM trang_thai_xac_minh
+      ORDER BY label
+    `;
+    
+    const result = await pool.query(query);
+    
+    const data = result.rows.map(row => ({
+      value: row.value.toString(),
+      label: row.label
+    }));
+
+    setCachedData(cacheKey, data);
+    console.log(`✅ Loaded ${data.length} trangthaixacminh options`);
+    
+    res.json(data);
+  } catch (error) {
+    console.error("❌ Lỗi lấy danh sách trạng thái xác minh:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// ✅ CẬP NHẬT: Lấy nguyên nhân từ bảng nguyen_nhan
+exports.getNguyenNhan = async (req, res) => {
+  try {
+    const cacheKey = getCacheKey('nguyennhan');
+    const cached = getCachedData(cacheKey);
+    
+    if (cached) {
+      return res.json(cached);
+    }
+
+    console.log("🚀 Fetching nguyennhan from nguyen_nhan...");
+    
+    const query = `
+      SELECT id as value, ten as label
+      FROM nguyen_nhan
+      ORDER BY label
+    `;
+    
+    const result = await pool.query(query);
+    
+    const data = result.rows.map(row => ({
+      value: row.value.toString(),
+      label: row.label
+    }));
+
+    setCachedData(cacheKey, data);
+    console.log(`✅ Loaded ${data.length} nguyennhan options`);
+    
+    res.json(data);
+  } catch (error) {
+    console.error("❌ Lỗi lấy danh sách nguyên nhân:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// ✅ CẬP NHẬT: Lấy tất cả chủ rừng từ bảng tlaocai_tkk_3lr_cru
 exports.getAllChuRung = async (req, res) => {
   try {
     const cacheKey = getCacheKey('churung');
@@ -204,7 +288,8 @@ exports.getAllChuRung = async (req, res) => {
     const result = await pool.query(churungQuery);
     
     const data = result.rows.map((row) => ({
-      churung: convertTcvn3ToUnicode(row.churung),
+      value: row.churung,
+      label: convertTcvn3ToUnicode(row.churung),
     }));
 
     setCachedData(cacheKey, data);
@@ -228,17 +313,11 @@ exports.clearCache = async (req, res) => {
 exports.getCacheStatus = async (req, res) => {
   try {
     const cacheInfo = {
-      inMemoryCache: {
-        size: cache.size,
-        keys: Array.from(cache.keys()),
-        ttl: CACHE_TTL / 1000 + ' seconds'
-      }
+      size: cache.size,
+      keys: Array.from(cache.keys()),
+      stats: cache.getStats()
     };
-
-    res.json({
-      success: true,
-      cacheInfo: cacheInfo
-    });
+    res.json(cacheInfo);
   } catch (error) {
     console.error("❌ Lỗi lấy cache status:", error);
     res.status(500).json({ error: error.message });

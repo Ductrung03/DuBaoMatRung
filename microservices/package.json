@@ -1,0 +1,47 @@
+{
+  "name": "@dubaomatrung/microservices",
+  "version": "1.0.0",
+  "description": "DuBaoMatRung Microservices Architecture",
+  "private": true,
+  "workspaces": [
+    "gateway",
+    "services/*",
+    "shared/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm --prefix gateway run dev\" \"npm --prefix services/auth-service run dev\" \"npm --prefix services/user-service run dev\" \"npm --prefix services/gis-service run dev\" \"npm --prefix services/report-service run dev\" \"npm --prefix services/admin-service run dev\" \"npm --prefix services/search-service run dev\" \"npm --prefix services/mapserver-service run dev\"",
+    "install:all": "npm install --workspaces",
+    "test": "npm run test --workspaces --if-present",
+    "test:integration": "cd tests && npm test",
+    "lint": "npm run lint --workspaces --if-present",
+    "health": "curl http://localhost:3000/health"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "author": "LuckyBoiz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luckyboiz/dubaomatrung.git"
+  },
+  "keywords": [
+    "microservices",
+    "forest-monitoring",
+    "gis",
+    "nodejs"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "pg": "^8.16.3",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  }
+}

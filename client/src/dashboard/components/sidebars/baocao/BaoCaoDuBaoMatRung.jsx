@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import Select from "../../Select";
+import axios from "axios";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -17,6 +17,9 @@ import { toast } from "react-toastify";
 import { ClipLoader } from 'react-spinners';
 import { useAuth } from "../../../contexts/AuthContext";
 import DistrictDropdown from "../../DistrictDropdown";
+import { getCommunes } from "../../../../utils/adminService";
+import Dropdown from "../../../../components/Dropdown";
+ // Import the generic Dropdown
 
 ChartJS.register(
   BarElement,
@@ -46,7 +49,6 @@ const BaoCaoDuBaoMatRung = () => {
   const [toDate, setToDate] = useState("");
   const [reportType, setReportType] = useState("");
   const [chartData] = useState(null);
-  const [, setOpenDropdown] = useState(null);
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   
   // ✅ THÊM: State cho checkbox xác minh
@@ -61,19 +63,16 @@ const BaoCaoDuBaoMatRung = () => {
   useAuth();
 
   useEffect(() => {
-    // Hàm này sẽ được thực hiện khi danh sách huyện thay đổi hoặc khi có huyện được chọn
     const fetchXa = async () => {
       if (selectedHuyen) {
         try {
           setIsLoading(true);
-          const xaRes = await fetch(
-            `${config.API_URL}/api/dropdown/xa?huyen=${encodeURIComponent(selectedHuyen)}`
-          );
-          const xaData = await xaRes.json();
-          setXaList(xaData);
+          const communes = await getCommunes(selectedHuyen);
+          setXaList(communes);
         } catch (err) {
           console.error("Lỗi lấy xã:", err);
           toast.error("Không thể tải danh sách xã. Vui lòng thử lại sau.");
+          setXaList([]);
         } finally {
           setIsLoading(false);
         }
@@ -81,36 +80,23 @@ const BaoCaoDuBaoMatRung = () => {
         setXaList([]);
       }
     };
-    
+
     fetchXa();
   }, [selectedHuyen]);
   
   const handleHuyenChange = (e) => {
-    const huyen = e.target.value;
-    setSelectedHuyen(huyen);
+    const value = typeof e === 'string' ? e : e.target.value;
+    setSelectedHuyen(value);
     setSelectedXa(""); // Reset xã khi thay đổi huyện
   };
 
-  const handleXaChange = (e) => {
-    setSelectedXa(e.target.value);
+  const handleXaChange = (value) => {
+    setSelectedXa(value);
   };
 
-  const timeoutRef = useRef(null);
-
-const handleDropdownToggle = (dropdownName, isOpen) => {
-  if (timeoutRef.current) {
-    clearTimeout(timeoutRef.current);
-  }
-  
-  if (!isOpen) {
-    // Delay việc đóng dropdown để tránh xung đột
-    timeoutRef.current = setTimeout(() => {
-      setOpenDropdown(null);
-    }, 100);
-  } else {
-    setOpenDropdown(dropdownName);
-  }
-};
+  const handleReportTypeChange = (value) => {
+    setReportType(value);
+  };
 
   const handleBaoCao = async () => {
     // Kiểm tra thông tin nhập vào - phải điền đầy đủ tất cả các trường
@@ -118,25 +104,25 @@ const handleDropdownToggle = (dropdownName, isOpen) => {
       toast.warning("Vui lòng chọn ngày bắt đầu và kết thúc");
       return;
     }
-    
+
     if (!reportType) {
       toast.warning("Vui lòng chọn loại báo cáo");
       return;
     }
-    
+
     if (!selectedHuyen) {
       toast.warning("Vui lòng chọn huyện");
       return;
     }
-    
+
     if (!selectedXa) {
       toast.warning("Vui lòng chọn xã");
       return;
     }
-    
+
     setIsLoading(true);
     setLoadingMessage("Đang tạo báo cáo...");
-    
+
     // Cập nhật trạng thái loading cho cả trang Thống kê báo cáo
     setReportLoading(true);
 
@@ -146,7 +132,7 @@ const handleDropdownToggle = (dropdownName, isOpen) => {
       huyen: selectedHuyen,
       xa: selectedXa,
       type: reportType,
-      xacMinh: isXacMinh ? 'true' : 'false'  // ✅ THÊM: Truyền tham số xác minh
+      status: isXacMinh ? 'true' : 'false'  // ✅ SỬA: Đổi tên param thành status
     });
 
     try {
@@ -156,29 +142,26 @@ const handleDropdownToggle = (dropdownName, isOpen) => {
         setLoadingMessage(newMessage);
       }, 800);
 
-      const res = await fetch(`${config.API_URL}/api/bao-cao/tra-cuu-du-lieu-bao-mat-rung?${params.toString()}`);
-      
-      clearInterval(progressInterval);
-      
-      if (!res.ok) {
-        throw new Error(`Lỗi ${res.status}: ${res.statusText}`);
-      }
+      // ✅ SỬA: Đổi endpoint thành /api/search/mat-rung
+      const res = await axios.get(`/api/search/mat-rung?${params.toString()}`);
 
-      const data = await res.json();
+      clearInterval(progressInterval);
+
+      const data = res.data;
       
       if (reportType === "Văn bản" || reportType === "Biểu đồ") {
-        if (!data.data || (Array.isArray(data.data) && data.data.length === 0)) {
+        if (!data.data || !data.data.features || data.data.features.length === 0) {
           toast.info(`Không tìm thấy dữ liệu ${isXacMinh ? 'đã xác minh' : ''} phù hợp với điều kiện tìm kiếm`);
           setReportLoading(false);
         } else {
-          setReportData(data.data);
+          setReportData(data.data.features);
           
           // Đợi một chút để trạng thái loading được hiển thị rõ ràng
           setTimeout(() => {
-            // ✅ SỬA: Lưu tham số xác minh vào URL
+            // ✅ SỬA: Lưu tham số status vào URL
             navigate({
               pathname: "/dashboard/baocao",
-              search: `?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(selectedHuyen)}&xa=${encodeURIComponent(selectedXa)}&xacMinh=${isXacMinh}`
+              search: `?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(selectedHuyen)}&xa=${encodeURIComponent(selectedXa)}&status=${isXacMinh}&type=${encodeURIComponent(reportType)}`
             });
             
             toast.success(`Đã tạo báo cáo ${isXacMinh ? 'xác minh' : ''} thành công!`);
@@ -254,8 +237,6 @@ const handleDropdownToggle = (dropdownName, isOpen) => {
                   value={selectedHuyen}
                   onChange={handleHuyenChange}
                   isLoading={isLoading}
-                  onFocus={() => handleDropdownToggle("huyen", true)}
-                  onBlur={() => handleDropdownToggle("huyen", false)}
                 />
               </div>
             </div>
@@ -263,19 +244,16 @@ const handleDropdownToggle = (dropdownName, isOpen) => {
             {/* Xã */}
             <div className="flex items-center gap-1">
               <label className="text-sm font-medium w-40">Xã</label>
-              <select
-                value={selectedXa}
-                onChange={handleXaChange}
-                className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+              <Dropdown
+                selectedValue={selectedXa}
+                onValueChange={handleXaChange}
+                options={xaList}
+                placeholder="Chọn xã"
                 disabled={isLoading}
-              >
-                <option value="">Chọn xã</option>
-                {xaList.map((item, i) => (
-                  <option key={i} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
+                loading={isLoading}
+                className="w-36"
+                selectClassName="w-full border border-green-400 rounded-md px-2 py-1 bg-white"
+              />
             </div>
 
             {/* ✅ THÊM: Checkbox Xác minh */}
@@ -297,19 +275,16 @@ const handleDropdownToggle = (dropdownName, isOpen) => {
             {/* Loại báo cáo */}
             <div className="flex items-center gap-1">
               <label className="text-sm font-medium w-40">Loại báo cáo</label>
-              <select
-                value={reportType}
-                onChange={(e) => setReportType(e.target.value)}
-                className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+              <Dropdown
+                selectedValue={reportType}
+                onValueChange={handleReportTypeChange}
+                options={loaiBaoCaoList.map(type => ({ value: type, label: type }))}
+                placeholder="Chọn loại"
                 disabled={isLoading}
-              >
-                <option value="">Chọn loại</option>
-                {loaiBaoCaoList.map((type, idx) => (
-                  <option key={idx} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
+                loading={isLoading}
+                className="w-36"
+                selectClassName="w-full border border-green-400 rounded-md px-2 py-1 bg-white"
+              />
             </div>
           </div>
 

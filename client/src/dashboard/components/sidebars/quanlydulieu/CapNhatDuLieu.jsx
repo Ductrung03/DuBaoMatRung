@@ -53,41 +53,70 @@ const CapNhatDuLieu = () => {
          
          
 
-          {/* ✅ DANH SÁCH CÁC LAYER RIÊNG LẺ */}
+          {/* ✅ DANH SÁCH CÁC LAYER - Phân biệt WMS vs GeoJSON */}
           <div className="flex flex-col gap-2">
-            {Object.entries(mapLayers).map(([layerKey, layer]) => (
-              <div key={layerKey} className="flex items-center justify-between p-2 border rounded-md hover:bg-gray-50">
-                <div className="flex-1">
-                  <div className="font-medium text-sm">
-                    {layerKey === 'administrative' && '🏛️'} 
-                    {layerKey === 'forestTypes' && '🌲'} 
-                    {layerKey === 'forestManagement' && '🏢'} 
-                    {layerKey === 'terrain' && '🏔️'} 
-                    {layerKey === 'deforestationAlerts' && '⚠️'}
-                    <span className="ml-2">{layer.name}</span>
-                  </div>
-                  
-                
-                </div>
-                
-                <button 
-                  onClick={() => handleLoadLayer(layerKey)}
-                  disabled={layer.loading || loadingAll}
-                  className="bg-green-600 hover:bg-green-700 text-white font-medium py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[70px]"
-                >
-                  {layer.loading ? (
-                    <ClipLoader color="#ffffff" size={12} />
-                  ) : (
-                    <>
-                      {layer.data ? "🔄 Tải lại" : "📥 Tải"}
-                      {layerKey === 'deforestationAlerts' && !layer.data?.autoLoaded && (
-                        <span className="block text-xs opacity-75">1 năm</span>
+            {Object.entries(mapLayers).map(([layerKey, layer]) => {
+              const isWMS = layer.layerType === 'wms';
+              const isGeoJSON = layer.layerType === 'geojson';
+
+              return (
+                <div key={layerKey} className="flex items-center justify-between p-2 border rounded-md hover:bg-gray-50">
+                  <div className="flex-1">
+                    <div className="font-medium text-sm flex items-center gap-2">
+                      {/* Icon theo layer */}
+                      {layerKey === 'administrative' && '🏛️'}
+                      {layerKey === 'forestTypes' && '🌲'}
+                      {layerKey === 'forestManagement' && '🏢'}
+                      {layerKey === 'terrain' && '🏔️'}
+                      {layerKey === 'terrainLine' && '🗺️'}
+                      {layerKey === 'forestStatus' && '🌳'}
+                      {layerKey === 'deforestationAlerts' && '⚠️'}
+
+                      <span>{layer.name}</span>
+
+                      {/* Badge hiển thị loại layer */}
+                      {isWMS && (
+                        <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
+                          WMS
+                        </span>
                       )}
-                    </>
-                  )}
-                </button>
-              </div>
-            ))}
+                      {isGeoJSON && (
+                        <span className="text-xs bg-green-100 text-green-800 px-1.5 py-0.5 rounded">
+                          GeoJSON
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Button khác nhau cho WMS vs GeoJSON */}
+                  <button
+                    onClick={() => handleLoadLayer(layerKey)}
+                    disabled={layer.loading || loadingAll}
+                    className={`${
+                      isWMS
+                        ? (layer.visible ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 hover:bg-gray-500')
+                        : 'bg-green-600 hover:bg-green-700'
+                    } text-white font-medium py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[80px]`}
+                  >
+                    {layer.loading ? (
+                      <ClipLoader color="#ffffff" size={12} />
+                    ) : (
+                      <>
+                        {isWMS && (layer.visible ? '👁️ Hiển thị' : '🙈 Ẩn')}
+                        {isGeoJSON && (
+                          <>
+                            {layer.data ? "🔄 Tải lại" : "📥 Tải"}
+                            {layerKey === 'deforestationAlerts' && !layer.data?.autoLoaded && (
+                              <span className="block text-xs opacity-75">1 năm</span>
+                            )}
+                          </>
+                        )}
+                      </>
+                    )}
+                  </button>
+                </div>
+              );
+            })}
           </div>
 
           {/* ✅ THỐNG KÊ TỔNG QUAN */}

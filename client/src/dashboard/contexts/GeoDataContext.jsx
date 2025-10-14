@@ -8,80 +8,118 @@ const GeoDataContext = createContext();
 
 export const useGeoData = () => useContext(GeoDataContext);
 
+// ✅ MAPSERVER CONSTANTS - Static layers via WMS
+export const MAPSERVER_LAYERS = {
+  ADMINISTRATIVE: 'ranhgioihc',      // Ranh giới hành chính
+  FOREST_TYPES: 'rg3lr',              // 3 Loại rừng (231K records!)
+  TERRAIN: 'nendiahinh',              // Nền địa hình
+  MANAGEMENT: 'chuquanly',            // Chủ quản lý rừng
+  DISTRICT: 'huyen'                   // Ranh giới huyện
+};
+
+// ✅ MapServer WMS qua API Gateway
+export const WMS_BASE_URL = '/api/mapserver';
+
 export const GeoDataProvider = ({ children }) => {
   const [geoData, setGeoData] = useState(null);
   const [loading, setLoading] = useState(false);
   
-  // Enhanced map layers config với viewport support
+  // Enhanced map layers config - Phân biệt WMS và GeoJSON layers
   const [mapLayers, setMapLayers] = useState({
-    administrative: { 
-      data: null, 
-      visible: true, 
+    // ✅ WMS LAYERS - Render qua MapServer, không cần load GeoJSON data
+    administrative: {
+      data: null,
+      visible: true,
       loading: false,
       name: "Ranh giới hành chính",
       endpoint: "administrative",
-      useViewport: true
+      layerType: "wms", // WMS layer
+      wmsLayer: MAPSERVER_LAYERS.ADMINISTRATIVE
     },
-    forestManagement: { 
-      data: null, 
+    forestManagement: {
+      data: null,
       visible: true,
       loading: false,
       name: "Chủ quản lý rừng",
       endpoint: "forest-management",
-      useViewport: true
+      layerType: "wms", // WMS layer
+      wmsLayer: MAPSERVER_LAYERS.MANAGEMENT
     },
-    terrain: { 
-      data: null, 
-      visible: false, 
+    terrain: {
+      data: null,
+      visible: false,
       loading: false,
-      name: "Nền địa hình, thủy văn, giao thông",
+      name: "Nền địa hình",
       endpoint: "terrain",
-      useViewport: true
+      layerType: "wms", // WMS layer
+      wmsLayer: MAPSERVER_LAYERS.TERRAIN
     },
-    forestTypes: { 
-      data: null, 
-      visible: false, // ẨN MẶC ĐỊNH - KHÔNG AUTO LOAD
+    terrainLine: {
+      data: null,
+      visible: true,
+      loading: false,
+      name: "Địa hình, thủy văn, giao thông",
+      endpoint: "terrain-line",
+      layerType: "wms", // WMS layer (line features)
+      wmsLayer: "nendiahinh_line"
+    },
+    forestTypes: {
+      data: null,
+      visible: false,
       loading: false,
       name: "Các loại rừng (phân loại LDLR)",
       endpoint: "forest-types",
-      useViewport: true
+      layerType: "wms", // WMS layer - 231K records!
+      wmsLayer: MAPSERVER_LAYERS.FOREST_TYPES
     },
-    deforestationAlerts: { 
-      data: null, 
-      visible: true, 
+    forestStatus: {
+      data: null,
+      visible: true,
+      loading: false,
+      name: "Hiện trạng rừng",
+      endpoint: "forest-status",
+      layerType: "wms", // WMS layer
+      wmsLayer: "hientrangrung"
+    },
+
+    // ✅ GEOJSON LAYERS - Load data từ API
+    deforestationAlerts: {
+      data: null,
+      visible: true,
       loading: false,
       name: "Dự báo mất rừng mới nhất",
       endpoint: "deforestation-alerts",
+      layerType: "geojson", // GeoJSON layer - cần load data
       useViewport: true
     }
   });
 
-  // ✅ HÀM MỚI: Auto load tất cả layers khi khởi động (trừ forestTypes)
+  // ✅ HÀM CẬP NHẬT: Auto load chỉ GeoJSON layers (WMS layers tự động hiển thị)
   const loadAllDefaultLayers = async () => {
     try {
-      console.log("🚀 Auto loading all default layers...");
-      
-      // Danh sách layers cần auto load (KHÔNG BAO GỒM forestTypes)
-      const layersToLoad = [
-        { key: 'administrative', name: 'Ranh giới hành chính', priority: 1 },
-        { key: 'forestManagement', name: 'Chủ quản lý rừng', priority: 2 },
-        { key: 'terrain', name: 'Nền địa hình', priority: 3 },
-        { key: 'deforestationAlerts', name: 'Dự báo mất rừng (3 tháng)', priority: 4 }
-      ];
+      console.log("🚀 Auto loading GeoJSON layers...");
 
-      // Load từng layer một cách tuần tự
-      for (const layer of layersToLoad) {
+      // Chỉ load các GeoJSON layers - WMS layers không cần load data
+      const geojsonLayers = Object.entries(mapLayers)
+        .filter(([key, layer]) => layer.layerType === 'geojson')
+        .map(([key, layer]) => ({ key, name: layer.name }));
+
+      console.log(`📊 Found ${geojsonLayers.length} GeoJSON layers to load`);
+
+      // Load từng GeoJSON layer
+      for (const layer of geojsonLayers) {
         try {
           console.log(`📥 Auto loading ${layer.name}...`);
           setLayerLoading(layer.key, true);
-          
-          let endpoint = `${config.API_URL}/api/layer-data/${mapLayers[layer.key].endpoint}`;
-          
+
+          // Use relative path to work with Vite proxy
+          let endpoint = `/api/layer-data/${mapLayers[layer.key].endpoint}`;
+
           // ✅ SPECIAL: Cho deforestationAlerts, thêm param để chỉ lấy 3 tháng
           if (layer.key === 'deforestationAlerts') {
             endpoint += '?days=90'; // 3 tháng = 90 ngày
           }
-          
+
           const response = await axios.get(endpoint, {
             headers: {
               'Accept': 'application/json',
@@ -89,37 +127,55 @@ export const GeoDataProvider = ({ children }) => {
             },
             timeout: 120000 // 2 phút timeout
           });
-          
-          if (response.data && response.data.features) {
+
+          // ✅ API returns { success, data: { type, features } }
+          if (response.data && response.data.data && response.data.data.features) {
             const layerData = {
-              ...response.data,
+              ...response.data.data, // Use nested data object
               layerType: layer.key,
               loadTime: 0,
               loadStrategy: 'auto_load_default',
               loadTimestamp: new Date().toISOString(),
               autoLoaded: true
             };
-            
+
             updateLayerData(layer.key, layerData);
-            console.log(`✅ Auto loaded ${layer.name}: ${response.data.features.length} features`);
+
+            // ✅ CẬP NHẬT: Nếu là deforestationAlerts, cũng cập nhật vào geoData để hiển thị trong table
+            if (layer.key === 'deforestationAlerts') {
+              console.log('📊 Auto-load: Updating geoData for table display');
+              setGeoData(layerData);
+            }
+
+            console.log(`✅ Auto loaded ${layer.name}: ${response.data.data.features.length} features`);
           }
-          
+
         } catch (error) {
           console.error(`❌ Error auto loading ${layer.name}:`, error);
           // Không toast error để tránh spam, chỉ log
         } finally {
           setLayerLoading(layer.key, false);
         }
-        
+
         // Delay ngắn giữa các layer để tránh overload
         await new Promise(resolve => setTimeout(resolve, 500));
       }
-      
-      // ✅ LOAD DỮ LIỆU MẶC ĐỊNH CHO BẢNG (mat_rung 3 tháng gần nhất)
-      await loadDefaultMatRungData();
-      
-      console.log("🎉 Auto load all default layers completed!");
-      
+
+      // ✅ WMS layers tự động visible - không cần load data
+      console.log("🗺️ WMS layers (hành chính, địa hình, loại rừng) sẽ tự động hiển thị qua MapServer");
+
+      // ✅ LOAD DỮ LIỆU MẶC ĐỊNH CHO BẢNG: Chỉ load mat_rung nếu KHÔNG có deforestationAlerts
+      // (vì deforestationAlerts ưu tiên cao hơn và đã bao gồm dữ liệu cần thiết)
+      const hasDeforestationAlerts = geojsonLayers.some(l => l.key === 'deforestationAlerts');
+      if (!hasDeforestationAlerts) {
+        console.log("📊 Loading default mat_rung data (no deforestationAlerts)");
+        await loadDefaultMatRungData();
+      } else {
+        console.log("✅ Skipping mat_rung load - using deforestationAlerts data instead");
+      }
+
+      console.log("🎉 Auto load completed! WMS layers visible, GeoJSON layers loaded.");
+
     } catch (error) {
       console.error("❌ Error in auto load all layers:", error);
     }
@@ -132,7 +188,7 @@ export const GeoDataProvider = ({ children }) => {
       setLoading(true);
 
       // Gọi API để lấy dữ liệu mat_rung 3 tháng gần nhất
-      const response = await axios.get(`${config.API_URL}/api/mat-rung`, {
+      const response = await axios.get(`/api/mat-rung`, {
        
       });
 
@@ -262,7 +318,7 @@ export const GeoDataProvider = ({ children }) => {
     loadAllDefaultLayers();
   };
 
-  // ✅ HÀM MỚI: Load layer riêng lẻ (cho các nút tải lên)
+  // ✅ HÀM CẬP NHẬT: Load layer riêng lẻ - xử lý đúng WMS vs GeoJSON
   const loadSingleLayer = async (layerKey) => {
     try {
       const layer = mapLayers[layerKey];
@@ -271,44 +327,69 @@ export const GeoDataProvider = ({ children }) => {
         return;
       }
 
-      setLayerLoading(layerKey, true);
-      
-      toast.info(`🔄 Đang tải ${layer.name}...`, { autoClose: 2000 });
-      
-      const startTime = Date.now();
-      let endpoint = `${config.API_URL}/api/layer-data/${layer.endpoint}`;
-      
-      // Special handling cho deforestationAlerts
-      if (layerKey === 'deforestationAlerts') {
-        endpoint += '?days=365'; // 1 năm cho load riêng lẻ
+      // ✅ WMS LAYER → Chỉ toggle visibility, không load data
+      if (layer.layerType === 'wms') {
+        const newVisibility = !layer.visible;
+        toggleLayerVisibility(layerKey);
+
+        toast.success(
+          `${newVisibility ? '👁️ Hiển thị' : '🙈 Ẩn'} ${layer.name} (WMS)`,
+          { autoClose: 2000 }
+        );
+
+        console.log(`✅ WMS Layer ${layer.name} ${newVisibility ? 'shown' : 'hidden'}`);
+        return;
       }
-      
-      const response = await axios.get(endpoint, {
-        headers: {
-          'Accept': 'application/json',
-          'Cache-Control': 'max-age=0'
-        },
-        timeout: 180000 // 3 minutes timeout
-      });
-      
-      const loadTime = ((Date.now() - startTime) / 1000).toFixed(1);
-      
-      if (response.data && response.data.features) {
-        const layerData = {
-          ...response.data,
-          layerType: layerKey,
-          loadTime: parseFloat(loadTime),
-          loadStrategy: 'manual_load',
-          loadTimestamp: new Date().toISOString(),
-          autoLoaded: false
-        };
-        
-        updateLayerData(layerKey, layerData);
-        
-        toast.success(`✅ ${layer.name}: ${response.data.features.length.toLocaleString()} đối tượng (${loadTime}s)`, { autoClose: 4000 });
-        
-      } else {
-        toast.warning(`⚠️ Không có dữ liệu cho ${layer.name}`);
+
+      // ✅ GEOJSON LAYER → Load data từ API
+      if (layer.layerType === 'geojson') {
+        setLayerLoading(layerKey, true);
+
+        toast.info(`🔄 Đang tải ${layer.name}...`, { autoClose: 2000 });
+
+        const startTime = Date.now();
+        let endpoint = `/api/layer-data/${layer.endpoint}`;
+
+        // Special handling cho deforestationAlerts
+        if (layerKey === 'deforestationAlerts') {
+          endpoint += '?days=365'; // 1 năm cho load riêng lẻ
+        }
+
+        const response = await axios.get(endpoint, {
+          headers: {
+            'Accept': 'application/json',
+            'Cache-Control': 'max-age=0'
+          },
+          timeout: 180000 // 3 minutes timeout
+        });
+
+        const loadTime = ((Date.now() - startTime) / 1000).toFixed(1);
+
+        // ✅ API returns { success, data: { type, features } }
+        if (response.data && response.data.data && response.data.data.features) {
+          const layerData = {
+            ...response.data.data, // Use nested data object
+            layerType: layerKey,
+            loadTime: parseFloat(loadTime),
+            loadStrategy: 'manual_load',
+            loadTimestamp: new Date().toISOString(),
+            autoLoaded: false
+          };
+
+          updateLayerData(layerKey, layerData);
+
+          // ✅ CẬP NHẬT: Nếu là deforestationAlerts, cũng cập nhật vào geoData để hiển thị trong table
+          if (layerKey === 'deforestationAlerts') {
+            console.log('📊 Updating geoData for table display');
+            setGeoData(layerData);
+          }
+
+          toast.success(`✅ ${layer.name}: ${response.data.data.features.length.toLocaleString()} đối tượng (${loadTime}s)`, { autoClose: 4000 });
+
+        } else {
+          console.error('❌ Invalid API response structure:', response.data);
+          toast.warning(`⚠️ Không có dữ liệu cho ${layer.name}`);
+        }
       }
     } catch (err) {
       console.error(`❌ Lỗi khi tải ${layerKey}:`, err);
@@ -354,7 +435,7 @@ const loadAutoForecastData = async (year, month, period) => {
 
     const { fromDate, toDate } = calculateDateRange(year, month, period);
 
-    const response = await axios.post(`${config.API_URL}/api/mat-rung/auto-forecast`, {
+    const response = await axios.post(`/api/mat-rung/auto-forecast`, {
       year,
       month,
       period,
@@ -434,7 +515,7 @@ const getAutoForecastPreview = async (year, month, period) => {
 
     const { fromDate, toDate } = calculateDateRange(year, month, period);
 
-    const response = await axios.post(`${config.API_URL}/api/mat-rung/forecast-preview`, {
+    const response = await axios.post(`/api/mat-rung/forecast-preview`, {
       year,
       month,
       period,
@@ -444,7 +525,7 @@ const getAutoForecastPreview = async (year, month, period) => {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
-      timeout: 10000 // 10 giây timeout cho preview
+      timeout: 30000 // 30 giây timeout cho preview
     });
 
     return response.data;
