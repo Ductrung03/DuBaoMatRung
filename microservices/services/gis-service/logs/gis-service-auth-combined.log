@@ -268,3 +268,4 @@
 {"level":"info","message":"Database pool closed","service":"gis-service-auth","timestamp":"2025-10-14 14:37:35"}
 {"database":"auth_db","level":"info","message":"Database connection test successful","service":"gis-service-auth","timestamp":"2025-10-14T08:16:45.950Z"}
 {"level":"info","message":"Database pool initialized successfully","service":"gis-service-auth","timestamp":"2025-10-14 15:16:45"}
+{"level":"info","message":"Database pool closed","service":"gis-service-auth","timestamp":"2025-10-14 17:16:24"}

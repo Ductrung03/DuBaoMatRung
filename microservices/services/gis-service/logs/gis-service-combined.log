@@ -2766,3 +2766,6 @@
 {"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/auto-forecast","service":"gis-service","timestamp":"2025-10-14 17:08:28"}
 {"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2025-10-14 17:08:33"}
 {"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/auto-forecast","service":"gis-service","timestamp":"2025-10-14 17:08:33"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-14 17:16:24"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-14 17:16:24"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-14 17:16:24"}
