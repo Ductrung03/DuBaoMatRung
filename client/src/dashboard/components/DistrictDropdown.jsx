@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import Dropdown from "../../components/Dropdown"; // Use the new generic Dropdown
-import { getDistricts } from "../../utils/adminService";
+import { getDistricts } from "../../utils/dropdownService";
 import config from "../../config";
 
 /**

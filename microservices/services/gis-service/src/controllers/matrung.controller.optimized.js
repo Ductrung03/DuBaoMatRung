@@ -1,9 +1,9 @@
-// gis-service/src/controllers/matrung.controller.js
+// gis-service/src/controllers/matrung.controller.optimized.js
 const createLogger = require('../../../../shared/logger');
 const { ValidationError, NotFoundError } = require('../../../../shared/errors');
 const { convertTcvn3ToUnicode, formatResponse } = require('../../../../shared/utils');
 
-const logger = createLogger('matrung-controller');
+const logger = createLogger('matrung-controller-optimized');
 
 // Mapping huyện
 const HUYEN_MAPPING = {
@@ -18,95 +18,22 @@ const HUYEN_MAPPING = {
   '09': 'Văn Bàn'
 };
 
-// Helper function to check if table exists
+// Helper function to check if table/view exists
 async function tableExists(db, tableName) {
   const query = `
     SELECT EXISTS (
       SELECT FROM information_schema.tables
-      WHERE table_schema = 'public' AND table_name = $1
-    )
-  `;
-  const result = await db.query(query, [tableName]);
-  return result.rows[0].exists;
-}
-
-// Helper function to check if materialized view exists
-async function materializedViewExists(db, viewName) {
-  const query = `
-    SELECT EXISTS (
-      SELECT FROM information_schema.views
       WHERE table_schema = 'public' AND table_name = $1
     ) OR EXISTS (
       SELECT FROM pg_matviews
       WHERE schemaname = 'public' AND matviewname = $1
     )
   `;
-  const result = await db.query(query, [viewName]);
+  const result = await db.query(query, [tableName]);
   return result.rows[0].exists;
 }
 
-// Optimized function to get administrative data using materialized views
-async function getAdminDataOptimized(db, geom) {
-  try {
-    // Check if materialized views exist
-    const hasMvHuyen = await materializedViewExists(db, 'mv_huyen');
-    const hasMvXa = await materializedViewExists(db, 'mv_xa_by_huyen');
-    const hasMvTieukhu = await materializedViewExists(db, 'mv_tieukhu_by_xa');
-    const hasMvKhoanh = await materializedViewExists(db, 'mv_khoanh_by_tieukhu');
-    
-    if (!hasMvHuyen) {
-      return { huyen: null, xa: null, tk: null, khoanh: null };
-    }
-
-    // Use spatial intersection with laocai_rg3lr for most accurate data
-    const hasRg3lr = await tableExists(db, 'laocai_rg3lr');
-    
-    if (hasRg3lr) {
-      const query = `
-        SELECT 
-          r.huyen,
-          r.xa,
-          r.tk,
-          r.khoanh
-        FROM laocai_rg3lr r
-        WHERE ST_Intersects(ST_Transform($1, 4326), ST_Transform(r.geom, 4326))
-        LIMIT 1
-      `;
-      
-      const result = await db.query(query, [geom]);
-      if (result.rows.length > 0) {
-        return result.rows[0];
-      }
-    }
-
-    // Fallback to laocai_ranhgioihc
-    const hasRanhGioiHC = await tableExists(db, 'laocai_ranhgioihc');
-    if (hasRanhGioiHC) {
-      const query = `
-        SELECT 
-          r.huyen,
-          r.xa,
-          r.tieukhu as tk,
-          r.khoanh
-        FROM laocai_ranhgioihc r
-        WHERE ST_Intersects(ST_Transform($1, 4326), ST_Transform(r.geom, 4326))
-        LIMIT 1
-      `;
-      
-      const result = await db.query(query, [geom]);
-      if (result.rows.length > 0) {
-        return result.rows[0];
-      }
-    }
-
-    return { huyen: null, xa: null, tk: null, khoanh: null };
-  } catch (error) {
-    logger.error('Error getting admin data:', error);
-    return { huyen: null, xa: null, tk: null, khoanh: null };
-  }
-}
-
-// Get mat rung data with filters - OPTIMIZED VERSION
+// OPTIMIZED: Get mat rung data with pre-computed administrative lookup
 exports.getMatRung = async (req, res, next) => {
   try {
     const {
@@ -124,12 +51,12 @@ exports.getMatRung = async (req, res, next) => {
     const redis = req.app.locals.redis;
 
     // Build cache key
-    const cacheKey = `matrung:${JSON.stringify(req.query)}`;
+    const cacheKey = `matrung:optimized:${JSON.stringify(req.query)}`;
 
     // Try cache first
     const cached = await redis.get(cacheKey);
     if (cached) {
-      logger.info('Cache hit for mat rung data');
+      logger.info('Cache hit for optimized mat rung data');
       return res.json({
         success: true,
         cached: true,
@@ -139,11 +66,11 @@ exports.getMatRung = async (req, res, next) => {
 
     // Check which tables exist
     const hasUsers = await tableExists(db, 'users');
-    const hasRg3lr = await tableExists(db, 'laocai_rg3lr');
+    const hasLookup = await tableExists(db, 'mv_mat_rung_admin_lookup');
 
     // No filters - return 12 months data
     if (!fromDate && !toDate && !huyen && !xa && !tk && !khoanh && !churung) {
-      logger.info('Loading mat rung data: 12 months default');
+      logger.info('Loading optimized mat rung data: 12 months default');
 
       const query = `
         SELECT
@@ -169,12 +96,12 @@ exports.getMatRung = async (req, res, next) => {
           NULL as verified_by_username,
           `}
 
-          ${hasRg3lr ? `
-          r.huyen,
-          r.xa,
-          r.tk,
-          r.khoanh,
-          r.churung,
+          ${hasLookup ? `
+          l.huyen,
+          l.xa,
+          l.tk,
+          l.khoanh,
+          l.churung,
           ` : `
           NULL as huyen,
           NULL as xa,
@@ -189,12 +116,7 @@ exports.getMatRung = async (req, res, next) => {
           ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
 
         FROM mat_rung m
-        ${hasRg3lr ? `
-        LEFT JOIN laocai_rg3lr r ON ST_Intersects(
-          ST_Transform(m.geom, 4326),
-          ST_Transform(r.geom, 4326)
-        )
-        ` : ''}
+        ${hasLookup ? 'LEFT JOIN mv_mat_rung_admin_lookup l ON m.gid = l.gid' : ''}
         ${hasUsers ? 'LEFT JOIN users u ON m.verified_by = u.id' : ''}
         WHERE m.geom IS NOT NULL
           AND m.end_sau::date >= CURRENT_DATE - INTERVAL '12 months'
@@ -207,17 +129,18 @@ exports.getMatRung = async (req, res, next) => {
 
       // Cache for 5 minutes
       await redis.set(cacheKey, {
-        message: `Loaded ${geoJSON.features.length} mat rung features (12 months)`,
+        message: `Loaded ${geoJSON.features.length} mat rung features (12 months, optimized)`,
         data: geoJSON,
         isDefault: true,
-        timeRange: '12_months'
+        timeRange: '12_months',
+        optimized: true
       }, 300);
 
       return res.json(formatResponse(
         true,
-        `Loaded ${geoJSON.features.length} features (12 months)`,
+        `Loaded ${geoJSON.features.length} features (12 months, optimized)`,
         geoJSON,
-        { isDefault: true, cached: false }
+        { isDefault: true, cached: false, optimized: true }
       ));
     }
 
@@ -226,41 +149,33 @@ exports.getMatRung = async (req, res, next) => {
       throw new ValidationError('fromDate and toDate are required for filtered search');
     }
 
-    logger.info('Loading mat rung data with filters', { fromDate, toDate, huyen, xa });
+    logger.info('Loading optimized mat rung data with filters', { fromDate, toDate, huyen, xa });
 
     // Build WHERE clause
     const conditions = ['m.start_dau >= $1', 'm.end_sau <= $2'];
     const params = [fromDate, toDate];
     let index = 3;
 
-    // Add spatial filters using laocai_rg3lr for better accuracy
-    let spatialJoin = '';
-    if (hasRg3lr && (huyen || xa || tk || khoanh || churung)) {
-      spatialJoin = `
-        LEFT JOIN laocai_rg3lr r ON ST_Intersects(
-          ST_Transform(m.geom, 4326),
-          ST_Transform(r.geom, 4326)
-        )
-      `;
-      
+    // Add filters using pre-computed lookup
+    if (hasLookup) {
       if (huyen) {
-        conditions.push(`r.huyen = $${index++}`);
+        conditions.push(`l.huyen = $${index++}`);
         params.push(huyen);
       }
       if (xa) {
-        conditions.push(`r.xa = $${index++}`);
+        conditions.push(`l.xa = $${index++}`);
         params.push(xa);
       }
       if (tk) {
-        conditions.push(`r.tk = $${index++}`);
+        conditions.push(`l.tk = $${index++}`);
         params.push(tk);
       }
       if (khoanh) {
-        conditions.push(`r.khoanh = $${index++}`);
+        conditions.push(`l.khoanh = $${index++}`);
         params.push(khoanh);
       }
       if (churung) {
-        conditions.push(`r.churung ILIKE $${index++}`);
+        conditions.push(`l.churung ILIKE $${index++}`);
         params.push(`%${churung}%`);
       }
     }
@@ -291,12 +206,12 @@ exports.getMatRung = async (req, res, next) => {
         NULL as verified_by_username,
         `}
 
-        ${hasRg3lr ? `
-        r.huyen,
-        r.xa,
-        r.tk,
-        r.khoanh,
-        r.churung,
+        ${hasLookup ? `
+        l.huyen,
+        l.xa,
+        l.tk,
+        l.khoanh,
+        l.churung,
         ` : `
         NULL as huyen,
         NULL as xa,
@@ -311,7 +226,7 @@ exports.getMatRung = async (req, res, next) => {
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
 
       FROM mat_rung m
-      ${spatialJoin}
+      ${hasLookup ? 'LEFT JOIN mv_mat_rung_admin_lookup l ON m.gid = l.gid' : ''}
       ${hasUsers ? 'LEFT JOIN users u ON m.verified_by = u.id' : ''}
       ${whereClause}
       ORDER BY m.end_sau DESC, m.gid DESC
@@ -320,21 +235,28 @@ exports.getMatRung = async (req, res, next) => {
 
     params.push(parseInt(limit));
 
+    const startTime = Date.now();
     const result = await db.query(query, params);
+    const queryTime = Date.now() - startTime;
+
     const geoJSON = buildGeoJSON(result.rows);
+
+    logger.info(`Optimized query completed in ${queryTime}ms, found ${result.rows.length} records`);
 
     // Cache for 5 minutes
     await redis.set(cacheKey, {
-      message: `Loaded ${geoJSON.features.length} features`,
+      message: `Loaded ${geoJSON.features.length} features (optimized)`,
       data: geoJSON,
-      filters: { fromDate, toDate, huyen, xa, tk, khoanh, churung }
+      filters: { fromDate, toDate, huyen, xa, tk, khoanh, churung },
+      queryTime: `${queryTime}ms`,
+      optimized: true
     }, 300);
 
     res.json(formatResponse(
       true,
-      `Loaded ${geoJSON.features.length} features with filters`,
+      `Loaded ${geoJSON.features.length} features with filters (optimized, ${queryTime}ms)`,
       geoJSON,
-      { isDefault: false, cached: false }
+      { isDefault: false, cached: false, optimized: true, queryTime }
     ));
 
   } catch (error) {
@@ -342,7 +264,7 @@ exports.getMatRung = async (req, res, next) => {
   }
 };
 
-// Get all mat rung data - OPTIMIZED VERSION
+// OPTIMIZED: Get all mat rung data
 exports.getAllMatRung = async (req, res, next) => {
   try {
     const { limit = 1000, months = 3 } = req.query;
@@ -350,7 +272,7 @@ exports.getAllMatRung = async (req, res, next) => {
     const db = req.app.locals.db;
     const redis = req.app.locals.redis;
 
-    const cacheKey = `matrung:all:${months}:${limit}`;
+    const cacheKey = `matrung:all:optimized:${months}:${limit}`;
 
     // Try cache
     const cached = await redis.get(cacheKey);
@@ -358,11 +280,11 @@ exports.getAllMatRung = async (req, res, next) => {
       return res.json({ ...cached, cached: true });
     }
 
-    logger.info(`Loading all mat rung data: ${months} months, limit: ${limit}`);
+    logger.info(`Loading all optimized mat rung data: ${months} months, limit: ${limit}`);
 
     // Check which tables exist
     const hasUsers = await tableExists(db, 'users');
-    const hasRg3lr = await tableExists(db, 'laocai_rg3lr');
+    const hasLookup = await tableExists(db, 'mv_mat_rung_admin_lookup');
 
     const query = `
       SELECT
@@ -388,12 +310,12 @@ exports.getAllMatRung = async (req, res, next) => {
         NULL as verified_by_username,
         `}
 
-        ${hasRg3lr ? `
-        r.huyen,
-        r.xa,
-        r.tk,
-        r.khoanh,
-        r.churung,
+        ${hasLookup ? `
+        l.huyen,
+        l.xa,
+        l.tk,
+        l.khoanh,
+        l.churung,
         ` : `
         NULL as huyen,
         NULL as xa,
@@ -408,12 +330,7 @@ exports.getAllMatRung = async (req, res, next) => {
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
 
       FROM mat_rung m
-      ${hasRg3lr ? `
-      LEFT JOIN laocai_rg3lr r ON ST_Intersects(
-        ST_Transform(m.geom, 4326),
-        ST_Transform(r.geom, 4326)
-      )
-      ` : ''}
+      ${hasLookup ? 'LEFT JOIN mv_mat_rung_admin_lookup l ON m.gid = l.gid' : ''}
       ${hasUsers ? 'LEFT JOIN users u ON m.verified_by = u.id' : ''}
       WHERE m.geom IS NOT NULL
         AND m.end_sau::date >= CURRENT_DATE - INTERVAL '${parseInt(months)} months'
@@ -421,16 +338,21 @@ exports.getAllMatRung = async (req, res, next) => {
       LIMIT $1
     `;
 
+    const startTime = Date.now();
     const result = await db.query(query, [parseInt(limit)]);
+    const queryTime = Date.now() - startTime;
+
     const geoJSON = buildGeoJSON(result.rows);
 
     const response = {
       success: true,
-      message: `Loaded ${geoJSON.features.length} features (${months} months)`,
+      message: `Loaded ${geoJSON.features.length} features (${months} months, optimized, ${queryTime}ms)`,
       data: geoJSON,
       total: geoJSON.features.length,
       limit: parseInt(limit),
-      timeRange: `${months}_months`
+      timeRange: `${months}_months`,
+      optimized: true,
+      queryTime
     };
 
     // Cache for 10 minutes
@@ -443,144 +365,7 @@ exports.getAllMatRung = async (req, res, next) => {
   }
 };
 
-// Get statistics - OPTIMIZED VERSION
-exports.getStats = async (req, res, next) => {
-  try {
-    const db = req.app.locals.db;
-    const redis = req.app.locals.redis;
-
-    const cacheKey = 'matrung:stats';
-
-    // Try cache
-    const cached = await redis.get(cacheKey);
-    if (cached) {
-      return res.json({ ...cached, cached: true });
-    }
-
-    logger.info('Calculating mat rung statistics');
-
-    // Check if table exists
-    const hasRg3lr = await tableExists(db, 'laocai_rg3lr');
-
-    const query = `
-      SELECT
-        COUNT(*) as total_records,
-        COUNT(CASE WHEN m.geom IS NOT NULL THEN 1 END) as records_with_geometry,
-        ${hasRg3lr ? `COUNT(CASE WHEN r.gid IS NOT NULL THEN 1 END) as records_with_spatial_data,` : `0 as records_with_spatial_data,`}
-        COUNT(CASE WHEN m.end_sau::date >= CURRENT_DATE - INTERVAL '3 months' THEN 1 END) as recent_3_months,
-        COUNT(CASE WHEN m.end_sau::date >= CURRENT_DATE - INTERVAL '12 months' THEN 1 END) as recent_12_months,
-        MIN(m.start_dau) as earliest_date,
-        MAX(m.end_sau) as latest_date,
-        SUM(m.area) as total_area,
-        COUNT(DISTINCT m.mahuyen) as unique_districts,
-        COUNT(CASE WHEN m.detection_status = 'Đã xác minh' THEN 1 END) as verified_records,
-        COUNT(CASE WHEN m.verified_by IS NOT NULL THEN 1 END) as records_with_verifier
-      FROM mat_rung m
-      ${hasRg3lr ? `
-      LEFT JOIN laocai_rg3lr r ON ST_Intersects(
-        ST_Transform(m.geom, 4326),
-        ST_Transform(r.geom, 4326)
-      )
-      ` : ''}
-    `;
-
-    const result = await db.query(query);
-    const stats = result.rows[0];
-
-    // Format stats
-    stats.total_area_ha = stats.total_area ? parseFloat((stats.total_area / 10000).toFixed(2)) : 0;
-    stats.spatial_intersection_rate = stats.total_records > 0
-      ? ((stats.records_with_spatial_data / stats.total_records) * 100).toFixed(2) + '%'
-      : '0%';
-    stats.verification_rate = stats.total_records > 0
-      ? ((stats.verified_records / stats.total_records) * 100).toFixed(2) + '%'
-      : '0%';
-
-    const response = {
-      success: true,
-      data: stats
-    };
-
-    // Cache for 30 minutes
-    await redis.set(cacheKey, response, 1800);
-
-    res.json(response);
-
-  } catch (error) {
-    next(error);
-  }
-};
-
-// Forecast preview - lightweight statistics without full geometry
-exports.forecastPreview = async (req, res, next) => {
-  try {
-    const { year, month, period, fromDate, toDate } = req.body;
-
-    if (!year || !month || !period || !fromDate || !toDate) {
-      throw new ValidationError('Missing required parameters: year, month, period, fromDate, toDate');
-    }
-
-    const db = req.app.locals.db;
-    const redis = req.app.locals.redis;
-
-    logger.info('Forecast preview request', { year, month, period, fromDate, toDate });
-
-    // Check cache first
-    const cacheKey = `forecast:preview:${fromDate}:${toDate}`;
-    const cached = await redis.get(cacheKey);
-    if (cached) {
-      logger.info('Forecast preview cache hit');
-      return res.json({ ...cached, cached: true });
-    }
-
-    // Quick count query - no geometry processing
-    const query = `
-      SELECT
-        COUNT(*) as total_features,
-        SUM(m.area) as total_area,
-        MIN(m.end_sau) as earliest_date,
-        MAX(m.end_sau) as latest_date
-      FROM mat_rung m
-      WHERE m.geom IS NOT NULL
-        AND m.end_sau::date >= $1::date
-        AND m.end_sau::date <= $2::date
-    `;
-
-    const startTime = Date.now();
-    const result = await db.query(query, [fromDate, toDate]);
-    const queryTime = Date.now() - startTime;
-
-    const stats = result.rows[0];
-    const totalFeatures = parseInt(stats.total_features) || 0;
-    const totalArea = parseFloat(stats.total_area) || 0;
-    const totalAreaHa = Math.round((totalArea / 10000) * 100) / 100;
-
-    const response = {
-      success: true,
-      data: {
-        period: `${period} tháng ${month}/${year}`,
-        total_features: totalFeatures,
-        total_area_ha: totalAreaHa,
-        date_range: `${fromDate} → ${toDate}`,
-        earliest_date: stats.earliest_date,
-        latest_date: stats.latest_date,
-        query_time_ms: queryTime
-      }
-    };
-
-    // Cache for 5 minutes
-    await redis.set(cacheKey, response, 300);
-
-    logger.info(`Forecast preview: ${totalFeatures} features, ${totalAreaHa} ha, ${queryTime}ms`);
-
-    res.json(response);
-
-  } catch (error) {
-    next(error);
-  }
-};
-
-// Auto forecast - OPTIMIZED VERSION
+// OPTIMIZED: Auto forecast
 exports.autoForecast = async (req, res, next) => {
   try {
     const { year, month, period, fromDate, toDate } = req.body;
@@ -591,11 +376,11 @@ exports.autoForecast = async (req, res, next) => {
 
     const db = req.app.locals.db;
 
-    logger.info('Auto forecast request', { year, month, period, fromDate, toDate });
+    logger.info('Optimized auto forecast request', { year, month, period, fromDate, toDate });
 
     // Check which tables exist
     const hasUsers = await tableExists(db, 'users');
-    const hasRg3lr = await tableExists(db, 'laocai_rg3lr');
+    const hasLookup = await tableExists(db, 'mv_mat_rung_admin_lookup');
 
     const query = `
       SELECT
@@ -621,12 +406,12 @@ exports.autoForecast = async (req, res, next) => {
         NULL as verified_by_username,
         `}
 
-        ${hasRg3lr ? `
-        r.huyen,
-        r.xa,
-        r.tk,
-        r.khoanh,
-        r.churung,
+        ${hasLookup ? `
+        l.huyen,
+        l.xa,
+        l.tk,
+        l.khoanh,
+        l.churung,
         ` : `
         NULL as huyen,
         NULL as xa,
@@ -641,12 +426,7 @@ exports.autoForecast = async (req, res, next) => {
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
 
       FROM mat_rung m
-      ${hasRg3lr ? `
-      LEFT JOIN laocai_rg3lr r ON ST_Intersects(
-        ST_Transform(m.geom, 4326),
-        ST_Transform(r.geom, 4326)
-      )
-      ` : ''}
+      ${hasLookup ? 'LEFT JOIN mv_mat_rung_admin_lookup l ON m.gid = l.gid' : ''}
       ${hasUsers ? 'LEFT JOIN users u ON m.verified_by = u.id' : ''}
       WHERE m.geom IS NOT NULL
         AND m.end_sau::date >= $1::date
@@ -659,7 +439,7 @@ exports.autoForecast = async (req, res, next) => {
     const result = await db.query(query, [fromDate, toDate]);
     const queryTime = Date.now() - startTime;
 
-    logger.info(`Auto forecast query completed in ${queryTime}ms, found ${result.rows.length} records`);
+    logger.info(`Optimized auto forecast query completed in ${queryTime}ms, found ${result.rows.length} records`);
 
     if (result.rows.length === 0) {
       return res.json({
@@ -669,7 +449,8 @@ exports.autoForecast = async (req, res, next) => {
         metadata: {
           query_time_ms: queryTime,
           period_type: period,
-          total_features: 0
+          total_features: 0,
+          optimized: true
         }
       });
     }
@@ -685,14 +466,15 @@ exports.autoForecast = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: `Auto forecast completed: ${geoJSON.features.length} features`,
+      message: `Optimized auto forecast completed: ${geoJSON.features.length} features (${queryTime}ms)`,
       data: geoJSON,
       summary: {
         period: `${period} tháng ${month}/${year}`,
         total_features: geoJSON.features.length,
         total_area_ha: Math.round((totalArea / 10000) * 100) / 100,
         date_range: `${fromDate} → ${toDate}`,
-        query_time: `${queryTime}ms`
+        query_time: `${queryTime}ms`,
+        optimized: true
       }
     });
 
@@ -701,7 +483,7 @@ exports.autoForecast = async (req, res, next) => {
   }
 };
 
-// Helper function to build GeoJSON
+// Helper function to build GeoJSON - OPTIMIZED
 function buildGeoJSON(rows, extraProps = {}) {
   const features = rows.map(row => {
     const huyen = convertTcvn3ToUnicode(
@@ -729,6 +511,7 @@ function buildGeoJSON(rows, extraProps = {}) {
         verified_by_name: row.verified_by_name,
         verified_by_username: row.verified_by_username,
 
+        // Administrative data from materialized view lookup
         huyen,
         xa: convertTcvn3ToUnicode(row.xa || ''),
         tk: row.tk,

@@ -4,7 +4,7 @@ import { useGeoData } from "../../../contexts/GeoDataContext";
 import config from "../../../../config";
 import DistrictDropdown from "../../DistrictDropdown";
 import { toast } from "react-toastify";
-import { getCommunes } from "../../../../utils/adminService.js";
+import { getCommunes } from "../../../../utils/dropdownService.js";
 import Dropdown from "../../../../components/Dropdown"; // Import the generic Dropdown
 
 const DuBaoMatRungTuyBien = () => {

@@ -1,430 +1,336 @@
-# Tài liệu Database - Hệ thống Dự báo Mất Rừng
+# Tài liệu Cơ sở dữ liệu
 
-## Tổng quan
+Tài liệu này được tạo tự động dựa trên việc truy vấn trực tiếp vào schema của các cơ sở dữ liệu. Nó mô tả chi tiết cấu trúc của các bảng, views, materialized views và các mối quan hệ trong hệ thống.
 
-Hệ thống sử dụng PostgreSQL 17 với PostGIS extension cho xử lý dữ liệu không gian địa lý (GIS).
+- **Ngày tạo:** 2025-10-15
+- **Phương pháp:** Truy vấn `information_schema` và `pg_catalog` của PostgreSQL.
 
-**Container Docker**: `QuanLyMatRungPostgres17`
-- Port: 5433 (external) -> 5432 (internal)
-- Image: postgis/postgis:17-3.5
-
----
-
-## Các Database
-
-Hệ thống gồm 3 database chính:
-
-1. **auth_db** - Quản lý người dùng và xác thực
-2. **gis_db** - Dữ liệu mất rừng và xác minh
-3. **admin_db** - Dữ liệu hành chính và bản đồ nền
+## Mục lục
+1.  [Cơ sở dữ liệu `auth_db`](#cơ-sở-dữ-liệu-auth_db)
+2.  [Cơ sở dữ liệu `gis_db`](#cơ-sở-dữ-liệu-gis_db)
+3.  [Cơ sở dữ liệu `admin_db`](#cơ-sở-dữ-liệu-admin_db)
 
 ---
 
-## 1. AUTH_DB - Database Xác thực và Người dùng
+## Cơ sở dữ liệu `auth_db`
 
-### 1.1. Table: `users`
-**Mô tả**: Lưu trữ thông tin tài khoản người dùng và phân quyền
+Cơ sở dữ liệu này chịu trách nhiệm quản lý người dùng, xác thực, phân quyền và ghi lại lịch sử hoạt động.
 
-| Cột | Kiểu dữ liệu | Ràng buộc | Mặc định | Mô tả |
-|-----|--------------|-----------|----------|-------|
-| id | integer | PRIMARY KEY, NOT NULL | auto increment | ID người dùng |
-| username | varchar(100) | UNIQUE, NOT NULL | | Tên đăng nhập (unique) |
-| password_hash | varchar(255) | NOT NULL | | Mật khẩu đã mã hóa |
-| full_name | varchar(255) | NOT NULL | | Họ và tên |
-| role | varchar(20) | NOT NULL | 'user' | Vai trò: admin, user, viewer, manager |
-| is_active | boolean | NOT NULL | true | Trạng thái hoạt động |
-| created_at | timestamp | NOT NULL | CURRENT_TIMESTAMP | Thời gian tạo |
-| last_login | timestamp | | | Thời gian đăng nhập cuối |
-| district_id | varchar(50) | | NULL | Mã huyện quản lý |
-| position | varchar(255) | NOT NULL | | Chức vụ |
-| organization | varchar(255) | NOT NULL | | Đơn vị công tác |
-| permission_level | varchar(50) | NOT NULL | 'district' | Cấp quyền: district, province, national |
+### Bảng (Tables)
 
-**Indexes**:
-- `users_pkey`: PRIMARY KEY trên id
-- `users_username_key`: UNIQUE trên username
-- `idx_users_username`: btree(username)
-- `idx_users_role`: btree(role)
-- `idx_users_is_active`: btree(is_active)
-- `idx_users_district_id`: btree(district_id)
+#### `users`
+Lưu trữ thông tin tài khoản người dùng.
 
-**Check Constraints**:
-- `chk_role`: role phải là một trong ['admin', 'user', 'viewer', 'manager']
-- `chk_permission`: permission_level phải là một trong ['district', 'province', 'national']
+| Cột | Kiểu dữ liệu | Cho phép NULL | Mặc định |
+| :--- | :--- | :--- | :--- |
+| id | integer | NO | nextval('users_id_seq') |
+| username | character varying | NO | |
+| password_hash | character varying | NO | |
+| full_name | character varying | NO | |
+| role | character varying | NO | 'user' |
+| is_active | boolean | NO | true |
+| created_at | timestamp | NO | CURRENT_TIMESTAMP |
+| last_login | timestamp | YES | |
+| district_id | character varying | YES | |
+| position | character varying | NO | |
+| organization | character varying | NO | |
+| permission_level | character varying | NO | 'district' |
 
-**Referenced By**:
-- user_sessions.user_id (CASCADE DELETE)
-- user_activity_log.user_id
+#### `user_sessions`
+Quản lý các phiên đăng nhập của người dùng.
 
----
+| Cột | Kiểu dữ liệu | Cho phép NULL | Mặc định |
+| :--- | :--- | :--- | :--- |
+| id | uuid | NO | uuid_generate_v4() |
+| user_id | integer | NO | |
+| token_hash | character varying | NO | |
+| ip_address | inet | YES | |
+| user_agent | text | YES | |
+| expires_at | timestamp | NO | |
+| created_at | timestamp | NO | CURRENT_TIMESTAMP |
+| last_activity | timestamp | NO | CURRENT_TIMESTAMP |
 
-### 1.2. Table: `user_sessions`
-**Mô tả**: Quản lý phiên đăng nhập và JWT tokens
+#### `user_activity_log`
+Ghi lại các hành động quan trọng của người dùng trong hệ thống.
 
-| Cột | Kiểu dữ liệu | Ràng buộc | Mặc định | Mô tả |
-|-----|--------------|-----------|----------|-------|
-| id | uuid | PRIMARY KEY, NOT NULL | uuid_generate_v4() | Session ID |
-| user_id | integer | NOT NULL, FK | | ID người dùng |
-| token_hash | varchar(255) | NOT NULL | | Token hash (JWT) |
-| ip_address | inet | | | Địa chỉ IP |
-| user_agent | text | | | User agent (browser info) |
-| expires_at | timestamp | NOT NULL | | Thời gian hết hạn |
-| created_at | timestamp | NOT NULL | CURRENT_TIMESTAMP | Thời gian tạo session |
-| last_activity | timestamp | NOT NULL | CURRENT_TIMESTAMP | Hoạt động cuối cùng |
+| Cột | Kiểu dữ liệu | Cho phép NULL | Mặc định |
+| :--- | :--- | :--- | :--- |
+| id | integer | NO | nextval('user_activity_log_id_seq') |
+| user_id | integer | NO | |
+| action | character varying | NO | |
+| resource | character varying | YES | |
+| details | jsonb | YES | |
+| ip_address | inet | YES | |
+| user_agent | text | YES | |
+| created_at | timestamp | NO | CURRENT_TIMESTAMP |
 
-**Indexes**:
-- `user_sessions_pkey`: PRIMARY KEY trên id
-- `idx_sessions_user_id`: btree(user_id)
-- `idx_sessions_token_hash`: btree(token_hash)
-- `idx_sessions_expires_at`: btree(expires_at)
+### Views
 
-**Foreign Keys**:
-- `fk_user`: user_id -> users(id) ON DELETE CASCADE
+#### `v_active_users`
+Cung cấp thông tin tóm tắt về những người dùng đang hoạt động và số lượng phiên đăng nhập của họ.
 
-**Triggers**:
-- `trigger_update_last_activity`: Tự động cập nhật last_activity khi UPDATE
-
----
-
-### 1.3. Table: `user_activity_log`
-**Mô tả**: Ghi log hoạt động của người dùng (audit trail)
-
-| Cột | Kiểu dữ liệu | Ràng buộc | Mặc định | Mô tả |
-|-----|--------------|-----------|----------|-------|
-| id | integer | PRIMARY KEY, NOT NULL | auto increment | Log ID |
-| user_id | integer | NOT NULL, FK | | ID người dùng |
-| action | varchar(100) | NOT NULL | | Hành động thực hiện |
-| resource | varchar(255) | | | Tài nguyên bị tác động |
-| details | jsonb | | | Chi tiết bổ sung (JSON) |
-| ip_address | inet | | | Địa chỉ IP |
-| user_agent | text | | | User agent |
-| created_at | timestamp | NOT NULL | CURRENT_TIMESTAMP | Thời gian ghi log |
-
-**Indexes**:
-- `user_activity_log_pkey`: PRIMARY KEY trên id
-- `idx_activity_user_id`: btree(user_id)
-- `idx_activity_action`: btree(action)
-- `idx_activity_created_at`: btree(created_at DESC)
-
-**Foreign Keys**:
-- `fk_user_activity`: user_id -> users(id)
-
----
-
-### 1.4. View: `v_active_users`
-**Mô tả**: Hiển thị người dùng đang hoạt động và số phiên đăng nhập
-
-**Columns**:
-- id, username, full_name, role, organization, permission_level, last_login
-- active_sessions (bigint): Số phiên đăng nhập còn hiệu lực
-
-**Definition**:
+**Định nghĩa:**
 ```sql
-SELECT u.id, u.username, u.full_name, u.role, u.organization,
-       u.permission_level, u.last_login,
-       COUNT(s.id) AS active_sessions
-FROM users u
-LEFT JOIN user_sessions s ON u.id = s.user_id AND s.expires_at > NOW()
-WHERE u.is_active = TRUE
-GROUP BY u.id
+SELECT u.id,
+    u.username,
+    u.full_name,
+    u.role,
+    u.organization,
+    u.permission_level,
+    u.last_login,
+    count(s.id) AS active_sessions
+   FROM (users u
+     LEFT JOIN user_sessions s ON (((u.id = s.user_id) AND (s.expires_at > now()))))
+  WHERE (u.is_active = true)
+  GROUP BY u.id;
 ```
 
----
+### Mối quan hệ (Foreign Keys)
 
-## 2. GIS_DB - Database Dữ liệu Mất Rừng
-
-### 2.1. Table: `mat_rung`
-**Mô tả**: Dữ liệu phát hiện mất rừng với tọa độ không gian (geometry)
-
-| Cột | Kiểu dữ liệu | Ràng buộc | Mặc định | Mô tả |
-|-----|--------------|-----------|----------|-------|
-| gid | integer | PRIMARY KEY, NOT NULL | auto increment | ID chính |
-| start_sau | varchar(10) | | | Ngày bắt đầu (sau) |
-| area | double precision | | | Diện tích (m²) |
-| start_dau | varchar(10) | | | Ngày bắt đầu (đầu) |
-| end_sau | varchar(10) | | | Ngày kết thúc (sau) |
-| mahuyen | varchar(2) | | | Mã huyện |
-| end_dau | varchar(10) | | | Ngày kết thúc (đầu) |
-| geom | geometry(MultiPolygon,4326) | | | Vùng địa lý WGS84 |
-| geom_simplified | geometry(MultiPolygon,4326) | | | Geometry đơn giản hóa (render nhanh) |
-| detection_status | varchar(20) | CHECK | 'Chưa xác minh' | Trạng thái: Chưa xác minh, Đã xác minh, Từ chối, Đang xử lý |
-| detection_date | date | | | Ngày phát hiện |
-| verified_by | integer | | | User ID người xác minh (từ auth_db) |
-| verified_area | double precision | | | Diện tích đã xác minh |
-| verification_reason | varchar(100) | | | Lý do xác minh |
-| verification_notes | text | | | Ghi chú xác minh |
-| created_at | timestamp | | CURRENT_TIMESTAMP | Thời gian tạo |
-| updated_at | timestamp | | CURRENT_TIMESTAMP | Thời gian cập nhật |
-
-**Indexes**:
-- `mat_rung_pkey`: PRIMARY KEY trên gid
-- `idx_mat_rung_gid`: btree(gid)
-- `idx_mat_rung_mahuyen`: btree(mahuyen)
-- `idx_mat_rung_dates`: btree(start_dau, end_sau)
-- `idx_mat_rung_composite`: btree(start_dau, end_sau, mahuyen)
-- `idx_mat_rung_detection_status`: btree(detection_status)
-- `idx_mat_rung_verified_by`: btree(verified_by) WHERE verified_by IS NOT NULL
-- `idx_mat_rung_status_date`: btree(detection_status, detection_date DESC) WHERE detection_status = 'Đã xác minh'
-- `idx_mat_rung_geom_gist`: gist(geom) - Index không gian
-- `idx_mat_rung_geom_simplified_gist`: gist(geom_simplified)
-- `idx_mat_rung_geom_3857`: gist(st_transform(geom, 3857))
-- `idx_mat_rung_geom_gist_optimized`: gist(geom) WHERE st_isvalid(geom) AND geom IS NOT NULL
-
-**Check Constraints**:
-- `chk_detection_status`: detection_status phải là một trong ['Chưa xác minh', 'Đã xác minh', 'Từ chối', 'Đang xử lý']
-
-**Triggers**:
-- `set_area_in_hectares`: Tự động tính diện tích khi INSERT/UPDATE
-- `trigger_log_verification_change`: Ghi log khi thay đổi trạng thái xác minh
-
-**Referenced By**:
-- mat_rung_verification_log.gid (CASCADE DELETE)
+| Bảng nguồn | Cột nguồn | Bảng đích | Cột đích |
+| :--- | :--- | :--- | :--- |
+| `user_sessions` | `user_id` | `users` | `id` |
+| `user_activity_log` | `user_id` | `users` | `id` |
 
 ---
 
-### 2.2. Table: `mat_rung_verification_log`
-**Mô tả**: Log lịch sử xác minh mất rừng
+## Cơ sở dữ liệu `gis_db`
 
-| Cột | Kiểu dữ liệu | Ràng buộc | Mặc định | Mô tả |
-|-----|--------------|-----------|----------|-------|
-| id | integer | PRIMARY KEY, NOT NULL | auto increment | Log ID |
-| gid | integer | NOT NULL, FK | | ID bản ghi mat_rung |
-| action | varchar(50) | NOT NULL, CHECK | | Hành động: VERIFY, UPDATE_VERIFICATION, REJECT, RESET |
-| old_status | varchar(50) | | | Trạng thái cũ |
-| new_status | varchar(50) | | | Trạng thái mới |
-| old_verified_area | double precision | | | Diện tích cũ |
-| new_verified_area | double precision | | | Diện tích mới |
-| old_verification_reason | varchar(100) | | | Lý do xác minh cũ |
-| new_verification_reason | varchar(100) | | | Lý do xác minh mới |
-| changed_by | integer | NOT NULL | | User ID người thực hiện |
-| changed_at | timestamp | | CURRENT_TIMESTAMP | Thời gian thay đổi |
-| client_ip | inet | | | Địa chỉ IP client |
-| user_agent | text | | | User agent |
+Cơ sở dữ liệu này chứa tất cả dữ liệu không gian (GIS) liên quan đến việc phát hiện và quản lý mất rừng.
 
-**Indexes**:
-- `mat_rung_verification_log_pkey`: PRIMARY KEY trên id
-- `idx_verification_log_gid`: btree(gid)
-- `idx_verification_log_changed_by`: btree(changed_by)
-- `idx_verification_log_changed_at`: btree(changed_at DESC)
+### Bảng (Tables)
 
-**Check Constraints**:
-- `chk_action`: action phải là một trong ['VERIFY', 'UPDATE_VERIFICATION', 'REJECT', 'RESET']
+#### `mat_rung`
+Bảng chính lưu trữ các điểm phát hiện mất rừng.
 
-**Foreign Keys**:
-- `fk_mat_rung`: gid -> mat_rung(gid) ON DELETE CASCADE
+| Cột | Kiểu dữ liệu | Cho phép NULL | Mặc định |
+| :--- | :--- | :--- | :--- |
+| gid | integer | NO | nextval('mat_rung_gid_seq') |
+| start_sau | character varying | YES | |
+| area | double precision | YES | |
+| start_dau | character varying | YES | |
+| end_sau | character varying | YES | |
+| mahuyen | character varying | YES | |
+| end_dau | character varying | YES | |
+| geom | USER-DEFINED | YES | |
+| geom_simplified | USER-DEFINED | YES | |
+| detection_status | character varying | YES | 'Chưa xác minh' |
+| detection_date | date | YES | |
+| verified_by | integer | YES | |
+| verified_area | double precision | YES | |
+| verification_reason | character varying | YES | |
+| verification_notes | text | YES | |
+| created_at | timestamp | YES | CURRENT_TIMESTAMP |
+| updated_at | timestamp | YES | CURRENT_TIMESTAMP |
 
----
+#### `mat_rung_verification_log`
+Ghi lại lịch sử các lần xác minh thông tin mất rừng.
 
-### 2.3. Table: `mat_rung_monthly_summary`
-**Mô tả**: Tổng hợp dữ liệu mất rừng theo tháng và huyện
+| Cột | Kiểu dữ liệu | Cho phép NULL | Mặc định |
+| :--- | :--- | :--- | :--- |
+| id | integer | NO | nextval('mat_rung_verification_log_id_seq') |
+| gid | integer | NO | |
+| action | character varying | NO | |
+| old_status | character varying | YES | |
+| new_status | character varying | YES | |
+| old_verified_area | double precision | YES | |
+| new_verified_area | double precision | YES | |
+| old_verification_reason | character varying | YES | |
+| new_verification_reason | character varying | YES | |
+| changed_by | integer | NO | |
+| changed_at | timestamp | YES | CURRENT_TIMESTAMP |
+| client_ip | inet | YES | |
+| user_agent | text | YES | |
 
-| Cột | Kiểu dữ liệu | Mô tả |
-|-----|--------------|-------|
-| month_year | timestamp with time zone | Tháng/năm |
-| mahuyen | varchar(2) | Mã huyện |
-| geom | geometry | Vùng địa lý |
-| alert_count | bigint | Số cảnh báo |
-| total_area | double precision | Tổng diện tích |
-| avg_area | double precision | Diện tích trung bình |
-| status_list | varchar[] | Danh sách trạng thái |
+#### `mat_rung_monthly_summary`
+Bảng tổng hợp dữ liệu mất rừng theo tháng và huyện.
 
----
+| Cột | Kiểu dữ liệu | Cho phép NULL | Mặc định |
+| :--- | :--- | :--- | :--- |
+| month_year | timestamp with time zone | YES | |
+| mahuyen | character varying | YES | |
+| geom | USER-DEFINED | YES | |
+| alert_count | bigint | YES | |
+| total_area | double precision | YES | |
+| avg_area | double precision | YES | |
+| status_list | ARRAY | YES | |
 
-### 2.4. View: `v_mat_rung_optimized`
-**Mô tả**: View tối ưu cho truy vấn nhanh dữ liệu mất rừng
+*(Lưu ý: Các bảng hệ thống của PostGIS như `spatial_ref_sys`, `geography_columns`, `geometry_columns` không được liệt kê chi tiết ở đây.)*
 
-**Columns**:
-- gid, start_dau, end_sau, area, mahuyen, geom
-- start_date (date): Chuyển đổi start_dau sang date
-- end_date (date): Chuyển đổi end_sau sang date
-- area_ha (numeric): Diện tích tính theo hecta
-- detection_status, verified_by
+### Views
 
-**Definition**:
+#### `v_mat_rung_optimized`
+View tối ưu hóa của bảng `mat_rung`, tính toán sẵn một số trường và đảm bảo `geom` hợp lệ.
+
+**Định nghĩa:**
 ```sql
-SELECT gid, start_dau, end_sau, area, mahuyen, geom,
-       start_dau::date AS start_date,
-       end_sau::date AS end_date,
-       ROUND((area / 10000.0)::numeric, 2) AS area_ha,
-       detection_status, verified_by
-FROM mat_rung m
-WHERE st_isvalid(geom) AND geom IS NOT NULL
+SELECT gid,
+    start_dau,
+    end_sau,
+    area,
+    mahuyen,
+    geom,
+    (start_dau)::date AS start_date,
+    (end_sau)::date AS end_date,
+    round(((area / (10000.0)::double precision))::numeric, 2) AS area_ha,
+    detection_status,
+    verified_by
+   FROM mat_rung m
+  WHERE (st_isvalid(geom) AND (geom IS NOT NULL));
 ```
 
----
+#### `verification_stats_by_status`
+View thống kê số liệu xác minh dựa trên `detection_status`.
 
-### 2.5. Views: `verification_stats_by_status` và `verification_stats_by_reason`
-**Mô tả**: Thống kê xác minh theo trạng thái và lý do
+**Định nghĩa:**
+```sql
+SELECT detection_status,
+    count(*) AS total_cases,
+    (sum(area) / (10000.0)::double precision) AS total_area_ha,
+    (avg(area) / (10000.0)::double precision) AS avg_area_ha,
+    min(detection_date) AS first_case,
+    max(detection_date) AS last_case
+   FROM mat_rung
+  WHERE (detection_status IS NOT NULL)
+  GROUP BY detection_status
+  ORDER BY (count(*)) DESC;
+```
 
----
+#### `verification_stats_by_reason`
+View thống kê số liệu xác minh dựa trên `verification_reason` (lý do xác minh).
 
-### 2.6. Table: `spatial_ref_sys`
-**Mô tả**: Hệ tọa độ không gian (PostGIS standard table)
-- Size: 6936 kB
+**Định nghĩa:**
+```sql
+SELECT verification_reason,
+    count(*) AS total_cases,
+    (sum(area) / (10000.0)::double precision) AS total_area_ha,
+    (avg(area) / (10000.0)::double precision) AS avg_area_ha,
+    min(detection_date) AS first_case,
+    max(detection_date) AS last_case
+   FROM mat_rung
+  WHERE (((detection_status)::text = 'Đã xác minh'::text) AND (verification_reason IS NOT NULL))
+  GROUP BY verification_reason
+  ORDER BY (count(*)) DESC;
+```
 
----
+### Mối quan hệ (Foreign Keys)
 
-## 3. ADMIN_DB - Database Hành chính và Bản đồ nền
-
-### 3.1. Table: `laocai_huyen`
-**Mô tả**: Ranh giới hành chính cấp huyện của Lào Cai
-
-| Cột | Kiểu dữ liệu | Mô tả |
-|-----|--------------|-------|
-| gid | integer | PRIMARY KEY |
-| objectid | double precision | Object ID |
-| matinh | double precision | Mã tỉnh |
-| tinh | varchar(30) | Tên tỉnh |
-| huyen | varchar(30) | Tên huyện |
-| sum_dtich | numeric | Tổng diện tích |
-| shape_leng | numeric | Chu vi |
-| shape_area | numeric | Diện tích hình dạng |
-| mahuyen_1 | varchar(50) | Mã huyện phụ |
-| geom | geometry(MultiPolygon,4326) | Vùng địa lý |
-
-**Indexes**:
-- `laocai_huyen_pkey`: PRIMARY KEY trên gid
-- `idx_laocai_huyen_geom`: gist(geom)
-
-**Size**: 1136 kB
-
----
-
-### 3.2. Table: `laocai_chuquanly`
-**Mô tả**: Đơn vị chủ quản lý rừng Lào Cai
-
-| Cột | Kiểu dữ liệu | Mô tả |
-|-----|--------------|-------|
-| gid | integer | PRIMARY KEY |
-| tt | integer | STT |
-| chuquanly | varchar(50) | Tên chủ quản lý |
-| geom | geometry(MultiPolygon,4326) | Vùng địa lý |
-| geom_simplified | geometry(MultiPolygon,4326) | Geometry đơn giản hóa |
-
-**Indexes**:
-- `laocai_chuquanly_pkey`: PRIMARY KEY trên gid
-- `idx_chuquanly_geom`: gist(geom)
-- `idx_chuquanly_geom_simplified`: gist(geom_simplified)
-
-**Size**: 275 MB (original), 520 kB (clustered)
+| Bảng nguồn | Cột nguồn | Bảng đích | Cột đích |
+| :--- | :--- | :--- | :--- |
+| `mat_rung_verification_log` | `gid` | `mat_rung` | `gid` |
 
 ---
 
-### 3.3. Table: `laocai_rg3lr`
-**Mô tả**: Phân loại rừng chi tiết theo hệ thống 3LR (3 loại rừng) cho Lào Cai
+## Cơ sở dữ liệu `admin_db`
 
-**Các cột chính**:
-- gid: PRIMARY KEY
-- matinh, mahuyen, maxa: Mã hành chính
-- xa, huyen, tinh: Tên hành chính
-- tk, khoanh, lo, thuad: Mã quản lý đất rừng
-- ldlr (loại đất lâm nghiệp): Loại đất lâm nghiệp
-- maldlr, malr3: Mã loại rừng
-- dtich: Diện tích
-- churung, machur: Chủ rừng
-- mdsd, mamdsd: Mục đích sử dụng
-- geom: geometry(MultiPolygon,4326)
-- geom_simplified_low/medium/high: Geometry đơn giản hóa nhiều mức độ
+Cơ sở dữ liệu này chứa các dữ liệu nền, dữ liệu hành chính và các bảng tra cứu (lookup tables) phục vụ cho toàn bộ hệ thống.
 
-**Indexes**:
-- `laocai_rg3lr_pkey`: PRIMARY KEY trên gid
-- `idx_rg3lr_geom`: gist(geom)
-- `idx_rg3lr_geom_low/medium/high`: gist trên các mức độ đơn giản hóa
-- `idx_rg3lr_ldlr`: btree(ldlr) WHERE ldlr IS NOT NULL
+### Bảng (Tables)
 
-**Size**: 966 MB (original), 13 MB (clustered)
+#### `laocai_huyen`
+Ranh giới hành chính các huyện của tỉnh Lào Cai.
 
-**Lưu ý**: Table này có 56 cột, chứa thông tin chi tiết về rừng theo tiêu chuẩn kiểm kê rừng Việt Nam (3LR system)
+| Cột | Kiểu dữ liệu | Cho phép NULL | Mặc định |
+| :--- | :--- | :--- | :--- |
+| gid | integer | NO | nextval('laocai_huyen_gid_seq') |
+| objectid | double precision | YES | |
+| matinh | double precision | YES | |
+| tinh | character varying | YES | |
+| huyen | character varying | YES | |
+| sum_dtich | numeric | YES | |
+| shape_leng | numeric | YES | |
+| shape_area | numeric | YES | |
+| mahuyen_1 | character varying | YES | |
+| geom | USER-DEFINED | YES | |
 
----
+#### `laocai_ranhgioihc`
+Ranh giới hành chính chi tiết (tiểu khu, khoảnh).
 
-### 3.4. Tables khác:
-- `laocai_chuquanly_clustered`: Bảng clustered tối ưu (520 kB)
-- `laocai_nendiahinh`: Dữ liệu nền địa hình (6976 kB)
-- `laocai_nendiahinh_line`: Đường nền địa hình (17 MB)
-- `laocai_ranhgioihc`: Ranh giới hành chính nhiều mức chi tiết (26 MB)
-- `laocai_rg3lr_clustered`: Bảng clustered tối ưu (13 MB)
-- `tlaocai_tkk_3lr_cru`: Thống kê ranh giới hành chính với đơn vị quản lý rừng (139 MB)
-- `spatial_ref_sys`: Hệ tọa độ (6936 kB)
+| Cột | Kiểu dữ liệu | Cho phép NULL | Mặc định |
+| :--- | :--- | :--- | :--- |
+| gid | integer | NO | nextval('laocai_ranhgioihc_gid_seq') |
+| huyen | character varying | YES | |
+| xa | character varying | YES | |
+| tieukhu | character varying | YES | |
+| khoanh | character varying | YES | |
+| geom | USER-DEFINED | YES | |
+| geom_low | USER-DEFINED | YES | |
+| geom_high | USER-DEFINED | YES | |
 
----
+#### `laocai_rg3lr`
+Dữ liệu quy hoạch 3 loại rừng.
 
-## Quan hệ giữa các Database
+| Cột | Kiểu dữ liệu | Cho phép NULL | Mặc định |
+| :--- | :--- | :--- | :--- |
+| gid | integer | NO | nextval('laocai_rg3lr_gid_seq') |
+| dtich | double precision | YES | |
+| ldlr | character varying | YES | |
+| malr3 | smallint | YES | |
+| mdsd | character varying | YES | |
+| churung | character varying | YES | |
+| huyen | character varying | YES | |
+| xa | character varying | YES | |
+| ... | ... | ... | ... |
+| geom | USER-DEFINED | YES | |
 
-### Cross-database References:
-1. **mat_rung.verified_by** (gis_db) tham chiếu đến **users.id** (auth_db)
-   - Không có foreign key constraint vật lý (cross-database)
-   - Được xử lý ở application layer
+*(Bảng `laocai_rg3lr` có rất nhiều cột, chỉ một số cột chính được liệt kê ở đây.)*
 
-2. **mat_rung_verification_log.changed_by** (gis_db) tham chiếu đến **users.id** (auth_db)
-   - Không có foreign key constraint vật lý
-   - Được xử lý ở application layer
+#### `laocai_chuquanly`
+Thông tin về chủ quản lý.
 
-3. **users.district_id** (auth_db) tham chiếu đến **laocai_huyen.mahuyen_1** (admin_db)
-   - Không có foreign key constraint vật lý
-   - Được xử lý ở application layer
+| Cột | Kiểu dữ liệu | Cho phép NULL | Mặc định |
+| :--- | :--- | :--- | :--- |
+| gid | integer | NO | nextval('laocai_chuquanly_gid_seq') |
+| tt | integer | YES | |
+| chuquanly | character varying | YES | |
+| geom | USER-DEFINED | YES | |
+| geom_simplified | USER-DEFINED | YES | |
 
----
+#### `chuc_nang_rung`
+Bảng tra cứu chức năng rừng.
 
-## Kiến trúc Microservices
+| Cột | Kiểu dữ liệu | Cho phép NULL | Mặc định |
+| :--- | :--- | :--- | :--- |
+| id | integer | NO | nextval('chuc_nang_rung_id_seq') |
+| ma_chuc_nang | character varying | NO | |
+| ten_chuc_nang | character varying | NO | |
+| mo_ta | text | YES | |
+| created_at | timestamp | YES | CURRENT_TIMESTAMP |
 
-Dựa vào cấu trúc database, hệ thống sử dụng kiến trúc microservices với:
+#### `nguyen_nhan`
+Bảng tra cứu nguyên nhân mất rừng.
 
-1. **Auth Service**: Sử dụng auth_db
-   - Xác thực người dùng
-   - Quản lý session và JWT tokens
-   - Audit logging
+| Cột | Kiểu dữ liệu | Cho phép NULL | Mặc định |
+| :--- | :--- | :--- | :--- |
+| id | integer | NO | nextval('nguyen_nhan_id_seq') |
+| ma_nguyen_nhan | character varying | NO | |
+| ten_nguyen_nhan | character varying | NO | |
+| mo_ta | text | YES | |
+| created_at | timestamp | YES | CURRENT_TIMESTAMP |
 
-2. **GIS Service**: Sử dụng gis_db
-   - Quản lý dữ liệu mất rừng
-   - Xác minh và theo dõi lịch sử
-   - Phân tích không gian địa lý
+#### `trang_thai_xac_minh`
+Bảng tra cứu các trạng thái xác minh.
 
-3. **Admin Service**: Sử dụng admin_db
-   - Dữ liệu hành chính
-   - Bản đồ nền và ranh giới
-   - Dữ liệu tham chiếu
+| Cột | Kiểu dữ liệu | Cho phép NULL | Mặc định |
+| :--- | :--- | :--- | :--- |
+| id | integer | NO | nextval('trang_thai_xac_minh_id_seq') |
+| ma_trang_thai | character varying | NO | |
+| ten_trang_thai | character varying | NO | |
+| mo_ta | text | YES | |
+| created_at | timestamp | YES | CURRENT_TIMESTAMP |
 
----
+*(Lưu ý: Các bảng khác như `laocai_nendiahinh`, `laocai_nendiahinh_line`, `laocai_chuquanly_clustered`, `laocai_rg3lr_clustered` không được liệt kê chi tiết.)*
 
-## Tối ưu hóa
+### Materialized Views
 
-### Spatial Indexes:
-- Tất cả geometry columns đều có GIST indexes
-- Clustered tables cho truy vấn nhanh
-- Simplified geometries cho rendering
+Đây là các view được tính toán trước để tăng tốc độ truy vấn, thường dùng cho các bộ lọc dropdown trên giao diện người dùng.
 
-### Query Optimization:
-- Composite indexes trên các cột thường truy vấn cùng nhau
-- Partial indexes cho điều kiện WHERE phổ biến
-- Views tối ưu cho các truy vấn phức tạp
+- **`mv_huyen`**: Liệt kê các huyện duy nhất.
+- **`mv_xa_by_huyen`**: Liệt kê các xã duy nhất theo từng huyện.
+- **`mv_tieukhu_by_xa`**: Liệt kê các tiểu khu duy nhất theo xã.
+- **`mv_khoanh_by_tieukhu`**: Liệt kê các khoảnh duy nhất theo tiểu khu.
+- **`mv_churung`**: Liệt kê các chủ rừng duy nhất.
 
-### Data Integrity:
-- Check constraints cho enum-like values
-- Triggers tự động cập nhật timestamps và tính toán
-- Foreign keys với CASCADE DELETE khi phù hợp
+### Mối quan hệ (Foreign Keys)
 
----
-
-## Backup và Maintenance
-
-Khuyến nghị:
-- Backup định kỳ tất cả 3 databases
-- Vacuum và analyze định kỳ (đặc biệt cho spatial tables)
-- Monitor index bloat và rebuild khi cần
-- Kiểm tra geometry validity định kỳ
-
----
-
-## Thông tin kết nối
-
-**Connection Info**:
-- Host: localhost
-- Port: 5433
-- Databases: auth_db, gis_db, admin_db
-- User: postgres
-- Extension: PostGIS 3.5
-
----
-
-*Tài liệu được tạo tự động bởi Claude Code - Ngày cập nhật: 2025-10-11*
+Cơ sở dữ liệu `admin_db` không có các ràng buộc foreign key được định nghĩa ở cấp độ schema. Các mối quan hệ được quản lý ở tầng ứng dụng.

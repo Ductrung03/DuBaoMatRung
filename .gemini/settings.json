@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "postgres-admin": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:4@172.17.0.1:5433/admin_db"
+      ]
+    },
+    "postgres-auth": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:4@172.17.0.1:5433/auth_db"
+      ]
+    },
+    "postgres-gis": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:4@172.17.0.1:5433/gis_db"
+      ]
+    },
+    "context7": {
+      "httpUrl": "https://mcp.context7.com/mcp"
+    }
+  },
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  },
+  "ui": {
+    "theme": "Default"
+  }
+}

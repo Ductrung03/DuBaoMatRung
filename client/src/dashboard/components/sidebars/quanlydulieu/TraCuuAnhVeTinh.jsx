@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import config from "../../../../config";
 import DistrictDropdown from "../../DistrictDropdown";
-import { getCommunes } from "../../../../utils/adminService";
+import { getCommunes } from "../../../../utils/dropdownService";
 import { toast } from "react-toastify";
 import Dropdown from "../../../../components/Dropdown"; // Import the generic Dropdown
 

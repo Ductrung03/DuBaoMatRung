@@ -41,8 +41,6 @@ export const getCommunes = async (districtName) => {
 export const getPlots = async (districtName, communeName) => {
   if (!districtName || !communeName) return [];
   try {
-    // Note: The backend controller for khoanh doesn't seem to filter by huyen/xa yet.
-    // This is a placeholder for when it does.
     const response = await axios.get(`${API_URL}/khoanh`, { params: { huyen: districtName, xa: communeName } });
     return response.data.data || [];
   } catch (error) {

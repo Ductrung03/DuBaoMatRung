@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getDistricts, getCommunes, getPlots, getSubZones } from '../../utils/adminService';
+import { getDistricts, getCommunes, getPlots, getSubZones } from '../../utils/dropdownService';
 
 /**
  * Custom Hook để quản lý state và logic cho các dropdown hành chính xếp chồng.

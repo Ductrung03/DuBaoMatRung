@@ -17,7 +17,7 @@ import config from "../../config";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-import { getDistricts } from "../../utils/adminService.js";
+import { getDistricts } from "../../utils/dropdownService.js";
 
 const QuanLyNguoiDung = () => {
   const navigate = useNavigate();

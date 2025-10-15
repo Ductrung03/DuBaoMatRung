@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useCascadingAdminUnits } from "../../../hooks/useCascadingAdminUnits";
-import { getChucNangRung, getChuRung, getTrangThaiXacMinh, getNguyenNhan } from "../../../../utils/adminService";
+import { getChucNangRung, getChuRung, getTrangThaiXacMinh, getNguyenNhan } from "../../../../utils/dropdownService";
 import DistrictDropdown from "../../DistrictDropdown";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useGeoData } from "../../../contexts/GeoDataContext";

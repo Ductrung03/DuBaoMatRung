@@ -17,7 +17,7 @@ import { toast } from "react-toastify";
 import { ClipLoader } from 'react-spinners';
 import { useAuth } from "../../../contexts/AuthContext";
 import DistrictDropdown from "../../DistrictDropdown";
-import { getCommunes } from "../../../../utils/adminService";
+import { getCommunes } from "../../../../utils/dropdownService";
 import Dropdown from "../../../../components/Dropdown";
  // Import the generic Dropdown
 

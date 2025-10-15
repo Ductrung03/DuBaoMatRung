@@ -1,0 +1,19 @@
+{
+  "theme": "Default",
+  "selectedAuthType": "oauth-personal",
+  "mcpServers": {
+    "postgres-local": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_HOST": "172.17.0.1",
+        "POSTGRES_PORT": "5433",
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_PASSWORD": "4"
+      }
+    },
+    "context7": {
+      "httpUrl": "https://mcp.context7.com/mcp"
+    }
+  }
+}
