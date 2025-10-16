@@ -34,10 +34,8 @@ const RealTimeDataLoader = ({
         setProgress(progressData);
         
         // Log cho debug
-        console.log(`📊 Progress update for ${layerKey}:`, progressData);
         
       } catch (error) {
-        console.warn(`⚠️ Error polling progress for ${layerKey}:`, error);
       }
     };
 

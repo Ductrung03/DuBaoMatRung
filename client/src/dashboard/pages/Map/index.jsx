@@ -100,35 +100,31 @@ const Map = () => {
       const { feature, center, bbox, zoom } = event.detail;
       
       if (!feature || !window._leaflet_map) {
-        console.warn("⚠️ Missing feature or map instance for zoom");
         return;
       }
 
       try {
         const targetGid = feature.properties.gid;
-        console.log(`🎯 Zooming to CB-${targetGid}:`, { center, bbox, zoom });
         
         // ✅ FIX: Zoom using bbox if available, fallback to center
         if (bbox && bbox.length === 4) {
           const [west, south, east, north] = bbox;
           const bounds = [[south, west], [north, east]];
-          
+
           window._leaflet_map.flyToBounds(bounds, {
             padding: [50, 50],
             duration: 2.0,
             animate: true,
             maxZoom: zoom || 16
           });
-          
-          console.log("✅ Zoomed using bbox:", bounds);
+
         } else if (center && center.length === 2) {
           const [lng, lat] = center;
           window._leaflet_map.flyTo([lat, lng], zoom || 16, {
             duration: 2.0,
             animate: true
           });
-          
-          console.log("✅ Zoomed using center:", [lat, lng]);
+
         }
         
         // ✅ FIX: Highlight target feature with delay
@@ -165,7 +161,6 @@ const Map = () => {
                   layer.openPopup();
                 }
                 
-                console.log(`✅ Highlighted CB-${targetGid} on map`);
               }
             });
             
@@ -173,7 +168,6 @@ const Map = () => {
               setSelectedFeature(feature);
               setHighlightedLayerRef(targetLayer);
             } else {
-              console.warn(`⚠️ Could not find layer for CB-${targetGid}`);
             }
           }
         }, 1000); // Delay để đảm bảo map đã zoom xong
@@ -201,37 +195,15 @@ const Map = () => {
 
   // Debug logging
   useEffect(() => {
-    console.log("🔍 MAP DEBUG - Current state:", {
-      layerName,
-      loading,
-      geoDataExists: !!geoData,
-      geoDataFeatures: geoData?.features?.length || 0,
-      geoDataType: geoData?.type,
-      currentPath: location.pathname,
-      shouldShowTable,
-      // ✅ FIX: Log để debug table display
-      tableWillShow: shouldShowTable
-    });
+    // Debug removed
   }, [layerName, loading, geoData, location.pathname, shouldShowTable]);
 
   // Log geoData changes
   useEffect(() => {
     if (geoData) {
-      console.log("📊 Dữ liệu GeoJSON nhận được:", {
-        type: geoData.type,
-        featuresCount: geoData.features?.length || 0,
-        firstFeature: geoData.features?.[0]?.properties
-      });
-      
+      // Debug removed
       if (geoData.features && geoData.features.length > 0) {
-        const firstFeature = geoData.features[0];
-        console.log("📊 Feature đầu tiên:", {
-          gid: firstFeature.properties.gid,
-          area: firstFeature.properties.area,
-          huyen: firstFeature.properties.huyen
-        });
-        
-        console.log(`🎉 Sẽ hiển thị ${geoData.features.length} khu vực mất rừng trên bản đồ và bảng`);
+        // Debug removed
       }
     }
   }, [geoData]);
@@ -240,17 +212,14 @@ const Map = () => {
   useEffect(() => {
     if (mapReady && geoData?.features?.length > 0 && window._leaflet_map && !selectedFeature) {
       try {
-        console.log("🔍 Auto zoom đến dữ liệu initial load...");
         const geoJsonLayer = L.geoJSON(geoData);
         const bounds = geoJsonLayer.getBounds();
 
         if (bounds.isValid()) {
-          console.log("✅ Bounds hợp lệ, thực hiện fitBounds");
           window._leaflet_map.fitBounds(bounds, { 
             padding: MAP_CONFIG.flyToBoundsPadding 
           });
         } else {
-          console.log("⚠️ Bounds không hợp lệ từ GeoJSON");
         }
       } catch (err) {
         console.error("❌ Lỗi khi auto zoom:", err);
@@ -282,11 +251,9 @@ const Map = () => {
           zoom={MAP_CONFIG.defaultZoom}
           className={`w-full rounded-xl shadow-lg ${mapHeight}`}
           whenCreated={(mapInstance) => {
-            console.log("🗺️ Map instance created");
             window._leaflet_map = mapInstance;
             setTimeout(() => {
               setMapReady(true);
-              console.log("✅ Map ready");
             }, 500);
           }}
         >
@@ -336,12 +303,6 @@ const Map = () => {
       </div>
 
       {/* ✅ FIX: Table Display - Luôn render khi có dữ liệu, không phụ thuộc trang */}
-      {console.log("🔍 About to render TableDisplay:", { 
-        hasGeoData: !!geoData, 
-        featuresLength: geoData?.features?.length,
-        shouldShowTable
-      })}
-      
       <TableDisplay
         loading={loading}
         geoData={geoData}

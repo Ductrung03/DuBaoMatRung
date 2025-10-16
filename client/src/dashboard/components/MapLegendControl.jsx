@@ -298,7 +298,6 @@ const MapLegendControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
           e.stopPropagation();
           
           const layerKey = eyeBtn.getAttribute("data-layer");
-          console.log(`🔄 Toggle layer: ${layerKey}`);
           
           // Toggle layer visibility
           toggleLayerVisibility(layerKey);

@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const createLogger = require('../../../../shared/logger');
 const { AuthenticationError, ValidationError } = require('../../../../shared/errors');
+const { sendActivityLog } = require('../../../../shared/loggerClient');
+const prisma = require('../lib/prisma');
 
 const logger = createLogger('auth-controller');
 const JWT_SECRET = process.env.JWT_SECRET || 'dubaomatrung_secret_key_change_this_in_production';
@@ -19,25 +21,22 @@ exports.login = async (req, res, next) => {
 
     logger.info('Login attempt', { username });
 
-    const db = req.app.locals.db;
+    // Query user with Prisma - bao gồm roles và permissions
+    const user = await prisma.user.findUnique({
+      where: { username, is_active: true },
+      include: {
+        roles: {
+          include: {
+            permissions: true
+          }
+        }
+      }
+    });
 
-    // Query user - LẤY ROLE THỰC TẾ TỪ DATABASE
-    const userQuery = `
-      SELECT
-        id, username, password_hash, full_name, position, organization,
-        role, permission_level, district_id, is_active
-      FROM users
-      WHERE username = $1 AND is_active = TRUE
-    `;
-
-    const result = await db.query(userQuery, [username]);
-
-    if (result.rows.length === 0) {
+    if (!user) {
       logger.warn('Login failed: user not found', { username });
       throw new AuthenticationError('Invalid username or password');
     }
-
-    const user = result.rows[0];
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
@@ -47,24 +46,38 @@ exports.login = async (req, res, next) => {
       throw new AuthenticationError('Invalid username or password');
     }
 
-    // Generate JWT token
+    // Generate JWT token với roles và permissions
     const tokenPayload = {
       id: user.id,
       username: user.username,
-      role: user.role,
-      permission_level: user.permission_level,
-      full_name: user.full_name
+      full_name: user.full_name,
+      roles: user.roles.map(role => role.name),
+      permissions: user.roles.flatMap(role =>
+        role.permissions.map(p => `${p.action}:${p.subject}`)
+      )
     };
 
     const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
     // Update last login
-    await db.query(
-      'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
-      [user.id]
-    );
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { last_login: new Date() }
+    });
 
     logger.info('Login successful', { userId: user.id, username });
+
+    // Send activity log to logging service
+    sendActivityLog({
+      service: 'auth-service',
+      action: 'USER_LOGIN',
+      userId: user.id,
+      ipAddress: req.ip || req.connection.remoteAddress,
+      details: {
+        username: user.username,
+        timestamp: new Date().toISOString()
+      }
+    });
 
     // Remove sensitive data
     const { password_hash, ...userWithoutPassword } = user;
@@ -90,23 +103,36 @@ exports.getCurrentUser = async (req, res, next) => {
       throw new AuthenticationError('User ID not found in request');
     }
 
-    const db = req.app.locals.db;
+    const user = await prisma.user.findUnique({
+      where: {
+        id: parseInt(userId),
+        is_active: true
+      },
+      include: {
+        roles: {
+          include: {
+            permissions: true
+          }
+        }
+      },
+      select: {
+        id: true,
+        username: true,
+        full_name: true,
+        is_active: true,
+        created_at: true,
+        last_login: true,
+        roles: true
+      }
+    });
 
-    const result = await db.query(
-      `SELECT id, username, full_name, position, organization,
-              role, permission_level, district_id, is_active, created_at, last_login
-       FROM users
-       WHERE id = $1 AND is_active = TRUE`,
-      [userId]
-    );
-
-    if (result.rows.length === 0) {
+    if (!user) {
       throw new AuthenticationError('User not found');
     }
 
     res.json({
       success: true,
-      user: result.rows[0]
+      user
     });
 
   } catch (error) {
@@ -122,6 +148,17 @@ exports.logout = async (req, res) => {
 
   if (userId) {
     logger.info('User logout', { userId });
+
+    // Send activity log to logging service
+    sendActivityLog({
+      service: 'auth-service',
+      action: 'USER_LOGOUT',
+      userId: parseInt(userId),
+      ipAddress: req.ip || req.connection.remoteAddress,
+      details: {
+        timestamp: new Date().toISOString()
+      }
+    });
   }
 
   res.json({
@@ -147,27 +184,34 @@ exports.refreshToken = async (req, res, next) => {
       throw new AuthenticationError('Invalid token');
     }
 
-    const db = req.app.locals.db;
-
     // Check if user still exists and is active
-    const result = await db.query(
-      'SELECT id, username, full_name, role, permission_level FROM users WHERE id = $1 AND is_active = TRUE',
-      [decoded.id]
-    );
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decoded.id,
+        is_active: true
+      },
+      include: {
+        roles: {
+          include: {
+            permissions: true
+          }
+        }
+      }
+    });
 
-    if (result.rows.length === 0) {
+    if (!user) {
       throw new AuthenticationError('User not found or inactive');
     }
 
-    const user = result.rows[0];
-
-    // Generate new token - LẤY ROLE THỰC TẾ TỪ DATABASE
+    // Generate new token với roles và permissions
     const newTokenPayload = {
       id: user.id,
       username: user.username,
-      role: user.role,
-      permission_level: user.permission_level,
-      full_name: user.full_name
+      full_name: user.full_name,
+      roles: user.roles.map(role => role.name),
+      permissions: user.roles.flatMap(role =>
+        role.permissions.map(p => `${p.action}:${p.subject}`)
+      )
     };
 
     const newToken = jwt.sign(newTokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });

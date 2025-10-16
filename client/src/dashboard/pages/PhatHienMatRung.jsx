@@ -48,9 +48,7 @@ export default function PhatHienMatRung() {
     // ✅ TĂNG TIMEOUT LÊN 60 GIÂY thay vì bỏ hoàn toàn
     const timeout = setTimeout(() => {
       if (loading) {
-        console.warn(`⚠️ Iframe loading timeout for ${activeTab} after 60 seconds`);
         // ✅ KHÔNG SET ERROR - chỉ log warning
-        console.log("💡 Continuing to wait for iframe to load...");
       }
     }, 60000); // 60 seconds timeout
     
@@ -85,7 +83,6 @@ export default function PhatHienMatRung() {
   
   // Xử lý khi iframe load thành công
   const handleIframeLoad = () => {
-    console.log(`✅ Iframe loaded successfully for ${activeTab}`);
     setLoading(false);
     setError(null);
     
@@ -119,7 +116,6 @@ export default function PhatHienMatRung() {
   const handleChangeTab = (tab) => {
     if (tab === activeTab) return;
     
-    console.log(`🔄 Switching to tab: ${tab}`);
     setActiveTab(tab);
   };
   
@@ -128,7 +124,6 @@ export default function PhatHienMatRung() {
     const newRetryCount = retryCount + 1;
     setRetryCount(newRetryCount);
     
-    console.log(`🔄 Retry attempt ${newRetryCount} for ${activeTab}`);
     
     if (newRetryCount <= 5) { // Tăng số lần retry
       loadIframe();

@@ -22,7 +22,6 @@ const CacheStatusComponent = ({ isOpen = false, onToggle }) => {
       const response = await axios.get(`/api/layer-data/server-cache/status`);
       setCacheStatus(response.data);
       setLastRefresh(new Date());
-      console.log("📊 Cache status loaded:", response.data);
     } catch (error) {
       console.error("Error loading cache status:", error);
       toast.error("Không thể tải trạng thái cache");

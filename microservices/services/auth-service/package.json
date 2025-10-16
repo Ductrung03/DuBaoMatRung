@@ -6,15 +6,21 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "npx nodemon src/index.js",
-    "test": "jest"
+    "test": "jest",
+    "prisma:generate": "npx prisma generate",
+    "prisma:migrate": "npx prisma migrate dev",
+    "prisma:seed": "node prisma/seed.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
+    "@prisma/client": "^6.17.1",
     "bcryptjs": "^3.0.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.6.1",
     "express": "^4.21.2",
     "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "prisma": "^6.17.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",

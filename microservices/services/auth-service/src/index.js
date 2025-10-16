@@ -6,20 +6,23 @@ const path = require('path');
 require('dotenv').config();
 
 // Import shared libraries from parent directory
-const DatabaseManager = require('../../../shared/database');
 const createLogger = require('../../../shared/logger');
 const { errorHandler } = require('../../../shared/errors');
 const { createSwaggerConfig, setupSwagger } = require('../../../shared/swagger');
 
+// Import Prisma client
+const prisma = require('./lib/prisma');
+
 // Import routes
 const authRoutes = require('./routes/auth.routes');
+const internalRoutes = require('./routes/internal.routes');
+const userRoutes = require('./routes/user.routes');
+const roleRoutes = require('./routes/role.routes');
+const permissionRoutes = require('./routes/permission.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 const logger = createLogger('auth-service');
-
-// Database manager
-let dbManager;
 
 // ========== MIDDLEWARE ==========
 app.use(helmet());
@@ -47,19 +50,27 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/ready', async (req, res) => {
-  const dbHealth = await dbManager.healthCheck();
+  try {
+    // Check Prisma connection
+    await prisma.$queryRaw`SELECT 1`;
 
-  if (!dbHealth.healthy) {
-    return res.status(503).json({
+    res.json({
+      status: 'READY',
+      database: {
+        healthy: true,
+        type: 'postgresql',
+        client: 'prisma'
+      }
+    });
+  } catch (error) {
+    res.status(503).json({
       status: 'NOT_READY',
-      database: dbHealth
+      database: {
+        healthy: false,
+        error: error.message
+      }
     });
   }
-
-  res.json({
-    status: 'READY',
-    database: dbHealth
-  });
 });
 
 // ========== SWAGGER DOCUMENTATION ==========
@@ -73,6 +84,10 @@ setupSwagger(app, swaggerSpec);
 
 // ========== ROUTES ==========
 app.use('/api/auth', authRoutes);
+app.use('/api/auth/internal', internalRoutes);
+app.use('/api/auth/users', userRoutes);
+app.use('/api/auth/roles', roleRoutes);
+app.use('/api/auth/permissions', permissionRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -88,19 +103,9 @@ app.use(errorHandler(logger));
 // ========== INITIALIZE & START ==========
 const startServer = async () => {
   try {
-    // Initialize database
-    dbManager = new DatabaseManager('auth-service', {
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME
-    });
-
-    await dbManager.initialize();
-
-    // Make db available to routes
-    app.locals.db = dbManager;
+    // Test Prisma connection
+    await prisma.$connect();
+    logger.info('Prisma connected to database');
 
     // Start server
     const server = app.listen(PORT, '0.0.0.0', () => {
@@ -120,7 +125,7 @@ const startServer = async () => {
 // Graceful shutdown
 const shutdown = async () => {
   logger.info('Shutting down auth service...');
-  await dbManager.close();
+  await prisma.$disconnect();
   process.exit(0);
 };
 

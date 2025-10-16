@@ -5,6 +5,7 @@
   "scripts": {
     "test": "jest --runInBand --detectOpenHandles",
     "test:integration": "jest tests/integration --runInBand",
+    "test:e2e": "jest tests/integration/e2e-flow.test.js --runInBand",
     "test:watch": "jest --watch"
   },
   "devDependencies": {

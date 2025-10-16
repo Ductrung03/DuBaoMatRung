@@ -114,3 +114,29 @@
 {"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-14 14:03:37","userId":1,"username":"admin"}
 {"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-14 15:16:55","username":"admin"}
 {"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-14 15:16:55","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-16 14:25:55","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-16 14:25:55","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-16 23:15:29","username":"admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-10-16 23:15:29","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-16 23:15:40","username":"admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-10-16 23:15:40","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-16 23:16:27","username":"admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-10-16 23:16:27","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-16 23:16:39","username":"admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-10-16 23:16:39","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-16 23:16:59","username":"admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-10-16 23:16:59","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-16 23:17:02","username":"admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-10-16 23:17:02","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-16 23:17:03","username":"admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-10-16 23:17:03","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-16 23:17:24","username":"admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-10-16 23:17:24","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-16 23:17:24","username":"admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-10-16 23:17:24","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-16 23:22:48","username":"admin"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-10-16 23:22:48","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-16 23:22:59","username":"admin"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-10-16 23:22:59","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-16 23:23:15","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-16 23:23:15","userId":1,"username":"admin"}

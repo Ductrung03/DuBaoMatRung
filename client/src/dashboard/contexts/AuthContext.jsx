@@ -18,7 +18,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  console.log("🔍 API URL từ config:", config.API_URL);
 
   // ✅ FIXED: Setup axios interceptor để handle token và 401 tự động
   useEffect(() => {
@@ -29,10 +28,6 @@ export const AuthProvider = ({ children }) => {
         if (currentToken) {
           config.headers.Authorization = `Bearer ${currentToken}`;
         }
-        console.log(`📤 Request: ${config.method?.toUpperCase()} ${config.url}`, {
-          hasToken: !!currentToken,
-          tokenPreview: currentToken ? currentToken.substring(0, 20) + '...' : 'none'
-        });
         return config;
       },
       (error) => {
@@ -44,7 +39,6 @@ export const AuthProvider = ({ children }) => {
     // Response interceptor để handle 401 và các lỗi khác
     const responseInterceptor = axios.interceptors.response.use(
       (response) => {
-        console.log(`✅ Response: ${response.config.method?.toUpperCase()} ${response.config.url} - ${response.status}`);
         return response;
       },
       (error) => {
@@ -55,7 +49,6 @@ export const AuthProvider = ({ children }) => {
         });
 
         if (error.response?.status === 401) {
-          console.log("🚨 401 Unauthorized - Clearing auth data and redirecting to login");
           
           // Clear all auth data
           setToken(null);
@@ -87,7 +80,6 @@ export const AuthProvider = ({ children }) => {
       
       if (currentToken) {
         try {
-          console.log("🔍 Verifying existing token...");
           
           // Set token vào state trước khi verify
           setToken(currentToken);
@@ -98,7 +90,6 @@ export const AuthProvider = ({ children }) => {
             }
           });
           
-          console.log("✅ Token valid, user data:", res.data.user);
           setUser(res.data.user);
           
           // Lưu user data vào localStorage
@@ -115,13 +106,11 @@ export const AuthProvider = ({ children }) => {
           
           // Only show error if it's not a network issue
           if (err.response?.status === 401) {
-            console.log("🔄 Token invalid, will redirect to login");
           } else {
             console.error("🌐 Network or server error during token verification");
           }
         }
       } else {
-        console.log("📝 No token found in localStorage");
       }
       setLoading(false);
     };
@@ -134,14 +123,12 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      console.log(`🔄 Attempting login for: ${username}`);
       
       const res = await axios.post(`/api/auth/login`, {
         username,
         password,
       });
 
-      console.log("✅ Login successful:", res.data);
       
       // Lưu token và user data
       const { token: newToken, user: userData } = res.data;
@@ -181,14 +168,12 @@ export const AuthProvider = ({ children }) => {
   // ✅ FIXED: Đăng xuất with cleanup
   const logout = async () => {
     try {
-      console.log("👋 Logging out user...");
       
       // Call logout API if token exists
       if (token) {
         try {
           await axios.post(`/api/auth/logout`);
         } catch (err) {
-          console.warn("⚠️ Logout API call failed (may be token invalid):", err);
         }
       }
       
@@ -206,9 +191,27 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Kiểm tra vai trò - CHỈ KIỂM TRA ROLE, KHÔNG CẦN PERMISSION_LEVEL
+  // Kiểm tra vai trò - với Prisma RBAC
   const isAdmin = () => {
-    return user && user.role === "admin";
+    if (!user || !user.roles) return false;
+    // Kiểm tra nếu user có role admin
+    return user.roles.some(role => role.name === "admin");
+  };
+
+  // Kiểm tra permission cụ thể
+  const hasPermission = (action, subject) => {
+    if (!user || !user.roles) return false;
+
+    // Admin có tất cả quyền
+    if (isAdmin()) return true;
+
+    // Kiểm tra permission trong các roles
+    return user.roles.some(role =>
+      role.permissions && role.permissions.some(perm =>
+        (perm.action === action && perm.subject === subject) ||
+        (perm.action === 'manage' && perm.subject === 'all')
+      )
+    );
   };
   
   // Lấy mã huyện của người dùng (TCVN3)
@@ -231,6 +234,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         isAdmin,
+        hasPermission,
         getUserDistrictId,
         canAccessDistrict
       }}

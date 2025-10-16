@@ -8,7 +8,6 @@ export const useMapInteraction = ({
 
   // Xử lý khi click vào feature
   const handleFeatureClick = (feature, layer) => {
-    console.log("Feature clicked:", feature);
     setSelectedFeature(feature);
     setHighlightedLayerRef(layer);
   };
@@ -21,9 +20,8 @@ export const useMapInteraction = ({
       
     layer.setStyle({
       ...currentStyle,
-      weight: currentStyle.weight + 1,
-      color: "#ff7800",
-      fillOpacity: Math.min(currentStyle.fillOpacity + 0.2, 1),
+      weight: 3,
+      color: '#ff7800',
     });
     layer.bringToFront();
   };

@@ -52,7 +52,6 @@ const XacMinhDuBaoMatRung = () => {
     
     try {
       const gidToSearch = formData.maLoDuBao.trim();
-      console.log("🔍 Tìm kiếm CB-" + gidToSearch);
 
       // ✅ FIX: Gọi API search đã được sửa
       const response = await axios.get(
@@ -67,13 +66,6 @@ const XacMinhDuBaoMatRung = () => {
 
       if (response.data.success) {
         const { target_feature, geojson, center, bbox } = response.data.data;
-        
-        console.log("✅ Tìm thấy CB-" + gidToSearch, {
-          target_gid: target_feature.properties.gid,
-          total_features: geojson.features.length,
-          center: center,
-          bbox: bbox
-        });
 
         // ✅ FIX: Set selectedRecord từ target_feature
         setSelectedRecord(target_feature);
@@ -115,7 +107,6 @@ const XacMinhDuBaoMatRung = () => {
           });
           window.dispatchEvent(zoomEvent);
           
-          console.log("🎯 Dispatched zoom event for CB-" + gidToSearch);
         }, 500);
 
         // ✅ FIX: Highlight row trong table với delay
@@ -128,7 +119,6 @@ const XacMinhDuBaoMatRung = () => {
           });
           window.dispatchEvent(tableEvent);
           
-          console.log("🎯 Dispatched table highlight for CB-" + gidToSearch);
         }, 1000);
 
         toast.success(`✅ Đã tìm thấy CB-${gidToSearch} và load ${sortedFeatures.length} khu vực`, {
@@ -186,7 +176,6 @@ const XacMinhDuBaoMatRung = () => {
     
     try {
       const gid = selectedRecord.properties.gid;
-      console.log("🔄 Bắt đầu xác minh CB-" + gid);
 
       // Chuẩn bị dữ liệu xác minh
       const verificationData = {
@@ -198,7 +187,6 @@ const XacMinhDuBaoMatRung = () => {
         detection_date: formData.ngayXacMinh || null
       };
 
-      console.log("📋 Dữ liệu xác minh:", verificationData);
 
       // Gọi API xác minh
       const response = await axios.post(
@@ -216,7 +204,6 @@ const XacMinhDuBaoMatRung = () => {
         const updatedData = response.data.data;
         const changes = response.data.meta?.changes || {};
 
-        console.log("✅ Xác minh thành công CB-" + gid, updatedData);
 
         // ✅ FIX: Cập nhật dữ liệu local ngay lập tức
         if (geoData && geoData.features) {

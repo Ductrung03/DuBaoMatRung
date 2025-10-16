@@ -336,7 +336,6 @@ const OptimizedLegendControl = ({
         if (checkbox) {
           checkbox.addEventListener("change", (e) => {
             e.stopPropagation();
-            console.log(
               `🔄 Toggle layer: ${layerKey}, visible: ${checkbox.checked}`
             );
             toggleLayerVisibility(layerKey);

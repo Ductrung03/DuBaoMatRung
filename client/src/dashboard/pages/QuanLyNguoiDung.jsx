@@ -41,10 +41,10 @@ const QuanLyNguoiDung = () => {
     username: "",
     password: "",
     full_name: "",
-    position: "", // Chức vụ
-    organization: "", // Đơn vị công tác
-    permission_level: "district", // Cấp phân quyền
-    district_id: "" // Khu vực quản lý
+    position: "",
+    organization: "",
+    permission_level: "district",
+    district_id: ""
   });
 
   // Password change form
@@ -224,8 +224,6 @@ const QuanLyNguoiDung = () => {
 
   // ✅ UPDATED: Open edit modal với các field mới
   const openEditModal = (user) => {
-    console.log("User data:", user);
-
     setModalMode("edit");
     setSelectedUser(user);
     setFormData({
@@ -275,11 +273,6 @@ const QuanLyNguoiDung = () => {
     e.preventDefault();
 
     try {
-      console.log("📋 Dữ liệu form trước khi gửi:", {
-        ...formData,
-        password: formData.password ? "***" : undefined,
-      });
-
       if (modalMode === "add") {
         // Kiểm tra dữ liệu
         if (!formData.username || !formData.password || !formData.full_name || !formData.position || !formData.organization) {

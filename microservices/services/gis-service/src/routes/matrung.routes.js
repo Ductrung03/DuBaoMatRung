@@ -1,7 +1,8 @@
 // gis-service/src/routes/matrung.routes.js
 const express = require('express');
 const router = express.Router();
-const matRungController = require('../controllers/matrung.controller');
+// Use Kysely-based controller for better query building
+const matRungController = require('../controllers/matrung.controller.kysely');
 const { asyncHandler } = require('../../../../shared/errors');
 
 /**

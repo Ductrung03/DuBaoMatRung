@@ -35,7 +35,6 @@ const DuBaoMatRungTuDong = () => {
     try {
       setIsProcessing(true);
       
-      console.log(`🔄 Dự báo tự động: ${selectedPeriod} tháng ${selectedMonth}/${selectedYear}`);
       
       // Hiển thị thông tin cho user
       const periodDescription = selectedPeriod === "Trước ngày 15" 
@@ -57,12 +56,6 @@ const DuBaoMatRungTuDong = () => {
           `✅ Dự báo hoàn tất: ${count} khu vực mất rừng (${totalAreaHa} ha) ${periodDescription}/${selectedYear}. Xem bảng dữ liệu bên dưới bản đồ!`,
           { autoClose: 5000, position: "top-center" }
         );
-
-        console.log(`✅ Auto forecast completed:`, {
-          period: `${periodDescription}/${selectedYear}`,
-          features: count,
-          totalArea: `${totalAreaHa} ha`
-        });
 
         // ✅ Tự động scroll xuống để user thấy bảng dữ liệu
         setTimeout(() => {

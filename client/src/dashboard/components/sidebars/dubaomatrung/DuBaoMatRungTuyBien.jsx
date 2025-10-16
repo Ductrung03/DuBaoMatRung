@@ -86,13 +86,6 @@ const DuBaoMatRungTuyBien = () => {
         return;
       }
 
-      console.log("🔮 Dự báo tùy biến với tham số:", {
-        fromDate,
-        toDate, 
-        huyen: selectedHuyen,
-        xa: selectedXa
-      });
-
       setLoading(true);
       setLoadingState(true);
 
@@ -135,7 +128,6 @@ const DuBaoMatRungTuyBien = () => {
         }
       );
 
-      console.log("✅ Dự báo tùy biến hoàn thành:", data.data.features.length, "features");
 
       setTimeout(() => {
         const mapElement = document.querySelector('.leaflet-container');

@@ -1,0 +1,37 @@
+openapi: 3.0.0
+info:
+  title: Logging Service API
+  version: 1.0.0
+  description: Tiếp nhận và lưu trữ các sự kiện nhật ký hoạt động.
+paths:
+  /logs:
+    post:
+      summary: Gửi một sự kiện log mới
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                timestamp:
+                  type: string
+                  format: date-time
+                userId:
+                  type: integer
+                service:
+                  type: string
+                  example: "gis-service"
+                action:
+                  type: string
+                  example: "UPDATE_VERIFICATION_STATUS"
+                ipAddress:
+                  type: string
+                  format: ipv4
+                details:
+                  type: object
+                  description: Bất kỳ dữ liệu JSON bổ sung nào cho ngữ cảnh.
+                  example: { "eventId": 123, "newStatus": "Đã xác minh" }
+      responses:
+        '202':
+          description: Sự kiện log đã được chấp nhận để xử lý.
