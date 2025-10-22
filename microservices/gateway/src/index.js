@@ -165,13 +165,13 @@ app.use('/api/auth', createProxy(logger, {
   timeout: 30000
 }));
 
-// User Service (protected)
+// User Service (protected) -> Now routed to Auth Service
 app.use('/api/users',
   authMiddleware.authenticate,
   createProxy(logger, {
-    target: process.env.USER_SERVICE_URL || 'http://localhost:3002',
-    pathRewrite: (path, req) => '/api/users' + path,
-    serviceName: 'User',
+    target: process.env.AUTH_SERVICE_URL || 'http://localhost:3001',
+    pathRewrite: (path, req) => '/api/auth/users' + path,
+    serviceName: 'User (via Auth)',
     timeout: 30000,
     forwardUserHeaders: true
   })

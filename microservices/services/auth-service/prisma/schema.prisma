@@ -1,7 +1,3 @@
-
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,30 +8,116 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  username      String   @unique
+  id            Int        @id @default(autoincrement())
+  username      String     @unique
   password_hash String
   full_name     String
-  is_active     Boolean  @default(true)
-  created_at    DateTime @default(now())
+  is_active     Boolean    @default(true)
+  created_at    DateTime   @default(now())
   last_login    DateTime?
-  roles         Role[]
+  email         String?
+  Role          Role[]
+  userRoles     UserRole[]
+
+  @@index([email])
+  @@index([full_name])
 }
 
 model Role {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique
-  description String?
-  users       User[]
-  permissions Permission[]
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  description     String?
+  is_system       Boolean          @default(false)
+  created_at      DateTime         @default(now())
+  updated_at      DateTime
+  created_by      Int?
+  User            User?            @relation(fields: [created_by], references: [id])
+  RoleDataScope   RoleDataScope[]
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+
+  @@index([created_at])
+  @@index([is_system])
 }
 
 model Permission {
-  id          Int     @id @default(autoincrement())
-  action      String
-  subject     String
-  description String?
-  roles       Role[]
+  id               Int              @id @default(autoincrement())
+  description      String?
+  code             String           @unique
+  name             String
+  module           String
+  category         String
+  parent_id        Int?
+  created_at       DateTime         @default(now())
+  updated_at       DateTime
+  icon             String?
+  order            Int              @default(0)
+  ui_path          String?
+  Permission       Permission?      @relation("PermissionToPermission", fields: [parent_id], references: [id])
+  other_Permission Permission[]     @relation("PermissionToPermission")
+  rolePermissions  RolePermission[]
 
-  @@unique([action, subject])
+  @@index([description])
+  @@index([module, category])
+  @@index([module])
+  @@index([name])
+  @@index([order])
+  @@index([parent_id])
+}
+
+model UserRole {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  role_id     Int
+  assigned_at DateTime @default(now())
+  assigned_by Int?
+  role        Role     @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, role_id])
+  @@index([role_id])
+}
+
+model RolePermission {
+  id            Int        @id @default(autoincrement())
+  role_id       Int
+  permission_id Int
+  created_at    DateTime   @default(now())
+  permission    Permission @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+  role          Role       @relation(fields: [role_id], references: [id], onDelete: Cascade)
+
+  @@unique([role_id, permission_id])
+  @@index([permission_id])
+}
+
+model DataScope {
+  id              Int             @id @default(autoincrement())
+  type            String
+  code            String          @unique
+  name            String
+  name_en         String?
+  parent_id       Int?
+  path            String
+  level           Int
+  is_active       Boolean         @default(true)
+  DataScope       DataScope?      @relation("DataScopeToDataScope", fields: [parent_id], references: [id])
+  other_DataScope DataScope[]     @relation("DataScopeToDataScope")
+  RoleDataScope   RoleDataScope[]
+
+  @@index([is_active])
+  @@index([parent_id])
+  @@index([path])
+  @@index([type])
+}
+
+model RoleDataScope {
+  id            Int       @id @default(autoincrement())
+  role_id       Int
+  data_scope_id Int
+  created_at    DateTime  @default(now())
+  DataScope     DataScope @relation(fields: [data_scope_id], references: [id], onDelete: Cascade)
+  Role          Role      @relation(fields: [role_id], references: [id], onDelete: Cascade)
+
+  @@unique([role_id, data_scope_id])
+  @@index([data_scope_id])
 }

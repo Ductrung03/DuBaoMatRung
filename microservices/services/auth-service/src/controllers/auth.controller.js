@@ -22,12 +22,20 @@ exports.login = async (req, res, next) => {
     logger.info('Login attempt', { username });
 
     // Query user with Prisma - bao gồm roles và permissions
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: { username, is_active: true },
       include: {
-        roles: {
+        userRoles: {
           include: {
-            permissions: true
+            role: {
+              include: {
+                rolePermissions: {
+                  include: {
+                    permission: true
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -47,13 +55,14 @@ exports.login = async (req, res, next) => {
     }
 
     // Generate JWT token với roles và permissions
+    const roles = user.userRoles.map(ur => ur.role);
     const tokenPayload = {
       id: user.id,
       username: user.username,
       full_name: user.full_name,
-      roles: user.roles.map(role => role.name),
-      permissions: user.roles.flatMap(role =>
-        role.permissions.map(p => `${p.action}:${p.subject}`)
+      roles: roles.map(role => role.name),
+      permissions: roles.flatMap(role =>
+        role.rolePermissions.map(rp => `${rp.permission.action}:${rp.permission.subject}`)
       )
     };
 
@@ -99,19 +108,27 @@ exports.getCurrentUser = async (req, res, next) => {
   try {
     const userId = req.headers['x-user-id'];
 
-    if (!userId) {
-      throw new AuthenticationError('User ID not found in request');
+    if (!userId || isNaN(parseInt(userId))) {
+      throw new ValidationError('Invalid User ID in request');
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: {
         id: parseInt(userId),
         is_active: true
       },
       include: {
-        roles: {
+        userRoles: {
           include: {
-            permissions: true
+            role: {
+              include: {
+                rolePermissions: {
+                  include: {
+                    permission: true
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -122,7 +139,7 @@ exports.getCurrentUser = async (req, res, next) => {
         is_active: true,
         created_at: true,
         last_login: true,
-        roles: true
+        userRoles: true
       }
     });
 
@@ -185,15 +202,23 @@ exports.refreshToken = async (req, res, next) => {
     }
 
     // Check if user still exists and is active
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: {
         id: decoded.id,
         is_active: true
       },
       include: {
-        roles: {
+        userRoles: {
           include: {
-            permissions: true
+            role: {
+              include: {
+                rolePermissions: {
+                  include: {
+                    permission: true
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -204,13 +229,14 @@ exports.refreshToken = async (req, res, next) => {
     }
 
     // Generate new token với roles và permissions
+    const roles = user.userRoles.map(ur => ur.role);
     const newTokenPayload = {
       id: user.id,
       username: user.username,
       full_name: user.full_name,
-      roles: user.roles.map(role => role.name),
-      permissions: user.roles.flatMap(role =>
-        role.permissions.map(p => `${p.action}:${p.subject}`)
+      roles: roles.map(role => role.name),
+      permissions: roles.flatMap(role =>
+        role.rolePermissions.map(rp => `${rp.permission.action}:${rp.permission.subject}`)
       )
     };
 

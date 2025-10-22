@@ -193,23 +193,23 @@ export const AuthProvider = ({ children }) => {
 
   // Kiểm tra vai trò - với Prisma RBAC
   const isAdmin = () => {
-    if (!user || !user.roles) return false;
+    if (!user || !user.userRoles) return false;
     // Kiểm tra nếu user có role admin
-    return user.roles.some(role => role.name === "admin");
+    return user.userRoles.some(userRole => userRole.role.name === "admin");
   };
 
   // Kiểm tra permission cụ thể
   const hasPermission = (action, subject) => {
-    if (!user || !user.roles) return false;
+    if (!user || !user.userRoles) return false;
 
     // Admin có tất cả quyền
     if (isAdmin()) return true;
 
     // Kiểm tra permission trong các roles
-    return user.roles.some(role =>
-      role.permissions && role.permissions.some(perm =>
-        (perm.action === action && perm.subject === subject) ||
-        (perm.action === 'manage' && perm.subject === 'all')
+    return user.userRoles.some(userRole =>
+      userRole.role.rolePermissions && userRole.role.rolePermissions.some(rp =>
+        (rp.permission.action === action && rp.permission.subject === subject) ||
+        (rp.permission.action === 'manage' && rp.permission.subject === 'all')
       )
     );
   };

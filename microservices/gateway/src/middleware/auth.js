@@ -19,18 +19,17 @@ const authenticate = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    // Attach user info to request
     req.user = {
       id: decoded.id,
       username: decoded.username,
-      role: decoded.role,
-      permission_level: decoded.permission_level
+      roles: decoded.roles,
+      permissions: decoded.permissions
     };
 
     // Forward user info to downstream services
     req.headers['x-user-id'] = decoded.id;
-    req.headers['x-user-role'] = decoded.role;
-    req.headers['x-user-permission'] = decoded.permission_level;
+    req.headers['x-user-role'] = decoded.roles ? decoded.roles.join(',') : '';
+    req.headers['x-user-permission'] = decoded.permissions ? decoded.permissions.join(',') : '';
 
     next();
   } catch (error) {

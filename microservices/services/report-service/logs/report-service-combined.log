@@ -535,3 +535,23 @@
 {"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-16 23:15:19"}
 {"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-16T16:34:43.383Z"}
 {"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-16 23:34:43"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T04:15:09.446Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 11:15:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 11:15:09"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T04:17:29.655Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 11:17:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 11:17:29"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T05:15:21.850Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 12:15:21"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T05:18:33.666Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 12:18:33"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 12:18:33"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T05:18:55.855Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 12:18:55"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 12:18:55"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T05:38:15.548Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 12:38:15"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 12:38:15"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T06:26:58.422Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 13:26:58"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 13:26:58"}

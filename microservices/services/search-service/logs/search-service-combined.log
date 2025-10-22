@@ -1129,3 +1129,44 @@
 {"level":"info","message":"Redis client ready","service":"search-service","timestamp":"2025-10-16 23:34:43"}
 {"level":"info","message":"Search Service running on port 3006","service":"search-service","timestamp":"2025-10-16 23:34:43"}
 {"level":"info","message":"Redis manager initialized successfully","service":"search-service","timestamp":"2025-10-16 23:34:43"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"search-service","timestamp":"2025-10-22T04:15:09.371Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"search-service","timestamp":"2025-10-22 11:15:09"}
+{"level":"info","message":"Redis client connected","service":"search-service","timestamp":"2025-10-22 11:15:09"}
+{"level":"info","message":"Redis client ready","service":"search-service","timestamp":"2025-10-22 11:15:09"}
+{"level":"info","message":"Search Service running on port 3006","service":"search-service","timestamp":"2025-10-22 11:15:09"}
+{"level":"info","message":"Redis manager initialized successfully","service":"search-service","timestamp":"2025-10-22 11:15:09"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"search-service","timestamp":"2025-10-22T04:17:29.528Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"search-service","timestamp":"2025-10-22 11:17:29"}
+{"level":"info","message":"Redis client connected","service":"search-service","timestamp":"2025-10-22 11:17:29"}
+{"level":"info","message":"Redis client ready","service":"search-service","timestamp":"2025-10-22 11:17:29"}
+{"level":"info","message":"Search Service running on port 3006","service":"search-service","timestamp":"2025-10-22 11:17:29"}
+{"level":"info","message":"Redis manager initialized successfully","service":"search-service","timestamp":"2025-10-22 11:17:29"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"search-service","timestamp":"2025-10-22T05:15:21.590Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"search-service","timestamp":"2025-10-22 12:15:21"}
+{"level":"info","message":"Redis client connected","service":"search-service","timestamp":"2025-10-22 12:15:21"}
+{"level":"info","message":"Search Service running on port 3006","service":"search-service","timestamp":"2025-10-22 12:15:21"}
+{"level":"info","message":"Redis client ready","service":"search-service","timestamp":"2025-10-22 12:15:21"}
+{"level":"info","message":"Redis manager initialized successfully","service":"search-service","timestamp":"2025-10-22 12:15:21"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"search-service","timestamp":"2025-10-22T05:18:33.600Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"search-service","timestamp":"2025-10-22 12:18:33"}
+{"level":"info","message":"Redis client connected","service":"search-service","timestamp":"2025-10-22 12:18:33"}
+{"level":"info","message":"Redis client ready","service":"search-service","timestamp":"2025-10-22 12:18:33"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3006","port":3006,"service":"search-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3006\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 12:18:33"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"search-service","timestamp":"2025-10-22T05:18:55.747Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"search-service","timestamp":"2025-10-22 12:18:55"}
+{"level":"info","message":"Redis client connected","service":"search-service","timestamp":"2025-10-22 12:18:55"}
+{"level":"info","message":"Search Service running on port 3006","service":"search-service","timestamp":"2025-10-22 12:18:55"}
+{"level":"info","message":"Redis client ready","service":"search-service","timestamp":"2025-10-22 12:18:55"}
+{"level":"info","message":"Redis manager initialized successfully","service":"search-service","timestamp":"2025-10-22 12:18:55"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"search-service","timestamp":"2025-10-22T05:38:15.456Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"search-service","timestamp":"2025-10-22 12:38:15"}
+{"level":"info","message":"Redis client connected","service":"search-service","timestamp":"2025-10-22 12:38:15"}
+{"level":"info","message":"Redis client ready","service":"search-service","timestamp":"2025-10-22 12:38:15"}
+{"level":"info","message":"Search Service running on port 3006","service":"search-service","timestamp":"2025-10-22 12:38:15"}
+{"level":"info","message":"Redis manager initialized successfully","service":"search-service","timestamp":"2025-10-22 12:38:15"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"search-service","timestamp":"2025-10-22T06:26:58.315Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"search-service","timestamp":"2025-10-22 13:26:58"}
+{"level":"info","message":"Redis client connected","service":"search-service","timestamp":"2025-10-22 13:26:58"}
+{"level":"info","message":"Redis client ready","service":"search-service","timestamp":"2025-10-22 13:26:58"}
+{"level":"info","message":"Search Service running on port 3006","service":"search-service","timestamp":"2025-10-22 13:26:58"}
+{"level":"info","message":"Redis manager initialized successfully","service":"search-service","timestamp":"2025-10-22 13:26:58"}
