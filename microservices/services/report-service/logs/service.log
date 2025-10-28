@@ -7,7 +7,6 @@
 [33m[nodemon] watching path(s): *.*[39m
 [33m[nodemon] watching extensions: js,mjs,cjs,json[39m
 [32m[nodemon] starting `node src/index.js`[39m
-2025-10-13 18:23:18 [report-service] [32minfo[39m: Database connection test successful {"database":"gis_db"}
-2025-10-13 18:23:18 [report-service] [32minfo[39m: Database pool initialized successfully
-2025-10-13 18:23:18 [report-service] [32minfo[39m: Report Service running on port 3004
-[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+2025-10-22 14:09:37 [report-service] [32minfo[39m: Database connection test successful {"database":"gis_db"}
+2025-10-22 14:09:37 [report-service] [32minfo[39m: Database pool initialized successfully
+2025-10-22 14:09:37 [report-service] [32minfo[39m: Report Service running on port 3004

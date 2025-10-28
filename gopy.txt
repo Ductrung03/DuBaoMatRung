@@ -1,0 +1,61 @@
+Thông tin tối thiểu để xuất báo cáo là thời gian.
+- Báo cáo có lựa chọn 2 loại như sau:
+Loại 1. Bảng thống kê vị trí phát hiện sớm mất rừng (toàn bộ)
+BẢNG THỐNG KÊ PHÁT HIỆN SỚM MẤT RỪNG
+Tỉnh: Huyện: Xã
+Từ ngày: đến ngày:
+TT Xã Lô cảnh báo Tiểu
+khu Khoảnh Tọa độ VN-2000 Diện tích (ha)
+X Y
+Tổng … lô ….
+Ngày tháng năm
+Người tổng hợp Hạt kiểm lâm
+Lưu ý:
++ Diện tích này lấy theo cột dtich
++ Dòng tổng: tính toán tổng số lô và tổng diện tích
++ Tọa độ X,Y làm tròn, không lấy sau dấu “,”
+Loại 2. Bảng thống kê vị trí mất rừng (tức là xacminh=1)
+BẢNG THỐNG KÊ VỊ TRÍ MẤT RỪNG
+Tỉnh: Huyện: Xã
+Từ ngày: đến ngày:
+TT Xã
+Lô
+cảnh
+báo
+Tiểu
+khu Khoảnh
+Tọa độ VN-2000 Diện tích
+(ha)
+Nguyên
+nhânX Y
+Tổng … lô ….
+Ngày tháng năm
+Người tổng hợp Hạt kiểm lâm
+Lưu ý:
++ Diện tích này lấy theo cột dtichXM
++ Dòng tổng: tính toán tổng số lô và tổng diện tích
++ Tọa độ X,Y làm tròn, không lấy sau dấu “,”
+
+Phía trên là yêu cầu cho trang báo cáo Hãy đọc code và làm cho tôi trang còn bị một vấn đề là chọnloại báo cáo là biểu đồ nhwung lại in ra văn bản
+
+Phần tên huyện xã đang bị sai font, hãy xem lại để lấy dữ liệu materialzeview cho chuẩn trong báo cáo không có dưx x liệu nào ngoài lô cảnh báo
+Tỉnh: Lào Cai
+Huyện: TP. Lµo Cai
+Xã: T¶ Phêi
+Từ ngày: 6/6/2023 Đến ngày: 22/10/2025
+TT	Huyện	Xã	Lô cảnh báo	Tiểu khu	Khoảnh	Tọa độ VN-2000
+X	Tọa độ VN-2000
+Y	Diện tích (ha)	Nguyên nhân
+1			CB-4899						
+2			CB-4898						
+3			CB-4897						
+4			CB-3604						
+5			CB-780						
+Tổng	0.00	
+Người tổng hợp
+Lào Cai, ngày 22 tháng 10 năm 2025
+Ban quản lý rừng
+
+Phần dữ liệu ở table cũng đang bị hiện ra null hết hãy xem và làm cho tôi 
+
+Hãy giao tiếp với tôi bằng tiếng việt

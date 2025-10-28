@@ -8,19 +8,25 @@ datasource db {
 }
 
 model User {
-  id            Int        @id @default(autoincrement())
-  username      String     @unique
-  password_hash String
-  full_name     String
-  is_active     Boolean    @default(true)
-  created_at    DateTime   @default(now())
-  last_login    DateTime?
-  email         String?
-  Role          Role[]
-  userRoles     UserRole[]
+  id             Int        @id @default(autoincrement())
+  username       String     @unique
+  password_hash  String
+  full_name      String
+  position       String?
+  organization   String?
+  permission_level String?  @default("district")
+  district_id    String?
+  is_active      Boolean    @default(true)
+  created_at     DateTime   @default(now())
+  last_login     DateTime?
+  email          String?
+  Role           Role[]
+  userRoles      UserRole[]
 
   @@index([email])
   @@index([full_name])
+  @@index([district_id])
+  @@index([permission_level])
 }
 
 model Role {

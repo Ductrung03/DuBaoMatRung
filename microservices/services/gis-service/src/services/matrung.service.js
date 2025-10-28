@@ -53,7 +53,7 @@ class MatRungService {
     if (!fromDate && !toDate && !huyen && !xa && !tk && !khoanh && !churung) {
       logger.info('Loading mat rung data: 12 months default');
 
-      const query = this.db
+      let query = this.db
         .selectFrom('mat_rung as m')
         .select([
           'm.gid',
@@ -81,44 +81,27 @@ class MatRungService {
 
       // Add user join if users table exists
       if (hasUsers) {
-        query
+        query = query
           .leftJoin('users as u', 'u.id', 'm.verified_by')
           .select([
             'u.full_name as verified_by_name',
             'u.username as verified_by_username'
           ]);
       } else {
-        query.select([
+        query = query.select([
           sql`NULL`.as('verified_by_name'),
           sql`NULL`.as('verified_by_username')
         ]);
       }
 
-      // Add rg3lr join if table exists
-      if (hasRg3lr) {
-        query
-          .leftJoin('laocai_rg3lr as r', (join) =>
-            join.on(sql`ST_Intersects(
-              ST_Transform(m.geom, 4326),
-              ST_Transform(r.geom, 4326)
-            )`)
-          )
-          .select([
-            'r.huyen',
-            'r.xa',
-            'r.tk',
-            'r.khoanh',
-            'r.churung'
-          ]);
-      } else {
-        query.select([
-          sql`NULL`.as('huyen'),
-          sql`NULL`.as('xa'),
-          sql`NULL`.as('tk'),
-          sql`NULL`.as('khoanh'),
-          sql`NULL`.as('churung')
-        ]);
-      }
+      // ✅ Không join với rg3lr trong service nữa - sẽ được xử lý ở controller
+      query = query.select([
+        sql`NULL`.as('huyen'),
+        sql`NULL`.as('xa'),
+        sql`NULL`.as('tk'),
+        sql`NULL`.as('khoanh'),
+        sql`NULL`.as('churung')
+      ]);
 
       const result = await query.execute();
       return result;

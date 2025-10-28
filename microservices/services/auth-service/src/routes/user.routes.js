@@ -105,6 +105,42 @@ router.patch('/:id', userController.updateUser);
 /**
  * @swagger
  * /api/auth/users/{id}:
+ *   put:
+ *     summary: Update a user (PUT method for compatibility)
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               full_name:
+ *                 type: string
+ *               is_active:
+ *                 type: boolean
+ *               role_ids:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ */
+router.put('/:id', userController.updateUser);
+
+/**
+ * @swagger
+ * /api/auth/users/{id}:
  *   delete:
  *     summary: Delete a user
  *     tags: [Users]

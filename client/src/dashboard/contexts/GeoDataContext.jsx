@@ -177,33 +177,25 @@ export const GeoDataProvider = ({ children }) => {
     try {
       setLoading(true);
 
-      // Gọi API để lấy dữ liệu mat_rung 3 tháng gần nhất
+      // ✅ Gọi API /api/mat-rung - mặc định trả về 12 tháng, limit 1000
       const response = await axios.get(`/api/mat-rung`, {
-       
+        params: {
+          limit: 1000
+        }
       });
 
-      if (response.data && response.data.mat_rung) {
-        const matRungData = response.data.mat_rung;
-        
-        // Lọc chỉ lấy 3 tháng gần nhất
-        const threeMonthsAgo = new Date();
-        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-        
-        const filteredFeatures = matRungData.features.filter(feature => {
-          const endDate = new Date(feature.properties.end_sau);
-          return endDate >= threeMonthsAgo;
-        });
-        
-        const filteredData = {
-          ...matRungData,
-          features: filteredFeatures
-        };
-        
-        
+      // ✅ API trả về: { success: true, data: { type: "FeatureCollection", features: [...] } }
+      if (response.data && response.data.success && response.data.data) {
+        const matRungData = response.data.data; // ✅ KEY LÀ 'data' KHÔNG PHẢI 'mat_rung'
+
+        console.log(`✅ Loaded ${matRungData.features?.length || 0} mat_rung records from API`);
+
+        // ✅ API đã tự động filter 12 tháng, không cần filter lại
         // Set vào geoData để hiển thị trong Map và Table
-        setGeoData(filteredData);
-        
+        setGeoData(matRungData);
+
       } else {
+        console.warn('⚠️ No mat_rung data in response:', response.data);
       }
     } catch (error) {
       console.error("❌ Lỗi khi load dữ liệu mat_rung mặc định:", error);

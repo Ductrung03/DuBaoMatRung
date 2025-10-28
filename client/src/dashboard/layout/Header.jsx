@@ -31,8 +31,8 @@ const Header = () => {
 
   // ✅ FIXED: Get permission level display - ƯU TIÊN ROLE TRƯỚC
   const getPermissionLevelDisplay = () => {
-    // Ưu tiên kiểm tra role === 'admin' trước
-    if (user?.role === 'admin') {
+    // Ưu tiên kiểm tra role admin từ userRoles
+    if (isAdmin()) {
       return 'Quản trị viên hệ thống';
     }
 
@@ -99,8 +99,8 @@ const Header = () => {
               Báo cáo
             </Link>
 
-            {isAdmin() && (
-              <Link 
+            {(isAdmin() || user?.permission_level === 'province') && (
+              <Link
                 to="/dashboard/phathienmatrung"
                 className={`text-base font-semibold hover:underline transition-colors ${
                   isActive("/dashboard/phathienmatrung")
@@ -111,9 +111,9 @@ const Header = () => {
                 Phát hiện mất rừng
               </Link>
             )}
-            
+
             {isAdmin() && (
-              <Link 
+              <Link
                 to="/dashboard/quanlynguoidung"
                 className={`text-base font-semibold hover:underline transition-colors ${
                   isActive("/dashboard/quanlynguoidung")

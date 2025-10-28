@@ -49,3 +49,92 @@
 {"level":"info","message":"Searching for CB-4935 with radius 10000m","service":"search-controller","timestamp":"2025-10-22 13:11:58"}
 {"level":"info","message":"Found CB-4935 at [22.363141923202143, 103.93200164278049]","service":"search-controller","timestamp":"2025-10-22 13:11:58"}
 {"level":"info","message":"Found 50 features within 10000m of CB-4935","service":"search-controller","timestamp":"2025-10-22 13:11:58"}
+{"fromDate":"2023-01-22","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 15:17:38","toDate":"2025-10-22"}
+{"fromDate":"2025-10-22","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 15:31:47","toDate":"2025-10-22"}
+{"fromDate":"2023-06-06","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 15:31:57","toDate":"2025-10-22"}
+{"fromDate":"2023-01-22","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 15:42:30","toDate":"2025-10-22"}
+{"fromDate":"2023-01-22","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 15:51:09","toDate":"2025-10-22"}
+{"fromDate":"2023-06-06","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 15:58:58","toDate":"2025-10-22"}
+{"fromDate":"2023-06-06","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:11:23","toDate":"2025-10-22"}
+{"fromDate":"2023-06-06","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:14:29","toDate":"2025-10-22","xa":"T¶ Phêi","xacMinh":"false"}
+{"fromDate":"2023-06-06","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:14:50","toDate":"2025-10-22","xa":"T¶ Phêi","xacMinh":"false"}
+{"fromDate":"2023-06-06","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:15:13","toDate":"2025-10-22","xacMinh":"false"}
+{"fromDate":"2023-06-06","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:15:36","toDate":"2025-10-22","xacMinh":"false"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:15:58","xacMinh":"false"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:16:19"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:16:42"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:17:33"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:17:55"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:19:13"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:19:34"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:20:11"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:20:31"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:21:07"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:21:28"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:22:31"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:22:54","xacMinh":"false"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:23:17","xacMinh":"true"}
+{"fromDate":"2023-01-22","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:27:09","toDate":"2025-10-22","xa":"T¶ Phêi","xacMinh":"false"}
+{"fromDate":"2023-01-22","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:27:13","toDate":"2025-10-22","xa":"T¶ Phêi","xacMinh":"true"}
+{"fromDate":"2023-01-22","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:27:22","toDate":"2025-10-22","xa":"V¹n Hßa","xacMinh":"false"}
+{"fromDate":"2023-01-22","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:27:25","toDate":"2025-10-22","xa":"P. Lµo Cai","xacMinh":"false"}
+{"fromDate":"2020-01-22","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 16:27:43","toDate":"2025-10-22","xa":"T¶ Phêi","xacMinh":"false"}
+{"fromDate":"2023-01-22","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 20:22:55","toDate":"2025-10-22","xa":"T¶ Phêi","xacMinh":"true"}
+{"fromDate":"2023-01-22","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 21:24:13","toDate":"2025-10-22","xa":"T¶ Phêi","xacMinh":"true"}
+{"fromDate":"2023-01-22","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 21:25:21","toDate":"2025-10-22","xa":"T¶ Phêi","xacMinh":"true"}
+{"fromDate":"2023-01-22","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-22 21:53:16","toDate":"2025-10-22","xa":"T¶ Phêi","xacMinh":"true"}
+{"fromDate":"2023-01-24","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-24 11:48:45","toDate":"2025-10-24","xa":"T¶ Phêi","xacMinh":"false"}
+{"fromDate":"2023-01-24","huyen":"TP. Lào Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-24 11:50:33","toDate":"2025-10-24","xa":"Tả Phèi","xacMinh":"false"}
+{"fromDate":"2023-01-24","huyen":"TP. Lào Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-24 11:53:28","toDate":"2025-10-24","xa":"Tả Phèi","xacMinh":"false"}
+{"huyen":"85","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-24 11:53:47","xacMinh":"false"}
+{"huyen":"85","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-24 14:50:20","xacMinh":"false"}
+{"fromDate":"2022-01-24","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-24 15:02:12","toDate":"2025-10-24","xa":"T¶ Phêi","xacMinh":"false"}
+{"fromDate":"2022-01-24","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-24 15:02:17","toDate":"2025-10-24","xa":"T¶ Phêi","xacMinh":"true"}
+{"level":"info","message":"Searching for CB-5826 with radius 10000m","service":"search-controller","timestamp":"2025-10-24 15:36:58"}
+{"level":"info","message":"Found CB-5826 at [22.392162853993998, 104.08104712033739]","service":"search-controller","timestamp":"2025-10-24 15:36:58"}
+{"level":"info","message":"Found 50 features within 10000m of CB-5826","service":"search-controller","timestamp":"2025-10-24 15:36:58"}
+{"level":"info","message":"Searching for CB-5826 with radius 10000m","service":"search-controller","timestamp":"2025-10-24 15:41:14"}
+{"level":"info","message":"Found CB-5826 at [22.392162853993998, 104.08104712033739]","service":"search-controller","timestamp":"2025-10-24 15:41:14"}
+{"level":"info","message":"Found 50 features within 10000m of CB-5826","service":"search-controller","timestamp":"2025-10-24 15:41:14"}
+{"level":"info","message":"Searching for CB-4935 with radius 10000m","service":"search-controller","timestamp":"2025-10-24 15:42:08"}
+{"level":"info","message":"Found CB-4935 at [22.363141923202143, 103.93200164278049]","service":"search-controller","timestamp":"2025-10-24 15:42:08"}
+{"level":"info","message":"Found 50 features within 10000m of CB-4935","service":"search-controller","timestamp":"2025-10-24 15:42:08"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-24 15:42:46"}
+{"level":"info","message":"Found 2 mat_rung records","service":"search-controller","timestamp":"2025-10-24 15:42:46"}
+{"level":"info","message":"Retrieved admin info for 2 locations","service":"search-controller","timestamp":"2025-10-24 15:42:46"}
+{"level":"info","message":"Searching for CB-4899 with radius 5000m","service":"search-controller","timestamp":"2025-10-24 15:42:57"}
+{"level":"info","message":"Found CB-4899 at [22.36556917231769, 103.91498940060379]","service":"search-controller","timestamp":"2025-10-24 15:42:57"}
+{"level":"info","message":"Found 50 features within 5000m of CB-4899","service":"search-controller","timestamp":"2025-10-24 15:42:57"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-24 15:44:19"}
+{"level":"info","message":"Found 2 mat_rung records","service":"search-controller","timestamp":"2025-10-24 15:44:19"}
+{"level":"info","message":"Retrieved admin info for 2 locations","service":"search-controller","timestamp":"2025-10-24 15:44:19"}
+{"level":"info","message":"Searching for CB-4899 with radius 5000m","service":"search-controller","timestamp":"2025-10-24 15:44:28"}
+{"level":"info","message":"Found CB-4899 at [22.36556917231769, 103.91498940060379]","service":"search-controller","timestamp":"2025-10-24 15:44:28"}
+{"level":"info","message":"Found 50 features within 5000m of CB-4899","service":"search-controller","timestamp":"2025-10-24 15:44:28"}
+{"level":"info","message":"Added admin info for 51 features","service":"search-controller","timestamp":"2025-10-24 15:44:28"}
+{"level":"info","message":"Searching for CB-4899 with radius 5000m","service":"search-controller","timestamp":"2025-10-24 15:45:02"}
+{"level":"info","message":"Found CB-4899 at [22.36556917231769, 103.91498940060379]","service":"search-controller","timestamp":"2025-10-24 15:45:02"}
+{"level":"info","message":"Found 50 features within 5000m of CB-4899","service":"search-controller","timestamp":"2025-10-24 15:45:02"}
+{"level":"info","message":"Added admin info for 51 features","service":"search-controller","timestamp":"2025-10-24 15:45:02"}
+{"level":"info","message":"Searching for CB-4935 with radius 10000m","service":"search-controller","timestamp":"2025-10-24 15:56:19"}
+{"level":"info","message":"Found CB-4935 at [22.363141923202143, 103.93200164278049]","service":"search-controller","timestamp":"2025-10-24 15:56:19"}
+{"level":"info","message":"Found 50 features within 10000m of CB-4935","service":"search-controller","timestamp":"2025-10-24 15:56:20"}
+{"level":"info","message":"Added admin info for 51 features","service":"search-controller","timestamp":"2025-10-24 15:56:20"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-24 22:08:27"}
+{"level":"info","message":"Found 2 mat_rung records","service":"search-controller","timestamp":"2025-10-24 22:08:27"}
+{"level":"info","message":"Retrieved admin info for 2 locations","service":"search-controller","timestamp":"2025-10-24 22:08:27"}
+{"level":"info","message":"Searching for CB-4899 with radius 5000m","service":"search-controller","timestamp":"2025-10-24 22:08:28"}
+{"level":"info","message":"Found CB-4899 at [22.36556917231769, 103.91498940060379]","service":"search-controller","timestamp":"2025-10-24 22:08:28"}
+{"level":"info","message":"Found 50 features within 5000m of CB-4899","service":"search-controller","timestamp":"2025-10-24 22:08:28"}
+{"level":"info","message":"Added admin info for 51 features","service":"search-controller","timestamp":"2025-10-24 22:08:28"}
+{"level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-24 22:09:37"}
+{"level":"info","message":"Found 1 mat_rung records","service":"search-controller","timestamp":"2025-10-24 22:09:37"}
+{"level":"info","message":"Retrieved admin info for 1 locations","service":"search-controller","timestamp":"2025-10-24 22:09:37"}
+{"level":"info","message":"Searching for CB-4899 with radius 5000m","service":"search-controller","timestamp":"2025-10-24 22:09:38"}
+{"level":"info","message":"Found CB-4899 at [22.36556917231769, 103.91498940060379]","service":"search-controller","timestamp":"2025-10-24 22:09:38"}
+{"level":"info","message":"Found 50 features within 5000m of CB-4899","service":"search-controller","timestamp":"2025-10-24 22:09:38"}
+{"level":"info","message":"Added admin info for 51 features","service":"search-controller","timestamp":"2025-10-24 22:09:38"}
+{"fromDate":"2023-01-24","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-24 22:18:30","toDate":"2025-10-24","xa":"Thèng NhÊt","xacMinh":"false"}
+{"level":"info","message":"Found 0 mat_rung records","service":"search-controller","timestamp":"2025-10-24 22:18:30"}
+{"fromDate":"2023-01-24","huyen":"TP. Lµo Cai","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2025-10-24 22:18:40","toDate":"2025-10-24","xa":"T¶ Phêi","xacMinh":"false"}
+{"level":"info","message":"Found 0 mat_rung records","service":"search-controller","timestamp":"2025-10-24 22:18:40"}

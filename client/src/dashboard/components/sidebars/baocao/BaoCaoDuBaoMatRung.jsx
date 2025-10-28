@@ -48,7 +48,8 @@ const BaoCaoDuBaoMatRung = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [reportType, setReportType] = useState("");
-  const [chartData] = useState(null);
+  const [chartData, setChartData] = useState(null);
+  const [showChart, setShowChart] = useState(false);
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   
   // ✅ THÊM: State cho checkbox xác minh
@@ -126,15 +127,6 @@ const BaoCaoDuBaoMatRung = () => {
     // Cập nhật trạng thái loading cho cả trang Thống kê báo cáo
     setReportLoading(true);
 
-    const params = new URLSearchParams({
-      fromDate,
-      toDate,
-      huyen: selectedHuyen,
-      xa: selectedXa,
-      type: reportType,
-      status: isXacMinh ? 'true' : 'false'  // ✅ SỬA: Đổi tên param thành status
-    });
-
     try {
       // Giả lập trạng thái loading progress
       const progressInterval = setInterval(() => {
@@ -142,28 +134,96 @@ const BaoCaoDuBaoMatRung = () => {
         setLoadingMessage(newMessage);
       }, 800);
 
-      // ✅ SỬA: Đổi endpoint thành /api/search/mat-rung
-      const res = await axios.get(`/api/search/mat-rung?${params.toString()}`);
+      if (reportType === "Biểu đồ") {
+        // ✅ XỬ LÝ CHO BIỂU ĐỒ: Luôn lấy tất cả dữ liệu để tạo biểu đồ thống kê
+        const params = new URLSearchParams({
+          fromDate,
+          toDate,
+          huyen: selectedHuyen,
+          xa: selectedXa,
+          xacMinh: 'false'  // Luôn lấy tất cả dữ liệu để thống kê
+        });
 
-      clearInterval(progressInterval);
+        const res = await axios.get(`/api/search/mat-rung?${params.toString()}`);
+        clearInterval(progressInterval);
 
-      const data = res.data;
-      
-      if (reportType === "Văn bản" || reportType === "Biểu đồ") {
+        const data = res.data;
+
+        if (!data.data || !data.data.features || data.data.features.length === 0) {
+          toast.info("Không có dữ liệu để tạo biểu đồ thống kê");
+          setReportLoading(false);
+          setIsLoading(false);
+          return;
+        }
+
+        // Xử lý dữ liệu để tạo chartData theo huyện
+        const features = data.data.features;
+        const chartData = {};
+
+        features.forEach(feature => {
+          const huyen = feature.properties.huyen_name || feature.properties.huyen || 'Unknown';
+          if (!chartData[huyen]) {
+            chartData[huyen] = {
+              "Chưa xác minh": 0,
+              "Đã xác minh": 0,
+              area_chua_xac_minh: 0,
+              area_da_xac_minh: 0
+            };
+          }
+
+          const isVerified = feature.properties.xacminh === 1 || feature.properties.xacminh === '1';
+          const area = (feature.properties.dtich || 0) / 10000; // Convert to hectares
+
+          if (isVerified) {
+            chartData[huyen]["Đã xác minh"] += 1;
+            chartData[huyen].area_da_xac_minh += area;
+          } else {
+            chartData[huyen]["Chưa xác minh"] += 1;
+            chartData[huyen].area_chua_xac_minh += area;
+          }
+        });
+
+        setReportData(chartData);
+
+        // Navigate với type=biểu đồ
+        setTimeout(() => {
+          navigate({
+            pathname: "/dashboard/baocao",
+            search: `?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(selectedHuyen)}&xa=${encodeURIComponent(selectedXa)}&xacMinh=false&type=${encodeURIComponent(reportType)}`
+          });
+
+          toast.success("Đã tạo biểu đồ thống kê thành công!");
+          setReportLoading(false);
+        }, 1000);
+
+      } else {
+        // XỬ LÝ CHO VĂN BẢN: Theo loại báo cáo đã chọn
+        const params = new URLSearchParams({
+          fromDate,
+          toDate,
+          huyen: selectedHuyen,
+          xa: selectedXa,
+          xacMinh: isXacMinh ? 'true' : 'false'
+        });
+
+        const res = await axios.get(`/api/search/mat-rung?${params.toString()}`);
+        clearInterval(progressInterval);
+
+        const data = res.data;
+
         if (!data.data || !data.data.features || data.data.features.length === 0) {
           toast.info(`Không tìm thấy dữ liệu ${isXacMinh ? 'đã xác minh' : ''} phù hợp với điều kiện tìm kiếm`);
           setReportLoading(false);
         } else {
           setReportData(data.data.features);
-          
+
           // Đợi một chút để trạng thái loading được hiển thị rõ ràng
           setTimeout(() => {
-            // ✅ SỬA: Lưu tham số status vào URL
             navigate({
               pathname: "/dashboard/baocao",
-              search: `?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(selectedHuyen)}&xa=${encodeURIComponent(selectedXa)}&status=${isXacMinh}&type=${encodeURIComponent(reportType)}`
+              search: `?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(selectedHuyen)}&xa=${encodeURIComponent(selectedXa)}&xacMinh=${isXacMinh}&type=${encodeURIComponent(reportType)}`
             });
-            
+
             toast.success(`Đã tạo báo cáo ${isXacMinh ? 'xác minh' : ''} thành công!`);
             setReportLoading(false);
           }, 1000);
@@ -305,7 +365,7 @@ const BaoCaoDuBaoMatRung = () => {
         </div>
       )}
 
-      {reportType === "Biểu đồ" && chartData && (
+      {showChart && chartData && (
         <div className="mt-6 bg-white p-4 rounded shadow-md">
           <h3 className="text-lg font-semibold text-center mb-4">
             Biểu đồ mức độ xác minh mất rừng theo huyện

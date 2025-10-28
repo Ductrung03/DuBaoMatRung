@@ -1,6 +1,7 @@
 // gis-service/src/controllers/layer.controller.js
 const createLogger = require('../../../../shared/logger');
 const { formatResponse } = require('../../../../shared/utils');
+const { convertTcvn3ToUnicode } = require('../../../../shared/utils/tcvn3-converter');
 
 const logger = createLogger('layer-controller');
 
@@ -17,6 +18,8 @@ const layerMapping = {
 
 // Get layer data by path parameter (new endpoint for frontend)
 exports.getLayerDataByPath = async (req, res, next) => {
+  let adminDb = null;
+
   try {
     const { layerName } = req.params;
     const { format = 'geojson', days } = req.query;
@@ -109,6 +112,68 @@ exports.getLayerDataByPath = async (req, res, next) => {
 
     const result = await db.query(query);
 
+    // ✅ Nếu là deforestation-alerts, thêm admin info từ admin_db
+    if (layerName === 'deforestation-alerts' && result.rows.length > 0) {
+      try {
+        const { Pool } = require('pg');
+        adminDb = new Pool({
+          host: process.env.DB_HOST || 'localhost',
+          port: process.env.DB_PORT || 5433,
+          user: process.env.DB_USER || 'postgres',
+          password: process.env.DB_PASSWORD,
+          database: 'admin_db',
+          max: 5,
+          idleTimeoutMillis: 5000
+        });
+
+        // Batch query admin info
+        const geometries = result.rows.map(row => row.geometry);
+        const placeholders = geometries.map((_, idx) => `$${idx + 1}`).join(',');
+
+        const adminQuery = `
+          WITH geoms AS (
+            SELECT
+              unnest(ARRAY[${placeholders}])::text as geom_json,
+              generate_series(1, ${geometries.length}) as idx
+          )
+          SELECT idx, r.huyen, r.xa, r.tieukhu, r.khoanh
+          FROM geoms g
+          LEFT JOIN laocai_ranhgioihc r
+            ON ST_Intersects(r.geom, ST_GeomFromGeoJSON(g.geom_json))
+        `;
+
+        const adminResult = await adminDb.query(adminQuery, geometries);
+        const adminInfoMap = {};
+
+        adminResult.rows.forEach(row => {
+          if (row.idx) {
+            adminInfoMap[row.idx - 1] = {
+              huyen: convertTcvn3ToUnicode(row.huyen),
+              xa: convertTcvn3ToUnicode(row.xa),
+              tk: row.tieukhu,
+              khoanh: row.khoanh
+            };
+          }
+        });
+
+        // Merge admin info vào result
+        result.rows = result.rows.map((row, idx) => {
+          const adminInfo = adminInfoMap[idx] || {};
+          return {
+            ...row,
+            huyen: adminInfo.huyen || null,
+            xa: adminInfo.xa || null,
+            tk: adminInfo.tk || null,
+            khoanh: adminInfo.khoanh || null
+          };
+        });
+
+        logger.info(`Added admin info for ${Object.keys(adminInfoMap).length}/${result.rows.length} features`);
+      } catch (err) {
+        logger.error('Failed to get admin info for layer:', err.message);
+      }
+    }
+
     const features = result.rows.map(row => {
       // Build properties object, loại bỏ geometry
       const properties = { ...row };
@@ -142,6 +207,14 @@ exports.getLayerDataByPath = async (req, res, next) => {
   } catch (error) {
     logger.error('Error loading layer data', { error: error.message });
     next(error);
+  } finally {
+    if (adminDb) {
+      try {
+        await adminDb.end();
+      } catch (err) {
+        logger.warn('Error closing admin_db:', err.message);
+      }
+    }
   }
 };
 

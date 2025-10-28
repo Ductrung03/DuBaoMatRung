@@ -2916,3 +2916,635 @@
 {"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 13:26:58"}
 {"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 13:27:02"}
 {"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 13:40:50"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 13:47:04"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T06:48:40.024Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 13:48:40"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 13:48:40"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 13:48:40"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 13:48:40"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 13:48:40"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T06:49:35.228Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 13:49:35"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 13:49:35"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 13:49:35"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 13:49:35"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 13:49:35"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 13:54:30"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 13:57:49"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 14:09:26"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-22 14:09:27"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-22 14:09:27"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-22 14:09:27"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T07:09:35.161Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 14:09:35"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 14:09:35"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 14:09:35"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 14:09:35"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 14:09:35"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 14:09:35"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 14:09:35"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 14:09:35"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 14:09:35"}
+{"ip":"127.0.0.1","level":"info","message":"GET /health","service":"gis-service","timestamp":"2025-10-22 14:09:36"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T07:10:46.505Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 14:10:46"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 14:10:46"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 14:10:46"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 14:10:46"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 14:10:46"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T07:13:26.260Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 14:13:26"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 14:13:37"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 14:27:21"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 14:29:18"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T07:29:38.522Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 14:29:38"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 14:29:38"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 14:29:38"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 14:29:38"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 14:29:38"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T07:42:36.564Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 14:42:36"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 14:42:36"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 14:42:36"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 14:42:36"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 14:42:36"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-22 14:42:42"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-22 14:42:42"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-22 14:42:42"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T07:43:21.332Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-22 14:43:48"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-22 14:43:48"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-22 14:43:48"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T07:44:21.955Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 14:44:21"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 14:44:55"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 14:44:59"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2025-10-22 14:56:56"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2025-10-22 15:00:20"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 15:31:26"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 15:41:58"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-22 15:42:38"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-22 15:42:38"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-22 15:42:38"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T08:42:42.174Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 15:42:42"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 15:42:46"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 15:42:52"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-22 15:44:27"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-22 15:44:27"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-22 15:44:27"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T08:50:32.394Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-22 15:50:35"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-22 15:50:35"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-22 15:50:35"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T08:50:46.813Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 15:50:46"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 15:50:51"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-22 15:52:24"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-22 15:52:24"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-22 15:52:24"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T08:58:29.766Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 15:58:29"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 15:58:33"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-22 16:02:35"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-22 16:02:35"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-22 16:02:35"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T09:03:12.152Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 16:03:12"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 16:03:12"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 16:03:12"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 16:03:12"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 16:03:12"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 16:03:12"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 16:03:12"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 16:03:12"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 16:03:12"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 16:03:13"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-22 16:07:38"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-22 16:07:38"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-22 16:07:38"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T09:10:29.480Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 16:10:29"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 16:10:32"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T09:26:27.108Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 16:26:27"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T09:26:42.167Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 16:26:42"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 16:26:47"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T13:15:16.161Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 20:15:16"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T13:15:21.167Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 20:15:21"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 20:15:21"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 20:15:21"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 20:15:21"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 20:15:21"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-22 20:15:35"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-22 20:15:35"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-22 20:15:35"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-22T13:15:46.957Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-22 20:15:46"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 20:15:55"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2025-10-22 20:26:11"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 20:47:55"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2025-10-22 20:49:16"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2025-10-22 20:53:10"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 21:24:34"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 21:24:41"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-22 21:52:52"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T04:44:47.597Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-24 11:44:54"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-24 11:44:54"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-24 11:44:54"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T04:45:08.098Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 11:45:08"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 11:45:21"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-24 11:46:29"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-24 11:46:29"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-24 11:46:29"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T04:48:01.152Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 11:48:01"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 11:48:01"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 11:48:01"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 11:48:01"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 11:48:01"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 11:48:01"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 11:48:01"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 11:48:01"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 11:48:01"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-24 11:48:04"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-24 11:48:04"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-24 11:48:04"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T04:48:15.163Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 11:48:15"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 11:48:18"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-24 11:48:57"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-24 11:48:57"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-24 11:48:57"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:01:36.175Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:01:36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:01:40"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-24 15:02:38"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-24 15:02:38"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-24 15:02:38"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:03:05.763Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:03:05"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:03:09"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2025-10-24 15:03:55"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-24 15:18:18"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-24 15:18:18"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-24 15:18:18"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:18:32.791Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:18:32"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:18:42"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2025-10-24 15:19:31"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:19:38"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:22:37.763Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:22:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:22:37"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:22:37"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:22:37"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:22:37"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:22:37"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:22:37"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:22:37"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:22:37"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:23:57.018Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:23:57"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:23:57"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:23:57"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:23:57"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:23:57"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:23:57"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:23:57"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:23:57"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:23:57"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:24:29.212Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:24:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:24:29"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:24:29"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:24:29"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:24:29"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:24:29"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:24:29"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:24:29"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:24:29"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:25:56"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:26:11"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:26:20"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-24 15:26:35"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-24 15:26:35"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-24 15:26:35"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:26:38.078Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:26:38"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:26:38"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:26:38"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:26:38"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:26:38"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:26:38"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:26:38"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:26:38"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:26:38"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:26:45"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:27:28.272Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:27:28"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:27:28"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:27:28"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:27:28"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-24 15:27:28"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:27:59.082Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:27:59"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:27:59"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:27:59"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:27:59"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:27:59"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:27:59"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:27:59"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:27:59"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:27:59"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung","service":"gis-service","timestamp":"2025-10-24 15:28:11"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung","service":"gis-service","timestamp":"2025-10-24 15:28:18"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:29:27"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:31:39.403Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:31:39"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:31:39"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:31:39"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:31:39"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-24 15:31:39"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:31:42"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:32:06"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2025-10-24 15:32:27"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:39:10.492Z"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:39:10.492Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:39:10"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:39:10"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:39:10"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:39:10"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:39:10"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:39:10"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:39:10"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:39:10"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:39:10"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-24 15:39:10"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:39:10"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:39:10"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:39:10"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:39:10"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:39:36.378Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:39:36"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:39:36"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:39:36"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:39:36"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:39:36"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:39:36"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:39:36"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:39:36"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:39:36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung","service":"gis-service","timestamp":"2025-10-24 15:39:51"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:40:01"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:40:19.300Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:40:19.327Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-24 15:40:19"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:40:19.971Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:40:19"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:40:20.000Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:40:20"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:40:20"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:40:20"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:40:20"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-24 15:40:20"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:40:35"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:41:20"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung","service":"gis-service","timestamp":"2025-10-24 15:42:46"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:43:32.298Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:43:32"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:43:32"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:43:32.305Z"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:43:32"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:43:32"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:43:32"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:43:32"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:43:32"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:43:32"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:43:32"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:43:32"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:43:32"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:43:32"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:43:32"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-24 15:43:32"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:44:56.727Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:44:56"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:44:56"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:44:56"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:44:56"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:44:56"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:44:56"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:44:56"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:44:56"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:44:56"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:44:56.743Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:44:56"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:44:56"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:44:56"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:44:56"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-24 15:44:56"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:44:57.254Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:44:57"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:44:57"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:44:57"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:44:57"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 15:44:57"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:44:57"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 15:44:57"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 15:44:57"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 15:44:57"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T08:44:57.272Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 15:44:57"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 15:44:57"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 15:44:57"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 15:44:57"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-24 15:44:57"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 15:56:00"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:42:31"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:43:02"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:43:34"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:44:06"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:44:38"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:45:10"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:45:41"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:46:13"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:46:45"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:47:17"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:47:49"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:48:21"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:48:53"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:49:25"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:49:56"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:50:28"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:51:00"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:51:32"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:52:04"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:52:36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:53:08"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:53:39"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:54:11"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:54:43"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:55:15"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:55:47"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:56:19"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:56:51"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:57:23"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:57:54"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:58:26"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:58:58"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 17:59:30"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:38:10"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:38:38"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:39:09"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:39:39"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:40:09"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:40:39"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:41:10"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:41:40"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:42:10"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:42:41"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:43:11"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:43:41"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:44:12"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:44:42"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:45:12"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:45:43"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:46:13"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:46:43"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:47:14"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:47:44"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:48:14"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:48:44"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:49:15"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:49:45"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:50:15"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:50:46"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:51:16"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:51:46"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:52:17"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:52:47"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:53:17"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:53:47"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:54:18"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:54:48"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:55:18"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:55:49"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:56:19"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:56:49"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:57:20"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:57:50"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:58:20"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:58:50"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:59:21"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 21:59:51"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 22:00:21"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 22:00:52"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 22:01:22"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 22:01:52"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 22:02:22"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 22:02:53"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 22:03:23"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 22:03:53"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T15:09:16.294Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 22:09:16"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 22:09:16"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 22:09:16"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 22:09:16"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 22:09:16"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 22:09:16"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 22:09:16"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 22:09:16"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 22:09:16"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung","service":"gis-service","timestamp":"2025-10-24 22:09:39"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T15:16:41.718Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 22:16:41"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 22:16:41"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 22:16:41"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 22:16:41"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-24 22:16:41"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-10-24T15:16:59.404Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-10-24 22:16:59"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-10-24 22:17:33"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2025-10-24 22:20:33"}

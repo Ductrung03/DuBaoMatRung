@@ -32,13 +32,14 @@ const ThongKeBaoCaoMatRung = () => {
   const [loadingMessage, setLoadingMessage] = useState("Đang tạo báo cáo...");
   const location = useLocation();
 
-  // ✅ Lấy thông tin từ URL params - THÊM xacMinh
+  // ✅ Lấy thông tin từ URL params - THÊM xacMinh và type
   const [reportParams, setReportParams] = useState({
     fromDate: '',
     toDate: '',
     huyen: '',
     xa: '',
-    xacMinh: 'false'
+    xacMinh: 'false',
+    type: ''
   });
 
   useEffect(() => {
@@ -48,10 +49,65 @@ const ThongKeBaoCaoMatRung = () => {
     const toDate = urlParams.get('toDate') || '';
     const huyen = urlParams.get('huyen') || '';
     const xa = urlParams.get('xa') || '';
-    const xacMinh = urlParams.get('xacMinh') || 'false';
-    
-    setReportParams({ fromDate, toDate, huyen, xa, xacMinh });
+    const xacMinh = urlParams.get('xacMinh') || urlParams.get('status') || 'false'; // Support both xacMinh and status for backward compatibility
+    const type = urlParams.get('type') || '';
+
+    setReportParams({ fromDate, toDate, huyen, xa, xacMinh, type });
+
+    // Nếu type là "Biểu đồ", gọi API để lấy dữ liệu thống kê
+    if (type === 'Biểu đồ') {
+      fetchChartData(fromDate, toDate, huyen, xa);
+    }
   }, [location.search]);
+
+  // Hàm lấy dữ liệu biểu đồ từ API
+  const fetchChartData = async (fromDate, toDate, huyen, xa) => {
+    try {
+      const params = new URLSearchParams({
+        fromDate,
+        toDate,
+        huyen,
+        xa,
+        xacMinh: 'false' // Luôn lấy tất cả dữ liệu để thống kê
+      });
+
+      const response = await fetch(`/api/search/mat-rung?${params.toString()}`);
+      const data = await response.json();
+
+      if (data.success && data.data.features) {
+        // Xử lý dữ liệu để tạo chartData theo huyện
+        const features = data.data.features;
+        const chartData = {};
+
+        features.forEach(feature => {
+          const huyenName = feature.properties.mahuyen || 'Unknown';
+          if (!chartData[huyenName]) {
+            chartData[huyenName] = {
+              "Chưa xác minh": 0,
+              "Đã xác minh": 0,
+              area_chua_xac_minh: 0,
+              area_da_xac_minh: 0
+            };
+          }
+
+          const isVerified = feature.properties.xacminh === 1 || feature.properties.xacminh === '1';
+          const area = (feature.properties.dtich || 0) / 10000; // Convert to hectares
+
+          if (isVerified) {
+            chartData[huyenName]["Đã xác minh"] += 1;
+            chartData[huyenName].area_da_xac_minh += area;
+          } else {
+            chartData[huyenName]["Chưa xác minh"] += 1;
+            chartData[huyenName].area_chua_xac_minh += area;
+          }
+        });
+
+        setReportData(chartData);
+      }
+    } catch (error) {
+      console.error('Error fetching chart data:', error);
+    }
+  };
 
   // Hàm format ngày để hiển thị đẹp hơn
   const formatDate = (dateString) => {
@@ -63,6 +119,32 @@ const ThongKeBaoCaoMatRung = () => {
       return dateString;
     }
   };
+
+  // Hàm xử lý dữ liệu biểu đồ từ reportData
+  const processChartData = (data) => {
+    if (!data || typeof data !== 'object') return { dataTinCay: [], dataDienTich: [] };
+
+    const dataTinCay = [];
+    const dataDienTich = [];
+
+    Object.entries(data).forEach(([huyen, stats]) => {
+      dataTinCay.push({
+        name: huyen,
+        "Chưa xác minh": stats["Chưa xác minh"] || 0,
+        "Đã xác minh": stats["Đã xác minh"] || 0,
+      });
+
+      dataDienTich.push({
+        name: huyen,
+        "Chưa xác minh": parseFloat((stats.area_chua_xac_minh || 0).toFixed(2)),
+        "Đã xác minh": parseFloat((stats.area_da_xac_minh || 0).toFixed(2)),
+      });
+    });
+
+    return { dataTinCay, dataDienTich };
+  };
+
+  const { dataTinCay, dataDienTich } = processChartData(reportData);
 
   // Hàm xử lý xuất file DOCX
   const handleExportDocx = () => {
@@ -141,13 +223,21 @@ const ThongKeBaoCaoMatRung = () => {
     return <ReportLoadingOverlay message={loadingMessage} />;
   }
 
-  // Kiểm tra nếu reportData là mảng => hiển thị bảng văn bản
-  if (Array.isArray(reportData)) {
+  // Kiểm tra nếu reportData là mảng và type là "Văn bản" => hiển thị bảng văn bản
+  // QUAN TRỌNG: Phải kiểm tra type !== "Biểu đồ" để tránh hiển thị nhầm
+  if (Array.isArray(reportData) && reportParams.type !== "Biểu đồ") {
     // ✅ Tiêu đề và headers khác nhau cho 2 loại báo cáo
     const isVerified = reportParams.xacMinh === 'true';
-    const reportTitle = isVerified 
-      ? "BẢNG THỐNG KÊ VỊ TRÍ MẤT RỪNG ĐÃ XÁC MINH "
-      : "BẢNG THỐNG KÊ VỊ TRÍ PHÁT HIỆN SỚM MẤT RỪNG ";
+    const reportTitle = isVerified
+      ? "BẢNG THỐNG KÊ VỊ TRÍ MẤT RỪNG"
+      : "BẢNG THỐNG KÊ PHÁT HIỆN SỚM MẤT RỪNG";
+
+    // Tính tổng số lô và tổng diện tích
+    const totalLots = reportData.length;
+    const totalArea = reportData.reduce((sum, item) => {
+      const areaField = isVerified ? item.properties.dtichXM : item.properties.dtich;
+      return sum + (areaField || 0);
+    }, 0) / 10000; // Convert to hectares
 
     return (
       <div className="p-6 font-sans max-h-[calc(100vh-100px)] overflow-y-auto">
@@ -155,10 +245,10 @@ const ThongKeBaoCaoMatRung = () => {
           <h2 className="text-center text-lg font-bold">
             {reportTitle}
           </h2>
-          
+
           {/* Thêm các nút xuất file */}
           <div className="flex gap-2">
-            <button 
+            <button
               onClick={handleExportDocx}
               disabled={isExportingDocx}
               className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm"
@@ -176,7 +266,7 @@ const ThongKeBaoCaoMatRung = () => {
                 </>
               )}
             </button>
-            <button 
+            <button
               onClick={handleExportPdf}
               disabled={isExportingPdf}
               className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-sm"
@@ -197,20 +287,23 @@ const ThongKeBaoCaoMatRung = () => {
             </button>
           </div>
         </div>
-        
+
         <div className="overflow-auto border border-gray-300 rounded shadow px-6 pt-2 pb-6">
           {/* Hiển thị thông tin từ params thực tế */}
           <div className="text-sm mb-2">
             <div className="flex justify-between font-semibold">
               <span>Tỉnh: Lào Cai</span>
+              <span>Huyện: {reportData.length > 0 ? (reportData[0].properties.huyen_name || reportParams.huyen) : (reportParams.huyen || '..........')}</span>
+              <span>Xã: {reportData.length > 0 ? (reportData[0].properties.xa_name || reportParams.xa) : (reportParams.xa || '..........')}</span>
+            </div>
+            <div className="flex justify-between font-semibold mt-1">
+              <span></span>
               <span>
                 Từ ngày: {formatDate(reportParams.fromDate) || '..........'}
                 {' '}
                 Đến ngày: {formatDate(reportParams.toDate) || '..........'}
               </span>
             </div>
-            {/* ✅ Hiển thị loại báo cáo */}
-           
           </div>
 
           {/* ✅ Bảng với headers khác nhau cho 2 loại báo cáo */}
@@ -218,6 +311,7 @@ const ThongKeBaoCaoMatRung = () => {
             <thead>
               <tr>
                 <th className="border border-black px-2 py-1">TT</th>
+                <th className="border border-black px-2 py-1">Huyện</th>
                 <th className="border border-black px-2 py-1">Xã</th>
                 <th className="border border-black px-2 py-1">Lô cảnh báo</th>
                 <th className="border border-black px-2 py-1">Tiểu khu</th>
@@ -234,14 +328,22 @@ const ThongKeBaoCaoMatRung = () => {
               {reportData.map((item, idx) => (
                 <tr key={idx}>
                   <td className="border border-black px-2 py-1">{idx + 1}</td>
-                  <td className="border border-black px-2 py-1">{item.properties.xa || ""}</td>
-                  <td className="border border-black px-2 py-1">{item.properties.gid || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.properties.huyen_name || item.properties.huyen || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.properties.xa_name || item.properties.xa || ""}</td>
+                  <td className="border border-black px-2 py-1">{item.properties.lo_canbao || (item.properties.gid ? `CB-${item.properties.gid}` : "")}</td>
                   <td className="border border-black px-2 py-1">{item.properties.tk || ""}</td>
                   <td className="border border-black px-2 py-1">{item.properties.khoanh || ""}</td>
-                  <td className="border border-black px-2 py-1">{item.properties.x || ""}</td>
-                  <td className="border border-black px-2 py-1">{item.properties.y || ""}</td>
                   <td className="border border-black px-2 py-1">
-                    {item.properties.area ? (item.properties.area / 10000).toFixed(1) : ""}
+                    {item.properties.x ? Math.round(item.properties.x) : ""}
+                  </td>
+                  <td className="border border-black px-2 py-1">
+                    {item.properties.y ? Math.round(item.properties.y) : ""}
+                  </td>
+                  <td className="border border-black px-2 py-1">
+                    {isVerified
+                      ? (item.properties.dtichXM ? (item.properties.dtichXM / 10000).toFixed(2) : "")
+                      : (item.properties.dtich ? (item.properties.dtich / 10000).toFixed(2) : "")
+                    }
                   </td>
                   {isVerified && (
                     <td className="border border-black px-2 py-1">
@@ -250,6 +352,14 @@ const ThongKeBaoCaoMatRung = () => {
                   )}
                 </tr>
               ))}
+              {/* Dòng tổng */}
+              <tr>
+                <td className="border border-black px-2 py-1 font-bold" colSpan={isVerified ? "9" : "8"}>Tổng</td>
+                <td className="border border-black px-2 py-1 font-bold">
+                  {totalArea.toFixed(2)}
+                </td>
+                {isVerified && <td className="border border-black px-2 py-1"></td>}
+              </tr>
             </tbody>
           </table>
 
@@ -260,7 +370,7 @@ const ThongKeBaoCaoMatRung = () => {
             <span className="text-right">
               Lào Cai, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
               <br />
-              <strong>Hạt kiểm lâm</strong>
+              <strong>Ban quản lý rừng</strong>
             </span>
           </div>
         </div>
@@ -268,80 +378,92 @@ const ThongKeBaoCaoMatRung = () => {
     );
   }
 
-  // Nếu reportData không phải mảng => hiển thị biểu đồ
-  const dataTinCay = Object.entries(reportData).map(([huyen, value]) => ({
-    name: huyen,
-    "Chưa xác minh": value["Chưa xác minh"] || 0,
-    "Đã xác minh": value["Đã xác minh"] || 0,
-  }));
+  // Nếu reportData là object và type là "Biểu đồ" => hiển thị biểu đồ
+  // QUAN TRỌNG: Kiểm tra reportData không phải mảng và type là "Biểu đồ"
+  if (typeof reportData === 'object' && !Array.isArray(reportData) && reportParams.type === "Biểu đồ") {
+    const dataTinCay = Object.entries(reportData).map(([huyen, value]) => ({
+      name: huyen,
+      "Chưa xác minh": value["Chưa xác minh"] || 0,
+      "Đã xác minh": value["Đã xác minh"] || 0,
+    }));
 
-  const dataDienTich = Object.entries(reportData).map(([huyen, value]) => ({
-    name: huyen,
-    "Chưa xác minh": value.area_chua_xac_minh || Math.random() * 100 + 20,
-    "Đã xác minh": value.area_da_xac_minh || Math.random() * 100 + 20,
-  }));
+    const dataDienTich = Object.entries(reportData).map(([huyen, value]) => ({
+      name: huyen,
+      "Chưa xác minh": value.area_chua_xac_minh || 0,
+      "Đã xác minh": value.area_da_xac_minh || 0,
+    }));
 
+    return (
+      <div className="p-6 font-sans max-h-[calc(100vh-100px)] overflow-y-auto">
+        <h2 className="text-center text-lg font-bold mb-4">
+          THỐNG KÊ KẾT QUẢ DỰ BÁO MẤT RỪNG
+        </h2>
+
+        {/* Hiển thị thông tin từ params thực tế */}
+        <div className="text-center text-sm mb-4 bg-gray-50 p-3 rounded">
+          <div className="font-semibold">
+            Tỉnh: Lào Cai |
+            Từ ngày: {formatDate(reportParams.fromDate)} -
+            Đến ngày: {formatDate(reportParams.toDate)}
+          </div>
+          {(reportParams.huyen || reportParams.xa) && (
+            <div className="text-xs text-gray-600 mt-1">
+              {reportParams.huyen && `Huyện: ${reportParams.huyen}`}
+              {reportParams.huyen && reportParams.xa && ' | '}
+              {reportParams.xa && `Xã: ${reportParams.xa}`}
+            </div>
+          )}
+          {/* ✅ Hiển thị loại báo cáo */}
+          <div className="text-sm text-green-600 font-medium mt-1">
+            {reportParams.type === 'Biểu đồ' ? '📊 Báo cáo biểu đồ thống kê' : (reportParams.xacMinh === 'true' ? '✅ Báo cáo xác minh (Loại 2)' : '📋 Báo cáo tổng hợp (Loại 1)')}
+          </div>
+        </div>
+
+        <div className="flex gap-6">
+          <div className="w-1/2 space-y-8">
+            <div>
+              <h3 className="text-center font-semibold mb-2">
+                Biểu đồ mức độ tin cậy dự báo mất rừng (%)
+              </h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={dataTinCay}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="Chưa xác minh" fill="#3399ff" />
+                  <Bar dataKey="Đã xác minh" fill="#ff6633" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div>
+              <h3 className="text-center font-semibold mb-2">
+                Biểu đồ diện tích dự báo mất rừng
+              </h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={dataDienTich}>
+                  <XAxis dataKey="name" />
+                  <YAxis unit=" ha" />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="Chưa xác minh" fill="#3399ff" />
+                  <Bar dataKey="Đã xác minh" fill="#ff6633" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Trường hợp không khớp với bất kỳ điều kiện nào
   return (
-    <div className="p-6 font-sans max-h-[calc(100vh-100px)] overflow-y-auto">
-      <h2 className="text-center text-lg font-bold mb-4">
-        THỐNG KÊ KẾT QUẢ DỰ BÁO MẤT RỪNG
-      </h2>
-
-      {/* Hiển thị thông tin từ params thực tế */}
-      <div className="text-center text-sm mb-4 bg-gray-50 p-3 rounded">
-        <div className="font-semibold">
-          Tỉnh: Lào Cai | 
-          Từ ngày: {formatDate(reportParams.fromDate)} - 
-          Đến ngày: {formatDate(reportParams.toDate)}
-        </div>
-        {(reportParams.huyen || reportParams.xa) && (
-          <div className="text-xs text-gray-600 mt-1">
-            {reportParams.huyen && `Huyện: ${reportParams.huyen}`}
-            {reportParams.huyen && reportParams.xa && ' | '}
-            {reportParams.xa && `Xã: ${reportParams.xa}`}
-          </div>
-        )}
-        {/* ✅ Hiển thị loại báo cáo */}
-        <div className="text-sm text-green-600 font-medium mt-1">
-          {reportParams.xacMinh === 'true' ? '✅ Báo cáo xác minh (Loại 2)' : '📊 Báo cáo tổng hợp (Loại 1)'}
-        </div>
-      </div>
-
-      <div className="flex gap-6">
-        <div className="w-1/2 space-y-8">
-          <div>
-            <h3 className="text-center font-semibold mb-2">
-              Biểu đồ mức độ tin cậy dự báo mất rừng (%)
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={dataTinCay}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="Chưa xác minh" fill="#3399ff" />
-                <Bar dataKey="Đã xác minh" fill="#ff6633" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div>
-            <h3 className="text-center font-semibold mb-2">
-              Biểu đồ diện tích dự báo mất rừng
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={dataDienTich}>
-                <XAxis dataKey="name" />
-                <YAxis unit=" ha" />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="Chưa xác minh" fill="#3399ff" />
-                <Bar dataKey="Đã xác minh" fill="#ff6633" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
+    <div className="p-6 font-sans">
+      <p className="text-center text-gray-500 mt-8">
+        Không thể hiển thị báo cáo. Vui lòng thử lại.
+      </p>
     </div>
   );
 };

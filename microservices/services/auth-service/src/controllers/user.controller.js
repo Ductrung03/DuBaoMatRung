@@ -14,10 +14,14 @@ exports.getAllUsers = async (req, res, next) => {
   try {
     const users = await prisma.user.findMany({
       include: {
-        roles: {
-          select: {
-            id: true,
-            name: true
+        userRoles: {
+          include: {
+            role: {
+              select: {
+                id: true,
+                name: true
+              }
+            }
           }
         }
       },
@@ -26,14 +30,17 @@ exports.getAllUsers = async (req, res, next) => {
       }
     });
 
-    // Remove password_hash from response
-    const usersWithoutPassword = users.map(({ password_hash, ...user }) => user);
+    // Transform data to match frontend expectations
+    const transformedUsers = users.map(({ password_hash, userRoles, ...user }) => ({
+      ...user,
+      roles: userRoles.map(ur => ur.role)
+    }));
 
     logger.info('Retrieved all users', { count: users.length });
 
     res.json({
       success: true,
-      data: usersWithoutPassword
+      data: transformedUsers
     });
   } catch (error) {
     next(error);
@@ -51,9 +58,17 @@ exports.getUserById = async (req, res, next) => {
     const user = await prisma.user.findUnique({
       where: { id: parseInt(id) },
       include: {
-        roles: {
+        userRoles: {
           include: {
-            permissions: true
+            role: {
+              include: {
+                rolePermissions: {
+                  include: {
+                    permission: true
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -63,12 +78,19 @@ exports.getUserById = async (req, res, next) => {
       throw new NotFoundError('User not found');
     }
 
-    // Remove password_hash from response
-    const { password_hash, ...userWithoutPassword } = user;
+    // Transform data to match frontend expectations
+    const { password_hash, userRoles, ...userData } = user;
+    const transformedUser = {
+      ...userData,
+      roles: userRoles.map(ur => ({
+        ...ur.role,
+        permissions: ur.role.rolePermissions.map(rp => rp.permission)
+      }))
+    };
 
     res.json({
       success: true,
-      data: userWithoutPassword
+      data: transformedUser
     });
   } catch (error) {
     next(error);
@@ -81,7 +103,7 @@ exports.getUserById = async (req, res, next) => {
  */
 exports.createUser = async (req, res, next) => {
   try {
-    const { username, password, full_name, role_ids } = req.body;
+    const { username, password, full_name, position, organization, permission_level, district_id, role_ids } = req.body;
 
     if (!username || !password || !full_name) {
       throw new ValidationError('Username, password, and full_name are required');
@@ -105,26 +127,42 @@ exports.createUser = async (req, res, next) => {
         username,
         password_hash,
         full_name,
+        position,
+        organization,
+        permission_level: permission_level || 'district',
+        district_id,
         ...(role_ids && role_ids.length > 0 && {
-          roles: {
-            connect: role_ids.map(id => ({ id: parseInt(id) }))
+          userRoles: {
+            create: role_ids.map(roleId => ({
+              role: {
+                connect: { id: parseInt(roleId) }
+              }
+            }))
           }
         })
       },
       include: {
-        roles: true
+        userRoles: {
+          include: {
+            role: true
+          }
+        }
       }
     });
 
     logger.info('User created', { userId: user.id, username: user.username });
 
-    // Remove password_hash from response
-    const { password_hash: _, ...userWithoutPassword } = user;
+    // Transform data to match frontend expectations
+    const { password_hash: _, userRoles, ...userData } = user;
+    const transformedUser = {
+      ...userData,
+      roles: userRoles.map(ur => ur.role)
+    };
 
     res.status(201).json({
       success: true,
       message: 'User created successfully',
-      data: userWithoutPassword
+      data: transformedUser
     });
   } catch (error) {
     next(error);
@@ -138,7 +176,7 @@ exports.createUser = async (req, res, next) => {
 exports.updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { username, password, full_name, is_active, role_ids } = req.body;
+    const { username, password, full_name, position, organization, permission_level, district_id, is_active, role_ids } = req.body;
 
     const user = await prisma.user.findUnique({
       where: { id: parseInt(id) }
@@ -152,6 +190,10 @@ exports.updateUser = async (req, res, next) => {
 
     if (username) updateData.username = username;
     if (full_name) updateData.full_name = full_name;
+    if (position !== undefined) updateData.position = position;
+    if (organization !== undefined) updateData.organization = organization;
+    if (permission_level !== undefined) updateData.permission_level = permission_level;
+    if (district_id !== undefined) updateData.district_id = district_id;
     if (is_active !== undefined) updateData.is_active = is_active;
 
     // Hash new password if provided
@@ -161,9 +203,13 @@ exports.updateUser = async (req, res, next) => {
 
     // Update roles if provided
     if (role_ids !== undefined) {
-      updateData.roles = {
-        set: [],
-        connect: role_ids.map(id => ({ id: parseInt(id) }))
+      updateData.userRoles = {
+        deleteMany: {}, // Remove all existing roles
+        create: role_ids.map(roleId => ({
+          role: {
+            connect: { id: parseInt(roleId) }
+          }
+        }))
       };
     }
 
@@ -171,19 +217,27 @@ exports.updateUser = async (req, res, next) => {
       where: { id: parseInt(id) },
       data: updateData,
       include: {
-        roles: true
+        userRoles: {
+          include: {
+            role: true
+          }
+        }
       }
     });
 
     logger.info('User updated', { userId: updatedUser.id });
 
-    // Remove password_hash from response
-    const { password_hash: _, ...userWithoutPassword } = updatedUser;
+    // Transform data to match frontend expectations
+    const { password_hash: _, userRoles, ...userData } = updatedUser;
+    const transformedUser = {
+      ...userData,
+      roles: userRoles.map(ur => ur.role)
+    };
 
     res.json({
       success: true,
       message: 'User updated successfully',
-      data: userWithoutPassword
+      data: transformedUser
     });
   } catch (error) {
     next(error);
@@ -253,12 +307,10 @@ exports.assignRole = async (req, res, next) => {
     }
 
     // Assign role to user
-    await prisma.user.update({
-      where: { id: parseInt(userId) },
+    await prisma.userRole.create({
       data: {
-        roles: {
-          connect: { id: parseInt(roleId) }
-        }
+        userId: parseInt(userId),
+        roleId: parseInt(roleId)
       }
     });
 
@@ -291,12 +343,10 @@ exports.removeRole = async (req, res, next) => {
     }
 
     // Remove role from user
-    await prisma.user.update({
-      where: { id: parseInt(userId) },
-      data: {
-        roles: {
-          disconnect: { id: parseInt(roleId) }
-        }
+    await prisma.userRole.deleteMany({
+      where: {
+        userId: parseInt(userId),
+        roleId: parseInt(roleId)
       }
     });
 

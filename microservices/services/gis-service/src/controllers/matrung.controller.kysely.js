@@ -69,8 +69,10 @@ function buildGeoJSON(rows, extraProps = {}) {
   };
 }
 
-// Get mat rung data with filters - KYSELY VERSION
+// Get mat rung data with filters - KYSELY VERSION WITH ADMIN_DB
 exports.getMatRung = async (req, res, next) => {
+  let adminDb = null;
+
   try {
     const {
       fromDate,
@@ -115,8 +117,76 @@ exports.getMatRung = async (req, res, next) => {
       limit
     });
 
-    const geoJSON = buildGeoJSON(rows);
+    logger.info(`Retrieved ${rows.length} mat_rung records`);
 
+    // ✅ Tạo connection đến admin_db
+    const { Pool } = require('pg');
+    adminDb = new Pool({
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 5433,
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD,
+      database: 'admin_db',
+      max: 5,
+      idleTimeoutMillis: 5000
+    });
+
+    // ✅ Batch query admin info
+    const adminInfoMap = {};
+    if (rows.length > 0) {
+      try {
+        const geometries = rows.map(row => row.geometry);
+        const placeholders = geometries.map((_, idx) => `$${idx + 1}`).join(',');
+
+        const adminQuery = `
+          WITH geoms AS (
+            SELECT
+              unnest(ARRAY[${placeholders}])::text as geom_json,
+              generate_series(1, ${geometries.length}) as idx
+          )
+          SELECT
+            idx,
+            r.huyen,
+            r.xa,
+            r.tieukhu,
+            r.khoanh
+          FROM geoms g
+          LEFT JOIN laocai_ranhgioihc r
+            ON ST_Intersects(r.geom, ST_GeomFromGeoJSON(g.geom_json))
+        `;
+
+        const adminResult = await adminDb.query(adminQuery, geometries);
+        const { convertTcvn3ToUnicode } = require('../../../../shared/utils/tcvn3-converter');
+        adminResult.rows.forEach(row => {
+          if (row.idx) {
+            adminInfoMap[row.idx - 1] = {
+              huyen: convertTcvn3ToUnicode(row.huyen),
+              xa: convertTcvn3ToUnicode(row.xa),
+              tk: row.tieukhu,
+              khoanh: row.khoanh
+            };
+          }
+        });
+
+        logger.info(`Admin info retrieved for ${Object.keys(adminInfoMap).length} locations`);
+      } catch (err) {
+        logger.error('Failed to get admin info:', err.message);
+      }
+    }
+
+    // ✅ Merge admin info (dữ liệu đã là Unicode, không cần convert)
+    const enrichedRows = rows.map((row, idx) => {
+      const adminInfo = adminInfoMap[idx] || {};
+      return {
+        ...row,
+        huyen: adminInfo.huyen || row.huyen,
+        xa: adminInfo.xa || row.xa,
+        tk: adminInfo.tk || row.tk,
+        khoanh: adminInfo.khoanh || row.khoanh
+      };
+    });
+
+    const geoJSON = buildGeoJSON(enrichedRows);
     const isDefault = !fromDate && !toDate && !huyen && !xa && !tk && !khoanh && !churung;
 
     // Cache for 5 minutes
@@ -138,7 +208,16 @@ exports.getMatRung = async (req, res, next) => {
     ));
 
   } catch (error) {
+    logger.error('Error in getMatRung:', error);
     next(error);
+  } finally {
+    if (adminDb) {
+      try {
+        await adminDb.end();
+      } catch (err) {
+        logger.warn('Error closing admin_db:', err.message);
+      }
+    }
   }
 };
 
