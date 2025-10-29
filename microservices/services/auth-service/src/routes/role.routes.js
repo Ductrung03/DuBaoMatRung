@@ -3,17 +3,22 @@ const express = require('express');
 const router = express.Router();
 const roleController = require('../controllers/role.controller');
 
-/**
- * @swagger
- * /api/auth/roles:
- *   get:
- *     summary: Get all roles
- *     tags: [Roles]
- *     responses:
- *       200:
- *         description: List of all roles
- */
+// Permission management routes
+router.post('/permissions', roleController.addRolePermission);
+router.delete('/:roleId/permissions/:permissionId', roleController.removeRolePermission);
+
+// Legacy permission routes
+router.get('/permissions/tree', roleController.getPermissionTree);
+router.get('/permissions/ui-tree', roleController.getUIPermissionTree);
+
+// Standard CRUD routes
 router.get('/', roleController.getAllRoles);
+router.get('/:id', roleController.getRoleById);
+router.post('/', roleController.createRole);
+router.patch('/:id', roleController.updateRole);
+router.delete('/:id', roleController.deleteRole);
+
+module.exports = router;
 
 /**
  * @swagger
@@ -131,7 +136,38 @@ router.delete('/:id', roleController.deleteRole);
  *       200:
  *         description: Permission assigned successfully
  */
-router.post('/:roleId/permissions', roleController.assignPermission);
+router.post('/:roleId/permissions', roleController.assignPermissions);
+
+/**
+ * @swagger
+ * /api/auth/roles/{roleId}/permissions:
+ *   put:
+ *     summary: Sync permissions for role (replace all)
+ *     tags: [Roles]
+ *     parameters:
+ *       - in: path
+ *         name: roleId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - permissionIds
+ *             properties:
+ *               permissionIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       200:
+ *         description: Permissions synced successfully
+ */
+router.put('/:roleId/permissions', roleController.syncPermissions);
 
 /**
  * @swagger

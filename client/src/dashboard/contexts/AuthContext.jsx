@@ -195,8 +195,10 @@ export const AuthProvider = ({ children }) => {
   const isAdmin = () => {
     if (!user) return false;
 
-    // Kiểm tra role admin từ userRoles
-    if (user.userRoles && user.userRoles.some(userRole => userRole.role.name === "admin")) {
+    // Kiểm tra role admin từ userRoles - FIXED: check cho cả super_admin và admin
+    if (user.userRoles && user.userRoles.some(userRole =>
+      userRole.role.name === "super_admin" || userRole.role.name === "admin"
+    )) {
       return true;
     }
 

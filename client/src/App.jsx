@@ -2,8 +2,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./dashboard/pages/Login";
 import MainLayout from "./dashboard/layout/MainLayout";
-
-
 import QuanLyDuLieu from "./dashboard/pages/QuanLyDuLieu";
 import ThongKeBaoCaoMatRung from "./dashboard/pages/ThongKeBaoCaoMatRung";
 import { GeoDataProvider } from "./dashboard/contexts/GeoDataContext";
@@ -11,7 +9,9 @@ import PhatHienMatRung from "./dashboard/pages/PhatHienMatRung";
 import { ReportProvider } from "./dashboard/contexts/ReportContext";
 import { AuthProvider } from "./dashboard/contexts/AuthContext";
 import ProtectedRoute from "./dashboard/components/ProtectedRoute";
+import PermissionProtectedRoute from "./components/PermissionProtectedRoute";
 import QuanLyNguoiDung from "./dashboard/pages/QuanLyNguoiDung";
+import QuanLyRoleUltraModern from "./dashboard/pages/QuanLyRoleUltraModern";
 import ErrorBoundary from "./dashboard/components/ErrorBoundary";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -38,26 +38,54 @@ function App() {
                   }
                 >
                   <Route path="" element={<Dashboard />} />
-                  <Route path="dubaomatrung" element={<DuBaoMatRung />} />
-                  <Route path="quanlydulieu" element={<QuanLyDuLieu />} />
+                  <Route 
+                    path="dubaomatrung" 
+                    element={
+                      <PermissionProtectedRoute requiredPermission="forecast">
+                        <DuBaoMatRung />
+                      </PermissionProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="quanlydulieu" 
+                    element={
+                      <PermissionProtectedRoute requiredPermission="data_management">
+                        <QuanLyDuLieu />
+                      </PermissionProtectedRoute>
+                    } 
+                  />
                   <Route 
                     path="phathienmatrung" 
                     element={
-                      <ProtectedRoute adminOnly={true}>
-                        {/* Wrap ErrorBoundary đặc biệt cho PhatHienMatRung */}
+                      <PermissionProtectedRoute requiredPermission="detection">
                         <ErrorBoundary>
                           <PhatHienMatRung />
                         </ErrorBoundary>
-                      </ProtectedRoute>
+                      </PermissionProtectedRoute>
                     } 
                   />
-                  <Route path="baocao" element={<ThongKeBaoCaoMatRung />} />
+                  <Route 
+                    path="baocao" 
+                    element={
+                      <PermissionProtectedRoute requiredPermission="reports">
+                        <ThongKeBaoCaoMatRung />
+                      </PermissionProtectedRoute>
+                    } 
+                  />
                   <Route
                     path="quanlynguoidung"
                     element={
-                      <ProtectedRoute adminOnly={true}>
+                      <PermissionProtectedRoute requiredPermission="user_management">
                         <QuanLyNguoiDung />
-                      </ProtectedRoute>
+                      </PermissionProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="quanlyrole"
+                    element={
+                      <PermissionProtectedRoute requiredPermission="role_management">
+                        <QuanLyRoleUltraModern />
+                      </PermissionProtectedRoute>
                     }
                   />
                 </Route>

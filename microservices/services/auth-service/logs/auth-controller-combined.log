@@ -290,3 +290,25 @@
 {"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-24 22:17:05","userId":1,"username":"admin"}
 {"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-24 22:17:33","username":"admin"}
 {"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-24 22:17:33","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-28 17:17:43","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-28 17:17:43","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-28 17:31:59","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-28 17:31:59","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-28 20:27:51","username":"admin"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-10-28 20:27:51","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-28 20:28:42","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-28 20:28:43","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2025-10-28 20:43:16","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-28 20:43:19","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-28 20:43:19","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-28 20:47:02","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-28 20:47:02","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-28 20:54:44","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-28 20:54:44","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-28 23:42:27","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-28 23:42:27","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2025-10-29 07:43:43","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-29 07:43:45","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-29 07:43:45","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-10-29 12:32:26","username":"Test"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-10-29 12:32:27","userId":3,"username":"Test"}

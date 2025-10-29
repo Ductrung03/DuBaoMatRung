@@ -56,14 +56,24 @@ exports.login = async (req, res, next) => {
 
     // Generate JWT token với roles và permissions
     const roles = user.userRoles.map(ur => ur.role);
+
+    // Flatten và deduplicate permissions
+    const permissionsSet = new Set();
+    roles.forEach(role => {
+      role.rolePermissions.forEach(rp => {
+        if (rp.permission && rp.permission.code) {
+          permissionsSet.add(rp.permission.code);
+        }
+      });
+    });
+
     const tokenPayload = {
       id: user.id,
       username: user.username,
       full_name: user.full_name,
+      email: user.email,
       roles: roles.map(role => role.name),
-      permissions: roles.flatMap(role =>
-        role.rolePermissions.map(rp => `${rp.permission.action}:${rp.permission.subject}`)
-      )
+      permissions: Array.from(permissionsSet)
     };
 
     const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
@@ -131,15 +141,6 @@ exports.getCurrentUser = async (req, res, next) => {
             }
           }
         }
-      },
-      select: {
-        id: true,
-        username: true,
-        full_name: true,
-        is_active: true,
-        created_at: true,
-        last_login: true,
-        userRoles: true
       }
     });
 
@@ -147,9 +148,12 @@ exports.getCurrentUser = async (req, res, next) => {
       throw new AuthenticationError('User not found');
     }
 
+    // Remove sensitive data
+    const { password_hash, ...userWithoutPassword } = user;
+
     res.json({
       success: true,
-      user
+      user: userWithoutPassword
     });
 
   } catch (error) {
@@ -230,14 +234,24 @@ exports.refreshToken = async (req, res, next) => {
 
     // Generate new token với roles và permissions
     const roles = user.userRoles.map(ur => ur.role);
+
+    // Flatten và deduplicate permissions
+    const permissionsSet = new Set();
+    roles.forEach(role => {
+      role.rolePermissions.forEach(rp => {
+        if (rp.permission && rp.permission.code) {
+          permissionsSet.add(rp.permission.code);
+        }
+      });
+    });
+
     const newTokenPayload = {
       id: user.id,
       username: user.username,
       full_name: user.full_name,
+      email: user.email,
       roles: roles.map(role => role.name),
-      permissions: roles.flatMap(role =>
-        role.rolePermissions.map(rp => `${rp.permission.action}:${rp.permission.subject}`)
-      )
+      permissions: Array.from(permissionsSet)
     };
 
     const newToken = jwt.sign(newTokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });

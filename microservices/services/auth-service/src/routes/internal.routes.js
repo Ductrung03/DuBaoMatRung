@@ -16,24 +16,19 @@ router.use(verifyInternalApiKey);
 /**
  * GET /api/auth/internal/user-info
  * Get user information by user IDs (batch request)
- *
- * Query params:
- *   - ids: comma-separated list of user IDs (e.g., "1,5,23")
- *
- * Headers:
- *   - X-Internal-Api-Key: Required internal API key for authentication
- *   - X-Service-Name: Optional service identifier for logging
- *
- * Response:
- *   {
- *     "success": true,
- *     "data": {
- *       "1": { "id": 1, "fullName": "...", "organization": "..." },
- *       "5": { "id": 5, "fullName": "...", "organization": "..." },
- *       "23": null  // User not found
- *     }
- *   }
  */
 router.get('/user-info', asyncHandler(internalController.getUserInfo));
+
+/**
+ * GET /api/auth/internal/users/:userId/permissions
+ * Get all permissions for a user (for gateway RBAC check)
+ */
+router.get('/users/:userId/permissions', asyncHandler(internalController.getUserPermissions));
+
+/**
+ * GET /api/auth/internal/users/:userId/roles
+ * Get all roles for a user
+ */
+router.get('/users/:userId/roles', asyncHandler(internalController.getUserRoles));
 
 module.exports = router;

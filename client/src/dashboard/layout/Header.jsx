@@ -29,14 +29,24 @@ const Header = () => {
 
   const isActive = (path) => currentPath === path;
 
-  // ✅ FIXED: Get permission level display - ƯU TIÊN ROLE TRƯỚC
+  // ✅ FIXED: Get permission level display - Hiển thị theo role thực tế
   const getPermissionLevelDisplay = () => {
-    // Ưu tiên kiểm tra role admin từ userRoles
-    if (isAdmin()) {
-      return 'Quản trị viên hệ thống';
+    // Ưu tiên hiển thị role từ userRoles
+    if (user?.userRoles && user.userRoles.length > 0) {
+      const roleName = user.userRoles[0].role.name;
+      const roleDescriptions = {
+        'super_admin': 'Quản trị viên tối cao',
+        'admin': 'Quản trị viên hệ thống',
+        'gis_manager': 'Quản lý GIS',
+        'gis_specialist': 'Chuyên viên GIS',
+        'verifier': 'Người xác minh',
+        'reporter': 'Người báo cáo',
+        'viewer': 'Người xem'
+      };
+      return roleDescriptions[roleName] || roleName;
     }
 
-    // Nếu không phải admin, check permission_level
+    // Fallback: nếu không có userRoles, check permission_level
     const levels = {
       'national': 'Người dùng cấp quốc gia',
       'province': 'Người dùng cấp tỉnh',
@@ -113,16 +123,28 @@ const Header = () => {
             )}
 
             {isAdmin() && (
-              <Link
-                to="/dashboard/quanlynguoidung"
-                className={`text-base font-semibold hover:underline transition-colors ${
-                  isActive("/dashboard/quanlynguoidung")
-                    ? "text-red-600"
-                    : "text-white"
-                }`}
-              >
-                Quản lý người dùng
-              </Link>
+              <>
+                <Link
+                  to="/dashboard/quanlynguoidung"
+                  className={`text-base font-semibold hover:underline transition-colors ${
+                    isActive("/dashboard/quanlynguoidung")
+                      ? "text-red-600"
+                      : "text-white"
+                  }`}
+                >
+                  Quản lý người dùng
+                </Link>
+                <Link
+                  to="/dashboard/quanlyrole"
+                  className={`text-base font-semibold hover:underline transition-colors ${
+                    isActive("/dashboard/quanlyrole")
+                      ? "text-red-600"
+                      : "text-white"
+                  }`}
+                >
+                  Quản lý Roles
+                </Link>
+              </>
             )}
           </div>
         </div>

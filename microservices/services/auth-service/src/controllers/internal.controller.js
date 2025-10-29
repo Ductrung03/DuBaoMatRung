@@ -1,7 +1,8 @@
 // auth-service/src/controllers/internal.controller.js
 const createLogger = require('../../../../shared/logger');
-const { ValidationError } = require('../../../../shared/errors');
+const { ValidationError, NotFoundError } = require('../../../../shared/errors');
 const prisma = require('../lib/prisma');
+const rbacService = require('../services/rbac.service');
 
 const logger = createLogger('internal-controller');
 
@@ -68,6 +69,56 @@ exports.getUserInfo = async (req, res, next) => {
       data: userMap
     });
 
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get user permissions for RBAC checks (internal)
+ * @route GET /api/auth/internal/users/:userId/permissions
+ */
+exports.getUserPermissions = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    const permissions = await rbacService.getUserPermissions(parseInt(userId));
+
+    logger.debug('User permissions fetched', {
+      userId,
+      count: permissions.length,
+      requestedBy: req.headers['x-service-name'] || 'unknown'
+    });
+
+    res.json({
+      success: true,
+      data: permissions
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get user roles (internal)
+ * @route GET /api/auth/internal/users/:userId/roles
+ */
+exports.getUserRoles = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    const roles = await rbacService.getUserRoles(parseInt(userId));
+
+    logger.debug('User roles fetched', {
+      userId,
+      count: roles.length,
+      requestedBy: req.headers['x-service-name'] || 'unknown'
+    });
+
+    res.json({
+      success: true,
+      data: roles
+    });
   } catch (error) {
     next(error);
   }

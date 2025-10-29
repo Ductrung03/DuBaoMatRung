@@ -22,14 +22,17 @@ const authenticate = (req, res, next) => {
     req.user = {
       id: decoded.id,
       username: decoded.username,
-      roles: decoded.roles,
-      permissions: decoded.permissions
+      full_name: decoded.full_name,
+      email: decoded.email,
+      roles: decoded.roles || [],
+      permissions: decoded.permissions || []
     };
 
     // Forward user info to downstream services
     req.headers['x-user-id'] = decoded.id;
-    req.headers['x-user-role'] = decoded.roles ? decoded.roles.join(',') : '';
-    req.headers['x-user-permission'] = decoded.permissions ? decoded.permissions.join(',') : '';
+    req.headers['x-user-username'] = decoded.username;
+    req.headers['x-user-roles'] = decoded.roles ? decoded.roles.join(',') : '';
+    req.headers['x-user-permissions'] = decoded.permissions ? decoded.permissions.join(',') : '';
 
     next();
   } catch (error) {
@@ -59,9 +62,10 @@ const requireRole = (...roles) => {
       });
     }
 
-    const userRole = req.user.role || req.user.permission_level;
+    const userRoles = req.user.roles || [];
+    const hasRole = roles.some(role => userRoles.includes(role));
 
-    if (!roles.includes(userRole)) {
+    if (!hasRole) {
       return res.status(403).json({
         success: false,
         message: 'Insufficient permissions'
@@ -72,8 +76,8 @@ const requireRole = (...roles) => {
   };
 };
 
-// Check if user has permission level
-const requirePermission = (...permissionLevels) => {
+// Check if user has permission
+const requirePermission = (...requiredPermissions) => {
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({
@@ -82,9 +86,10 @@ const requirePermission = (...permissionLevels) => {
       });
     }
 
-    const userPermission = req.user.permission_level || req.user.role;
+    const userPermissions = req.user.permissions || [];
+    const hasPermission = requiredPermissions.some(perm => userPermissions.includes(perm));
 
-    if (!permissionLevels.includes(userPermission)) {
+    if (!hasPermission) {
       return res.status(403).json({
         success: false,
         message: 'Insufficient permission level'
@@ -110,12 +115,16 @@ const optionalAuth = (req, res, next) => {
     req.user = {
       id: decoded.id,
       username: decoded.username,
-      role: decoded.role,
-      permission_level: decoded.permission_level
+      full_name: decoded.full_name,
+      email: decoded.email,
+      roles: decoded.roles || [],
+      permissions: decoded.permissions || []
     };
 
     req.headers['x-user-id'] = decoded.id;
-    req.headers['x-user-role'] = decoded.role;
+    req.headers['x-user-username'] = decoded.username;
+    req.headers['x-user-roles'] = decoded.roles ? decoded.roles.join(',') : '';
+    req.headers['x-user-permissions'] = decoded.permissions ? decoded.permissions.join(',') : '';
   } catch (error) {
     // Ignore errors for optional auth
     console.warn('Optional auth failed:', error.message);

@@ -50,13 +50,63 @@ exports.searchMatRung = async (req, res, next) => {
       params.push(toDate);
     }
 
-    if (huyen) {
-      whereClause += ` AND m.mahuyen = $${paramIndex++}`;
-      params.push(huyen);
+    // ✅ Build query with proper admin_db spatial filtering
+    let query;
+    let needsAdminJoin = huyen || xa;
+
+    if (needsAdminJoin) {
+      // Connect to admin_db for spatial filtering
+      const { Pool } = require('pg');
+      adminDb = new Pool({
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT || 5433,
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD,
+        database: 'admin_db',
+        max: 5,
+        idleTimeoutMillis: 5000
+      });
+
+      // First, get GIDs that match spatial filter from admin_db
+      let spatialWhereClause = '';
+      const spatialParams = [];
+      let spatialParamIndex = 1;
+
+      if (huyen) {
+        spatialWhereClause += ` WHERE r.huyen = $${spatialParamIndex++}`;
+        spatialParams.push(huyen);
+      }
+
+      if (xa) {
+        spatialWhereClause += huyen ? ' AND' : ' WHERE';
+        spatialWhereClause += ` r.xa = $${spatialParamIndex++}`;
+        spatialParams.push(xa);
+      }
+
+      // Get matching geometries from admin_db
+      const spatialQuery = `
+        SELECT ST_Union(r.geom) as union_geom
+        FROM laocai_ranhgioihc r
+        ${spatialWhereClause}
+      `;
+
+      const spatialResult = await adminDb.query(spatialQuery, spatialParams);
+
+      if (!spatialResult.rows[0] || !spatialResult.rows[0].union_geom) {
+        logger.warn('No matching admin boundaries found', { huyen, xa });
+        return res.json(formatResponse(true, 'No data found', {
+          type: 'FeatureCollection',
+          features: []
+        }));
+      }
+
+      // Now query mat_rung with spatial intersection
+      whereClause += ` AND ST_Intersects(m.geom, ST_GeomFromEWKB($${paramIndex++}))`;
+      params.push(spatialResult.rows[0].union_geom);
     }
 
     // ✅ OPTIMIZED: Query với tất cả thông tin cần thiết
-    const query = `
+    query = `
       SELECT
         m.gid,
         m.area,
@@ -85,18 +135,28 @@ exports.searchMatRung = async (req, res, next) => {
 
     logger.info(`Found ${result.rows.length} mat_rung records`);
 
-    // ✅ OPTIMIZED: Tạo connection pool đến admin_db CHỈ 1 LẦN
-    const { Pool } = require('pg');
-    adminDb = new Pool({
-      host: process.env.DB_HOST || 'localhost',
-      port: process.env.DB_PORT || 5433,
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD,
-      database: 'admin_db',
-      max: 5,
-      idleTimeoutMillis: 5000,
-      connectionTimeoutMillis: 10000
-    });
+    // ✅ OPTIMIZED: Get admin info for all results
+    if (result.rows.length === 0) {
+      return res.json(formatResponse(true, 'No data found', {
+        type: 'FeatureCollection',
+        features: []
+      }));
+    }
+
+    // Connect to admin_db for admin info lookup (if not already connected)
+    if (!adminDb) {
+      const { Pool } = require('pg');
+      adminDb = new Pool({
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT || 5433,
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD,
+        database: 'admin_db',
+        max: 5,
+        idleTimeoutMillis: 5000,
+        connectionTimeoutMillis: 10000
+      });
+    }
 
     // ✅ OPTIMIZED: Batch query thay vì query từng record
     // Lấy tất cả centroids

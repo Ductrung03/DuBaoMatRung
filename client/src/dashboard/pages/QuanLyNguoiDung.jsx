@@ -11,6 +11,12 @@ import {
   FaUser,
   FaEye,
   FaEyeSlash,
+  FaUserTag,
+  FaTimes,
+  FaSave,
+  FaInfoCircle,
+  FaCheckCircle,
+  FaCog,
 } from "react-icons/fa";
 import { ClipLoader } from "react-spinners";
 import config from "../../config";
@@ -24,16 +30,19 @@ const QuanLyNguoiDung = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState("add"); // "add", "edit", "password"
+  const [modalMode, setModalMode] = useState("add"); // "add", "edit", "password", "roles"
   const [selectedUser, setSelectedUser] = useState(null);
   const [huyenList, setHuyenList] = useState([]);
   const { user: currentUser } = useAuth();
   const [filteredUsers, setFilteredUsers] = useState([]);
-  
+  const [roles, setRoles] = useState([]);
+  const [selectedRoles, setSelectedRoles] = useState([]);
+
   // Trạng thái lọc
   const [filters, setFilters] = useState({
     permission_level: "",
     district: "",
+    role: "",
   });
 
   // ✅ UPDATED: Form state với các field mới
@@ -43,7 +52,6 @@ const QuanLyNguoiDung = () => {
     full_name: "",
     position: "",
     organization: "",
-    permission_level: "district",
     district_id: ""
   });
 
@@ -82,20 +90,24 @@ const QuanLyNguoiDung = () => {
     const fetchInitialData = async () => {
       try {
         setLoading(true);
-        
+
         const currentToken = localStorage.getItem("token");
         if (!currentToken) {
           navigate("/login");
           return;
         }
 
-        // Fetch users and districts in parallel
-        const [usersResponse, districtsResponse] = await Promise.allSettled([
+        // Fetch users, districts, and roles in parallel
+        const [usersResponse, districtsResponse, rolesResponse] = await Promise.allSettled([
           axios.get(`/api/users`, {
             headers: { Authorization: `Bearer ${currentToken}` },
             timeout: 10000
           }),
-          getDistricts()
+          getDistricts(),
+          axios.get(`/api/auth/roles`, {
+            headers: { Authorization: `Bearer ${currentToken}` },
+            timeout: 10000
+          })
         ]);
 
         // Handle users response
@@ -120,6 +132,15 @@ const QuanLyNguoiDung = () => {
           console.error("❌ Error fetching districts:", districtsResponse.reason);
           toast.warning("Không thể tải danh sách huyện, một số tính năng có thể bị hạn chế");
           setHuyenList([]);
+        }
+
+        // Handle roles response
+        if (rolesResponse.status === 'fulfilled') {
+          setRoles(rolesResponse.value.data.data || []);
+        } else {
+          console.error("❌ Error fetching roles:", rolesResponse.reason);
+          toast.warning("Không thể tải danh sách roles");
+          setRoles([]);
         }
 
       } catch (err) {
@@ -152,6 +173,13 @@ const QuanLyNguoiDung = () => {
       result = result.filter((user) => user.district_id === filters.district);
     }
 
+    // Lọc theo role
+    if (filters.role) {
+      result = result.filter((user) =>
+        user.userRoles && user.userRoles.some(ur => ur.roleId === parseInt(filters.role))
+      );
+    }
+
     setFilteredUsers(result);
   };
 
@@ -169,6 +197,7 @@ const QuanLyNguoiDung = () => {
     setFilters({
       permission_level: "",
       district: "",
+      role: "",
     });
   };
 
@@ -209,9 +238,10 @@ const QuanLyNguoiDung = () => {
       full_name: "",
       position: "",
       organization: "",
-      permission_level: "district",
       district_id: ""
     });
+    // Reset selected roles
+    setSelectedRoles([]);
     // Reset password visibility
     setShowPasswords({
       password: false,
@@ -223,7 +253,7 @@ const QuanLyNguoiDung = () => {
   };
 
   // ✅ UPDATED: Open edit modal với các field mới
-  const openEditModal = (user) => {
+  const openEditModal = async (user) => {
     setModalMode("edit");
     setSelectedUser(user);
     setFormData({
@@ -231,10 +261,22 @@ const QuanLyNguoiDung = () => {
       full_name: user.full_name,
       position: user.position || "",
       organization: user.organization || "",
-      permission_level: user.permission_level || "district",
       district_id: user.district_id || "",
       password: "",
     });
+
+    // Load current user roles
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`/api/auth/users/${user.id}/roles`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const userRoleIds = (res.data.data || []).map(ur => ur.roleId);
+      setSelectedRoles(userRoleIds);
+    } catch (err) {
+      console.error("Lỗi lấy roles của user:", err);
+      setSelectedRoles([]);
+    }
 
     // Reset password visibility
     setShowPasswords({
@@ -264,6 +306,27 @@ const QuanLyNguoiDung = () => {
     setShowModal(true);
   };
 
+  const openRolesModal = async (user) => {
+    setModalMode("roles");
+    setSelectedUser(user);
+
+    // Fetch user's current roles
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`/api/auth/users/${user.id}/roles`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const userRoleIds = (res.data.data || []).map(ur => ur.roleId);
+      setSelectedRoles(userRoleIds);
+    } catch (err) {
+      console.error("Lỗi lấy roles của user:", err);
+      setSelectedRoles([]);
+    }
+
+    setShowModal(true);
+  };
+
   const closeModal = () => {
     setShowModal(false);
     setSelectedUser(null);
@@ -273,48 +336,180 @@ const QuanLyNguoiDung = () => {
     e.preventDefault();
 
     try {
+      const token = localStorage.getItem("token");
+
       if (modalMode === "add") {
-        // Kiểm tra dữ liệu
-        if (!formData.username || !formData.password || !formData.full_name || !formData.position || !formData.organization) {
-          toast.error("Vui lòng nhập đầy đủ thông tin!");
+        // Enhanced validation for user creation
+        const requiredFields = [
+          { field: 'username', message: 'Tên đăng nhập không được để trống' },
+          { field: 'password', message: 'Mật khẩu không được để trống' },
+          { field: 'full_name', message: 'Họ tên không được để trống' },
+          { field: 'position', message: 'Chức vụ không được để trống' },
+          { field: 'organization', message: 'Đơn vị công tác không được để trống' }
+        ];
+
+        for (const { field, message } of requiredFields) {
+          if (!formData[field] || !formData[field].trim()) {
+            toast.error(message);
+            return;
+          }
+        }
+
+        // Role validation
+        if (selectedRoles.length === 0) {
+          toast.error("Vui lòng chọn ít nhất một vai trò cho người dùng");
+          return;
+        }
+
+        // Username validation
+        if (formData.username.length < 3) {
+          toast.error("Tên đăng nhập phải có ít nhất 3 ký tự");
+          return;
+        }
+
+        if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+          toast.error("Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới");
+          return;
+        }
+
+        // Password validation
+        if (formData.password.length < 6) {
+          toast.error("Mật khẩu phải có ít nhất 6 ký tự");
           return;
         }
 
         // Thêm người dùng mới
-        await axios.post(`/api/users`, formData);
-        toast.success("Thêm người dùng thành công!");
+        const userResponse = await axios.post(`/api/users`, formData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const newUserId = userResponse.data.data.id;
+
+        // Gán roles cho user mới
+        for (const roleId of selectedRoles) {
+          await axios.post(
+            `/api/auth/users/${newUserId}/roles`,
+            { roleId },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        }
+
+        toast.success(`Thêm người dùng thành công với ${selectedRoles.length} vai trò!`);
       } else if (modalMode === "edit") {
+        // Validation for edit
+        const requiredFields = [
+          { field: 'full_name', message: 'Họ tên không được để trống' },
+          { field: 'position', message: 'Chức vụ không được để trống' },
+          { field: 'organization', message: 'Đơn vị công tác không được để trống' }
+        ];
+
+        for (const { field, message } of requiredFields) {
+          if (!formData[field] || !formData[field].trim()) {
+            toast.error(message);
+            return;
+          }
+        }
+
+        // Password validation if provided
+        if (formData.password && formData.password.length < 6) {
+          toast.error("Mật khẩu mới phải có ít nhất 6 ký tự");
+          return;
+        }
+
         // Cập nhật người dùng
         await axios.put(`/api/users/${selectedUser.id}`, {
           full_name: formData.full_name,
           position: formData.position,
           organization: formData.organization,
-          permission_level: formData.permission_level,
           district_id: formData.district_id,
           is_active: true,
           ...(formData.password ? { password: formData.password } : {}),
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
         });
         toast.success("Cập nhật người dùng thành công!");
       } else if (modalMode === "password") {
-        // Đổi mật khẩu
+        // Enhanced password validation
+        if (!passwordForm.old_password.trim()) {
+          toast.error("Vui lòng nhập mật khẩu cũ");
+          return;
+        }
+
+        if (!passwordForm.new_password.trim()) {
+          toast.error("Vui lòng nhập mật khẩu mới");
+          return;
+        }
+
+        if (passwordForm.new_password.length < 6) {
+          toast.error("Mật khẩu mới phải có ít nhất 6 ký tự");
+          return;
+        }
+
         if (passwordForm.new_password !== passwordForm.confirm_password) {
           toast.error("Mật khẩu mới và xác nhận mật khẩu không khớp!");
+          return;
+        }
+
+        if (passwordForm.old_password === passwordForm.new_password) {
+          toast.error("Mật khẩu mới phải khác mật khẩu cũ");
           return;
         }
 
         await axios.put(`/api/users/${selectedUser.id}/change-password`, {
           old_password: passwordForm.old_password,
           new_password: passwordForm.new_password,
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
         });
         toast.success("Đổi mật khẩu thành công!");
+      } else if (modalMode === "roles") {
+        // Fetch current roles
+        const currentRes = await axios.get(`/api/auth/users/${selectedUser.id}/roles`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const currentRoleIds = (currentRes.data.data || []).map(ur => ur.roleId);
+
+        // Determine roles to add and remove
+        const toAdd = selectedRoles.filter(id => !currentRoleIds.includes(id));
+        const toRemove = currentRoleIds.filter(id => !selectedRoles.includes(id));
+
+        // Add new roles
+        for (const roleId of toAdd) {
+          await axios.post(
+            `/api/auth/users/${selectedUser.id}/roles`,
+            { roleId },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        }
+
+        // Remove old roles
+        for (const roleId of toRemove) {
+          await axios.delete(
+            `/api/auth/users/${selectedUser.id}/roles/${roleId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        }
+
+        toast.success(`Cập nhật vai trò thành công! ${selectedRoles.length > 0 ? `Đã gán ${selectedRoles.length} vai trò.` : 'Đã xóa tất cả vai trò.'}`);
       }
 
       closeModal();
       fetchUsers();
     } catch (err) {
       console.error("Lỗi:", err);
-      const errorMessage = err.response?.data?.message || "Có lỗi xảy ra";
-      toast.error(errorMessage);
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || "Có lỗi xảy ra";
+      
+      // Handle specific error cases
+      if (err.response?.status === 409) {
+        toast.error("Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.");
+      } else if (err.response?.status === 401) {
+        toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+        navigate("/login");
+      } else if (err.response?.status === 403) {
+        toast.error("Bạn không có quyền thực hiện thao tác này.");
+      } else {
+        toast.error(errorMessage);
+      }
     }
   };
 
@@ -364,7 +559,26 @@ const QuanLyNguoiDung = () => {
         <div className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Cấp phân quyền
+              Role
+            </label>
+            <select
+              name="role"
+              value={filters.role}
+              onChange={handleFilterChange}
+              className="w-full border border-gray-300 rounded-md py-2 px-3 focus:ring-forest-green-primary focus:border-forest-green-primary"
+            >
+              <option value="">Tất cả roles</option>
+              {roles.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.name} - {role.description}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Cấp phân quyền (cũ)
             </label>
             <select
               name="permission_level"
@@ -436,7 +650,10 @@ const QuanLyNguoiDung = () => {
                   Khu vực quản lý
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Cấp phân quyền
+                  Roles
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Cấp phân quyền (cũ)
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Đăng nhập cuối
@@ -465,6 +682,22 @@ const QuanLyNguoiDung = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {getDistrictName(user.district_id)}
                     </td>
+                    <td className="px-6 py-4 text-sm">
+                      <div className="flex flex-wrap gap-1">
+                        {user.userRoles && user.userRoles.length > 0 ? (
+                          user.userRoles.map((ur) => (
+                            <span
+                              key={ur.id}
+                              className="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full"
+                            >
+                              {ur.role.name}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-gray-400 text-xs">Chưa có role</span>
+                        )}
+                      </div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -484,6 +717,13 @@ const QuanLyNguoiDung = () => {
                         : "Chưa đăng nhập"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 space-x-2">
+                      <button
+                        onClick={() => openRolesModal(user)}
+                        className="text-indigo-600 hover:text-indigo-900"
+                        title="Quản lý roles"
+                      >
+                        <FaUserTag />
+                      </button>
                       <button
                         onClick={() => openEditModal(user)}
                         className="text-blue-600 hover:text-blue-900"
@@ -513,10 +753,10 @@ const QuanLyNguoiDung = () => {
               ) : (
                 <tr>
                   <td
-                    colSpan="8"
+                    colSpan="9"
                     className="px-6 py-4 text-center text-sm text-gray-500"
                   >
-                    {filters.permission_level || filters.district
+                    {filters.permission_level || filters.district || filters.role
                       ? "Không tìm thấy người dùng phù hợp với bộ lọc."
                       : "Không có dữ liệu người dùng."}
                   </td>
@@ -527,7 +767,7 @@ const QuanLyNguoiDung = () => {
         </div>
       )}
       
-      {/* ✅ FIXED Z-INDEX: Modal thêm/sửa/đổi mật khẩu người dùng */}
+      {/* ✅ IMPROVED: Modal thêm/sửa/đổi mật khẩu người dùng */}
       {showModal && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
@@ -541,36 +781,73 @@ const QuanLyNguoiDung = () => {
           }}
         >
           <div 
-            className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden"
             style={{ zIndex: 100001 }}
           >
-            <form onSubmit={handleSubmit}>
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                    <div className="flex items-center mb-4">
-                      <div className="bg-forest-green-primary rounded-full p-2 mr-2">
-                        <FaUser className="text-white" />
-                      </div>
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        {modalMode === "add"
-                          ? "Thêm người dùng mới"
-                          : modalMode === "edit"
-                          ? "Chỉnh sửa người dùng"
-                          : "Đổi mật khẩu người dùng"}
-                      </h3>
-                    </div>
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-forest-green-primary to-green-600 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="bg-white bg-opacity-20 rounded-full p-2 mr-3">
+                    {modalMode === "add" ? (
+                      <FaUserPlus className="text-white text-lg" />
+                    ) : modalMode === "edit" ? (
+                      <FaEdit className="text-white text-lg" />
+                    ) : modalMode === "password" ? (
+                      <FaKey className="text-white text-lg" />
+                    ) : (
+                      <FaUserTag className="text-white text-lg" />
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white">
+                      {modalMode === "add"
+                        ? "Thêm người dùng mới"
+                        : modalMode === "edit"
+                        ? "Chỉnh sửa thông tin người dùng"
+                        : modalMode === "password"
+                        ? "Đổi mật khẩu người dùng"
+                        : "Quản lý vai trò người dùng"}
+                    </h3>
+                    {selectedUser && modalMode !== "add" && (
+                      <p className="text-green-100 text-sm">
+                        {selectedUser.full_name} ({selectedUser.username})
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="text-white hover:text-gray-200 transition-colors"
+                >
+                  <FaTimes className="text-xl" />
+                </button>
+              </div>
+            </div>
 
-                    <div className="mt-4 space-y-4">
+            {/* Modal Body */}
+            <form onSubmit={handleSubmit} className="flex flex-col h-full">
+              <div className="flex-1 overflow-y-auto px-6 py-6">
+                <div className="space-y-6">
                       {modalMode === "password" ? (
                         // ✅ UPDATED: Form đổi mật khẩu với toggle
-                        <>
+                        <div className="space-y-6">
+                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <div className="flex items-center">
+                              <FaKey className="text-yellow-600 mr-2" />
+                              <p className="text-sm text-yellow-800">
+                                Đổi mật khẩu cho: <strong className="text-yellow-900">{selectedUser?.full_name}</strong>
+                              </p>
+                            </div>
+                          </div>
+
                           <div>
                             <label
                               htmlFor="old_password"
-                              className="block text-sm font-medium text-gray-700"
+                              className="block text-sm font-semibold text-gray-700 mb-2"
                             >
-                              Mật khẩu cũ *
+                              Mật khẩu hiện tại *
                             </label>
                             <div className="relative">
                               <input
@@ -580,21 +857,23 @@ const QuanLyNguoiDung = () => {
                                 required
                                 value={passwordForm.old_password}
                                 onChange={handlePasswordChange}
-                                className="mt-1 focus:ring-forest-green-primary focus:border-forest-green-primary block w-full shadow-sm sm:text-sm border-gray-300 rounded-md pr-10"
+                                className="user-management-input pr-12"
+                                placeholder="Nhập mật khẩu hiện tại"
                               />
                               <button
                                 type="button"
                                 onClick={() => togglePasswordVisibility('old_password')}
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                               >
                                 {showPasswords.old_password ? <FaEyeSlash /> : <FaEye />}
                               </button>
                             </div>
                           </div>
+
                           <div>
                             <label
                               htmlFor="new_password"
-                              className="block text-sm font-medium text-gray-700"
+                              className="block text-sm font-semibold text-gray-700 mb-2"
                             >
                               Mật khẩu mới *
                             </label>
@@ -606,21 +885,23 @@ const QuanLyNguoiDung = () => {
                                 required
                                 value={passwordForm.new_password}
                                 onChange={handlePasswordChange}
-                                className="mt-1 focus:ring-forest-green-primary focus:border-forest-green-primary block w-full shadow-sm sm:text-sm border-gray-300 rounded-md pr-10"
+                                className="user-management-input pr-12"
+                                placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
                               />
                               <button
                                 type="button"
                                 onClick={() => togglePasswordVisibility('new_password')}
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                               >
                                 {showPasswords.new_password ? <FaEyeSlash /> : <FaEye />}
                               </button>
                             </div>
                           </div>
+
                           <div>
                             <label
                               htmlFor="confirm_password"
-                              className="block text-sm font-medium text-gray-700"
+                              className="block text-sm font-semibold text-gray-700 mb-2"
                             >
                               Xác nhận mật khẩu mới *
                             </label>
@@ -632,26 +913,42 @@ const QuanLyNguoiDung = () => {
                                 required
                                 value={passwordForm.confirm_password}
                                 onChange={handlePasswordChange}
-                                className="mt-1 focus:ring-forest-green-primary focus:border-forest-green-primary block w-full shadow-sm sm:text-sm border-gray-300 rounded-md pr-10"
+                                className="user-management-input pr-12"
+                                placeholder="Nhập lại mật khẩu mới"
                               />
                               <button
                                 type="button"
                                 onClick={() => togglePasswordVisibility('confirm_password')}
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                               >
                                 {showPasswords.confirm_password ? <FaEyeSlash /> : <FaEye />}
                               </button>
                             </div>
+                            {passwordForm.new_password && passwordForm.confirm_password && 
+                             passwordForm.new_password !== passwordForm.confirm_password && (
+                              <p className="text-red-500 text-xs mt-1">
+                                Mật khẩu xác nhận không khớp
+                              </p>
+                            )}
                           </div>
-                        </>
+
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h4 className="text-sm font-semibold text-blue-900 mb-2">Yêu cầu mật khẩu:</h4>
+                            <ul className="text-xs text-blue-800 space-y-1">
+                              <li>• Tối thiểu 6 ký tự</li>
+                              <li>• Khác với mật khẩu hiện tại</li>
+                              <li>• Nên sử dụng kết hợp chữ cái, số và ký tự đặc biệt</li>
+                            </ul>
+                          </div>
+                        </div>
                       ) : (
                         // ✅ UPDATED: Form thêm/sửa người dùng với các field mới và toggle password
                         <>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <label
                                 htmlFor="username"
-                                className="block text-sm font-medium text-gray-700"
+                                className="block text-sm font-semibold text-gray-700 mb-2"
                               >
                                 Tên đăng nhập *
                               </label>
@@ -663,14 +960,20 @@ const QuanLyNguoiDung = () => {
                                 readOnly={modalMode === "edit"}
                                 value={formData.username}
                                 onChange={handleInputChange}
-                                className="mt-1 focus:ring-forest-green-primary focus:border-forest-green-primary block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                className="user-management-input"
+                                placeholder="Nhập tên đăng nhập"
                               />
+                              {modalMode === "add" && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Chỉ được chứa chữ cái, số và dấu gạch dưới
+                                </p>
+                              )}
                             </div>
                             
                             <div>
                               <label
                                 htmlFor="full_name"
-                                className="block text-sm font-medium text-gray-700"
+                                className="block text-sm font-semibold text-gray-700 mb-2"
                               >
                                 Họ và tên *
                               </label>
@@ -681,7 +984,8 @@ const QuanLyNguoiDung = () => {
                                 required
                                 value={formData.full_name}
                                 onChange={handleInputChange}
-                                className="mt-1 focus:ring-forest-green-primary focus:border-forest-green-primary block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                className="user-management-input"
+                                placeholder="Nhập họ và tên đầy đủ"
                               />
                             </div>
                           </div>
@@ -690,7 +994,7 @@ const QuanLyNguoiDung = () => {
                             <div>
                               <label
                                 htmlFor="password"
-                                className="block text-sm font-medium text-gray-700"
+                                className="block text-sm font-semibold text-gray-700 mb-2"
                               >
                                 Mật khẩu *
                               </label>
@@ -702,12 +1006,13 @@ const QuanLyNguoiDung = () => {
                                   required={modalMode === "add"}
                                   value={formData.password}
                                   onChange={handleInputChange}
-                                  className="mt-1 focus:ring-forest-green-primary focus:border-forest-green-primary block w-full shadow-sm sm:text-sm border-gray-300 rounded-md pr-10"
+                                  className="user-management-input pr-12"
+                                  placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
                                 />
                                 <button
                                   type="button"
                                   onClick={() => togglePasswordVisibility('password')}
-                                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                                 >
                                   {showPasswords.password ? <FaEyeSlash /> : <FaEye />}
                                 </button>
@@ -715,11 +1020,11 @@ const QuanLyNguoiDung = () => {
                             </div>
                           )}
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <label
                                 htmlFor="position"
-                                className="block text-sm font-medium text-gray-700"
+                                className="block text-sm font-semibold text-gray-700 mb-2"
                               >
                                 Chức vụ *
                               </label>
@@ -731,14 +1036,14 @@ const QuanLyNguoiDung = () => {
                                 value={formData.position}
                                 onChange={handleInputChange}
                                 placeholder="VD: Cán bộ kiểm lâm, Trưởng hạt kiểm lâm..."
-                                className="mt-1 focus:ring-forest-green-primary focus:border-forest-green-primary block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                className="user-management-input"
                               />
                             </div>
 
                             <div>
                               <label
                                 htmlFor="organization"
-                                className="block text-sm font-medium text-gray-700"
+                                className="block text-sm font-semibold text-gray-700 mb-2"
                               >
                                 Đơn vị công tác *
                               </label>
@@ -750,67 +1055,42 @@ const QuanLyNguoiDung = () => {
                                 value={formData.organization}
                                 onChange={handleInputChange}
                                 placeholder="VD: Hạt Kiểm lâm Lào Cai, Chi cục Kiểm lâm tỉnh..."
-                                className="mt-1 focus:ring-forest-green-primary focus:border-forest-green-primary block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                className="user-management-input"
                               />
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label
-                                htmlFor="permission_level"
-                                className="block text-sm font-medium text-gray-700"
-                              >
-                                Cấp phân quyền *
-                              </label>
-                              <select
-                                name="permission_level"
-                                id="permission_level"
-                                required
-                                value={formData.permission_level}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-forest-green-primary focus:border-forest-green-primary sm:text-sm"
-                              >
-                                <option value="district">Người dùng cấp huyện</option>
-                                <option value="province">Người dùng cấp tỉnh</option>
-                                <option value="admin">Quản trị viên hệ thống</option>
-                              </select>
-                            </div>
-
-                            <div>
-                              <label
-                                htmlFor="district_id"
-                                className="block text-sm font-medium text-gray-700"
-                              >
-                                Khu vực quản lý
-                              </label>
-                              <select
-                                name="district_id"
-                                id="district_id"
-                                value={formData.district_id || ""}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-forest-green-primary focus:border-forest-green-primary sm:text-sm"
-                              >
-                                <option value="">Toàn tỉnh (cho admin/cấp tỉnh)</option>
-                                {huyenList.map((huyen, idx) => (
-                                  <option key={idx} value={huyen.value}>
-                                    {huyen.label}
-                                  </option>
-                                ))}
-                              </select>
-                              {formData.permission_level === "admin" && formData.district_id && (
-                                <p className="text-yellow-600 text-xs mt-1">
-                                  Lưu ý: Quản trị viên thường không nên bị giới hạn khu vực
-                                </p>
-                              )}
-                            </div>
+                          <div>
+                            <label
+                              htmlFor="district_id"
+                              className="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                              Phạm vi dữ liệu
+                            </label>
+                            <select
+                              name="district_id"
+                              id="district_id"
+                              value={formData.district_id || ""}
+                              onChange={handleInputChange}
+                              className="user-management-select"
+                            >
+                              <option value="">Toàn tỉnh</option>
+                              {huyenList.map((huyen, idx) => (
+                                <option key={idx} value={huyen.value}>
+                                  {huyen.label}
+                                </option>
+                              ))}
+                            </select>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Chọn khu vực dữ liệu mà người dùng có thể truy cập
+                            </p>
                           </div>
 
                           {modalMode === "edit" && (
                             <div>
                               <label
                                 htmlFor="password"
-                                className="block text-sm font-medium text-gray-700"
+                                className="block text-sm font-semibold text-gray-700 mb-2"
                               >
                                 Mật khẩu mới (để trống nếu không đổi)
                               </label>
@@ -821,42 +1101,285 @@ const QuanLyNguoiDung = () => {
                                   id="password"
                                   value={formData.password}
                                   onChange={handleInputChange}
-                                  className="mt-1 focus:ring-forest-green-primary focus:border-forest-green-primary block w-full shadow-sm sm:text-sm border-gray-300 rounded-md pr-10"
+                                  className="user-management-input pr-12"
+                                  placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
                                 />
                                 <button
                                   type="button"
                                   onClick={() => togglePasswordVisibility('password')}
-                                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                                 >
                                   {showPasswords.password ? <FaEyeSlash /> : <FaEye />}
                                 </button>
                               </div>
                             </div>
                           )}
+
+                          {/* Role Selection for Add/Edit */}
+                          {(modalMode === "add" || modalMode === "edit") && (
+                            <div>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Vai trò (Roles) *
+                              </label>
+                              <div className="border border-gray-300 rounded-lg p-3 bg-gray-50 max-h-60 overflow-y-auto role-selection-scroll">
+                                {roles.length === 0 ? (
+                                  <div className="text-center py-4 text-gray-500">
+                                    <FaUserTag className="mx-auto text-2xl mb-2 opacity-50" />
+                                    <p className="text-sm">Không có vai trò nào</p>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-2">
+                                    {roles.map((role) => {
+                                      const isSelected = selectedRoles.includes(role.id);
+                                      return (
+                                        <div
+                                          key={role.id}
+                                          onClick={() => {
+                                            setSelectedRoles(prev => {
+                                              if (prev.includes(role.id)) {
+                                                return prev.filter(id => id !== role.id);
+                                              } else {
+                                                return [...prev, role.id];
+                                              }
+                                            });
+                                          }}
+                                          className={`p-3 border rounded-lg cursor-pointer transition-all duration-200 ${
+                                            isSelected
+                                              ? "border-green-500 bg-green-50"
+                                              : "border-gray-200 hover:border-gray-300 bg-white"
+                                          }`}
+                                        >
+                                          <div className="flex items-center">
+                                            <div className={`w-4 h-4 rounded border-2 flex items-center justify-center mr-3 ${
+                                              isSelected 
+                                                ? "bg-green-500 border-green-500" 
+                                                : "border-gray-300 bg-white"
+                                            }`}>
+                                              {isSelected && (
+                                                <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                              )}
+                                            </div>
+                                            <div className="flex-1">
+                                              <div className="flex items-center">
+                                                <span className="font-medium text-gray-900">{role.name}</span>
+                                                {role.is_system && (
+                                                  <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                                                    Hệ thống
+                                                  </span>
+                                                )}
+                                              </div>
+                                              <p className="text-sm text-gray-600 mt-1">{role.description || "Không có mô tả"}</p>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                              {selectedRoles.length === 0 && (
+                                <p className="text-red-500 text-xs mt-1">
+                                  Vui lòng chọn ít nhất một vai trò cho người dùng
+                                </p>
+                              )}
+                              {selectedRoles.length > 0 && (
+                                <p className="text-green-600 text-xs mt-1">
+                                  Đã chọn {selectedRoles.length} vai trò
+                                </p>
+                              )}
+                            </div>
+                          )}
                         </>
                       )}
-                    </div>
-                  </div>
+
+                      {modalMode === "roles" && (
+                        // Roles Management - Improved UI
+                        <div className="space-y-4">
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div className="flex items-center">
+                              <FaUserTag className="text-blue-600 mr-2" />
+                              <p className="text-sm text-blue-800">
+                                Quản lý vai trò cho: <strong className="text-blue-900">{selectedUser?.full_name}</strong>
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Role Selection */}
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-lg font-semibold text-gray-900">Chọn vai trò</h4>
+                              <span className="text-sm text-gray-500">
+                                {selectedRoles.length} / {roles.length} được chọn
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-3 max-h-80 overflow-y-auto role-selection-scroll border border-gray-200 rounded-lg p-3 bg-gray-50">
+                              {roles.length === 0 ? (
+                                <div className="text-center py-8 text-gray-500">
+                                  <FaUserTag className="mx-auto text-4xl mb-2 opacity-50" />
+                                  <p className="font-medium">Không có vai trò nào được tạo</p>
+                                  <p className="text-sm">Vui lòng tạo vai trò trước khi gán cho người dùng</p>
+                                </div>
+                              ) : (
+                                roles.map((role) => {
+                                  const isSelected = selectedRoles.includes(role.id);
+                                  return (
+                                    <div
+                                      key={role.id}
+                                      onClick={() => {
+                                        setSelectedRoles(prev => {
+                                          if (prev.includes(role.id)) {
+                                            return prev.filter(id => id !== role.id);
+                                          } else {
+                                            return [...prev, role.id];
+                                          }
+                                        });
+                                      }}
+                                      className={`relative p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5 ${
+                                        isSelected
+                                          ? "border-green-500 bg-green-50 shadow-sm ring-2 ring-green-200"
+                                          : "border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50"
+                                      }`}
+                                    >
+                                      <div className="flex items-start">
+                                        {/* Enhanced Checkbox */}
+                                        <div className="flex-shrink-0 mr-3 mt-1">
+                                          <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all duration-200 ${
+                                            isSelected 
+                                              ? "bg-green-500 border-green-500 shadow-sm" 
+                                              : "border-gray-300 bg-white hover:border-gray-400"
+                                          }`}>
+                                            {isSelected && (
+                                              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                              </svg>
+                                            )}
+                                          </div>
+                                        </div>
+
+                                        {/* Role Info */}
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex items-center mb-2">
+                                            <h5 className="font-semibold text-gray-900 truncate text-base">
+                                              {role.name}
+                                            </h5>
+                                            {role.is_system && (
+                                              <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                                <FaCog className="mr-1" />
+                                                Hệ thống
+                                              </span>
+                                            )}
+                                          </div>
+                                          
+                                          <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                                            {role.description || "Không có mô tả cho vai trò này"}
+                                          </p>
+                                          
+                                          <div className="flex items-center justify-between text-xs text-gray-500">
+                                            <div className="flex items-center">
+                                              <FaKey className="mr-1 text-gray-400" />
+                                              <span className="font-medium">{role._count?.permissions || 0} quyền</span>
+                                            </div>
+                                            {role.created_at && (
+                                              <span className="text-gray-400">
+                                                Tạo: {new Date(role.created_at).toLocaleDateString('vi-VN')}
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
+
+                                        {/* Selection Indicator */}
+                                        {isSelected && (
+                                          <div className="absolute top-2 right-2">
+                                            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                })
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Summary */}
+                          <div className={`p-3 rounded-lg border ${
+                            selectedRoles.length === 0 
+                              ? "bg-yellow-50 border-yellow-200" 
+                              : "bg-green-50 border-green-200"
+                          }`}>
+                            {selectedRoles.length === 0 ? (
+                              <div className="flex items-center text-yellow-800">
+                                <FaInfoCircle className="mr-2" />
+                                <span className="text-sm">
+                                  Chưa chọn vai trò nào. Người dùng sẽ không có quyền truy cập hệ thống.
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center text-green-800">
+                                <FaCheckCircle className="mr-2" />
+                                <span className="text-sm">
+                                  Đã chọn {selectedRoles.length} vai trò. Người dùng sẽ có quyền truy cập tương ứng.
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                 </div>
               </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  type="submit"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-forest-green-primary text-base font-medium text-white hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-green-primary sm:ml-3 sm:w-auto sm:text-sm"
-                >
-                  {modalMode === "add"
-                    ? "Thêm mới"
-                    : modalMode === "edit"
-                    ? "Cập nhật"
-                    : "Đổi mật khẩu"}
-                </button>
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                >
-                  Hủy bỏ
-                </button>
+
+              {/* Modal Footer */}
+              <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row-reverse gap-3">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-forest-green-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-green-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {loading ? (
+                      <>
+                        <ClipLoader color="#ffffff" size={16} className="mr-2" />
+                        Đang xử lý...
+                      </>
+                    ) : (
+                      <>
+                        {modalMode === "add" ? (
+                          <>
+                            <FaUserPlus className="mr-2" />
+                            Thêm người dùng
+                          </>
+                        ) : modalMode === "edit" ? (
+                          <>
+                            <FaSave className="mr-2" />
+                            Cập nhật thông tin
+                          </>
+                        ) : modalMode === "password" ? (
+                          <>
+                            <FaKey className="mr-2" />
+                            Đổi mật khẩu
+                          </>
+                        ) : (
+                          <>
+                            <FaUserTag className="mr-2" />
+                            Lưu vai trò
+                          </>
+                        )}
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    disabled={loading}
+                    className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <FaTimes className="mr-2" />
+                    Hủy bỏ
+                  </button>
+                </div>
               </div>
             </form>
           </div>

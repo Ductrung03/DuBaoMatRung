@@ -8,3 +8,5 @@
 {"area_changed":true,"gid":"780","level":"info","message":"Mat rung verified successfully","service":"verification-controller","timestamp":"2025-10-12 22:12:10","userId":"1","verification_reason":"Cháy rừng"}
 {"gid":"780","level":"info","message":"Verifying mat rung by ID","service":"verification-controller","timestamp":"2025-10-12 22:13:11","userId":"1","verification_reason":"Cháy rừng"}
 {"area_changed":true,"gid":"780","level":"info","message":"Mat rung verified successfully","service":"verification-controller","timestamp":"2025-10-12 22:13:11","userId":"1","verification_reason":"Cháy rừng"}
+{"gid":"4935","level":"info","message":"Verifying mat rung by ID","service":"verification-controller","timestamp":"2025-10-28 17:18:23","userId":"1","verification_reason":"Cháy rừng"}
+{"area_changed":null,"gid":"4935","level":"info","message":"Mat rung verified successfully","service":"verification-controller","timestamp":"2025-10-28 17:18:23","userId":"1","verification_reason":"Cháy rừng"}

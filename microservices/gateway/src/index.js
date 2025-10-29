@@ -157,6 +157,17 @@ app.use('/api/auth/logout',
   })
 );
 
+// Protected permissions endpoints
+app.use('/api/auth/permissions',
+  authMiddleware.authenticate,
+  createProxy(logger, {
+    target: process.env.AUTH_SERVICE_URL || 'http://localhost:3001',
+    pathRewrite: (path, req) => '/api/auth/permissions' + path,
+    serviceName: 'Auth permissions',
+    forwardUserHeaders: true
+  })
+);
+
 // Auth Service proxy - với body restreaming support (public endpoints like login, register)
 app.use('/api/auth', createProxy(logger, {
   target: process.env.AUTH_SERVICE_URL || 'http://localhost:3001',

@@ -14,19 +14,22 @@ model User {
   full_name      String
   position       String?
   organization   String?
-  permission_level String?  @default("district")
   district_id    String?
   is_active      Boolean    @default(true)
   created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
   last_login     DateTime?
   email          String?
-  Role           Role[]
+  phone          String?
+  avatar_url     String?
   userRoles      UserRole[]
+  createdRoles   Role[]     @relation("RoleCreator")
 
   @@index([email])
   @@index([full_name])
   @@index([district_id])
-  @@index([permission_level])
+  @@index([is_active])
+  @@index([username])
 }
 
 model Role {
@@ -34,41 +37,51 @@ model Role {
   name            String           @unique
   description     String?
   is_system       Boolean          @default(false)
+  is_active       Boolean          @default(true)
   created_at      DateTime         @default(now())
-  updated_at      DateTime
+  updated_at      DateTime         @updatedAt
   created_by      Int?
-  User            User?            @relation(fields: [created_by], references: [id])
-  RoleDataScope   RoleDataScope[]
+  creator         User?            @relation("RoleCreator", fields: [created_by], references: [id], onDelete: SetNull)
+  roleDataScopes  RoleDataScope[]
   rolePermissions RolePermission[]
   userRoles       UserRole[]
 
+  @@index([name])
   @@index([created_at])
   @@index([is_system])
+  @@index([is_active])
+  @@index([created_by])
 }
 
 model Permission {
   id               Int              @id @default(autoincrement())
-  description      String?
   code             String           @unique
   name             String
+  description      String?
   module           String
-  category         String
+  resource         String
+  action           String
   parent_id        Int?
+  is_active        Boolean          @default(true)
   created_at       DateTime         @default(now())
-  updated_at       DateTime
+  updated_at       DateTime         @updatedAt
   icon             String?
   order            Int              @default(0)
   ui_path          String?
-  Permission       Permission?      @relation("PermissionToPermission", fields: [parent_id], references: [id])
-  other_Permission Permission[]     @relation("PermissionToPermission")
+  ui_category      String?
+  ui_element       String?
+  parent           Permission?      @relation("PermissionHierarchy", fields: [parent_id], references: [id], onDelete: Cascade)
+  children         Permission[]     @relation("PermissionHierarchy")
   rolePermissions  RolePermission[]
 
-  @@index([description])
-  @@index([module, category])
+  @@unique([module, resource, action])
+  @@index([code])
+  @@index([module, resource])
   @@index([module])
   @@index([name])
   @@index([order])
   @@index([parent_id])
+  @@index([is_active])
 }
 
 model UserRole {
@@ -121,9 +134,11 @@ model RoleDataScope {
   role_id       Int
   data_scope_id Int
   created_at    DateTime  @default(now())
-  DataScope     DataScope @relation(fields: [data_scope_id], references: [id], onDelete: Cascade)
-  Role          Role      @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  updated_at    DateTime  @updatedAt
+  dataScope     DataScope @relation(fields: [data_scope_id], references: [id], onDelete: Cascade)
+  role          Role      @relation(fields: [role_id], references: [id], onDelete: Cascade)
 
   @@unique([role_id, data_scope_id])
+  @@index([role_id])
   @@index([data_scope_id])
 }

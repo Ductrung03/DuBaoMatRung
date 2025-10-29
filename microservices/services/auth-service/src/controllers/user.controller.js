@@ -103,7 +103,7 @@ exports.getUserById = async (req, res, next) => {
  */
 exports.createUser = async (req, res, next) => {
   try {
-    const { username, password, full_name, position, organization, permission_level, district_id, role_ids } = req.body;
+    const { username, password, full_name, position, organization, district_id, role_ids } = req.body;
 
     if (!username || !password || !full_name) {
       throw new ValidationError('Username, password, and full_name are required');
@@ -129,7 +129,6 @@ exports.createUser = async (req, res, next) => {
         full_name,
         position,
         organization,
-        permission_level: permission_level || 'district',
         district_id,
         ...(role_ids && role_ids.length > 0 && {
           userRoles: {
@@ -176,7 +175,7 @@ exports.createUser = async (req, res, next) => {
 exports.updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { username, password, full_name, position, organization, permission_level, district_id, is_active, role_ids } = req.body;
+    const { username, password, full_name, position, organization, district_id, is_active, role_ids } = req.body;
 
     const user = await prisma.user.findUnique({
       where: { id: parseInt(id) }
@@ -192,7 +191,6 @@ exports.updateUser = async (req, res, next) => {
     if (full_name) updateData.full_name = full_name;
     if (position !== undefined) updateData.position = position;
     if (organization !== undefined) updateData.organization = organization;
-    if (permission_level !== undefined) updateData.permission_level = permission_level;
     if (district_id !== undefined) updateData.district_id = district_id;
     if (is_active !== undefined) updateData.is_active = is_active;
 
@@ -309,8 +307,8 @@ exports.assignRole = async (req, res, next) => {
     // Assign role to user
     await prisma.userRole.create({
       data: {
-        userId: parseInt(userId),
-        roleId: parseInt(roleId)
+        user_id: parseInt(userId),
+        role_id: parseInt(roleId)
       }
     });
 
@@ -345,8 +343,8 @@ exports.removeRole = async (req, res, next) => {
     // Remove role from user
     await prisma.userRole.deleteMany({
       where: {
-        userId: parseInt(userId),
-        roleId: parseInt(roleId)
+        user_id: parseInt(userId),
+        role_id: parseInt(roleId)
       }
     });
 
