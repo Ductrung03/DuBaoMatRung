@@ -248,7 +248,7 @@ app.use('/api/verification',
 
 // Report Service
 app.use('/api/bao-cao',
-  authMiddleware.authenticate,
+  authMiddleware.authenticateFlexible, // Support token from header or query parameter
   createProxy(logger, {
     target: process.env.REPORT_SERVICE_URL || 'http://localhost:3004',
     pathRewrite: (path, req) => '/api/bao-cao' + path,

@@ -12,7 +12,7 @@ const getPermissionsTree = async (req, res, next) => {
       where: { is_active: true },
       orderBy: [{ order: 'asc' }, { name: 'asc' }]
     });
-    
+
     const tree = buildPermissionTree(permissions);
     
     res.json({
@@ -398,25 +398,13 @@ const validatePermissionStructure = (permissions) => {
   return errors;
 };
 
-// Export functions
-module.exports = {
-  // New web-based functions
-  getPermissionsTree,
-  getPermissionsByCategory,
-  getUserMenuItems,
-  checkPageAccess,
-  getPageActions,
-  validatePermissions,
-  // Legacy functions
-  getAllPermissions,
-  getPermissionById,
-  createPermission,
-  updatePermission,
-  deletePermission,
-  getPagePermissionTree,
-  getUIGroupedPermissions,
-  getModernPermissionsTree
-};
+// Export web-based permission functions
+exports.getPermissionsTree = getPermissionsTree;
+exports.getPermissionsByCategory = getPermissionsByCategory;
+exports.getUserMenuItems = getUserMenuItems;
+exports.checkPageAccess = checkPageAccess;
+exports.getPageActions = getPageActions;
+exports.validatePermissions = validatePermissions;
 
 /**
  * Get all permissions
@@ -836,6 +824,229 @@ exports.getModernPermissionsTree = async (req, res, next) => {
     });
   } catch (error) {
     logger.error('Error retrieving modern permissions tree', { error: error.message });
+    next(error);
+  }
+};
+
+/**
+ * Get feature-based permissions tree (New Permission System)
+ * @route GET /api/auth/permissions/feature-tree
+ */
+exports.getFeaturePermissionsTree = async (req, res, next) => {
+  try {
+    const { getFeaturePermissionsTree } = require('../config/feature-based-permissions.config');
+
+    // Get the tree structure from config
+    const tree = getFeaturePermissionsTree();
+
+    // Fetch all permissions from database
+    const allPermissions = await prisma.permission.findMany({
+      where: { is_active: true },
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        description: true,
+        module: true,
+        resource: true,
+        action: true,
+        ui_path: true,
+        ui_element: true,
+        ui_category: true,
+        icon: true,
+        order: true
+      }
+    });
+
+    // Create a map for quick lookup
+    const permissionMap = {};
+    allPermissions.forEach(p => {
+      permissionMap[p.code] = p;
+    });
+
+    // Enhance tree with database data
+    const enhancedTree = {};
+
+    Object.entries(tree).forEach(([pageKey, pageData]) => {
+      enhancedTree[pageKey] = {
+        name: pageData.name,
+        description: pageData.description,
+        icon: pageData.icon,
+        path: pageData.path,
+        color: pageData.color,
+        features: {}
+      };
+
+      Object.entries(pageData.features).forEach(([featureKey, feature]) => {
+        const dbPerm = permissionMap[feature.code];
+
+        enhancedTree[pageKey].features[featureKey] = {
+          ...feature,
+          id: dbPerm?.id || null,
+          exists_in_db: !!dbPerm
+        };
+      });
+    });
+
+    logger.info('Retrieved feature-based permissions tree');
+
+    res.json({
+      success: true,
+      data: enhancedTree,
+      total_pages: Object.keys(enhancedTree).length,
+      total_features: Object.values(enhancedTree).reduce(
+        (sum, page) => sum + Object.keys(page.features).length,
+        0
+      )
+    });
+  } catch (error) {
+    logger.error('Error retrieving feature-based permissions tree', { error: error.message });
+    next(error);
+  }
+};
+
+/**
+ * Get user's accessible pages and features
+ * @route GET /api/auth/permissions/my-access
+ */
+exports.getMyAccessibleFeatures = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { getUserAccessiblePages, getUserAccessibleFeatures } = require('../config/feature-based-permissions.config');
+
+    // Get user's permission codes
+    const userPermissions = await prisma.permission.findMany({
+      where: {
+        is_active: true,
+        rolePermissions: {
+          some: {
+            role: {
+              userRoles: {
+                some: { user_id: userId }
+              }
+            }
+          }
+        }
+      },
+      select: { code: true }
+    });
+
+    const permissionCodes = userPermissions.map(p => p.code);
+
+    // Get accessible pages
+    const accessiblePages = getUserAccessiblePages(permissionCodes);
+
+    // Get accessible features for each page
+    const pagesWithFeatures = accessiblePages.map(page => ({
+      ...page,
+      features: getUserAccessibleFeatures(page.key, permissionCodes)
+    }));
+
+    logger.info('Retrieved user accessible features', {
+      userId,
+      pageCount: pagesWithFeatures.length
+    });
+
+    res.json({
+      success: true,
+      data: {
+        pages: pagesWithFeatures,
+        total_permissions: permissionCodes.length
+      }
+    });
+  } catch (error) {
+    logger.error('Error retrieving user accessible features', { error: error.message });
+    next(error);
+  }
+};
+
+/**
+ * Get feature-based permissions tree for role management UI
+ * @route GET /api/auth/permissions/role-management-tree
+ */
+exports.getRoleManagementTree = async (req, res, next) => {
+  try {
+    const { getFeaturePermissionsTree } = require('../config/feature-based-permissions.config');
+
+    // Get the tree structure from config
+    const tree = getFeaturePermissionsTree();
+
+    // Fetch all permissions from database
+    const allPermissions = await prisma.permission.findMany({
+      where: { is_active: true },
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        description: true,
+        module: true,
+        resource: true,
+        action: true,
+        ui_path: true,
+        ui_element: true,
+        ui_category: true,
+        icon: true,
+        order: true
+      }
+    });
+
+    // Create a map for quick lookup
+    const permissionMap = {};
+    allPermissions.forEach(p => {
+      permissionMap[p.code] = p;
+    });
+
+    // Build structure for role management UI
+    const roleManagementTree = [];
+
+    Object.entries(tree).forEach(([pageKey, pageData]) => {
+      const pageNode = {
+        key: pageKey,
+        name: pageData.name,
+        description: pageData.description,
+        icon: pageData.icon,
+        path: pageData.path,
+        color: pageData.color,
+        type: 'page',
+        children: []
+      };
+
+      Object.entries(pageData.features).forEach(([featureKey, feature]) => {
+        const dbPerm = permissionMap[feature.code];
+
+        if (dbPerm) {
+          pageNode.children.push({
+            key: featureKey,
+            code: feature.code,
+            name: feature.name,
+            description: feature.description,
+            ui_element: feature.ui_element,
+            type: 'feature',
+            permission_id: dbPerm.id,
+            parent_page: pageKey
+          });
+        }
+      });
+
+      // Only add page if it has features
+      if (pageNode.children.length > 0) {
+        roleManagementTree.push(pageNode);
+      }
+    });
+
+    logger.info('Retrieved role management permissions tree');
+
+    res.json({
+      success: true,
+      data: roleManagementTree,
+      total_pages: roleManagementTree.length,
+      total_features: roleManagementTree.reduce(
+        (sum, page) => sum + page.children.length,
+        0
+      )
+    });
+  } catch (error) {
+    logger.error('Error retrieving role management permissions tree', { error: error.message });
     next(error);
   }
 };

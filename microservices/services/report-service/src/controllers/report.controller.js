@@ -1,7 +1,8 @@
 // report-service/src/controllers/report.controller.js
 const PDFDocument = require('pdfkit');
 const { Document, Packer, Paragraph, TextRun } = require('docx');
-const { formatResponse, convertTcvn3ToUnicode } = require('../../../../shared/utils');
+const { formatResponse } = require('../../../../shared/utils');
+const { convertTcvn3ToUnicode } = require('../../../../shared/utils/tcvn3-converter');
 const createLogger = require('../../../../shared/logger');
 
 const logger = createLogger('report-controller');
@@ -11,7 +12,7 @@ exports.generatePDF = async (req, res, next) => {
   try {
     const { title, data } = req.body;
 
-    logger.info('Generating PDF report', { title });
+    logger.info('Generating PDF report', { title });a
 
     const doc = new PDFDocument();
     const buffers = [];
@@ -158,7 +159,14 @@ exports.exportDOCX = async (req, res, next) => {
     if (xa) searchParams.append('xa', xa);
     if (xacMinh === 'true') searchParams.append('xacMinh', 'true');
 
-    const searchResponse = await axios.get(`${searchUrl}?${searchParams.toString()}`);
+    // Get user info from headers forwarded by gateway
+    const userHeaders = {};
+    if (req.headers['x-user-id']) userHeaders['x-user-id'] = req.headers['x-user-id'];
+    if (req.headers['x-user-username']) userHeaders['x-user-username'] = req.headers['x-user-username'];
+    if (req.headers['x-user-roles']) userHeaders['x-user-roles'] = req.headers['x-user-roles'];
+    if (req.headers['x-user-permissions']) userHeaders['x-user-permissions'] = req.headers['x-user-permissions'];
+
+    const searchResponse = await axios.get(`${searchUrl}?${searchParams.toString()}`, { headers: userHeaders });
     const data = searchResponse.data.data;
 
     if (!data || !data.features || data.features.length === 0) {
@@ -207,7 +215,7 @@ exports.exportDOCX = async (req, res, next) => {
           new Paragraph({
             children: [
               new TextRun({
-                text: `Huyện: ${convertTcvn3ToUnicode ? convertTcvn3ToUnicode(huyen) : huyen || '..........'}`,
+                text: `Huyện: ${huyen ? convertTcvn3ToUnicode(huyen) : '..........'}`,
                 size: 24
               })
             ]
@@ -215,7 +223,7 @@ exports.exportDOCX = async (req, res, next) => {
           new Paragraph({
             children: [
               new TextRun({
-                text: `Xã: ${convertTcvn3ToUnicode ? convertTcvn3ToUnicode(xa) : xa || '..........'}`,
+                text: `Xã: ${xa ? convertTcvn3ToUnicode(xa) : '..........'}`,
                 size: 24
               })
             ]
@@ -321,7 +329,14 @@ exports.exportPDF = async (req, res, next) => {
     if (xa) searchParams.append('xa', xa);
     if (xacMinh === 'true') searchParams.append('xacMinh', 'true');
 
-    const searchResponse = await axios.get(`${searchUrl}?${searchParams.toString()}`);
+    // Get user info from headers forwarded by gateway
+    const userHeaders = {};
+    if (req.headers['x-user-id']) userHeaders['x-user-id'] = req.headers['x-user-id'];
+    if (req.headers['x-user-username']) userHeaders['x-user-username'] = req.headers['x-user-username'];
+    if (req.headers['x-user-roles']) userHeaders['x-user-roles'] = req.headers['x-user-roles'];
+    if (req.headers['x-user-permissions']) userHeaders['x-user-permissions'] = req.headers['x-user-permissions'];
+
+    const searchResponse = await axios.get(`${searchUrl}?${searchParams.toString()}`, { headers: userHeaders });
     const data = searchResponse.data.data;
 
     if (!data || !data.features || data.features.length === 0) {
@@ -356,8 +371,8 @@ exports.exportPDF = async (req, res, next) => {
     doc.fontSize(20).text(reportTitle, { align: 'center' });
     doc.moveDown();
     doc.fontSize(12).text(`Tỉnh: Lào Cai`);
-    doc.text(`Huyện: ${convertTcvn3ToUnicode ? convertTcvn3ToUnicode(huyen) : huyen || '..........'}`);
-    doc.text(`Xã: ${convertTcvn3ToUnicode ? convertTcvn3ToUnicode(xa) : xa || '..........'}`);
+    doc.text(`Huyện: ${huyen ? convertTcvn3ToUnicode(huyen) : '..........'}`);
+    doc.text(`Xã: ${xa ? convertTcvn3ToUnicode(xa) : '..........'}`);
     doc.text(`Từ ngày: ${fromDate ? new Date(fromDate).toLocaleDateString('vi-VN') : '..........'} Đến ngày: ${toDate ? new Date(toDate).toLocaleDateString('vi-VN') : '..........'}`);
     doc.moveDown();
 
@@ -385,9 +400,9 @@ exports.exportPDF = async (req, res, next) => {
       xPos = 50;
       const rowData = [
         (idx + 1).toString(),
-        convertTcvn3ToUnicode ? convertTcvn3ToUnicode(item.properties.huyen_name || item.properties.huyen || "") : (item.properties.huyen_name || item.properties.huyen || ""),
-        convertTcvn3ToUnicode ? convertTcvn3ToUnicode(item.properties.xa_name || item.properties.xa || "") : (item.properties.xa_name || item.properties.xa || ""),
-        `CB-${item.properties.lo_canbao || item.properties.gid || ""}`,
+        item.properties.huyen_name || "",
+        item.properties.xa_name || (item.properties.xa ? convertTcvn3ToUnicode(item.properties.xa) : ""),
+        item.properties.lo_canbao || `CB-${item.properties.gid}` || "",
         item.properties.tk || "",
         item.properties.khoanh || "",
         item.properties.x ? Math.round(item.properties.x).toString() : "",

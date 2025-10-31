@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../dashboard/contexts/AuthContext';
-import api from '../services/api';
 
 const PermissionProtectedRoute = ({ children, requiredPermission, fallback = null }) => {
   const { user, isAdmin } = useAuth();
@@ -11,7 +10,7 @@ const PermissionProtectedRoute = ({ children, requiredPermission, fallback = nul
     checkPermission();
   }, [user, requiredPermission]);
 
-  const checkPermission = async () => {
+  const checkPermission = () => {
     if (!user || !requiredPermission) {
       setHasPermission(false);
       setLoading(false);
@@ -20,20 +19,28 @@ const PermissionProtectedRoute = ({ children, requiredPermission, fallback = nul
 
     // Admin có tất cả quyền
     if (isAdmin()) {
+      console.log('✅ User is admin, granting access to:', requiredPermission);
       setHasPermission(true);
       setLoading(false);
       return;
     }
 
-    try {
-      const response = await api.get(`/auth/permissions/check/${requiredPermission}`);
-      setHasPermission(response.data.success && response.data.hasAccess);
-    } catch (error) {
-      console.error('Error checking permission:', error);
-      setHasPermission(false);
-    } finally {
-      setLoading(false);
-    }
+    // Kiểm tra permission trong JWT token (đã được decode trong user object)
+    // JWT token có field "permissions" chứa array các permission codes
+    const userPermissions = user.permissions || [];
+
+    // Kiểm tra xem user có bất kỳ permission nào bắt đầu với prefix này không
+    // Ví dụ: requiredPermission = "forecast" sẽ match với "forecast.auto", "forecast.custom", etc.
+    const hasAccess = userPermissions.some(perm => perm.startsWith(requiredPermission + '.'));
+
+    console.log(`🔍 Checking permission "${requiredPermission}":`, {
+      userPermissions,
+      hasAccess,
+      isAdmin: isAdmin()
+    });
+
+    setHasPermission(hasAccess);
+    setLoading(false);
   };
 
   if (loading) {

@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { jwtDecode } from "jwt-decode";
 import config from "../../config";
 
 // Tạo context
@@ -77,33 +78,43 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkLoggedIn = async () => {
       const currentToken = localStorage.getItem("token");
-      
+
       if (currentToken) {
         try {
-          
+
           // Set token vào state trước khi verify
           setToken(currentToken);
-          
+
+          // Decode JWT to get permissions
+          const decodedToken = jwtDecode(currentToken);
+          console.log("🔓 Decoded JWT token:", decodedToken);
+
           const res = await axios.get(`/api/auth/me`, {
             headers: {
               Authorization: `Bearer ${currentToken}`
             }
           });
-          
-          setUser(res.data.user);
-          
+
+          // Merge user data with permissions from JWT
+          const userData = {
+            ...res.data.user,
+            permissions: decodedToken.permissions || []
+          };
+
+          setUser(userData);
+
           // Lưu user data vào localStorage
-          localStorage.setItem("user", JSON.stringify(res.data.user));
-          
+          localStorage.setItem("user", JSON.stringify(userData));
+
         } catch (err) {
           console.error("❌ Token verification failed:", err);
-          
+
           // Clear invalid token
           setToken(null);
           setUser(null);
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          
+
           // Only show error if it's not a network issue
           if (err.response?.status === 401) {
           } else {
@@ -122,24 +133,34 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       setLoading(true);
-      
-      
+
+
       const res = await axios.post(`/api/auth/login`, {
         username,
         password,
       });
 
-      
+
       // Lưu token và user data
       const { token: newToken, user: userData } = res.data;
-      
+
+      // Decode JWT to get permissions
+      const decodedToken = jwtDecode(newToken);
+      console.log("🔓 Login - Decoded JWT token:", decodedToken);
+
+      // Merge user data with permissions from JWT
+      const userDataWithPermissions = {
+        ...userData,
+        permissions: decodedToken.permissions || []
+      };
+
       setToken(newToken);
-      setUser(userData);
-      
+      setUser(userDataWithPermissions);
+
       // Lưu vào localStorage
       localStorage.setItem("token", newToken);
-      localStorage.setItem("user", JSON.stringify(userData));
-      
+      localStorage.setItem("user", JSON.stringify(userDataWithPermissions));
+
       toast.success("Đăng nhập thành công!");
       navigate("/dashboard");
       return true;

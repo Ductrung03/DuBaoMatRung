@@ -9,7 +9,7 @@ export const getPermissionsTree = async (req, res) => {
     const permissions = await prisma.permission.findMany({
       where: { is_active: true },
       orderBy: [{ order: 'asc' }, { name: 'asc' }]
-    });
+    });a
     
     const tree = buildPermissionTree(permissions);
     

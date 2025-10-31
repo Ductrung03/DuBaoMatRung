@@ -11,7 +11,7 @@ import { AuthProvider } from "./dashboard/contexts/AuthContext";
 import ProtectedRoute from "./dashboard/components/ProtectedRoute";
 import PermissionProtectedRoute from "./components/PermissionProtectedRoute";
 import QuanLyNguoiDung from "./dashboard/pages/QuanLyNguoiDung";
-import QuanLyRoleUltraModern from "./dashboard/pages/QuanLyRoleUltraModern";
+import QuanLyRole from "./dashboard/pages/QuanLyRole";
 import ErrorBoundary from "./dashboard/components/ErrorBoundary";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -84,7 +84,7 @@ function App() {
                     path="quanlyrole"
                     element={
                       <PermissionProtectedRoute requiredPermission="role_management">
-                        <QuanLyRoleUltraModern />
+                        <QuanLyRole />
                       </PermissionProtectedRoute>
                     }
                   />

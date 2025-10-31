@@ -133,8 +133,67 @@ const optionalAuth = (req, res, next) => {
   next();
 };
 
+// Authenticate with token from header or query parameter
+const authenticateFlexible = (req, res, next) => {
+  let token = null;
+
+  // Try to get token from Authorization header first
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  }
+
+  // If not in header, try query parameter
+  if (!token && req.query.token) {
+    token = req.query.token;
+  }
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: 'No token provided'
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    req.user = {
+      id: decoded.id,
+      username: decoded.username,
+      full_name: decoded.full_name,
+      email: decoded.email,
+      roles: decoded.roles || [],
+      permissions: decoded.permissions || []
+    };
+
+    // Forward user info to downstream services
+    req.headers['x-user-id'] = decoded.id;
+    req.headers['x-user-username'] = decoded.username;
+    req.headers['x-user-roles'] = decoded.roles ? decoded.roles.join(',') : '';
+    req.headers['x-user-permissions'] = decoded.permissions ? decoded.permissions.join(',') : '';
+
+    next();
+  } catch (error) {
+    console.error('JWT verification failed:', error.message);
+
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token expired'
+      });
+    }
+
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid token'
+    });
+  }
+};
+
 module.exports = {
   authenticate,
+  authenticateFlexible,
   requireRole,
   requirePermission,
   optionalAuth

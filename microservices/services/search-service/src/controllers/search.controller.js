@@ -85,14 +85,14 @@ exports.searchMatRung = async (req, res, next) => {
 
       // Get matching geometries from admin_db
       const spatialQuery = `
-        SELECT ST_Union(r.geom) as union_geom
+        SELECT ST_AsText(ST_Union(r.geom)) as union_geom_wkt
         FROM laocai_ranhgioihc r
         ${spatialWhereClause}
       `;
 
       const spatialResult = await adminDb.query(spatialQuery, spatialParams);
 
-      if (!spatialResult.rows[0] || !spatialResult.rows[0].union_geom) {
+      if (!spatialResult.rows[0] || !spatialResult.rows[0].union_geom_wkt) {
         logger.warn('No matching admin boundaries found', { huyen, xa });
         return res.json(formatResponse(true, 'No data found', {
           type: 'FeatureCollection',
@@ -100,9 +100,9 @@ exports.searchMatRung = async (req, res, next) => {
         }));
       }
 
-      // Now query mat_rung with spatial intersection
-      whereClause += ` AND ST_Intersects(m.geom, ST_GeomFromEWKB($${paramIndex++}))`;
-      params.push(spatialResult.rows[0].union_geom);
+      // Now query mat_rung with spatial intersection using WKT
+      whereClause += ` AND ST_Intersects(m.geom, ST_GeomFromText($${paramIndex++}, 4326))`;
+      params.push(spatialResult.rows[0].union_geom_wkt);
     }
 
     // ✅ OPTIMIZED: Query với tất cả thông tin cần thiết
@@ -122,7 +122,7 @@ exports.searchMatRung = async (req, res, next) => {
         m.detection_status,
         m.verification_notes,
         ST_AsGeoJSON(m.geom) as geometry,
-        ST_AsEWKT(ST_Centroid(m.geom)) as centroid_ewkt
+        ST_AsText(ST_Centroid(m.geom)) as centroid_wkt
       FROM mat_rung m
       ${whereClause}
       ORDER BY m.gid DESC
@@ -160,7 +160,7 @@ exports.searchMatRung = async (req, res, next) => {
 
     // ✅ OPTIMIZED: Batch query thay vì query từng record
     // Lấy tất cả centroids
-    const centroids = result.rows.map(row => row.centroid_ewkt);
+    const centroids = result.rows.map(row => row.centroid_wkt);
 
     // Query admin info cho tất cả records trong 1 lần
     let adminInfoMap = {};
@@ -171,17 +171,17 @@ exports.searchMatRung = async (req, res, next) => {
         const tempTableQuery = `
           WITH centroids AS (
             SELECT
-              unnest(ARRAY[${centroids.map((_, idx) => `$${idx + 1}`).join(',')}]) as point_ewkt
+              unnest(ARRAY[${centroids.map((_, idx) => `$${idx + 1}::text`).join(',')}]) as point_wkt
           )
           SELECT
             r.huyen,
             r.xa,
             r.tieukhu,
             r.khoanh,
-            ST_AsEWKT(c.point_ewkt::geometry) as centroid_key
+            c.point_wkt as centroid_key
           FROM centroids c
           LEFT JOIN laocai_ranhgioihc r
-            ON ST_Intersects(r.geom, c.point_ewkt::geometry)
+            ON ST_Intersects(r.geom, ST_GeomFromText(c.point_wkt, 4326))
         `;
 
         const adminResult = await adminDb.query(tempTableQuery, centroids);
@@ -206,7 +206,7 @@ exports.searchMatRung = async (req, res, next) => {
 
     // ✅ Map kết quả với admin info
     const features = result.rows.map((row) => {
-      const adminInfo = adminInfoMap[row.centroid_ewkt] || {
+      const adminInfo = adminInfoMap[row.centroid_wkt] || {
         huyen_name: row.mahuyen,
         xa_name: null,
         tk: null,
@@ -446,7 +446,7 @@ exports.searchMatRungById = async (req, res, next) => {
         SELECT idx, r.huyen, r.xa, r.tieukhu, r.khoanh
         FROM geoms g
         LEFT JOIN laocai_ranhgioihc r
-          ON ST_Intersects(r.geom, ST_GeomFromGeoJSON(g.geom_json))
+          ON ST_Intersects(r.geom, ST_SetSRID(ST_GeomFromGeoJSON(g.geom_json), 4326))
       `;
 
       const adminResult = await adminDb.query(adminQuery, geometries);

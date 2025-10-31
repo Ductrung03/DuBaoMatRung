@@ -64,3 +64,5 @@
 {"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 20:15:21"}
 {"code":"ECONNREFUSED","level":"error","message":"","service":"admin-service","timestamp":"2025-10-28 17:16:40"}
 {"error":"","level":"error","message":"Failed to start admin service","service":"admin-service","timestamp":"2025-10-28 17:16:40"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"admin-service","timestamp":"2025-10-30 14:03:06"}
+{"error":"","level":"error","message":"Failed to start admin service","service":"admin-service","timestamp":"2025-10-30 14:03:06"}

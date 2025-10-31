@@ -53,3 +53,11 @@ Thumbs.db
 coverage/
 .nyc_output/
 .aider*
+
+#AI agent
+.claude
+.gemini
+.qodo
+.specify
+specs
+

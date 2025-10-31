@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   BarChart,
   Bar,
@@ -9,30 +9,21 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useReport } from "../contexts/ReportContext";
-import { FaFileWord, FaFilePdf, FaDownload, FaEye } from "react-icons/fa";
 import { ClipLoader } from 'react-spinners';
-import config from "../../config";
-import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
-
-// Hiển thị overlay loading khi đang xử lý báo cáo
-const ReportLoadingOverlay = ({ message }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-lg shadow-lg max-w-md text-center">
-      <ClipLoader color="#027e02" size={60} />
-      <p className="mt-4 text-forest-green-primary font-medium text-lg">{message}</p>
-    </div>
-  </div>
-);
+import { convertTcvn3ToUnicode } from "../../utils/fontConverter";
+import { FaFileWord, FaFilePdf, FaEye } from "react-icons/fa";
+import { toast } from "react-toastify";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType, BorderStyle, AlignmentType } from 'docx';
 
 const ThongKeBaoCaoMatRung = () => {
-  const { reportData, reportLoading } = useReport();
-  const [isExportingDocx, setIsExportingDocx] = useState(false);
-  const [isExportingPdf, setIsExportingPdf] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState("Đang tạo báo cáo...");
+  const { reportData, reportLoading, setReportData } = useReport();
   const location = useLocation();
+  const reportRef = useRef(null); // Ref để lấy nội dung báo cáo
 
-  // ✅ Lấy thông tin từ URL params - THÊM xacMinh và type
+  // Lấy thông tin từ URL params
   const [reportParams, setReportParams] = useState({
     fromDate: '',
     toDate: '',
@@ -42,6 +33,10 @@ const ThongKeBaoCaoMatRung = () => {
     type: ''
   });
 
+  // State cho xuất file
+  const [isExportingDocx, setIsExportingDocx] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+
   useEffect(() => {
     // Lấy params từ URL
     const urlParams = new URLSearchParams(location.search);
@@ -49,16 +44,249 @@ const ThongKeBaoCaoMatRung = () => {
     const toDate = urlParams.get('toDate') || '';
     const huyen = urlParams.get('huyen') || '';
     const xa = urlParams.get('xa') || '';
-    const xacMinh = urlParams.get('xacMinh') || urlParams.get('status') || 'false'; // Support both xacMinh and status for backward compatibility
+    const xacMinh = urlParams.get('xacMinh') || urlParams.get('status') || 'false';
     const type = urlParams.get('type') || '';
 
     setReportParams({ fromDate, toDate, huyen, xa, xacMinh, type });
 
-    // Nếu type là "Biểu đồ", gọi API để lấy dữ liệu thống kê
-    if (type === 'Biểu đồ') {
-      fetchChartData(fromDate, toDate, huyen, xa);
+    // Lấy dữ liệu cho báo cáo
+    if (fromDate && toDate) {
+      if (type === 'Biểu đồ') {
+        fetchChartData(fromDate, toDate, huyen, xa);
+      } else {
+        fetchReportData(fromDate, toDate, huyen, xa, xacMinh);
+      }
     }
   }, [location.search]);
+
+  // Hàm lấy dữ liệu báo cáo từ API
+  const fetchReportData = async (fromDate, toDate, huyen, xa, xacMinh) => {
+    try {
+      const params = new URLSearchParams({
+        fromDate,
+        toDate
+      });
+      
+      if (huyen) params.append('huyen', huyen);
+      if (xa) params.append('xa', xa);
+
+      const response = await fetch(`/api/search/mat-rung?${params.toString()}`);
+      const data = await response.json();
+
+      if (data.success && data.data.features) {
+        let filteredData = data.data.features;
+        
+        // Lọc theo trạng thái xác minh
+        if (xacMinh === 'true') {
+          filteredData = filteredData.filter(feature => 
+            feature.properties.xacminh === 1 || feature.properties.xacminh === '1'
+          );
+        }
+        
+        setReportData(filteredData);
+      }
+    } catch (error) {
+      console.error('Error fetching report data:', error);
+      setReportData([]);
+    }
+  };
+
+  // Xuất DOCX từ dữ liệu hiện tại
+  const handleExportDocx = async () => {
+    try {
+      setIsExportingDocx(true);
+
+      if (!Array.isArray(reportData) || reportData.length === 0) {
+        throw new Error('Không có dữ liệu để xuất báo cáo');
+      }
+
+      const isVerified = reportParams.xacMinh === 'true';
+      const reportTitle = isVerified
+        ? "BẢNG THỐNG KÊ VỊ TRÍ MẤT RỪNG"
+        : "BẢNG THỐNG KÊ PHÁT HIỆN SỚM MẤT RỪNG";
+
+      // Tính tổng
+      const totalLots = reportData.length;
+      const totalArea = reportData.reduce((sum, item) => {
+        const areaField = isVerified ? (item.properties.dtichXM || item.properties.dtich_xm || item.properties.dtich) : item.properties.dtich;
+        return sum + (areaField || 0);
+      }, 0) / 10000;
+
+      // Tạo header rows cho bảng
+      const headerCells = [
+        new TableCell({ children: [new Paragraph({ text: "TT", alignment: AlignmentType.CENTER })], width: { size: 5, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Xã", alignment: AlignmentType.CENTER })], width: { size: 15, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Lô cảnh báo", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Tiểu khu", alignment: AlignmentType.CENTER })], width: { size: 10, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Khoảnh", alignment: AlignmentType.CENTER })], width: { size: 10, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Tọa độ VN-2000 X", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Tọa độ VN-2000 Y", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Diện tích (ha)", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
+      ];
+
+      if (isVerified) {
+        headerCells.push(new TableCell({ children: [new Paragraph({ text: "Nguyên nhân", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }));
+      }
+
+      // Tạo data rows
+      const dataRows = reportData.map((item, idx) => {
+        const cells = [
+          new TableCell({ children: [new Paragraph({ text: `${idx + 1}`, alignment: AlignmentType.CENTER })] }),
+          new TableCell({ children: [new Paragraph({ text: item.properties.xa_name || (item.properties.xa ? convertTcvn3ToUnicode(item.properties.xa) : "") || item.properties.maxa || "", alignment: AlignmentType.CENTER })] }),
+          new TableCell({ children: [new Paragraph({ text: item.properties.lo_canbao || (item.properties.gid ? `CB-${item.properties.gid}` : ""), alignment: AlignmentType.CENTER })] }),
+          new TableCell({ children: [new Paragraph({ text: item.properties.tk || item.properties.tieukhu || "", alignment: AlignmentType.CENTER })] }),
+          new TableCell({ children: [new Paragraph({ text: item.properties.khoanh || "", alignment: AlignmentType.CENTER })] }),
+          new TableCell({ children: [new Paragraph({ text: item.properties.x ? Math.round(item.properties.x).toString() : "", alignment: AlignmentType.CENTER })] }),
+          new TableCell({ children: [new Paragraph({ text: item.properties.y ? Math.round(item.properties.y).toString() : "", alignment: AlignmentType.CENTER })] }),
+          new TableCell({
+            children: [new Paragraph({
+              text: (() => {
+                const areaField = isVerified ? (item.properties.dtichXM || item.properties.dtich_xm) : item.properties.dtich;
+                return areaField ? (areaField / 10000).toFixed(2) : "";
+              })(),
+              alignment: AlignmentType.CENTER
+            })]
+          }),
+        ];
+
+        if (isVerified) {
+          cells.push(new TableCell({ children: [new Paragraph({ text: item.properties.verification_reason || item.properties.nguyennhan || item.properties.verification_notes || "", alignment: AlignmentType.CENTER })] }));
+        }
+
+        return new TableRow({ children: cells });
+      });
+
+      // Tạo total row
+      const totalCells = [
+        new TableCell({ children: [new Paragraph({ text: `Tổng ${totalLots} lô`, alignment: AlignmentType.CENTER })], columnSpan: isVerified ? 8 : 7 }),
+        new TableCell({ children: [new Paragraph({ text: totalArea.toFixed(2), alignment: AlignmentType.CENTER })] }),
+      ];
+      if (isVerified) {
+        totalCells.push(new TableCell({ children: [new Paragraph({ text: "", alignment: AlignmentType.CENTER })] }));
+      }
+
+      // Tạo document
+      const doc = new Document({
+        sections: [{
+          properties: {},
+          children: [
+            new Paragraph({ text: reportTitle, heading: "Heading1", alignment: AlignmentType.CENTER }),
+            new Paragraph({ text: `Tỉnh: Lào Cai`, alignment: AlignmentType.LEFT }),
+            new Paragraph({ text: `Huyện: ${reportParams.huyen ? convertTcvn3ToUnicode(reportParams.huyen) : (reportData.length > 0 ? (reportData[0].properties.huyen_name || convertTcvn3ToUnicode(reportData[0].properties.huyen) || reportData[0].properties.mahuyen || '..........') : '..........')}`, alignment: AlignmentType.CENTER }),
+            new Paragraph({ text: `Xã: ${reportParams.xa ? convertTcvn3ToUnicode(reportParams.xa) : (reportData.length > 0 ? (reportData[0].properties.xa_name || convertTcvn3ToUnicode(reportData[0].properties.xa) || reportData[0].properties.maxa || '..........') : '..........')}`, alignment: AlignmentType.RIGHT }),
+            new Paragraph({ text: `Từ ngày: ${formatDate(reportParams.fromDate) || '..........'} Đến ngày: ${formatDate(reportParams.toDate) || '..........'}`, alignment: AlignmentType.CENTER }),
+            new Paragraph({ text: "" }), // Empty line
+            new Table({
+              width: { size: 100, type: WidthType.PERCENTAGE },
+              rows: [
+                new TableRow({ children: headerCells }),
+                ...dataRows,
+                new TableRow({ children: totalCells })
+              ]
+            }),
+            new Paragraph({ text: "" }), // Empty line
+            new Paragraph({ text: "Người tổng hợp", alignment: AlignmentType.LEFT }),
+            new Paragraph({ text: `Lào Cai, ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}`, alignment: AlignmentType.RIGHT }),
+            new Paragraph({ text: "Hạt kiểm lâm", alignment: AlignmentType.RIGHT, bold: true }),
+          ]
+        }]
+      });
+
+      const blob = await Packer.toBlob(doc);
+
+      const fileName = isVerified
+        ? `bao-cao-vi-tri-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.docx`
+        : `bao-cao-phat-hien-som-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.docx`;
+
+      // Download file
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("File DOCX đã được tải xuống thành công!");
+      setTimeout(() => setIsExportingDocx(false), 1000);
+    } catch (error) {
+      console.error("Lỗi khi xuất DOCX:", error);
+      toast.error("Có lỗi xảy ra khi xuất DOCX: " + error.message);
+      setIsExportingDocx(false);
+    }
+  };
+
+  // Xuất PDF từ HTML hiện tại
+  const handleExportPdf = async () => {
+    try {
+      setIsExportingPdf(true);
+
+      if (!reportRef.current) {
+        throw new Error('Không tìm thấy nội dung báo cáo');
+      }
+
+      // Ẩn tạm thời các nút trong khi chụp
+      const buttons = reportRef.current.parentElement.querySelectorAll('button');
+      buttons.forEach(btn => {
+        btn.style.display = 'none';
+      });
+
+      // Tạo canvas từ HTML (chụp trực tiếp từ element hiện tại)
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2, // Tăng chất lượng
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        windowWidth: reportRef.current.scrollWidth,
+        windowHeight: reportRef.current.scrollHeight
+      });
+
+      // Hiện lại các nút
+      buttons.forEach(btn => {
+        btn.style.display = '';
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'landscape', // Hoặc 'portrait' tùy bảng
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgWidth = 297; // A4 landscape width in mm
+      const pageHeight = 210; // A4 landscape height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // Thêm trang đầu tiên
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Thêm các trang tiếp theo nếu nội dung dài
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const isVerified = reportParams.xacMinh === 'true';
+      const fileName = isVerified
+        ? `bao-cao-vi-tri-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.pdf`
+        : `bao-cao-phat-hien-som-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.pdf`;
+
+      pdf.save(fileName);
+
+      toast.success("File PDF đã được tải xuống thành công!");
+      setTimeout(() => setIsExportingPdf(false), 1000);
+    } catch (error) {
+      console.error("Lỗi khi xuất PDF:", error);
+      toast.error("Có lỗi xảy ra khi xuất PDF: " + error.message);
+      setIsExportingPdf(false);
+    }
+  };
 
   // Hàm lấy dữ liệu biểu đồ từ API
   const fetchChartData = async (fromDate, toDate, huyen, xa) => {
@@ -146,69 +374,8 @@ const ThongKeBaoCaoMatRung = () => {
 
   const { dataTinCay, dataDienTich } = processChartData(reportData);
 
-  // Hàm xử lý xuất file DOCX
-  const handleExportDocx = () => {
-    try {
-      // Hiển thị loading
-      setIsExportingDocx(true);
-      setLoadingMessage("Đang chuẩn bị tải DOCX...");
-      
-      // ✅ Thêm tham số xacMinh vào URL
-      const exportUrl = `/api/bao-cao/export-docx?fromDate=${reportParams.fromDate}&toDate=${reportParams.toDate}&huyen=${encodeURIComponent(reportParams.huyen)}&xa=${encodeURIComponent(reportParams.xa)}&xacMinh=${reportParams.xacMinh}`;
-      const link = document.createElement('a');
-      link.href = exportUrl;
-      
-      // ✅ Tên file khác nhau cho 2 loại báo cáo
-      const fileName = reportParams.xacMinh === 'true' 
-        ? `bao-cao-xac-minh-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.docx`
-        : `bao-cao-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.docx`;
-      link.setAttribute('download', fileName);
-      link.setAttribute('target', '_blank');
-      
-      // Thêm vào DOM, click và xóa
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Thông báo và tắt loading sau 2 giây
-      toast.success("File DOCX đang được tải xuống");
-      setTimeout(() => {
-        setIsExportingDocx(false);
-      }, 2000);
-    } catch (error) {
-      console.error("Lỗi khi tải DOCX:", error);
-      toast.error("Có lỗi xảy ra khi tải DOCX");
-      setIsExportingDocx(false);
-    }
-  };
-
-  // Hàm xử lý xuất PDF
-  const handleExportPdf = () => {
-    try {
-      // Hiển thị loading
-      setIsExportingPdf(true);
-      setLoadingMessage("Đang chuẩn bị mở trang báo cáo...");
-      
-      // ✅ Thêm tham số xacMinh vào URL
-      const exportUrl = `/api/bao-cao/export-pdf?fromDate=${reportParams.fromDate}&toDate=${reportParams.toDate}&huyen=${encodeURIComponent(reportParams.huyen)}&xa=${encodeURIComponent(reportParams.xa)}&xacMinh=${reportParams.xacMinh}`;
-      
-      // Mở cửa sổ mới
-      window.open(exportUrl, '_blank');
-      
-      // Thông báo và tắt loading
-      toast.info("Đã mở trang báo cáo. Hãy nhấn nút 'Lưu PDF' ở trang mới để tải về.");
-      setTimeout(() => {
-        setIsExportingPdf(false);
-      }, 2000);
-    } catch (error) {
-      console.error("Lỗi khi mở trang PDF:", error);
-      toast.error("Có lỗi xảy ra khi mở trang báo cáo");
-      setIsExportingPdf(false);
-    }
-  };
-
-  // Trạng thái loading tổng hợp
-  const isPageLoading = reportLoading || isExportingDocx || isExportingPdf;
+  // Trạng thái loading
+  const isPageLoading = reportLoading;
 
   // Hiển thị nếu không có dữ liệu
   if (!reportData && !reportLoading)
@@ -218,35 +385,36 @@ const ThongKeBaoCaoMatRung = () => {
       </p>
     );
 
-  // Hiển thị overlay loading khi đang xử lý
+  // Hiển thị loading khi đang tải dữ liệu
   if (isPageLoading) {
-    return <ReportLoadingOverlay message={loadingMessage} />;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <ClipLoader color="#027e02" size={60} />
+        <p className="ml-4 text-forest-green-primary font-medium text-lg">Đang tải dữ liệu...</p>
+      </div>
+    );
   }
 
-  // Kiểm tra nếu reportData là mảng và type là "Văn bản" => hiển thị bảng văn bản
-  // QUAN TRỌNG: Phải kiểm tra type !== "Biểu đồ" để tránh hiển thị nhầm
+  // Hiển thị báo cáo văn bản (Loại 1 và Loại 2)
   if (Array.isArray(reportData) && reportParams.type !== "Biểu đồ") {
-    // ✅ Tiêu đề và headers khác nhau cho 2 loại báo cáo
     const isVerified = reportParams.xacMinh === 'true';
     const reportTitle = isVerified
       ? "BẢNG THỐNG KÊ VỊ TRÍ MẤT RỪNG"
       : "BẢNG THỐNG KÊ PHÁT HIỆN SỚM MẤT RỪNG";
 
-    // Tính tổng số lô và tổng diện tích
     const totalLots = reportData.length;
     const totalArea = reportData.reduce((sum, item) => {
-      const areaField = isVerified ? item.properties.dtichXM : item.properties.dtich;
+      const areaField = isVerified ? (item.properties.dtichXM || item.properties.dtich_xm || item.properties.dtich) : item.properties.dtich;
       return sum + (areaField || 0);
-    }, 0) / 10000; // Convert to hectares
+    }, 0) / 10000;
 
     return (
       <div className="p-6 font-sans max-h-[calc(100vh-100px)] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-center text-lg font-bold">
+          <h2 className="text-center text-lg font-bold flex-1">
             {reportTitle}
           </h2>
 
-          {/* Thêm các nút xuất file */}
           <div className="flex gap-2">
             <button
               onClick={handleExportDocx}
@@ -266,35 +434,34 @@ const ThongKeBaoCaoMatRung = () => {
                 </>
               )}
             </button>
+
             <button
               onClick={handleExportPdf}
               disabled={isExportingPdf}
               className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-sm"
-              title="Xem và lưu báo cáo dạng PDF"
+              title="Xuất file PDF"
             >
               {isExportingPdf ? (
                 <>
                   <ClipLoader color="#ffffff" size={14} />
-                  <span className="ml-1">Đang chuẩn bị...</span>
+                  <span className="ml-1">Đang xuất...</span>
                 </>
               ) : (
                 <>
-                  <FaEye className="text-lg mr-1" />
                   <FaFilePdf className="text-lg" />
-                  <span className="ml-1">Xem & Lưu PDF</span>
+                  <span>Xuất PDF</span>
                 </>
               )}
             </button>
           </div>
         </div>
 
-        <div className="overflow-auto border border-gray-300 rounded shadow px-6 pt-2 pb-6">
-          {/* Hiển thị thông tin từ params thực tế */}
+        <div ref={reportRef} className="overflow-auto border border-gray-300 rounded shadow px-6 pt-2 pb-6">
           <div className="text-sm mb-2">
             <div className="flex justify-between font-semibold">
               <span>Tỉnh: Lào Cai</span>
-              <span>Huyện: {reportData.length > 0 ? (reportData[0].properties.huyen_name || reportParams.huyen) : (reportParams.huyen || '..........')}</span>
-              <span>Xã: {reportData.length > 0 ? (reportData[0].properties.xa_name || reportParams.xa) : (reportParams.xa || '..........')}</span>
+              <span>Huyện: {reportParams.huyen ? convertTcvn3ToUnicode(reportParams.huyen) : (reportData.length > 0 ? (reportData[0].properties.huyen_name || convertTcvn3ToUnicode(reportData[0].properties.huyen) || reportData[0].properties.mahuyen || '..........') : '..........')}</span>
+              <span>Xã: {reportParams.xa ? convertTcvn3ToUnicode(reportParams.xa) : (reportData.length > 0 ? (reportData[0].properties.xa_name || convertTcvn3ToUnicode(reportData[0].properties.xa) || reportData[0].properties.maxa || '..........') : '..........')}</span>
             </div>
             <div className="flex justify-between font-semibold mt-1">
               <span></span>
@@ -306,12 +473,10 @@ const ThongKeBaoCaoMatRung = () => {
             </div>
           </div>
 
-          {/* ✅ Bảng với headers khác nhau cho 2 loại báo cáo */}
           <table className="w-full border border-black text-sm text-center table-fixed">
             <thead>
               <tr>
-                <th className="border border-black px-2 py-1">TT</th>
-                <th className="border border-black px-2 py-1">Huyện</th>
+                <th className="border border-black px-2 py-1 w-12">TT</th>
                 <th className="border border-black px-2 py-1">Xã</th>
                 <th className="border border-black px-2 py-1">Lô cảnh báo</th>
                 <th className="border border-black px-2 py-1">Tiểu khu</th>
@@ -328,11 +493,18 @@ const ThongKeBaoCaoMatRung = () => {
               {reportData.map((item, idx) => (
                 <tr key={idx}>
                   <td className="border border-black px-2 py-1">{idx + 1}</td>
-                  <td className="border border-black px-2 py-1">{item.properties.huyen_name || item.properties.huyen || ""}</td>
-                  <td className="border border-black px-2 py-1">{item.properties.xa_name || item.properties.xa || ""}</td>
-                  <td className="border border-black px-2 py-1">{item.properties.lo_canbao || (item.properties.gid ? `CB-${item.properties.gid}` : "")}</td>
-                  <td className="border border-black px-2 py-1">{item.properties.tk || ""}</td>
-                  <td className="border border-black px-2 py-1">{item.properties.khoanh || ""}</td>
+                  <td className="border border-black px-2 py-1">
+                    {item.properties.xa_name || (item.properties.xa ? convertTcvn3ToUnicode(item.properties.xa) : "") || item.properties.maxa || ""}
+                  </td>
+                  <td className="border border-black px-2 py-1">
+                    {item.properties.lo_canbao || (item.properties.gid ? `CB-${item.properties.gid}` : "")}
+                  </td>
+                  <td className="border border-black px-2 py-1">
+                    {item.properties.tk || item.properties.tieukhu || ""}
+                  </td>
+                  <td className="border border-black px-2 py-1">
+                    {item.properties.khoanh || ""}
+                  </td>
                   <td className="border border-black px-2 py-1">
                     {item.properties.x ? Math.round(item.properties.x) : ""}
                   </td>
@@ -340,22 +512,24 @@ const ThongKeBaoCaoMatRung = () => {
                     {item.properties.y ? Math.round(item.properties.y) : ""}
                   </td>
                   <td className="border border-black px-2 py-1">
-                    {isVerified
-                      ? (item.properties.dtichXM ? (item.properties.dtichXM / 10000).toFixed(2) : "")
-                      : (item.properties.dtich ? (item.properties.dtich / 10000).toFixed(2) : "")
-                    }
+                    {(() => {
+                      const areaField = isVerified ? (item.properties.dtichXM || item.properties.dtich_xm) : item.properties.dtich;
+                      return areaField ? (areaField / 10000).toFixed(2) : "";
+                    })()}
                   </td>
                   {isVerified && (
                     <td className="border border-black px-2 py-1">
-                      {item.properties.verification_reason || ""}
+                      {item.properties.verification_reason || item.properties.nguyennhan || item.properties.verification_notes || ""}
                     </td>
                   )}
                 </tr>
               ))}
-              {/* Dòng tổng */}
-              <tr>
-                <td className="border border-black px-2 py-1 font-bold" colSpan={isVerified ? "9" : "8"}>Tổng</td>
-                <td className="border border-black px-2 py-1 font-bold">
+              
+              <tr className="font-bold">
+                <td className="border border-black px-2 py-1" colSpan={isVerified ? "8" : "7"}>
+                  Tổng {totalLots} lô
+                </td>
+                <td className="border border-black px-2 py-1">
                   {totalArea.toFixed(2)}
                 </td>
                 {isVerified && <td className="border border-black px-2 py-1"></td>}
@@ -364,14 +538,25 @@ const ThongKeBaoCaoMatRung = () => {
           </table>
 
           <div className="flex justify-between mt-6 text-sm px-2">
-            <span>
-              <strong>Người tổng hợp</strong>
-            </span>
-            <span className="text-right">
-              Lào Cai, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
-              <br />
-              <strong>Ban quản lý rừng</strong>
-            </span>
+            <div>
+              <div className="mb-2">
+                <strong>Người tổng hợp</strong>
+              </div>
+              <div className="text-xs text-gray-600">
+                Lưu ý:<br/>
+                + Diện tích này lấy theo cột {isVerified ? 'dtichXM' : 'dtich'}<br/>
+                + Dòng tổng: tính toán tổng số lô và tổng diện tích<br/>
+                + Tọa độ X,Y làm tròn, không lấy sau dấu ","
+              </div>
+            </div>
+            <div className="text-right">
+              <div>
+                Lào Cai, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
+              </div>
+              <div className="mt-2">
+                <strong>Hạt kiểm lâm</strong>
+              </div>
+            </div>
           </div>
         </div>
       </div>
