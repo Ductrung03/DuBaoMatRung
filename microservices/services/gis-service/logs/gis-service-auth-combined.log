@@ -272,3 +272,5 @@
 {"database":"auth_db","level":"info","message":"Database connection test successful","service":"gis-service-auth","timestamp":"2025-10-15T07:39:58.116Z"}
 {"level":"info","message":"Database pool initialized successfully","service":"gis-service-auth","timestamp":"2025-10-15 14:39:58"}
 {"level":"info","message":"Database pool closed","service":"gis-service-auth","timestamp":"2025-10-15 14:41:29"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"gis-service-auth","timestamp":"2025-11-01T06:33:23.994Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service-auth","timestamp":"2025-11-01 13:33:23"}

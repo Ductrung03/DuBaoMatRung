@@ -1149,3 +1149,6 @@
 {"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-10-15 14:40:05","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
 {"level":"info","message":"Shutting down auth service...","service":"auth-service","timestamp":"2025-10-15 14:41:29"}
 {"level":"info","message":"Database pool closed","service":"auth-service","timestamp":"2025-10-15 14:41:29"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"auth-service","timestamp":"2025-11-01T06:33:23.928Z"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-01 13:33:23"}
+{"level":"info","message":"Database pool initialized successfully","service":"auth-service","timestamp":"2025-11-01 13:33:23"}

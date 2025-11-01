@@ -2782,3 +2782,12 @@
 {"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-10-15 14:41:29"}
 {"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-10-15 14:41:29"}
 {"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-10-15 14:41:29"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-11-01T06:33:23.985Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-11-01 13:33:23"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-11-01 13:33:23"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-11-01 13:33:24"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-11-01 13:33:24"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-11-01 13:33:24"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-11-01 13:33:24"}
+{"level":"info","message":"Auth database (auth_db) connected","service":"gis-service","timestamp":"2025-11-01 13:33:24"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-11-01 13:33:24"}
