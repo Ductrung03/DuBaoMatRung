@@ -100,23 +100,37 @@ if ($Services.Count -eq 0) {
     exit 0
 }
 
-Write-Host ""
-Write-Host "=== Restarting services ===" -ForegroundColor Yellow
-foreach ($service in $Services) {
-    Write-Host "  Restarting: $service" -ForegroundColor Cyan
+try {
+    Write-Host ""
+    Write-Host "=== Restarting services ===" -ForegroundColor Yellow
 
-    # Rebuild and restart the service
-    docker-compose build $service
-    docker-compose up -d $service
+    foreach ($service in $Services) {
+        Write-Host "  Restarting: $service" -ForegroundColor Cyan
 
-    Write-Host "  ✓ $service restarted" -ForegroundColor Green
+        try {
+            # Rebuild and restart the service
+            docker-compose build $service
+            docker-compose up -d $service
+            Write-Host "  ✓ $service restarted" -ForegroundColor Green
+        }
+        catch {
+            Write-Host "  ✗ Failed to restart $service : $_" -ForegroundColor Red
+        }
+    }
+
+    Write-Host ""
+    Write-Host "=== Status ===" -ForegroundColor Yellow
+    docker-compose ps
+
+    Write-Host ""
+    Write-Host "=== UPDATE COMPLETE! ===" -ForegroundColor Green
+    Write-Host "  Restarted services: $($Services -join ', ')" -ForegroundColor Cyan
+    Write-Host ""
 }
-
-Write-Host ""
-Write-Host "=== Status ===" -ForegroundColor Yellow
-docker-compose ps
-
-Write-Host ""
-Write-Host "=== UPDATE COMPLETE! ===" -ForegroundColor Green
-Write-Host "  Restarted services: $($Services -join ', ')" -ForegroundColor Cyan
-Write-Host ""
+catch {
+    Write-Host ""
+    Write-Host "=== UPDATE ERROR ===" -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Red
+    Write-Host ""
+    exit 1
+}
