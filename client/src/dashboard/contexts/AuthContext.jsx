@@ -79,15 +79,21 @@ export const AuthProvider = ({ children }) => {
     const checkLoggedIn = async () => {
       const currentToken = localStorage.getItem("token");
 
-      if (currentToken) {
+      if (currentToken && typeof currentToken === 'string' && currentToken !== 'null' && currentToken !== 'undefined') {
         try {
 
           // Set token vào state trước khi verify
           setToken(currentToken);
 
-          // Decode JWT to get permissions
-          const decodedToken = jwtDecode(currentToken);
-          console.log("🔓 Decoded JWT token:", decodedToken);
+          // Decode JWT to get permissions - với validation và error handling
+          let decodedToken;
+          try {
+            decodedToken = jwtDecode(currentToken);
+            console.log("🔓 Decoded JWT token:", decodedToken);
+          } catch (decodeError) {
+            console.error("❌ JWT decode error:", decodeError);
+            throw new Error("Invalid token format");
+          }
 
           const res = await axios.get(`/api/auth/me`, {
             headers: {
@@ -144,9 +150,20 @@ export const AuthProvider = ({ children }) => {
       // Lưu token và user data
       const { token: newToken, user: userData } = res.data;
 
-      // Decode JWT to get permissions
-      const decodedToken = jwtDecode(newToken);
-      console.log("🔓 Login - Decoded JWT token:", decodedToken);
+      // Validate token before decoding
+      if (!newToken || typeof newToken !== 'string') {
+        throw new Error('Invalid token received from server');
+      }
+
+      // Decode JWT to get permissions - với error handling
+      let decodedToken;
+      try {
+        decodedToken = jwtDecode(newToken);
+        console.log("🔓 Login - Decoded JWT token:", decodedToken);
+      } catch (decodeError) {
+        console.error("❌ Login JWT decode error:", decodeError);
+        throw new Error('Invalid token format received from server');
+      }
 
       // Merge user data with permissions from JWT
       const userDataWithPermissions = {
