@@ -1815,3 +1815,5 @@
 {"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-11-01 13:37:28"}
 {"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-11-01 13:37:28"}
 {"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-11-01 13:37:28"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-11-01T08:11:39.588Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-11-01 15:11:39"}

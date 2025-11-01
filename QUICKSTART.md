@@ -51,6 +51,7 @@ Docker sẽ tự động:
 - ✅ Tạo tất cả databases (PostgreSQL, PostGIS, MongoDB, Redis)
 - ✅ Build tất cả services
 - ✅ Khởi động ứng dụng
+- ✅ Chạy database migrations và seed data
 
 ---
 
@@ -61,6 +62,10 @@ Truy cập:
 - **Website**: http://103.56.161.239:5173
 - **API**: http://103.56.161.239:3000
 - **API Docs**: http://103.56.161.239:3000/api-docs
+
+**Đăng nhập với:**
+- Username: `admin`
+- Password: `admin123`
 
 ---
 

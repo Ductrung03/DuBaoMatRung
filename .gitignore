@@ -65,3 +65,5 @@ specs
 # Docker
 .env
 *.env.local
+init
+docker-init

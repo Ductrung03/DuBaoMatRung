@@ -2812,3 +2812,4 @@
 >>>>>>> 008-refactor-perms-logs-scope
 {"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-01 13:37:28"}
 {"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-01 13:37:28"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-01 15:11:39"}
