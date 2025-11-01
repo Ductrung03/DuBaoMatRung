@@ -16,91 +16,86 @@ Write-Host "  QUICK UPDATE - Smart Restart" -ForegroundColor Cyan
 Write-Host "===================================================================" -ForegroundColor Cyan
 Write-Host ""
 
-Set-Location $PROJECT_PATH
-
-# Pull latest code
-Write-Host "=== Pulling latest code ===" -ForegroundColor Yellow
 try {
+    Set-Location $PROJECT_PATH
+
+    # Pull latest code
+    Write-Host "=== Pulling latest code ===" -ForegroundColor Yellow
     git fetch origin
     $gitStatus = git status -sb
     Write-Host "  $gitStatus" -ForegroundColor Cyan
 
     git pull origin main
-    Write-Host "  ✓ Code updated" -ForegroundColor Green
-} catch {
-    Write-Host "  ✗ Git pull failed: $_" -ForegroundColor Red
-    exit 1
-}
+    Write-Host "  Code updated" -ForegroundColor Green
 
-# Determine which services to restart
-if ($Services.Count -eq 0) {
-    Write-Host ""
-    Write-Host "=== Detecting changed files ===" -ForegroundColor Yellow
+    # Determine which services to restart
+    if ($Services.Count -eq 0) {
+        Write-Host ""
+        Write-Host "=== Detecting changed files ===" -ForegroundColor Yellow
 
-    # Get list of changed files
-    $changedFiles = git diff --name-only HEAD@{1} HEAD
+        # Get list of changed files
+        $changedFiles = git diff --name-only HEAD@{1} HEAD
 
-    $servicesToRestart = @()
+        $servicesToRestart = @()
 
-    foreach ($file in $changedFiles) {
-        Write-Host "  Changed: $file" -ForegroundColor Cyan
+        foreach ($file in $changedFiles) {
+            Write-Host "  Changed: $file" -ForegroundColor Cyan
 
-        if ($file -like "client/*") {
-            if ($servicesToRestart -notcontains "client") {
-                $servicesToRestart += "client"
+            if ($file -like "client/*") {
+                if ($servicesToRestart -notcontains "client") {
+                    $servicesToRestart += "client"
+                }
+            }
+            elseif ($file -like "microservices/gateway/*") {
+                if ($servicesToRestart -notcontains "gateway") {
+                    $servicesToRestart += "gateway"
+                }
+            }
+            elseif ($file -like "microservices/services/auth-service/*") {
+                if ($servicesToRestart -notcontains "auth-service") {
+                    $servicesToRestart += "auth-service"
+                }
+            }
+            elseif ($file -like "microservices/services/user-service/*") {
+                if ($servicesToRestart -notcontains "user-service") {
+                    $servicesToRestart += "user-service"
+                }
+            }
+            elseif ($file -like "microservices/services/gis-service/*") {
+                if ($servicesToRestart -notcontains "gis-service") {
+                    $servicesToRestart += "gis-service"
+                }
+            }
+            elseif ($file -like "microservices/services/report-service/*") {
+                if ($servicesToRestart -notcontains "report-service") {
+                    $servicesToRestart += "report-service"
+                }
+            }
+            elseif ($file -like "microservices/services/admin-service/*") {
+                if ($servicesToRestart -notcontains "admin-service") {
+                    $servicesToRestart += "admin-service"
+                }
+            }
+            elseif ($file -like "microservices/services/search-service/*") {
+                if ($servicesToRestart -notcontains "search-service") {
+                    $servicesToRestart += "search-service"
+                }
+            }
+            elseif ($file -like "docker-compose.yml" -or $file -like ".env*") {
+                Write-Host "  ! Infrastructure files changed - full restart recommended" -ForegroundColor Yellow
             }
         }
-        elseif ($file -like "microservices/gateway/*") {
-            if ($servicesToRestart -notcontains "gateway") {
-                $servicesToRestart += "gateway"
-            }
-        }
-        elseif ($file -like "microservices/services/auth-service/*") {
-            if ($servicesToRestart -notcontains "auth-service") {
-                $servicesToRestart += "auth-service"
-            }
-        }
-        elseif ($file -like "microservices/services/user-service/*") {
-            if ($servicesToRestart -notcontains "user-service") {
-                $servicesToRestart += "user-service"
-            }
-        }
-        elseif ($file -like "microservices/services/gis-service/*") {
-            if ($servicesToRestart -notcontains "gis-service") {
-                $servicesToRestart += "gis-service"
-            }
-        }
-        elseif ($file -like "microservices/services/report-service/*") {
-            if ($servicesToRestart -notcontains "report-service") {
-                $servicesToRestart += "report-service"
-            }
-        }
-        elseif ($file -like "microservices/services/admin-service/*") {
-            if ($servicesToRestart -notcontains "admin-service") {
-                $servicesToRestart += "admin-service"
-            }
-        }
-        elseif ($file -like "microservices/services/search-service/*") {
-            if ($servicesToRestart -notcontains "search-service") {
-                $servicesToRestart += "search-service"
-            }
-        }
-        elseif ($file -like "docker-compose.yml" -or $file -like ".env*") {
-            Write-Host "  ! Infrastructure files changed - full restart recommended" -ForegroundColor Yellow
-        }
+
+        $Services = $servicesToRestart
     }
 
-    $Services = $servicesToRestart
-}
+    if ($Services.Count -eq 0) {
+        Write-Host ""
+        Write-Host "  No services to restart (no code changes detected)" -ForegroundColor Green
+        Write-Host ""
+        exit 0
+    }
 
-if ($Services.Count -eq 0) {
-    Write-Host ""
-    Write-Host "  No services to restart (no code changes detected)" -ForegroundColor Green
-    Write-Host ""
-    exit 0
-}
-
-try {
     Write-Host ""
     Write-Host "=== Restarting services ===" -ForegroundColor Yellow
 
@@ -108,13 +103,12 @@ try {
         Write-Host "  Restarting: $service" -ForegroundColor Cyan
 
         try {
-            # Rebuild and restart the service
             docker-compose build $service
             docker-compose up -d $service
-            Write-Host "  ✓ $service restarted" -ForegroundColor Green
+            Write-Host "  $service restarted" -ForegroundColor Green
         }
         catch {
-            Write-Host "  ✗ Failed to restart $service : $_" -ForegroundColor Red
+            Write-Host "  Failed to restart $service" -ForegroundColor Red
         }
     }
 
