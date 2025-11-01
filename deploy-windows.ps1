@@ -15,7 +15,6 @@ $ErrorActionPreference = "Stop"
 # ===================================================================
 $PROJECT_NAME = "DuBaoMatRung"
 $DEPLOY_PATH = "C:\Projects\$PROJECT_NAME"
-$GIT_REPO = "https://github.com/luckyboiz/dubaomatrung.git"
 
 # Database config
 $DB_HOST = "localhost"
@@ -121,23 +120,21 @@ function Stop-Services {
     Write-Host "  All services stopped" -ForegroundColor Green
 }
 
-function Clone-Or-Pull {
+function Update-Code {
     Write-Host ""
-    Write-Host "=== Getting code from Git ===" -ForegroundColor Yellow
+    Write-Host "=== Updating code from Git ===" -ForegroundColor Yellow
 
-    if (Test-Path $DEPLOY_PATH) {
-        Write-Host "  Directory exists, updating code..." -ForegroundColor Cyan
-        Set-Location $DEPLOY_PATH
-        git fetch origin
-        git reset --hard origin/main
-        git pull origin main
-    } else {
-        Write-Host "  Cloning repository..." -ForegroundColor Cyan
-        New-Item -ItemType Directory -Path $DEPLOY_PATH -Force | Out-Null
-        Set-Location (Split-Path $DEPLOY_PATH -Parent)
-        git clone $GIT_REPO $PROJECT_NAME
-        Set-Location $DEPLOY_PATH
+    if (-not (Test-Path $DEPLOY_PATH)) {
+        Write-Host "  ERROR: Project directory not found: $DEPLOY_PATH" -ForegroundColor Red
+        Write-Host "  Please make sure you have cloned the repository to $DEPLOY_PATH" -ForegroundColor Yellow
+        exit 1
     }
+
+    Write-Host "  Updating code..." -ForegroundColor Cyan
+    Set-Location $DEPLOY_PATH
+    git fetch origin
+    git reset --hard origin/main
+    git pull origin main
 
     Write-Host "  Code updated successfully" -ForegroundColor Green
 }
@@ -311,7 +308,7 @@ try {
         Write-Host ""
         Write-Host "=== QUICK UPDATE MODE ===" -ForegroundColor Green
         Stop-Services
-        Clone-Or-Pull
+        Update-Code
         Install-Dependencies
         Build-Frontend
         Start-Services
@@ -323,7 +320,7 @@ try {
         }
 
         Stop-Services
-        Clone-Or-Pull
+        Update-Code
         Setup-Environment
         Install-Dependencies
         Build-Frontend
