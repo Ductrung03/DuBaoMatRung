@@ -102,8 +102,12 @@ function Stop-Services {
     Write-Host "=== Stopping services ===" -ForegroundColor Yellow
 
     if (Check-Command "pm2") {
-        pm2 stop all 2>$null
-        pm2 delete all 2>$null
+        try {
+            pm2 stop all 2>&1 | Out-Null
+            pm2 delete all 2>&1 | Out-Null
+        } catch {
+            Write-Host "  No PM2 processes running" -ForegroundColor Cyan
+        }
     }
 
     $ports = @($GATEWAY_PORT, $AUTH_PORT, $USER_PORT, $GIS_PORT, $REPORT_PORT, $ADMIN_PORT, $SEARCH_PORT, $MAPSERVER_PORT, $CLIENT_PORT)
@@ -210,14 +214,24 @@ function Setup-Database {
     Write-Host ""
     Write-Host "=== Setting up database ===" -ForegroundColor Yellow
 
-    $env:PGPASSWORD = $DB_PASSWORD
-    $dbExists = psql -h $DB_HOST -p $DB_PORT -U $DB_USER -lqt | Select-String -Pattern $DB_NAME
+    try {
+        $env:PGPASSWORD = $DB_PASSWORD
+        $dbExists = psql -h $DB_HOST -p $DB_PORT -U $DB_USER -lqt 2>&1 | Select-String -Pattern $DB_NAME
 
-    if (-not $dbExists) {
-        Write-Host "  Creating new database..." -ForegroundColor Cyan
-        psql -h $DB_HOST -p $DB_PORT -U $DB_USER -c "CREATE DATABASE $DB_NAME;"
-    } else {
-        Write-Host "  Database already exists" -ForegroundColor Cyan
+        if (-not $dbExists) {
+            Write-Host "  Creating new database..." -ForegroundColor Cyan
+            psql -h $DB_HOST -p $DB_PORT -U $DB_USER -c "CREATE DATABASE $DB_NAME;" 2>&1 | Out-Null
+            Write-Host "  Database created successfully" -ForegroundColor Green
+        } else {
+            Write-Host "  Database already exists" -ForegroundColor Cyan
+        }
+    } catch {
+        Write-Host "  WARNING: Could not connect to PostgreSQL" -ForegroundColor Yellow
+        Write-Host "  Please check:" -ForegroundColor Yellow
+        Write-Host "    - PostgreSQL is running" -ForegroundColor Yellow
+        Write-Host "    - DB_PASSWORD is correct in script (line 23)" -ForegroundColor Yellow
+        Write-Host "    - DB_USER '$DB_USER' exists" -ForegroundColor Yellow
+        Write-Host "  Skipping database setup..." -ForegroundColor Yellow
     }
 
     if (Test-Path "$DEPLOY_PATH\microservices\migrations") {
@@ -225,7 +239,7 @@ function Setup-Database {
         Set-Location "$DEPLOY_PATH\microservices"
     }
 
-    Write-Host "  Database ready" -ForegroundColor Green
+    Write-Host "  Database setup completed" -ForegroundColor Green
 }
 
 function Build-Frontend {
