@@ -1,0 +1,85 @@
+# ===================================================================
+# DOCKER COMPOSE - DEVELOPMENT MODE
+# Hot reload enabled - No rebuild needed
+# ===================================================================
+
+services:
+  # Override gateway with volume mount and nodemon
+  gateway:
+    volumes:
+      - ./microservices/gateway/src:/app/src
+      - ./microservices/gateway/.env:/app/.env
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  # Override auth-service
+  auth-service:
+    volumes:
+      - ./microservices/services/auth-service/src:/app/src
+      - ./microservices/services/auth-service/.env:/app/.env
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  # Override user-service
+  user-service:
+    volumes:
+      - ./microservices/services/user-service/src:/app/src
+      - ./microservices/services/user-service/.env:/app/.env
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  # Override gis-service
+  gis-service:
+    volumes:
+      - ./microservices/services/gis-service/src:/app/src
+      - ./microservices/services/gis-service/.env:/app/.env
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  # Override report-service
+  report-service:
+    volumes:
+      - ./microservices/services/report-service/src:/app/src
+      - ./microservices/services/report-service/.env:/app/.env
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  # Override admin-service
+  admin-service:
+    volumes:
+      - ./microservices/services/admin-service/src:/app/src
+      - ./microservices/services/admin-service/.env:/app/.env
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  # Override search-service
+  search-service:
+    volumes:
+      - ./microservices/services/search-service/src:/app/src
+      - ./microservices/services/search-service/.env:/app/.env
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  # Override client for development
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+      args:
+        - VITE_API_URL=http://103.56.161.239:3000
+    volumes:
+      - ./client/src:/app/src
+      - ./client/public:/app/public
+      - ./client/.env:/app/.env
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
