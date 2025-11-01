@@ -20,14 +20,30 @@ $DB_PASSWORD = "4"
 
 Save and close.
 
-## Step 2: Run Deployment
+## Step 2: Initialize Git (if needed)
+
+Check if your folder is a git repository:
+```powershell
+cd C:\DuBaoMatRung
+git status
+```
+
+If you see "fatal: not a git repository", initialize it:
+```powershell
+git init
+git remote add origin <your-repo-url>
+git fetch origin
+git checkout main
+```
+
+## Step 3: Run Deployment
 
 ```powershell
 cd C:\DuBaoMatRung
 .\deploy-windows.ps1 -FirstTime
 ```
 
-## Step 3: Update PM2 (if needed)
+## Step 4: Update PM2 (if needed)
 
 If you see PM2 update warning:
 ```powershell

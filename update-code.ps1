@@ -4,7 +4,7 @@
 # ===================================================================
 
 $ErrorActionPreference = "Stop"
-$PROJECT_PATH = "C:\Projects\DuBaoMatRung"
+$PROJECT_PATH = "C:\DuBaoMatRung"
 
 Write-Host ""
 Write-Host "===================================================================" -ForegroundColor Cyan

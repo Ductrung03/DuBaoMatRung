@@ -14,7 +14,7 @@ $ErrorActionPreference = "Stop"
 # CONFIGURATION
 # ===================================================================
 $PROJECT_NAME = "DuBaoMatRung"
-$DEPLOY_PATH = "C:\Projects\$PROJECT_NAME"
+$DEPLOY_PATH = "C:\$PROJECT_NAME"
 
 # Database config
 $DB_HOST = "localhost"
@@ -134,13 +134,18 @@ function Update-Code {
         exit 1
     }
 
-    Write-Host "  Updating code..." -ForegroundColor Cyan
     Set-Location $DEPLOY_PATH
-    git fetch origin
-    git reset --hard origin/main
-    git pull origin main
 
-    Write-Host "  Code updated successfully" -ForegroundColor Green
+    if (Test-Path "$DEPLOY_PATH\.git") {
+        Write-Host "  Updating code from Git..." -ForegroundColor Cyan
+        git fetch origin
+        git reset --hard origin/main
+        git pull origin main
+        Write-Host "  Code updated successfully" -ForegroundColor Green
+    } else {
+        Write-Host "  WARNING: Not a git repository - skipping git update" -ForegroundColor Yellow
+        Write-Host "  Code will not be updated from Git" -ForegroundColor Yellow
+    }
 }
 
 function Setup-Environment {
