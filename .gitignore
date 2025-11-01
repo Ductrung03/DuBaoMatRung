@@ -23,6 +23,7 @@ client/build
 .env
 .env.*
 !.env.example
+!.env.docker
 
 # Logs
 /logs
@@ -54,10 +55,13 @@ coverage/
 .nyc_output/
 .aider*
 
-#AI agent
+# AI agent
 .claude
 .gemini
 .qodo
 .specify
 specs
 
+# Docker
+.env
+*.env.local
