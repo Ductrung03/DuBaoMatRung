@@ -12,6 +12,9 @@ const createLogger = require('../../../shared/logger');
 const { errorHandler } = require('../../../shared/errors');
 const { createSwaggerConfig, setupSwagger } = require('../../../shared/swagger');
 
+// Import Kysely
+const { createKyselyGisDb } = require('./db/kysely');
+
 // Import routes
 const matRungRoutes = require('./routes/matrung.routes');
 const shapefileRoutes = require('./routes/shapefile.routes');
@@ -27,8 +30,8 @@ const PORT = process.env.PORT || 3003;
 const logger = createLogger('gis-service');
 
 // Managers
-let dbManager;       // Primary connection to gis_db
-let authDbManager;   // Secondary connection to auth_db for user queries
+let dbManager;       // Primary connection to gis_db (legacy, will be phased out)
+let kyselyDb;        // Kysely Query Builder for gis_db
 let redisManager;
 
 // ========== MIDDLEWARE ==========
@@ -118,16 +121,10 @@ const startServer = async () => {
 
     await dbManager.initialize();
 
-    // Initialize secondary database connection to auth_db for user queries
-    authDbManager = new DatabaseManager('gis-service-auth', {
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT || 5432,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: 'auth_db'  // Connect to auth_db for users table
-    });
-
-    await authDbManager.initialize();
+    // Initialize Kysely Query Builder
+    const gisDbUrl = `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME}`;
+    kyselyDb = createKyselyGisDb(gisDbUrl);
+    logger.info('Kysely Query Builder initialized for gis_db');
 
     // Initialize Redis
     redisManager = new RedisManager('gis-service', {
@@ -138,8 +135,8 @@ const startServer = async () => {
     await redisManager.initialize();
 
     // Make available to routes
-    app.locals.db = dbManager;           // gis_db connection
-    app.locals.authDb = authDbManager;   // auth_db connection
+    app.locals.db = dbManager;           // gis_db connection (legacy)
+    app.locals.kyselyDb = kyselyDb;      // Kysely Query Builder
     app.locals.redis = redisManager;
     app.locals.logger = logger;
 
@@ -147,7 +144,7 @@ const startServer = async () => {
     const server = app.listen(PORT, '0.0.0.0', () => {
       logger.info(`GIS Service running on port ${PORT}`);
       logger.info('PostGIS database (gis_db) connected');
-      logger.info('Auth database (auth_db) connected');
+      logger.info('Kysely Query Builder ready');
       logger.info('Redis cache connected');
     });
 
@@ -165,7 +162,6 @@ const startServer = async () => {
 const shutdown = async () => {
   logger.info('Shutting down GIS service...');
   await dbManager.close();
-  await authDbManager.close();
   await redisManager.close();
   process.exit(0);
 };

@@ -12,11 +12,14 @@ const { errorHandler } = require('../../../shared/errors');
 const { createSwaggerConfig, setupSwagger } = require('../../../shared/swagger');
 const adminRoutes = require('./routes/admin.routes');
 
+// Import Kysely
+const { createKyselyAdminDb } = require('./db/kysely');
+
 const app = express();
 const PORT = process.env.PORT || 3005;
 const logger = createLogger('admin-service');
 
-let dbManager, redisManager;
+let dbManager, kyselyDb, redisManager;
 
 app.use(helmet());
 app.use(cors());
@@ -54,13 +57,21 @@ const startServer = async () => {
     });
 
     await dbManager.initialize();
+
+    // Initialize Kysely Query Builder
+    const adminDbUrl = `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME}`;
+    kyselyDb = createKyselyAdminDb(adminDbUrl);
+    logger.info('Kysely Query Builder initialized for admin_db');
+
     await redisManager.initialize();
 
-    app.locals.db = dbManager;
+    app.locals.db = dbManager;           // Legacy connection
+    app.locals.kyselyDb = kyselyDb;      // Kysely Query Builder
     app.locals.redis = redisManager;
 
     const server = app.listen(PORT, '0.0.0.0', () => {
       logger.info(`Admin Service running on port ${PORT}`);
+      logger.info('Kysely Query Builder ready');
     });
 
     server.on('error', (error) => {

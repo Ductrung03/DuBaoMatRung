@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  title: Auth Service API
+  version: 1.0.0
+  description: Quản lý người dùng, vai trò, quyền và xác thực.
+paths:
+  /auth/login:
+    post:
+      summary: Đăng nhập người dùng
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username: { type: string }
+                password: { type: string }
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken: { type: string }
+
+  /users:
+    get:
+      summary: Lấy danh sách tất cả người dùng
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Một danh sách người dùng.
+    post:
+      summary: Tạo người dùng mới
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '201':
+          description: Người dùng đã được tạo.
+
+  /roles:
+    get:
+      summary: Lấy danh sách tất cả vai trò
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Một danh sách các vai trò.
+    post:
+      summary: Tạo vai trò mới
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                description: { type: string }
+      responses:
+        '201':
+          description: Vai trò đã được tạo.
+
+  /roles/{roleId}/permissions:
+    post:
+      summary: Gán một quyền cho vai trò
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: roleId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissionId: { type: integer }
+      responses:
+        '200':
+          description: Quyền đã được gán.
+
+components:
+  schemas:
+    UserInput:
+      type: object
+      properties:
+        username: { type: string }
+        password: { type: string }
+        full_name: { type: string }
+        role_ids: 
+          type: array
+          items:
+            type: integer
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

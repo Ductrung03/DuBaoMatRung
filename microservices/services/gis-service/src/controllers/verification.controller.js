@@ -2,6 +2,8 @@
 const createLogger = require('../../../../shared/logger');
 const { ValidationError, AuthorizationError } = require('../../../../shared/errors');
 const { formatResponse } = require('../../../../shared/utils');
+const { sendActivityLog } = require('../../../../shared/loggerClient');
+const authServiceClient = require('../services/authServiceClient');
 
 const logger = createLogger('verification-controller');
 
@@ -67,6 +69,20 @@ exports.verifyMatRung = async (req, res, next) => {
 
     logger.info('Mat rung verified successfully', { gid, userId });
 
+    // Send activity log to logging service
+    sendActivityLog({
+      service: 'gis-service',
+      action: 'UPDATE_VERIFICATION_STATUS',
+      userId: parseInt(userId),
+      ipAddress: req.ip || req.connection.remoteAddress,
+      details: {
+        gid,
+        status,
+        reason,
+        timestamp: new Date().toISOString()
+      }
+    });
+
     res.json(formatResponse(
       true,
       'Verification completed successfully',
@@ -93,7 +109,6 @@ exports.getVerificationHistory = async (req, res, next) => {
     }
 
     const db = req.app.locals.db;
-    const authDb = req.app.locals.authDb;
 
     logger.info('Getting verification history', { gid });
 
@@ -119,18 +134,13 @@ exports.getVerificationHistory = async (req, res, next) => {
 
     const matRungData = result.rows[0];
 
-    // If there's a verified_by user, fetch user info from auth_db
+    // If there's a verified_by user, fetch user info from auth-service
     if (matRungData.verified_by) {
-      const userQuery = `
-        SELECT id, full_name, username
-        FROM users
-        WHERE id = $1
-      `;
-      const userResult = await authDb.query(userQuery, [matRungData.verified_by]);
+      const userInfo = await authServiceClient.getSingleUserInfo(matRungData.verified_by);
 
-      if (userResult.rows.length > 0) {
-        matRungData.verified_by_name = userResult.rows[0].full_name;
-        matRungData.verified_by_username = userResult.rows[0].username;
+      if (userInfo) {
+        matRungData.verified_by_name = userInfo.fullName;
+        matRungData.verified_by_organization = userInfo.organization;
       }
     }
 
@@ -198,6 +208,20 @@ exports.batchVerify = async (req, res, next) => {
       verified: result.rows.length
     });
 
+    // Send activity log to logging service
+    sendActivityLog({
+      service: 'gis-service',
+      action: 'BATCH_VERIFICATION',
+      userId: parseInt(userId),
+      ipAddress: req.ip || req.connection.remoteAddress,
+      details: {
+        count: result.rows.length,
+        status,
+        gids: result.rows.map(r => r.gid),
+        timestamp: new Date().toISOString()
+      }
+    });
+
     res.json(formatResponse(
       true,
       `Batch verification completed: ${result.rows.length} records updated`,
@@ -235,7 +259,6 @@ exports.verifyMatRungById = async (req, res, next) => {
     }
 
     const db = req.app.locals.db;         // gis_db connection
-    const authDb = req.app.locals.authDb; // auth_db connection
     const redis = req.app.locals.redis;
 
     logger.info('Verifying mat rung by ID', { gid, verification_reason, userId });
@@ -259,13 +282,12 @@ exports.verifyMatRungById = async (req, res, next) => {
 
     const currentRecord = checkResult.rows[0];
 
-    // Get verified_by user info from auth_db if exists
+    // Get verified_by user info from auth-service if exists
     let verifiedByName = null;
     if (currentRecord.verified_by) {
-      const userQuery = 'SELECT full_name FROM users WHERE id = $1';
-      const userResult = await authDb.query(userQuery, [currentRecord.verified_by]);
-      if (userResult.rows.length > 0) {
-        verifiedByName = userResult.rows[0].full_name;
+      const userInfo = await authServiceClient.getSingleUserInfo(currentRecord.verified_by);
+      if (userInfo) {
+        verifiedByName = userInfo.fullName;
       }
     }
 
@@ -309,10 +331,8 @@ exports.verifyMatRungById = async (req, res, next) => {
 
     const updatedRecord = result.rows[0];
 
-    // Get verified user info from auth_db
-    const userQuery = 'SELECT id, full_name, username FROM users WHERE id = $1';
-    const userResult = await authDb.query(userQuery, [userId]);
-    const verifiedByUser = userResult.rows.length > 0 ? userResult.rows[0] : null;
+    // Get verified user info from auth-service
+    const verifiedByUser = await authServiceClient.getSingleUserInfo(userId);
 
     // Clear cache
     await redis.clearPattern('matrung:*');
@@ -324,6 +344,21 @@ exports.verifyMatRungById = async (req, res, next) => {
       area_changed: areaChanged
     });
 
+    // Send activity log to logging service
+    sendActivityLog({
+      service: 'gis-service',
+      action: 'VERIFY_MATRUNG_BY_ID',
+      userId: parseInt(userId),
+      ipAddress: req.ip || req.connection.remoteAddress,
+      details: {
+        gid: parseInt(gid),
+        verification_reason,
+        area_changed: areaChanged,
+        verified_area: finalVerifiedArea,
+        timestamp: new Date().toISOString()
+      }
+    });
+
     // Prepare detailed response
     const responseData = {
       gid: parseInt(gid),
@@ -333,7 +368,7 @@ exports.verifyMatRungById = async (req, res, next) => {
       verification_notes: updatedRecord.verification_notes,
       detection_date: updatedRecord.detection_date,
       verified_by: updatedRecord.verified_by,
-      verified_by_name: verifiedByUser ? verifiedByUser.full_name : userName
+      verified_by_name: verifiedByUser ? verifiedByUser.fullName : userName
     };
 
     const changes = {
@@ -341,7 +376,7 @@ exports.verifyMatRungById = async (req, res, next) => {
       new_verified_area: finalVerifiedArea,
       area_changed: areaChanged,
       verification_date_used: finalDetectionDate,
-      verified_by_user: verifiedByUser ? verifiedByUser.full_name : userName
+      verified_by_user: verifiedByUser ? verifiedByUser.fullName : userName
     };
 
     res.json(formatResponse(

@@ -1056,9 +1056,762 @@
 {"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-15 14:39:57"}
 {"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-15 14:39:57"}
 {"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-15 14:39:57"}
+<<<<<<< HEAD
 {"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-11-01T06:33:23.852Z"}
 {"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-11-01 13:33:23"}
 {"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-11-01 13:33:23"}
 {"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-11-01 13:33:23"}
 {"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-11-01 13:33:23"}
 {"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-11-01 13:33:23"}
+=======
+{"code":"ECONNREFUSED","level":"error","message":"","service":"admin-service","timestamp":"2025-10-16 14:18:17"}
+{"error":"","level":"error","message":"Failed to start admin service","service":"admin-service","timestamp":"2025-10-16 14:18:17"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"admin-service","timestamp":"2025-10-16 14:24:00"}
+{"error":"","level":"error","message":"Failed to start admin service","service":"admin-service","timestamp":"2025-10-16 14:24:00"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"admin-service","timestamp":"2025-10-16 14:24:15"}
+{"error":"","level":"error","message":"Failed to start admin service","service":"admin-service","timestamp":"2025-10-16 14:24:15"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-16T07:25:35.391Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-16 14:25:35"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-16 14:25:35"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-16 14:25:35"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-16 14:25:35"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-16 14:25:35"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-16T08:43:14.332Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-16 15:43:14"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-16 15:43:14"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-16 15:43:14"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-16 15:43:14"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-16 15:43:14"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-16T16:15:19.294Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-16 23:15:19"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-16 23:15:19"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-16 23:15:19"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-16 23:15:19"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-16 23:15:19"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-16 23:15:19"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-16 23:15:19"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-16T16:34:43.338Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-16 23:34:43"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T04:15:09.466Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 11:15:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 11:15:09"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 11:15:09"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 11:15:09"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 11:15:09"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 11:15:09"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 11:15:09"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T04:17:29.631Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 11:17:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 11:17:29"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 11:17:29"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 11:17:29"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 11:17:29"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 11:17:29"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 11:17:29"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T04:24:23.325Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 11:24:23"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 11:24:23"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 11:24:23"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 11:24:23"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 11:24:23"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 11:24:23"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 11:24:23"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T05:15:21.770Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 12:15:21"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T05:18:33.711Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 12:18:33"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 12:18:33"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 12:18:33"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 12:18:33"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 12:18:33"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 12:18:33"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 12:18:33"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T05:18:55.836Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 12:18:55"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 12:18:55"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 12:18:55"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 12:18:55"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 12:18:55"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 12:18:55"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 12:18:55"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T05:38:15.542Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 12:38:15"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 12:38:15"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 12:38:15"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 12:38:15"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 12:38:15"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 12:38:15"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 12:38:15"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T06:26:58.405Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 13:26:58"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 13:26:58"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 13:26:58"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 13:26:58"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 13:26:58"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 13:26:58"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 13:26:58"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T06:48:39.833Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 13:48:39"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 13:48:39"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 13:48:39"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 13:48:39"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 13:48:39"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T06:49:35.057Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 13:49:35"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 13:49:35"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 13:49:35"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 13:49:35"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 13:49:35"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T07:09:39.189Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 14:09:39"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 14:09:39"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 14:09:39"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 14:09:39"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 14:09:39"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 14:09:39"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 14:09:39"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T07:10:46.333Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 14:10:46"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 14:10:46"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 14:10:46"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 14:10:46"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T07:13:26.120Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 14:13:26"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T07:29:38.369Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 14:29:38"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 14:29:38"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 14:29:38"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 14:29:38"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T07:42:36.403Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 14:42:36"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 14:42:36"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 14:42:36"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 14:42:36"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 14:42:36"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T07:43:21.158Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 14:43:21"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T07:44:21.799Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 14:44:21"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T08:42:42.003Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 15:42:42"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T08:49:55.483Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 15:49:55"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T08:49:55.500Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 15:49:55"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T08:50:32.225Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 15:50:32"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T08:50:46.727Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 15:50:46"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T08:58:29.693Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 15:58:29"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T09:03:11.955Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 16:03:11"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 16:03:11"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 16:03:11"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 16:03:11"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 16:03:11"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 16:03:11"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 16:03:11"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T09:10:29.334Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 16:10:29"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T09:26:16.169Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 16:26:16"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T09:26:27.000Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 16:26:27"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T09:26:42.099Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 16:26:42"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T13:15:16.013Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 20:15:16"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T13:15:21.106Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 20:15:21"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 20:15:21"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 20:15:21"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 20:15:21"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005","port":3005,"service":"admin-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 20:15:21"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T13:15:46.855Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-22 20:15:46"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-22T14:53:30.324Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-22 21:53:30"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-24T04:44:47.411Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-24 11:44:47"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-24T04:45:08.031Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-24 11:45:08"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-24T04:48:00.959Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-24 11:48:00"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-24 11:48:00"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-24 11:48:00"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-24 11:48:00"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-24 11:48:00"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-24 11:48:00"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-24 11:48:00"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-24T04:48:15.079Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-24 11:48:15"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-24T08:01:36.107Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-24 15:01:36"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-24T08:03:05.622Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-24 15:03:05"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-24T08:18:32.684Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-24 15:18:32"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-24T08:26:37.976Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-24 15:26:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-24 15:26:37"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-24 15:26:37"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-24 15:26:37"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-24 15:26:37"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-24 15:26:37"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-24 15:26:37"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-24T08:31:39.250Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-24 15:31:39"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-24 15:31:39"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-24 15:31:39"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-24 15:31:39"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-24 15:31:39"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-24 15:31:39"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-24 15:31:39"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-24T15:16:41.587Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-24 22:16:41"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-24 22:16:41"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-24 22:16:41"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-24 22:16:41"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-24 22:16:41"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-24 22:16:41"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-24 22:16:41"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-24T15:16:59.275Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-24 22:16:59"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-24T15:21:29.541Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-24 22:21:29"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"admin-service","timestamp":"2025-10-28 17:16:40"}
+{"error":"","level":"error","message":"Failed to start admin service","service":"admin-service","timestamp":"2025-10-28 17:16:40"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T10:17:00.006Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 17:17:00"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 17:17:00"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 17:17:00"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 17:17:00"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 17:17:00"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 17:17:00"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 17:17:00"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T10:17:24.620Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 17:17:24"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 17:17:24"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 17:17:24"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 17:17:24"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 17:17:24"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 17:17:24"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 17:17:24"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T10:31:13.194Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 17:31:13"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 17:31:13"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 17:31:13"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 17:31:13"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 17:31:13"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 17:31:13"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 17:31:13"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T10:31:53.825Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 17:31:53"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 17:31:53"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 17:31:53"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 17:31:53"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 17:31:53"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 17:31:53"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 17:31:53"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T12:58:53.221Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 19:58:53"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 19:58:53"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 19:58:53"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 19:58:53"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 19:58:53"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 19:58:53"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 19:58:53"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T12:59:09.387Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 19:59:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 19:59:09"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 19:59:09"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 19:59:09"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 19:59:09"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 19:59:09"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 19:59:09"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T13:07:35.872Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 20:07:35"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:07:35"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 20:07:35"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 20:07:35"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 20:07:35"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:07:35"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 20:07:35"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T13:10:39.022Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 20:10:39"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:10:39"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 20:10:39"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 20:10:39"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 20:10:39"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:10:39"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 20:10:39"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T13:10:57.177Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 20:10:57"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:10:57"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 20:10:57"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 20:10:57"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 20:10:57"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:10:57"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 20:10:57"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T13:25:12.987Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 20:25:12"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:25:12"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 20:25:12"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 20:25:12"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 20:25:12"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:25:12"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 20:25:12"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T13:25:27.637Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 20:25:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:25:27"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 20:25:27"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 20:25:27"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 20:25:27"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:25:27"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 20:25:27"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T13:27:37.912Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 20:27:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:27:37"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 20:27:37"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 20:27:37"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 20:27:37"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:27:37"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 20:27:37"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T13:43:04.767Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 20:43:04"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:43:04"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 20:43:04"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 20:43:04"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 20:43:04"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 20:43:04"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 20:43:04"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T15:27:21.075Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 22:27:21"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 22:27:21"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 22:27:21"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 22:27:21"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 22:27:21"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 22:27:21"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 22:27:21"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T15:46:08.701Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 22:46:08"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 22:46:08"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 22:46:08"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 22:46:08"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 22:46:08"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 22:46:08"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 22:46:08"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T16:42:22.211Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 23:42:22"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-28 23:42:22"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-28 23:42:22"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-28 23:42:22"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-28 23:42:22"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-28 23:42:22"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-28 23:42:22"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-28T16:49:57.299Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-28 23:49:57"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T00:15:19.599Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 07:15:19"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 07:15:19"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 07:15:19"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 07:15:19"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 07:15:19"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 07:15:19"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 07:15:19"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T00:15:35.531Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 07:15:35"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 07:15:35"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 07:15:35"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 07:15:35"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 07:15:35"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 07:15:35"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 07:15:35"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T00:43:25.401Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 07:43:25"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 07:43:25"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 07:43:25"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 07:43:25"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 07:43:25"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 07:43:25"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 07:43:25"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T01:29:23.678Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 08:29:23"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 08:29:23"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 08:29:23"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 08:29:23"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 08:29:23"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 08:29:23"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 08:29:23"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T05:27:12.471Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 12:27:12"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 12:27:12"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 12:27:12"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 12:27:12"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 12:27:12"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 12:27:12"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 12:27:12"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T05:28:12.787Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 12:28:12"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 12:28:12"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 12:28:12"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 12:28:12"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 12:28:12"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 12:28:12"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 12:28:12"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T05:31:37.446Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 12:31:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 12:31:37"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 12:31:37"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 12:31:37"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 12:31:37"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 12:31:37"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 12:31:37"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T05:46:26.054Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 12:46:26"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 12:46:26"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 12:46:26"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 12:46:26"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 12:46:26"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 12:46:26"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 12:46:26"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T05:51:13.919Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 12:51:13"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 12:51:13"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 12:51:13"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 12:51:13"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 12:51:13"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 12:51:13"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 12:51:13"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T06:38:57.417Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 13:38:57"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T06:41:27.853Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 13:41:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 13:41:27"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 13:41:27"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 13:41:27"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 13:41:27"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 13:41:27"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 13:41:27"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T06:41:47.471Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 13:41:47"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 13:41:47"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 13:41:47"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 13:41:47"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 13:41:47"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 13:41:47"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 13:41:47"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T08:18:09.105Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 15:18:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 15:18:09"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 15:18:09"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 15:18:09"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 15:18:09"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 15:18:09"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 15:18:09"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T09:28:54.941Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 16:28:54"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 16:28:54"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 16:28:54"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 16:28:54"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 16:28:54"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 16:28:54"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 16:28:54"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T09:33:56.991Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 16:33:57"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 16:33:56"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 16:33:57"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 16:33:57"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 16:33:57"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 16:33:57"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 16:33:57"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T09:37:37.259Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 16:37:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 16:37:37"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 16:37:37"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 16:37:37"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 16:37:37"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 16:37:37"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 16:37:37"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T09:38:56.585Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 16:38:56"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 16:38:56"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 16:38:56"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 16:38:56"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 16:38:56"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 16:38:56"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 16:38:56"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T09:45:55.232Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 16:45:55"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 16:45:55"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 16:45:55"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 16:45:55"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 16:45:55"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 16:45:55"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 16:45:55"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T09:51:27.753Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 16:51:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-29 16:51:27"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-29 16:51:27"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-29 16:51:27"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-29 16:51:27"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-29 16:51:27"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-29 16:51:27"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-29T15:19:04.999Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-29 22:19:05"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"admin-service","timestamp":"2025-10-30 14:03:06"}
+{"error":"","level":"error","message":"Failed to start admin service","service":"admin-service","timestamp":"2025-10-30 14:03:06"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-30T07:03:22.980Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-30 14:03:22"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-30 14:03:22"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-30 14:03:22"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-30 14:03:22"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-30 14:03:22"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-30 14:03:22"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-30 14:03:22"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-30T07:03:47.994Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-30 14:03:47"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-30 14:03:47"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-30 14:03:48"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-30 14:03:48"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-30 14:03:48"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-30 14:03:48"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-30 14:03:48"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-30T07:22:28.933Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-30 14:22:28"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-30 14:22:28"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-30 14:22:28"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-30 14:22:28"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-30 14:22:28"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-30 14:22:28"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-30 14:22:28"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-30T07:37:19.917Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-30 14:37:19"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-30 14:37:19"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-30 14:37:19"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-30 14:37:19"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-30 14:37:19"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-30 14:37:19"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-30 14:37:19"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-30T07:52:51.166Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-30 14:52:51"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-30 14:52:51"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-30 14:52:51"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-30 14:52:51"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-30 14:52:51"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-30 14:52:51"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-30 14:52:51"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-30T07:59:06.662Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-30 14:59:06"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-30 14:59:06"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-30 14:59:06"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-30 14:59:06"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-30 14:59:06"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-30 14:59:06"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-30 14:59:06"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-30T08:12:04.397Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-30 15:12:04"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-30 15:12:04"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-30 15:12:04"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-30 15:12:04"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-30 15:12:04"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-30 15:12:04"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-30 15:12:04"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-30T08:12:22.649Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-30 15:12:22"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-30 15:12:22"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-30 15:12:22"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-30 15:12:22"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-30 15:12:22"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-30 15:12:22"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-30 15:12:22"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-30T08:32:07.056Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-30 15:32:07"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-30 15:32:07"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-30 15:32:07"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-30 15:32:07"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-30 15:32:07"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-30 15:32:07"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-30 15:32:07"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-31T00:39:09.559Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-31 07:39:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-31 07:39:09"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-31 07:39:09"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-31 07:39:09"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-31 07:39:09"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-31 07:39:09"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-31 07:39:09"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-31T02:23:58.190Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-31 09:23:58"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-31 09:23:58"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-31 09:23:58"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-31 09:23:58"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-31 09:23:58"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-31 09:23:58"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-31 09:23:58"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-31T02:24:44.859Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-31 09:24:44"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-31 09:24:44"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-31 09:24:44"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-31 09:24:44"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-31 09:24:44"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-31 09:24:44"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-31 09:24:44"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-31T02:37:39.474Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-31 09:37:39"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-31T03:05:47.255Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-31 10:05:47"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-31 10:05:47"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-31 10:05:47"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-31 10:05:47"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-31 10:05:47"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-31 10:05:47"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-31 10:05:47"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-31T03:06:03.580Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-31 10:06:03"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-31 10:06:03"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-31 10:06:03"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-31 10:06:03"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-31 10:06:03"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-31 10:06:03"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-31 10:06:03"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-10-31T16:32:01.981Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-10-31 23:32:01"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-10-31 23:32:01"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-10-31 23:32:01"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-10-31 23:32:01"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-10-31 23:32:02"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-10-31 23:32:01"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-10-31 23:32:02"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-11-01T06:34:11.725Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-11-01 13:34:11"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-11-01 13:34:11"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-11-01 13:34:11"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-11-01 13:34:11"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-11-01 13:34:11"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-11-01 13:34:11"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-11-01 13:34:11"}
+>>>>>>> 008-refactor-perms-logs-scope
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-11-01T06:37:28.612Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-11-01 13:37:28"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-11-01 13:37:28"}
+{"level":"info","message":"Redis client connected","service":"admin-service","timestamp":"2025-11-01 13:37:28"}
+{"level":"info","message":"Redis client ready","service":"admin-service","timestamp":"2025-11-01 13:37:28"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-11-01 13:37:28"}
+{"level":"info","message":"Redis manager initialized successfully","service":"admin-service","timestamp":"2025-11-01 13:37:28"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-11-01 13:37:28"}

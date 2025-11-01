@@ -174,15 +174,9 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   React.useEffect(() => {
     // eslint-disable-next-line no-undef
     if (process.env.NODE_ENV === "development" && data && data.length > 0) {
-      console.log("🔍 Table data loaded:", data.length, "records");
       
       // ✅ FIX: Debug user info trong data
       const sampleRow = data[0];
-      console.log("📋 Sample row user info:", {
-        verified_by: sampleRow.verified_by,
-        verified_by_name: sampleRow.verified_by_name,
-        verified_by_username: sampleRow.verified_by_username
-      });
       
       // ✅ FIX: Check for target feature (is_target property or first feature)
       const possibleTarget = data.find(row => row.is_target === true) || data[0];
@@ -190,7 +184,6 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
         const targetGidValue = getActualValue(possibleTarget, "loCB");
         if (targetGidValue) {
           setTargetGid(targetGidValue);
-          console.log("🎯 Target GID detected:", targetGidValue);
         }
       }
     }
@@ -349,7 +342,6 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
 
       if (feature && feature.properties && feature.properties.gid) {
         const targetGid = feature.properties.gid;
-        console.log("🎯 Highlighting table row for CB-" + targetGid);
 
         // Find index of row in data
         const rowIndex = data.findIndex((row) => {
@@ -358,7 +350,6 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
         });
 
         if (rowIndex !== -1) {
-          console.log(`✅ Found row at index ${rowIndex} for CB-${targetGid}`);
           
           setHighlightedRow(rowIndex);
           setSelectedRow(rowIndex);
@@ -375,10 +366,9 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
 
               if (rowRect.top < containerRect.top || rowRect.bottom > containerRect.bottom) {
                 highlightedRowElement.scrollIntoView({
-                  behavior: "smooth",
-                  block: "center",
+                  behavior: 'smooth',
+                  block: 'nearest'
                 });
-                console.log("📜 Scrolled to highlighted row");
               }
             }
           }, 100);
@@ -388,15 +378,12 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
             setHighlightedRow(null);
           }, 10000);
 
-          console.log("✅ Table row highlighted for CB-" + targetGid);
 
           // Call onRowClick if available
           if (onRowClick) {
             onRowClick(data[rowIndex]);
           }
         } else {
-          console.warn(`⚠️ Row not found in table for CB-${targetGid}`);
-          console.log("Available GIDs:", data.map(row => getActualValue(row, "loCB")));
         }
       }
     };

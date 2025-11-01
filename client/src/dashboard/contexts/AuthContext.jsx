@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { jwtDecode } from "jwt-decode";
 import config from "../../config";
 
 // Tạo context
@@ -18,7 +19,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  console.log("🔍 API URL từ config:", config.API_URL);
 
   // ✅ FIXED: Setup axios interceptor để handle token và 401 tự động
   useEffect(() => {
@@ -29,10 +29,6 @@ export const AuthProvider = ({ children }) => {
         if (currentToken) {
           config.headers.Authorization = `Bearer ${currentToken}`;
         }
-        console.log(`📤 Request: ${config.method?.toUpperCase()} ${config.url}`, {
-          hasToken: !!currentToken,
-          tokenPreview: currentToken ? currentToken.substring(0, 20) + '...' : 'none'
-        });
         return config;
       },
       (error) => {
@@ -44,7 +40,6 @@ export const AuthProvider = ({ children }) => {
     // Response interceptor để handle 401 và các lỗi khác
     const responseInterceptor = axios.interceptors.response.use(
       (response) => {
-        console.log(`✅ Response: ${response.config.method?.toUpperCase()} ${response.config.url} - ${response.status}`);
         return response;
       },
       (error) => {
@@ -55,7 +50,6 @@ export const AuthProvider = ({ children }) => {
         });
 
         if (error.response?.status === 401) {
-          console.log("🚨 401 Unauthorized - Clearing auth data and redirecting to login");
           
           // Clear all auth data
           setToken(null);
@@ -84,44 +78,50 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkLoggedIn = async () => {
       const currentToken = localStorage.getItem("token");
-      
+
       if (currentToken) {
         try {
-          console.log("🔍 Verifying existing token...");
-          
+
           // Set token vào state trước khi verify
           setToken(currentToken);
-          
+
+          // Decode JWT to get permissions
+          const decodedToken = jwtDecode(currentToken);
+          console.log("🔓 Decoded JWT token:", decodedToken);
+
           const res = await axios.get(`/api/auth/me`, {
             headers: {
               Authorization: `Bearer ${currentToken}`
             }
           });
-          
-          console.log("✅ Token valid, user data:", res.data.user);
-          setUser(res.data.user);
-          
+
+          // Merge user data with permissions from JWT
+          const userData = {
+            ...res.data.user,
+            permissions: decodedToken.permissions || []
+          };
+
+          setUser(userData);
+
           // Lưu user data vào localStorage
-          localStorage.setItem("user", JSON.stringify(res.data.user));
-          
+          localStorage.setItem("user", JSON.stringify(userData));
+
         } catch (err) {
           console.error("❌ Token verification failed:", err);
-          
+
           // Clear invalid token
           setToken(null);
           setUser(null);
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          
+
           // Only show error if it's not a network issue
           if (err.response?.status === 401) {
-            console.log("🔄 Token invalid, will redirect to login");
           } else {
             console.error("🌐 Network or server error during token verification");
           }
         }
       } else {
-        console.log("📝 No token found in localStorage");
       }
       setLoading(false);
     };
@@ -133,26 +133,34 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       setLoading(true);
-      
-      console.log(`🔄 Attempting login for: ${username}`);
-      
+
+
       const res = await axios.post(`/api/auth/login`, {
         username,
         password,
       });
 
-      console.log("✅ Login successful:", res.data);
-      
+
       // Lưu token và user data
       const { token: newToken, user: userData } = res.data;
-      
+
+      // Decode JWT to get permissions
+      const decodedToken = jwtDecode(newToken);
+      console.log("🔓 Login - Decoded JWT token:", decodedToken);
+
+      // Merge user data with permissions from JWT
+      const userDataWithPermissions = {
+        ...userData,
+        permissions: decodedToken.permissions || []
+      };
+
       setToken(newToken);
-      setUser(userData);
-      
+      setUser(userDataWithPermissions);
+
       // Lưu vào localStorage
       localStorage.setItem("token", newToken);
-      localStorage.setItem("user", JSON.stringify(userData));
-      
+      localStorage.setItem("user", JSON.stringify(userDataWithPermissions));
+
       toast.success("Đăng nhập thành công!");
       navigate("/dashboard");
       return true;
@@ -181,14 +189,12 @@ export const AuthProvider = ({ children }) => {
   // ✅ FIXED: Đăng xuất with cleanup
   const logout = async () => {
     try {
-      console.log("👋 Logging out user...");
       
       // Call logout API if token exists
       if (token) {
         try {
           await axios.post(`/api/auth/logout`);
         } catch (err) {
-          console.warn("⚠️ Logout API call failed (may be token invalid):", err);
         }
       }
       
@@ -206,9 +212,35 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Kiểm tra vai trò - CHỈ KIỂM TRA ROLE, KHÔNG CẦN PERMISSION_LEVEL
+  // Kiểm tra vai trò - với Prisma RBAC
   const isAdmin = () => {
-    return user && user.role === "admin";
+    if (!user) return false;
+
+    // Kiểm tra role admin từ userRoles - FIXED: check cho cả super_admin và admin
+    if (user.userRoles && user.userRoles.some(userRole =>
+      userRole.role.name === "super_admin" || userRole.role.name === "admin"
+    )) {
+      return true;
+    }
+
+    // Fallback: kiểm tra permission_level
+    return user.permission_level === 'admin' || user.role === 'admin';
+  };
+
+  // Kiểm tra permission cụ thể
+  const hasPermission = (action, subject) => {
+    if (!user || !user.userRoles) return false;
+
+    // Admin có tất cả quyền
+    if (isAdmin()) return true;
+
+    // Kiểm tra permission trong các roles
+    return user.userRoles.some(userRole =>
+      userRole.role.rolePermissions && userRole.role.rolePermissions.some(rp =>
+        (rp.permission.action === action && rp.permission.subject === subject) ||
+        (rp.permission.action === 'manage' && rp.permission.subject === 'all')
+      )
+    );
   };
   
   // Lấy mã huyện của người dùng (TCVN3)
@@ -231,6 +263,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         isAdmin,
+        hasPermission,
         getUserDistrictId,
         canAccessDistrict
       }}

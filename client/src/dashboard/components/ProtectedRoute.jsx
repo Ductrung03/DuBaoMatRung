@@ -1,11 +1,16 @@
-// client/src/dashboard/components/ProtectedRoute.jsx - IMPROVED ERROR HANDLING
+// client/src/dashboard/components/ProtectedRoute.jsx - WITH RBAC SUPPORT
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ClipLoader } from 'react-spinners';
+import { toast } from 'react-toastify';
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const { user, loading, isAdmin } = useAuth();
+const ProtectedRoute = ({
+  children,
+  adminOnly = false,
+  requiredPermission = null // { action: 'read', subject: 'users' }
+}) => {
+  const { user, loading, isAdmin, hasPermission } = useAuth();
   const location = useLocation();
 
   // Show loading spinner while checking authentication
@@ -24,17 +29,21 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 
   // Redirect to login if not authenticated
   if (!user) {
-    console.log("🔒 No user found, redirecting to login");
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // Check admin permission if required
   if (adminOnly && !isAdmin()) {
-    console.log("🚫 User is not admin, redirecting to dashboard");
+    toast.error("Bạn không có quyền truy cập trang này. Yêu cầu quyền Admin.");
     return <Navigate to="/dashboard" replace />;
   }
 
-  console.log("✅ User authenticated, rendering protected content");
+  // Check specific permission if required
+  if (requiredPermission && !hasPermission(requiredPermission.action, requiredPermission.subject)) {
+    toast.error(`Bạn không có quyền ${requiredPermission.action} ${requiredPermission.subject}`);
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return children;
 };
 

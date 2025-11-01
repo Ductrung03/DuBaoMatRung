@@ -8,7 +8,6 @@ const MapUpdater = ({ selectedFeature }) => {
   useEffect(() => {
     if (selectedFeature && selectedFeature.geometry) {
       try {
-        console.log("MapUpdater: Đang cố gắng zoom đến feature");
         
         // Tạo layer mới từ geometry của feature đã chọn
         const geojsonFeature = {
@@ -22,18 +21,15 @@ const MapUpdater = ({ selectedFeature }) => {
         const bounds = tempLayer.getBounds();
 
         if (bounds.isValid()) {
-          console.log("MapUpdater: Bounds hợp lệ, thực hiện flyToBounds:", bounds);
 
           // Sử dụng setTimeout để đảm bảo map đã render xong
           setTimeout(() => {
             map.flyToBounds(bounds, {
               padding: [50, 50],
-              duration: 1.0,
-              animate: true,
+              duration: 1.5
             });
           }, 200);
         } else {
-          console.warn("MapUpdater: Bounds không hợp lệ, thử phương án khác");
 
           // Phương án dự phòng - zoom đến tọa độ trung tâm
           try {
@@ -41,11 +37,9 @@ const MapUpdater = ({ selectedFeature }) => {
             if (selectedFeature.geometry.type === "MultiPolygon") {
               centerCoords = selectedFeature.geometry.coordinates[0][0][0];
               map.setView([centerCoords[1], centerCoords[0]], 16);
-              console.log("MapUpdater: Đã zoom đến tọa độ MultiPolygon:", centerCoords);
             } else if (selectedFeature.geometry.type === "Polygon") {
               centerCoords = selectedFeature.geometry.coordinates[0][0];
               map.setView([centerCoords[1], centerCoords[0]], 16);
-              console.log("MapUpdater: Đã zoom đến tọa độ Polygon:", centerCoords);
             }
           } catch (innerErr) {
             console.error("MapUpdater: Lỗi khi dùng phương án dự phòng:", innerErr);

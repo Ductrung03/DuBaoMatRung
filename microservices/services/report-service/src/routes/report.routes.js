@@ -93,6 +93,104 @@ router.post('/docx', asyncHandler(reportController.generateDOCX));
 
 /**
  * @swagger
+ * /api/bao-cao/export-docx:
+ *   get:
+ *     summary: Export DOCX report
+ *     description: Generate and download a DOCX report for forest loss data
+ *     tags: [Reports]
+ *     parameters:
+ *       - in: query
+ *         name: fromDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for report
+ *       - in: query
+ *         name: toDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for report
+ *       - in: query
+ *         name: huyen
+ *         schema:
+ *           type: string
+ *         description: District name
+ *       - in: query
+ *         name: xa
+ *         schema:
+ *           type: string
+ *         description: Commune name
+ *       - in: query
+ *         name: xacMinh
+ *         schema:
+ *           type: string
+ *           enum: [true, false]
+ *         description: Whether to include verified data only
+ *     responses:
+ *       200:
+ *         description: DOCX report generated successfully
+ *         content:
+ *           application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       400:
+ *         description: Invalid request parameters
+ */
+router.get('/export-docx', asyncHandler(reportController.exportDOCX));
+
+/**
+ * @swagger
+ * /api/bao-cao/export-pdf:
+ *   get:
+ *     summary: Export PDF report
+ *     description: Generate and display a PDF report for forest loss data
+ *     tags: [Reports]
+ *     parameters:
+ *       - in: query
+ *         name: fromDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for report
+ *       - in: query
+ *         name: toDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for report
+ *       - in: query
+ *         name: huyen
+ *         schema:
+ *           type: string
+ *         description: District name
+ *       - in: query
+ *         name: xa
+ *         schema:
+ *           type: string
+ *         description: Commune name
+ *       - in: query
+ *         name: xacMinh
+ *         schema:
+ *           type: string
+ *           enum: [true, false]
+ *         description: Whether to include verified data only
+ *     responses:
+ *       200:
+ *         description: PDF report generated successfully
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       400:
+ *         description: Invalid request parameters
+ */
+router.get('/export-pdf', asyncHandler(reportController.exportPDF));
+
+/**
+ * @swagger
  * /api/reports/stats:
  *   get:
  *     summary: Get report statistics

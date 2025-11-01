@@ -97,7 +97,6 @@ const ImportShapefile = () => {
         });
       }, 800);
 
-      console.log("🔄 Gửi request import với URL:", zipUrl);
 
       const response = await axios.post(
         `/api/import-gee-url`,
@@ -108,7 +107,6 @@ const ImportShapefile = () => {
             // Hiển thị progress khi upload
             if (progressEvent.total) {
               const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-              console.log(`Upload progress: ${percentCompleted}%`);
             }
           }
         }
@@ -119,7 +117,6 @@ const ImportShapefile = () => {
       setLoadingMessage("Hoàn thành!");
 
       const data = response.data;
-      console.log("✅ Nhận được response:", data);
 
       // Xử lý các trường hợp response khác nhau
       if (data.success === false) {
@@ -146,7 +143,6 @@ const ImportShapefile = () => {
       toast.success(successMessage);
 
       if (data.geojson) {
-        console.log("📊 Cập nhật dữ liệu GeoJSON vào context");
         setGeoData(data.geojson);
         navigate("/dashboard/quanlydulieu");
       }

@@ -29,10 +29,7 @@ const MapLayers = ({
     // Bind popup
     if (feature.properties) {
       const popupContent = buildPopupContent(feature, layerType);
-      layer.bindPopup(popupContent, {
-        maxWidth: 300,
-        className: "custom-popup-container",
-      });
+      layer.bindPopup(popupContent, { maxWidth: 300, className: 'custom-popup' });
     }
 
     // Mouse events
@@ -57,10 +54,7 @@ const MapLayers = ({
     // Bind popup cho dữ liệu mất rừng
     if (feature.properties) {
       const popupContent = buildMatRungPopup(feature);
-      layer.bindPopup(popupContent, {
-        maxWidth: 300,
-        className: "custom-popup-container",
-      });
+      layer.bindPopup(popupContent, { maxWidth: 300, className: 'custom-popup' });
     }
 
     // Mouse events
@@ -85,20 +79,12 @@ const MapLayers = ({
     // Bind popup cho dự báo mất rừng
     if (feature.properties) {
       const popupContent = buildDeforestationAlertsPopup(feature);
-      layer.bindPopup(popupContent, {
-        maxWidth: 300,
-        className: "custom-popup-container",
-      });
+      layer.bindPopup(popupContent, { maxWidth: 300, className: 'custom-popup' });
     }
 
     // Mouse events với style đặc biệt
     layer.on("mouseover", function () {
-      this.setStyle({
-        weight: 4,
-        color: "#ff7800",
-        dashArray: "",
-        fillOpacity: 0.9,
-      });
+      this.setStyle({});
       this.bringToFront();
     });
 
@@ -189,20 +175,12 @@ const MapLayers = ({
             // Popup cho fallback data
             if (feature.properties) {
               const popupContent = buildPopupContent(feature, "deforestation");
-              layer.bindPopup(popupContent, {
-                maxWidth: 300,
-                className: "custom-popup-container",
-              });
+              layer.bindPopup(popupContent, { maxWidth: 300, className: 'custom-popup' });
             }
 
             // Mouse events
             layer.on("mouseover", function () {
-              this.setStyle({
-                weight: 3,
-                color: "#ff7800",
-                dashArray: "",
-                fillOpacity: 0.7,
-              });
+              this.setStyle({});
               this.bringToFront();
             });
 
@@ -218,11 +196,7 @@ const MapLayers = ({
             layer.on("click", () => {
               if (geoJsonLayerRef?.current) {
                 geoJsonLayerRef.current.eachLayer((l) => {
-                  l.setStyle({
-                    weight: l === layer ? 3 : 1,
-                    color: l === layer ? "#ff7800" : "#3388ff",
-                    fillOpacity: l === layer ? 0.7 : 0.2,
-                  });
+                  l.setStyle({});
 
                   if (l === layer) {
                     l.bringToFront();

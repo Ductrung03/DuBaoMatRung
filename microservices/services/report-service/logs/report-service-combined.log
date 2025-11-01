@@ -515,6 +515,349 @@
 {"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-15T07:39:58.045Z"}
 {"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-15 14:39:58"}
 {"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-15 14:39:58"}
+<<<<<<< HEAD
 {"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-11-01T06:33:23.942Z"}
 {"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-11-01 13:33:23"}
 {"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-11-01 13:33:23"}
+=======
+{"code":"ECONNREFUSED","level":"error","message":"","service":"report-service","timestamp":"2025-10-16 14:18:17"}
+{"date":"Thu Oct 16 2025 14:18:17 GMT+0700 (Indochina Time)","error":{"code":"ECONNREFUSED"},"level":"error","message":"unhandledRejection: (no error message)\nAggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js:49:3)","os":{"loadavg":[1.76,1.6,1.38],"uptime":2427.34},"process":{"argv":["/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js"],"cwd":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service","execPath":"/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","gid":1000,"memoryUsage":{"arrayBuffers":477768,"external":3825403,"heapTotal":43749376,"heapUsed":27353432,"rss":97533952},"pid":54058,"uid":1000,"version":"v20.19.5"},"rejection":true,"service":"report-service","stack":"AggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js:49:3)","timestamp":"2025-10-16 14:18:17","trace":[{"column":11,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js","function":null,"line":45,"method":null,"native":false},{"column":5,"file":"node:internal/process/task_queues","function":"process.processTicksAndRejections","line":95,"method":"processTicksAndRejections","native":false},{"column":22,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.testConnection","line":61,"method":"testConnection","native":false},{"column":5,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.initialize","line":53,"method":"initialize","native":false},{"column":3,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js","function":"async startServer","line":49,"method":null,"native":false}]}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"report-service","timestamp":"2025-10-16 14:24:01"}
+{"date":"Thu Oct 16 2025 14:24:01 GMT+0700 (Indochina Time)","error":{"code":"ECONNREFUSED"},"level":"error","message":"unhandledRejection: (no error message)\nAggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js:49:3)","os":{"loadavg":[2.41,1.63,1.43],"uptime":2771.06},"process":{"argv":["/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js"],"cwd":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service","execPath":"/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","gid":1000,"memoryUsage":{"arrayBuffers":477768,"external":3825403,"heapTotal":43487232,"heapUsed":27465664,"rss":98955264},"pid":60503,"uid":1000,"version":"v20.19.5"},"rejection":true,"service":"report-service","stack":"AggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js:49:3)","timestamp":"2025-10-16 14:24:01","trace":[{"column":11,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js","function":null,"line":45,"method":null,"native":false},{"column":5,"file":"node:internal/process/task_queues","function":"process.processTicksAndRejections","line":95,"method":"processTicksAndRejections","native":false},{"column":22,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.testConnection","line":61,"method":"testConnection","native":false},{"column":5,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.initialize","line":53,"method":"initialize","native":false},{"column":3,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js","function":"async startServer","line":49,"method":null,"native":false}]}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"report-service","timestamp":"2025-10-16 14:24:15"}
+{"date":"Thu Oct 16 2025 14:24:15 GMT+0700 (Indochina Time)","error":{"code":"ECONNREFUSED"},"level":"error","message":"unhandledRejection: (no error message)\nAggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js:49:3)","os":{"loadavg":[2.19,1.6,1.42],"uptime":2785.27},"process":{"argv":["/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js"],"cwd":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service","execPath":"/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","gid":1000,"memoryUsage":{"arrayBuffers":477769,"external":3825404,"heapTotal":41914368,"heapUsed":29521120,"rss":96231424},"pid":61419,"uid":1000,"version":"v20.19.5"},"rejection":true,"service":"report-service","stack":"AggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js:49:3)","timestamp":"2025-10-16 14:24:15","trace":[{"column":11,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js","function":null,"line":45,"method":null,"native":false},{"column":5,"file":"node:internal/process/task_queues","function":"process.processTicksAndRejections","line":95,"method":"processTicksAndRejections","native":false},{"column":22,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.testConnection","line":61,"method":"testConnection","native":false},{"column":5,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.initialize","line":53,"method":"initialize","native":false},{"column":3,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js","function":"async startServer","line":49,"method":null,"native":false}]}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-16T07:25:35.464Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-16 14:25:35"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-16 14:25:35"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-16T08:43:14.412Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-16 15:43:14"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-16 15:43:14"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-16T16:12:19.002Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-16 23:12:19"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-16 23:12:19"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-16T16:15:19.309Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-16 23:15:19"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-16 23:15:19"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-16T16:34:43.383Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-16 23:34:43"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T04:15:09.446Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 11:15:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 11:15:09"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T04:17:29.655Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 11:17:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 11:17:29"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T05:15:21.850Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 12:15:21"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T05:18:33.666Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 12:18:33"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 12:18:33"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T05:18:55.855Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 12:18:55"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 12:18:55"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T05:38:15.548Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 12:38:15"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 12:38:15"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T06:26:58.422Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 13:26:58"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 13:26:58"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T06:48:39.849Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3004","port":3004,"service":"report-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3004\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 13:48:39"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T06:49:35.074Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3004","port":3004,"service":"report-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3004\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 13:49:35"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T07:09:37.110Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 14:09:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 14:09:37"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T07:10:46.311Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3004","port":3004,"service":"report-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3004\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 14:10:46"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T07:13:26.124Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 14:13:26"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T07:29:38.422Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3004","port":3004,"service":"report-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3004\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 14:29:38"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T07:42:36.424Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3004","port":3004,"service":"report-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3004\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 14:42:36"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T07:43:21.122Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 14:43:21"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T07:44:21.848Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 14:44:21"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T08:42:42.033Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 15:42:42"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 15:42:42"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T08:46:52.299Z"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T08:46:52.298Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 15:46:52"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 15:46:52"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3004","port":3004,"service":"report-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3004\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 15:46:52"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T08:47:43.627Z"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T08:47:43.628Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 15:47:43"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 15:47:43"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3004","port":3004,"service":"report-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3004\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 15:47:43"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T08:49:55.512Z"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T08:49:55.513Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3004","port":3004,"service":"report-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3004\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 15:49:55"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 15:49:55"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T08:50:32.277Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 15:50:32"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 15:50:32"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T08:50:46.697Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 15:50:46"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T08:58:29.662Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 15:58:29"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T09:03:11.968Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 16:03:11"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 16:03:11"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T09:10:29.307Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 16:10:29"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T09:26:16.186Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 16:26:16"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T09:26:27.022Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 16:26:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 16:26:27"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T09:26:42.056Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 16:26:42"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 16:26:42"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T13:15:16.020Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 20:15:16"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 20:15:16"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T13:15:21.086Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3004","port":3004,"service":"report-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3004\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 20:15:21"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T13:15:46.882Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 20:15:46"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T14:14:49.596Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 21:14:49"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 21:14:49"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T14:15:09.816Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 21:15:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 21:15:09"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T14:15:17.272Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 21:15:17"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 21:15:17"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T14:15:28.287Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 21:15:28"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-22 21:15:28"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-22T14:53:30.349Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-22 21:53:30"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-24T04:44:47.392Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-24 11:44:47"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-24T04:45:07.995Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-24 11:45:08"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-24 11:45:07"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-24T04:48:00.985Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-24 11:48:00"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-24 11:48:00"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-24T04:48:15.090Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-24 11:48:15"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-24 11:48:15"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-24T08:01:36.068Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-24 15:01:36"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-24 15:01:36"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-24T08:03:05.633Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-24 15:03:05"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-24T08:18:32.700Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-24 15:18:32"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-24T08:26:37.964Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-24 15:26:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-24 15:26:37"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-24T08:31:39.225Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-24 15:31:39"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-24 15:31:39"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-24T15:16:41.611Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-24 22:16:41"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-24 22:16:41"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-24T15:16:59.299Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-24 22:16:59"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-24T15:21:29.544Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-24 22:21:29"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"report-service","timestamp":"2025-10-28 17:16:40"}
+{"date":"Tue Oct 28 2025 17:16:40 GMT+0700 (Indochina Time)","error":{"code":"ECONNREFUSED"},"level":"error","message":"unhandledRejection: (no error message)\nAggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js:49:3)","os":{"loadavg":[2.29,1.62,1.38],"uptime":14010.64},"process":{"argv":["/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js"],"cwd":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service","execPath":"/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","gid":1000,"memoryUsage":{"arrayBuffers":477768,"external":3825403,"heapTotal":61259776,"heapUsed":27766944,"rss":98897920},"pid":91439,"uid":1000,"version":"v20.19.5"},"rejection":true,"service":"report-service","stack":"AggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js:49:3)","timestamp":"2025-10-28 17:16:40","trace":[{"column":11,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js","function":null,"line":45,"method":null,"native":false},{"column":5,"file":"node:internal/process/task_queues","function":"process.processTicksAndRejections","line":95,"method":"processTicksAndRejections","native":false},{"column":22,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.testConnection","line":61,"method":"testConnection","native":false},{"column":5,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.initialize","line":53,"method":"initialize","native":false},{"column":3,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js","function":"async startServer","line":49,"method":null,"native":false}]}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T10:17:00.029Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 17:17:00"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 17:17:00"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T10:17:24.647Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 17:17:24"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 17:17:24"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T10:31:13.201Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 17:31:13"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 17:31:13"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T10:31:53.825Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 17:31:53"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 17:31:53"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T12:58:53.229Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 19:58:53"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 19:58:53"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T12:59:09.414Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 19:59:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 19:59:09"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T13:07:35.937Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 20:07:35"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 20:07:35"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T13:10:39.013Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 20:10:39"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 20:10:39"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T13:10:57.147Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 20:10:57"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 20:10:57"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T13:25:12.963Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 20:25:12"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 20:25:12"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T13:25:27.676Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 20:25:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 20:25:27"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T13:27:37.909Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 20:27:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 20:27:37"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T13:43:04.756Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 20:43:04"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 20:43:04"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T15:27:21.085Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 22:27:21"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 22:27:21"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T15:46:08.702Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 22:46:08"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 22:46:08"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T16:42:22.197Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 23:42:22"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-28 23:42:22"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-28T16:49:57.310Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-28 23:49:57"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T00:15:19.588Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 07:15:19"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 07:15:19"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T00:15:35.565Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 07:15:35"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 07:15:35"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T00:43:25.400Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 07:43:25"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 07:43:25"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T01:29:23.681Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 08:29:23"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 08:29:23"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T05:28:12.814Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 12:28:12"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 12:28:12"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T05:31:37.373Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 12:31:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 12:31:37"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T05:46:26.067Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 12:46:26"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 12:46:26"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T05:51:13.928Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 12:51:13"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 12:51:13"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T06:38:57.434Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 13:38:57"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T06:41:27.896Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 13:41:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 13:41:27"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T06:41:47.497Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 13:41:47"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 13:41:47"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T08:18:09.093Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 15:18:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 15:18:09"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T08:20:57.136Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 15:20:57"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 15:20:57"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T09:28:54.969Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 16:28:54"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 16:28:54"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T09:33:56.999Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 16:33:57"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 16:33:57"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T09:37:37.250Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 16:37:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 16:37:37"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T09:38:56.586Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 16:38:56"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 16:38:56"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T09:45:55.261Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 16:45:55"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 16:45:55"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T09:51:27.753Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 16:51:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-29 16:51:27"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-29T15:19:05.045Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-29 22:19:05"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"report-service","timestamp":"2025-10-30 14:03:06"}
+{"date":"Thu Oct 30 2025 14:03:06 GMT+0700 (Indochina Time)","error":{"code":"ECONNREFUSED"},"level":"error","message":"unhandledRejection: (no error message)\nAggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js:49:3)","os":{"loadavg":[2.66,2.08,1.83],"uptime":9746.21},"process":{"argv":["/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js"],"cwd":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service","execPath":"/home/luckyboiz/.nvm/versions/node/v20.19.5/bin/node","gid":1000,"memoryUsage":{"arrayBuffers":477768,"external":3825403,"heapTotal":61050880,"heapUsed":27593520,"rss":99024896},"pid":62966,"uid":1000,"version":"v20.19.5"},"rejection":true,"service":"report-service","stack":"AggregateError [ECONNREFUSED]: \n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.testConnection (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:61:22)\n    at async DatabaseManager.initialize (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:53:5)\n    at async startServer (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js:49:3)","timestamp":"2025-10-30 14:03:06","trace":[{"column":11,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js","function":null,"line":45,"method":null,"native":false},{"column":5,"file":"node:internal/process/task_queues","function":"process.processTicksAndRejections","line":95,"method":"processTicksAndRejections","native":false},{"column":22,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.testConnection","line":61,"method":"testConnection","native":false},{"column":5,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js","function":"async DatabaseManager.initialize","line":53,"method":"initialize","native":false},{"column":3,"file":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/index.js","function":"async startServer","line":49,"method":null,"native":false}]}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T07:03:22.964Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 14:03:22"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 14:03:22"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T07:03:47.983Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 14:03:47"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 14:03:47"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T07:21:13.530Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 14:21:13"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 14:21:13"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T07:21:25.080Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 14:21:25"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 14:21:25"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T07:21:34.114Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 14:21:34"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 14:21:34"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T07:22:28.947Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 14:22:28"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 14:22:28"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T07:37:19.910Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 14:37:19"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 14:37:19"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T07:41:36.694Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 14:41:36"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 14:41:36"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T07:41:53.214Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 14:41:53"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 14:41:53"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T07:42:04.134Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 14:42:04"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 14:42:04"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T07:42:23.834Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 14:42:23"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 14:42:23"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T07:52:51.204Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 14:52:51"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 14:52:51"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T07:59:06.719Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 14:59:06"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 14:59:06"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T08:10:42.392Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 15:10:42"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 15:10:42"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T08:13:17.897Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 15:13:17"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 15:13:17"}
+{"level":"error","message":"unsupported number: NaN","method":"GET","name":"Error","path":"/api/bao-cao/export-pdf","service":"report-service","stack":"Error: unsupported number: NaN\n    at number (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/node_modules/pdfkit/js/pdfkit.js:160:11)\n    at PDFDocument._fragment (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/node_modules/pdfkit/js/pdfkit.js:3463:32)\n    at PDFDocument._line (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/node_modules/pdfkit/js/pdfkit.js:3342:10)\n    at PDFDocument._text (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/node_modules/pdfkit/js/pdfkit.js:3088:9)\n    at PDFDocument.text (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/node_modules/pdfkit/js/pdfkit.js:3095:17)\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/controllers/report.controller.js:388:11\n    at Array.forEach (<anonymous>)\n    at exports.exportPDF (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/report-service/src/controllers/report.controller.js:387:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","statusCode":500,"timestamp":"2025-10-30 15:14:29"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-30T08:32:07.100Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-30 15:32:07"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-30 15:32:07"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-31T00:39:09.583Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-31 07:39:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-31 07:39:09"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-31T02:23:58.221Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-31 09:23:58"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-31 09:23:58"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-31T02:24:44.857Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-31 09:24:44"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-31 09:24:44"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-31T02:37:39.513Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-31 09:37:39"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-31T03:05:47.278Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-31 10:05:47"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-31 10:05:47"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-31T03:06:03.580Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-31 10:06:03"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-31 10:06:03"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-10-31T16:32:02.004Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-10-31 23:32:02"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-10-31 23:32:02"}
+>>>>>>> 008-refactor-perms-logs-scope

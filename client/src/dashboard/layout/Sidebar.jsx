@@ -9,6 +9,7 @@ import XacMinhDuBaoMatRung from "../components/sidebars/quanlydulieu/XacMinhDuBa
 import Dashboard from "../components/sidebars/Dashboard";
 import BaoCaoDuBaoMatRung from "../components/sidebars/baocao/BaoCaoDuBaoMatRung";
 import ImportShapefile from "../components/sidebars/phathienmatrung/ImportShapefile";
+import FeatureGuard from "../../components/FeatureGuard";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -17,21 +18,38 @@ const Sidebar = () => {
   
   const pathAfterDashboard = currentPath.replace("/dashboard", "").replace(/^\//, "");
 
-  // Logic để ánh xạ đường dẫn với component
+  // Logic để ánh xạ đường dẫn với component - ĐÃ ĐƯỢC BẢO VỆ BỞI FEATURE PERMISSIONS
   const getComponentByPath = () => {
     switch (pathAfterDashboard) {
       case "dubaomatrung":
-        return [<DuBaoMatRungTuDong key="tuDong" />, <DuBaoMatRungTuyBien key="tuyBien" />];
+        return [
+          <FeatureGuard key="tuDong" featureCode="forecast.auto">
+            <DuBaoMatRungTuDong />
+          </FeatureGuard>,
+          <FeatureGuard key="tuyBien" featureCode="forecast.custom">
+            <DuBaoMatRungTuyBien />
+          </FeatureGuard>
+        ];
       case "quanlydulieu":
         return [
-          <TraCuuDuLieuDuBaoMatRung key="traCuu" />,
-          <TraCuuAnhVeTinh key="anhVeTinh" />,
-          <XacMinhDuBaoMatRung key="xacMinh" />,
-          <CapNhatDuLieu key="capNhat" onGeoDataLoaded={setGeoData} />
+          <FeatureGuard key="traCuu" featureCode="data_management.forecast_search">
+            <TraCuuDuLieuDuBaoMatRung />
+          </FeatureGuard>,
+          <FeatureGuard key="anhVeTinh" featureCode="data_management.satellite_search">
+            <TraCuuAnhVeTinh />
+          </FeatureGuard>,
+          <FeatureGuard key="xacMinh" featureCode="data_management.verification">
+            <XacMinhDuBaoMatRung />
+          </FeatureGuard>,
+          <FeatureGuard key="capNhat" featureCode="data_management.data_update">
+            <CapNhatDuLieu onGeoDataLoaded={setGeoData} />
+          </FeatureGuard>
         ];
       case "baocao":
+        // Trang báo cáo không cần FeatureGuard ở sidebar vì toàn trang đã được bảo vệ bởi PermissionProtectedRoute
         return [<BaoCaoDuBaoMatRung key="baoCao" />];
       case "phathienmatrung":
+        // Trang phát hiện không cần FeatureGuard ở sidebar vì toàn trang đã được bảo vệ bởi PermissionProtectedRoute
         return [<ImportShapefile key="importShapefile" />];
       case "":
       default:

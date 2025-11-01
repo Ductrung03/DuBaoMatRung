@@ -97,19 +97,16 @@ export const GeoDataProvider = ({ children }) => {
   // ✅ HÀM CẬP NHẬT: Auto load chỉ GeoJSON layers (WMS layers tự động hiển thị)
   const loadAllDefaultLayers = async () => {
     try {
-      console.log("🚀 Auto loading GeoJSON layers...");
 
       // Chỉ load các GeoJSON layers - WMS layers không cần load data
       const geojsonLayers = Object.entries(mapLayers)
         .filter(([key, layer]) => layer.layerType === 'geojson')
         .map(([key, layer]) => ({ key, name: layer.name }));
 
-      console.log(`📊 Found ${geojsonLayers.length} GeoJSON layers to load`);
 
       // Load từng GeoJSON layer
       for (const layer of geojsonLayers) {
         try {
-          console.log(`📥 Auto loading ${layer.name}...`);
           setLayerLoading(layer.key, true);
 
           // Use relative path to work with Vite proxy
@@ -143,11 +140,9 @@ export const GeoDataProvider = ({ children }) => {
 
             // ✅ CẬP NHẬT: Nếu là deforestationAlerts, cũng cập nhật vào geoData để hiển thị trong table
             if (layer.key === 'deforestationAlerts') {
-              console.log('📊 Auto-load: Updating geoData for table display');
               setGeoData(layerData);
             }
 
-            console.log(`✅ Auto loaded ${layer.name}: ${response.data.data.features.length} features`);
           }
 
         } catch (error) {
@@ -162,19 +157,15 @@ export const GeoDataProvider = ({ children }) => {
       }
 
       // ✅ WMS layers tự động visible - không cần load data
-      console.log("🗺️ WMS layers (hành chính, địa hình, loại rừng) sẽ tự động hiển thị qua MapServer");
 
       // ✅ LOAD DỮ LIỆU MẶC ĐỊNH CHO BẢNG: Chỉ load mat_rung nếu KHÔNG có deforestationAlerts
       // (vì deforestationAlerts ưu tiên cao hơn và đã bao gồm dữ liệu cần thiết)
       const hasDeforestationAlerts = geojsonLayers.some(l => l.key === 'deforestationAlerts');
       if (!hasDeforestationAlerts) {
-        console.log("📊 Loading default mat_rung data (no deforestationAlerts)");
         await loadDefaultMatRungData();
       } else {
-        console.log("✅ Skipping mat_rung load - using deforestationAlerts data instead");
       }
 
-      console.log("🎉 Auto load completed! WMS layers visible, GeoJSON layers loaded.");
 
     } catch (error) {
       console.error("❌ Error in auto load all layers:", error);
@@ -184,38 +175,27 @@ export const GeoDataProvider = ({ children }) => {
   // ✅ HÀM CẬP NHẬT: Load dữ liệu mặc định từ bảng mat_rung - CHỈ 3 THÁNG
   const loadDefaultMatRungData = async () => {
     try {
-      console.log("🔄 Loading mặc định dữ liệu từ bảng mat_rung (3 tháng gần nhất)...");
       setLoading(true);
 
-      // Gọi API để lấy dữ liệu mat_rung 3 tháng gần nhất
+      // ✅ Gọi API /api/mat-rung - mặc định trả về 12 tháng, limit 1000
       const response = await axios.get(`/api/mat-rung`, {
-       
+        params: {
+          limit: 1000
+        }
       });
 
-      if (response.data && response.data.mat_rung) {
-        const matRungData = response.data.mat_rung;
-        
-        // Lọc chỉ lấy 3 tháng gần nhất
-        const threeMonthsAgo = new Date();
-        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-        
-        const filteredFeatures = matRungData.features.filter(feature => {
-          const endDate = new Date(feature.properties.end_sau);
-          return endDate >= threeMonthsAgo;
-        });
-        
-        const filteredData = {
-          ...matRungData,
-          features: filteredFeatures
-        };
-        
-        console.log(`✅ Loaded ${filteredData.features?.length || 0} mat_rung features (3 tháng gần nhất)`);
-        
+      // ✅ API trả về: { success: true, data: { type: "FeatureCollection", features: [...] } }
+      if (response.data && response.data.success && response.data.data) {
+        const matRungData = response.data.data; // ✅ KEY LÀ 'data' KHÔNG PHẢI 'mat_rung'
+
+        console.log(`✅ Loaded ${matRungData.features?.length || 0} mat_rung records from API`);
+
+        // ✅ API đã tự động filter 12 tháng, không cần filter lại
         // Set vào geoData để hiển thị trong Map và Table
-        setGeoData(filteredData);
-        
+        setGeoData(matRungData);
+
       } else {
-        console.log("⚠️ Không có dữ liệu mat_rung");
+        console.warn('⚠️ No mat_rung data in response:', response.data);
       }
     } catch (error) {
       console.error("❌ Lỗi khi load dữ liệu mat_rung mặc định:", error);
@@ -227,7 +207,6 @@ export const GeoDataProvider = ({ children }) => {
 
   // ✅ AUTO LOAD KHI COMPONENT MOUNT
   useEffect(() => {
-    console.log("🚀 GeoDataProvider mounted - starting auto load...");
     
     // Delay nhỏ để đảm bảo UI đã render
     const timer = setTimeout(() => {
@@ -239,7 +218,6 @@ export const GeoDataProvider = ({ children }) => {
 
   // Enhanced layer data update với viewport metadata
   const updateLayerData = (layerName, data) => {
-    console.log(`🔄 Cập nhật dữ liệu cho layer: ${layerName}`);
     
     setMapLayers(prev => ({
       ...prev,
@@ -254,7 +232,6 @@ export const GeoDataProvider = ({ children }) => {
   };
 
   const toggleLayerVisibility = (layerName) => {
-    console.log(`👁️ Toggle visibility cho layer: ${layerName}`);
     setMapLayers(prev => ({
       ...prev,
       [layerName]: {
@@ -265,7 +242,6 @@ export const GeoDataProvider = ({ children }) => {
   };
 
   const setLayerLoading = (layerName, loading) => {
-    console.log(`⏳ Set loading ${loading} cho layer: ${layerName}`);
     setMapLayers(prev => ({
       ...prev,
       [layerName]: {
@@ -296,7 +272,6 @@ export const GeoDataProvider = ({ children }) => {
   };
 
   const clearAllLayers = () => {
-    console.log("🗑️ Clearing tất cả dữ liệu layer");
     setMapLayers(prev => {
       const newLayers = {};
       Object.keys(prev).forEach(key => {
@@ -337,7 +312,6 @@ export const GeoDataProvider = ({ children }) => {
           { autoClose: 2000 }
         );
 
-        console.log(`✅ WMS Layer ${layer.name} ${newVisibility ? 'shown' : 'hidden'}`);
         return;
       }
 
@@ -380,7 +354,6 @@ export const GeoDataProvider = ({ children }) => {
 
           // ✅ CẬP NHẬT: Nếu là deforestationAlerts, cũng cập nhật vào geoData để hiển thị trong table
           if (layerKey === 'deforestationAlerts') {
-            console.log('📊 Updating geoData for table display');
             setGeoData(layerData);
           }
 
@@ -403,7 +376,6 @@ export const GeoDataProvider = ({ children }) => {
 // ✅ HÀM MỚI: Load dữ liệu dự báo tự động
 const loadAutoForecastData = async (year, month, period) => {
   try {
-    console.log(`🔮 Loading auto forecast data: ${period} tháng ${month}/${year}`);
     setLoading(true);
 
     // Tính toán khoảng thời gian (logic tương tự component)
@@ -459,7 +431,6 @@ const loadAutoForecastData = async (year, month, period) => {
       // Set dữ liệu vào context
       setGeoData(forecastData);
       
-      console.log(`✅ Auto forecast loaded: ${forecastData.features?.length || 0} features`);
       
       return {
         success: true,
@@ -542,13 +513,11 @@ const getAutoForecastPreview = async (year, month, period) => {
 // ✅ HÀM MỚI: Clear dữ liệu và reset về mặc định
 const resetToDefaultData = async () => {
   try {
-    console.log("🔄 Resetting to default data...");
     setLoading(true);
     
     // Load lại dữ liệu mặc định (3 tháng gần nhất)
     await loadDefaultMatRungData();
     
-    console.log("✅ Reset to default completed");
     return { success: true };
     
   } catch (error) {

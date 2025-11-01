@@ -7,59 +7,11 @@
 [33m[nodemon] watching path(s): *.*[39m
 [33m[nodemon] watching extensions: js,mjs,cjs,json[39m
 [32m[nodemon] starting `node src/index.js`[39m
-2025-10-13 18:23:20 [admin-service] [32minfo[39m: Database connection test successful {"database":"admin_db"}
-2025-10-13 18:23:20 [admin-service] [32minfo[39m: Database pool initialized successfully
-2025-10-13 18:23:20 [admin-service] [32minfo[39m: Redis client connected
-2025-10-13 18:23:20 [admin-service] [32minfo[39m: Redis client ready
-2025-10-13 18:23:20 [admin-service] [32minfo[39m: Redis manager initialized successfully
-2025-10-13 18:23:20 [admin-service] [32minfo[39m: Admin Service running on port 3005
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `node src/index.js`[39m
-2025-10-13 18:38:43 [admin-service] [32minfo[39m: Database connection test successful {"database":"admin_db"}
-2025-10-13 18:38:43 [admin-service] [32minfo[39m: Database pool initialized successfully
-2025-10-13 18:38:43 [admin-service] [32minfo[39m: Redis client connected
-2025-10-13 18:38:43 [admin-service] [32minfo[39m: Redis client ready
-2025-10-13 18:38:43 [admin-service] [32minfo[39m: Redis manager initialized successfully
-2025-10-13 18:38:43 [admin-service] [32minfo[39m: Admin Service running on port 3005
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `node src/index.js`[39m
-2025-10-13 18:38:48 [admin-service] [32minfo[39m: Database connection test successful {"database":"admin_db"}
-2025-10-13 18:38:48 [admin-service] [32minfo[39m: Database pool initialized successfully
-2025-10-13 18:38:48 [admin-service] [32minfo[39m: Redis client connected
-2025-10-13 18:38:48 [admin-service] [32minfo[39m: Redis client ready
-2025-10-13 18:38:48 [admin-service] [32minfo[39m: Redis manager initialized successfully
-2025-10-13 18:38:48 [admin-service] [32minfo[39m: Admin Service running on port 3005
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `node src/index.js`[39m
-2025-10-13 18:38:57 [admin-service] [32minfo[39m: Database connection test successful {"database":"admin_db"}
-2025-10-13 18:38:57 [admin-service] [32minfo[39m: Database pool initialized successfully
-2025-10-13 18:38:57 [admin-service] [32minfo[39m: Redis client connected
-2025-10-13 18:38:57 [admin-service] [32minfo[39m: Redis client ready
-2025-10-13 18:38:57 [admin-service] [32minfo[39m: Redis manager initialized successfully
-2025-10-13 18:38:57 [admin-service] [32minfo[39m: Admin Service running on port 3005
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `node src/index.js`[39m
-2025-10-13 18:39:04 [admin-service] [32minfo[39m: Database connection test successful {"database":"admin_db"}
-2025-10-13 18:39:04 [admin-service] [32minfo[39m: Database pool initialized successfully
-2025-10-13 18:39:04 [admin-service] [32minfo[39m: Redis client connected
-2025-10-13 18:39:04 [admin-service] [32minfo[39m: Redis client ready
-2025-10-13 18:39:04 [admin-service] [32minfo[39m: Redis manager initialized successfully
-2025-10-13 18:39:04 [admin-service] [32minfo[39m: Admin Service running on port 3005
-[31m[nodemon] app crashed - waiting for file changes before starting...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `node src/index.js`[39m
-2025-10-13 20:00:59 [admin-service] [32minfo[39m: Database connection test successful {"database":"admin_db"}
-2025-10-13 20:00:59 [admin-service] [32minfo[39m: Database pool initialized successfully
-2025-10-13 20:00:59 [admin-service] [32minfo[39m: Redis client connected
-2025-10-13 20:00:59 [admin-service] [32minfo[39m: Redis client ready
-2025-10-13 20:00:59 [admin-service] [32minfo[39m: Redis manager initialized successfully
-2025-10-13 20:00:59 [admin-service] [32minfo[39m: Admin Service running on port 3005
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `node src/index.js`[39m
-2025-10-13 20:01:18 [admin-service] [32minfo[39m: Database connection test successful {"database":"admin_db"}
-2025-10-13 20:01:18 [admin-service] [32minfo[39m: Database pool initialized successfully
-2025-10-13 20:01:18 [admin-service] [32minfo[39m: Redis client connected
-2025-10-13 20:01:18 [admin-service] [32minfo[39m: Redis client ready
-2025-10-13 20:01:18 [admin-service] [32minfo[39m: Redis manager initialized successfully
-2025-10-13 20:01:18 [admin-service] [31merror[39m: Server error: listen EADDRINUSE: address already in use 0.0.0.0:3005 {"code":"EADDRINUSE","errno":-98,"syscall":"listen","address":"0.0.0.0","port":3005,"stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3005\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)"}
-[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+2025-10-22 14:09:39 [admin-service] [32minfo[39m: Database connection test successful {"database":"admin_db"}
+2025-10-22 14:09:39 [admin-service] [32minfo[39m: Database pool initialized successfully
+2025-10-22 14:09:39 [admin-service] [32minfo[39m: Kysely Query Builder initialized for admin_db
+2025-10-22 14:09:39 [admin-service] [32minfo[39m: Redis client connected
+2025-10-22 14:09:39 [admin-service] [32minfo[39m: Redis client ready
+2025-10-22 14:09:39 [admin-service] [32minfo[39m: Redis manager initialized successfully
+2025-10-22 14:09:39 [admin-service] [32minfo[39m: Admin Service running on port 3005
+2025-10-22 14:09:39 [admin-service] [32minfo[39m: Kysely Query Builder ready

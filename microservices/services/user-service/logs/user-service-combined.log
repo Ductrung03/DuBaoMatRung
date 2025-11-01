@@ -531,6 +531,367 @@
 {"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-15T07:39:57.939Z"}
 {"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-15 14:39:57"}
 {"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-15 14:39:57"}
+<<<<<<< HEAD
 {"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-11-01T06:33:23.879Z"}
 {"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-11-01 13:33:23"}
 {"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-11-01 13:33:23"}
+=======
+{"code":"ECONNREFUSED","level":"error","message":"","service":"user-service","timestamp":"2025-10-16 14:18:17"}
+{"error":"","level":"error","message":"Failed to start user service","service":"user-service","timestamp":"2025-10-16 14:18:17"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"user-service","timestamp":"2025-10-16 14:24:00"}
+{"error":"","level":"error","message":"Failed to start user service","service":"user-service","timestamp":"2025-10-16 14:24:00"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"user-service","timestamp":"2025-10-16 14:24:15"}
+{"error":"","level":"error","message":"Failed to start user service","service":"user-service","timestamp":"2025-10-16 14:24:15"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-16T07:25:35.342Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-16 14:25:35"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-16 14:25:35"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-16T08:43:14.303Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-16 15:43:14"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-16 15:43:14"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-16T16:09:20.909Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-16 23:09:20"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-16 23:09:20"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-16T16:15:19.118Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-16 23:15:19"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-16 23:15:19"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-16T16:34:43.133Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-16 23:34:43"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T04:15:09.373Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 11:15:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 11:15:09"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T04:17:29.548Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 11:17:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 11:17:29"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T05:15:21.705Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 12:15:21"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T05:18:33.641Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 12:18:33"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 12:18:33"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T05:18:55.722Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 12:18:55"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 12:18:55"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T05:38:15.460Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 12:38:15"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 12:38:15"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 12:40:30"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 1)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 12:40:30"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 12:40:30"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 12:40:30"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 1)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 12:40:30"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 12:40:30"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:00:39"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 0)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:00:39"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:00:39"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:00:39"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 1)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:00:39"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:00:39"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:01:29"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 1)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:01:29"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:01:29"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:01:29"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 0)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:01:29"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:01:29"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:01:52"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 0)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:01:52"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:01:52"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:01:52"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 1)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:01:52"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:01:52"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:09:41"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 0)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:09:41"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:09:41"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:09:41"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 0)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:09:41"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:09:41"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:16:53"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 1)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:16:53"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:16:53"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:16:53"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 1)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:16:53"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:16:53"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:26:37"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 1)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:26:37"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:26:37"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:26:37"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 1)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:26:37"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:26:37"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T06:26:58.314Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 13:26:58"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 13:26:58"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:27:08"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 0)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:27:08"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:27:08"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"SELECT COUNT(*) FROM users","service":"user-service","timestamp":"2025-10-22 13:27:08"}
+{"level":"error","message":"relation \"users\" does not exist","method":"GET","name":"error","path":"/api/users/","service":"user-service","stack":"error: relation \"users\" does not exist\n    at /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async DatabaseManager.query (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/shared/database/index.js:81:22)\n    at async Promise.all (index 1)\n    at async exports.getAllUsers (/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/microservices/services/user-service/src/controllers/user.controller.js:27:35)","statusCode":500,"timestamp":"2025-10-22 13:27:08"}
+{"code":"42P01","level":"error","message":"relation \"users\" does not exist","query":"\n      SELECT id, username, full_name, position, organization,\n             permission_level, district_id, is_active, created_at, last_login\n      FROM users\n      ORDER BY created_at DESC\n      LIMIT $1 OFFSET $2\n    ","service":"user-service","timestamp":"2025-10-22 13:27:08"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T06:48:39.712Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3002","port":3002,"service":"user-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3002\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 13:48:39"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T06:49:34.973Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3002","port":3002,"service":"user-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3002\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 13:49:34"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T07:09:32.860Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 14:09:32"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 14:09:32"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T07:10:46.171Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3002","port":3002,"service":"user-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3002\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 14:10:46"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T07:13:26.025Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 14:13:26"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 14:13:26"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T07:29:38.275Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3002","port":3002,"service":"user-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3002\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 14:29:38"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T07:42:36.313Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3002","port":3002,"service":"user-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3002\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 14:42:36"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T07:43:21.044Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 14:43:21"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 14:43:21"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T07:44:21.720Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 14:44:21"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 14:44:21"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T08:42:41.920Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 15:42:41"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 15:42:41"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T08:49:55.321Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 15:49:55"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 15:49:55"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T08:49:55.369Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3002","port":3002,"service":"user-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3002\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 15:49:55"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T08:50:32.130Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3002","port":3002,"service":"user-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3002\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 15:50:32"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T08:50:46.636Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 15:50:46"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 15:50:46"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T08:58:29.591Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 15:58:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 15:58:29"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T09:03:11.880Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 16:03:11"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 16:03:11"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T09:10:29.226Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 16:10:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 16:10:29"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T09:26:16.083Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 16:26:16"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 16:26:16"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T09:26:26.896Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3002","port":3002,"service":"user-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3002\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 16:26:26"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T09:26:41.980Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 16:26:41"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 16:26:41"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T13:15:15.920Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 20:15:15"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 20:15:15"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T13:15:21.016Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3002","port":3002,"service":"user-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3002\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-22 20:15:21"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T13:15:46.803Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 20:15:46"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-22 20:15:46"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-22T14:53:30.247Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-22 21:53:30"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-24T04:44:47.297Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-24 11:44:47"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-24 11:44:47"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-24T04:45:07.932Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-24 11:45:07"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-24 11:45:07"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-24T04:48:00.875Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-24 11:48:00"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-24 11:48:00"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-24T04:48:14.922Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-24 11:48:14"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-24 11:48:14"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-24T08:01:35.956Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-24 15:01:35"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-24 15:01:35"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-24T08:03:05.521Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-24 15:03:05"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-24 15:03:05"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-24T08:18:32.646Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-24 15:18:32"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-24 15:18:32"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-24T08:26:37.819Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-24 15:26:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-24 15:26:37"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-24T08:31:39.077Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-24 15:31:39"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-24 15:31:39"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-24T15:16:41.445Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-24 22:16:41"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-24 22:16:41"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-24T15:16:59.167Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-24 22:16:59"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-24 22:16:59"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-24T15:21:29.362Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-24 22:21:29"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-24 22:21:29"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"user-service","timestamp":"2025-10-28 17:16:40"}
+{"error":"","level":"error","message":"Failed to start user service","service":"user-service","timestamp":"2025-10-28 17:16:40"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T10:16:59.954Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 17:16:59"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 17:16:59"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T10:17:24.490Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 17:17:24"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 17:17:24"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T10:31:13.083Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 17:31:13"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 17:31:13"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T10:31:53.695Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 17:31:53"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 17:31:53"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T12:58:53.106Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 19:58:53"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 19:58:53"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T12:59:09.336Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 19:59:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 19:59:09"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T13:07:35.893Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 20:07:35"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 20:07:35"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T13:10:38.924Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 20:10:38"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 20:10:38"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T13:10:57.061Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 20:10:57"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 20:10:57"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T13:25:12.866Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 20:25:12"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 20:25:12"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T13:25:27.484Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 20:25:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 20:25:27"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T13:27:37.743Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 20:27:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 20:27:37"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T13:43:04.707Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 20:43:04"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 20:43:04"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T15:27:20.967Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 22:27:20"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 22:27:20"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T15:46:08.583Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 22:46:08"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 22:46:08"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T16:42:22.086Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 23:42:22"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 23:42:22"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-28T16:49:57.171Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-28 23:49:57"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-28 23:49:57"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T00:15:19.473Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 07:15:19"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 07:15:19"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T00:15:35.523Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 07:15:35"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 07:15:35"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T00:43:25.280Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 07:43:25"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 07:43:25"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T01:29:23.550Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 08:29:23"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 08:29:23"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T02:44:39.391Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3002","port":3002,"service":"user-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3002\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-10-29 09:44:39"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T05:25:07.850Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 12:25:07"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 12:25:07"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T05:25:27.389Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 12:25:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 12:25:27"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T05:28:12.708Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 12:28:12"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 12:28:12"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T05:31:37.315Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 12:31:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 12:31:37"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T05:46:26.017Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 12:46:26"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 12:46:26"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T05:51:13.821Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 12:51:13"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 12:51:13"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T06:38:57.314Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 13:38:57"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T06:41:27.770Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 13:41:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 13:41:27"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T06:41:47.401Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 13:41:47"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 13:41:47"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T08:18:09.016Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 15:18:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 15:18:09"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T09:28:54.843Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 16:28:54"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 16:28:54"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T09:33:56.935Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 16:33:56"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 16:33:56"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T09:37:37.156Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 16:37:37"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 16:37:37"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T09:38:56.456Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 16:38:56"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 16:38:56"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T09:45:55.164Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 16:45:55"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 16:45:55"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T09:51:27.636Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 16:51:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 16:51:27"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-29T15:19:04.848Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-29 22:19:04"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-29 22:19:04"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"user-service","timestamp":"2025-10-30 14:03:05"}
+{"error":"","level":"error","message":"Failed to start user service","service":"user-service","timestamp":"2025-10-30 14:03:05"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-30T07:03:22.919Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-30 14:03:22"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-30 14:03:22"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-30T07:03:47.858Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-30 14:03:47"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-30 14:03:47"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-30T07:22:28.822Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-30 14:22:28"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-30 14:22:28"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-30T07:37:19.796Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-30 14:37:19"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-30 14:37:19"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-30T07:52:51.035Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-30 14:52:51"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-30 14:52:51"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-30T07:59:06.550Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-30 14:59:06"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-30 14:59:06"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-30T08:12:04.339Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-30 15:12:04"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-30 15:12:04"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-30T08:12:22.549Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-30 15:12:22"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-30 15:12:22"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-30T08:32:06.970Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-30 15:32:06"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-30 15:32:06"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-31T00:39:09.460Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-31 07:39:09"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-31 07:39:09"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-31T02:23:58.103Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-31 09:23:58"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-31 09:23:58"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-31T02:24:44.783Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-31 09:24:44"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-31 09:24:44"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-31T02:37:39.369Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-31 09:37:39"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-31T03:05:47.102Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-31 10:05:47"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-31 10:05:47"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-31T03:06:03.502Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-31 10:06:03"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-31 10:06:03"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-10-31T16:32:01.892Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-10-31 23:32:01"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-10-31 23:32:01"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-11-01T06:34:11.597Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-11-01 13:34:11"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-11-01 13:34:11"}
+>>>>>>> 008-refactor-perms-logs-scope
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-11-01T06:37:28.545Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-11-01 13:37:28"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-11-01 13:37:28"}

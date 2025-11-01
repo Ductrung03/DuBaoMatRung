@@ -5,14 +5,20 @@ const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
-const { createProxyMiddleware } = require('http-proxy-middleware');
 const swaggerUi = require('swagger-ui-express');
 require('dotenv').config();
 
+const createLogger = require('../../shared/logger');
 const authMiddleware = require('./middleware/auth');
 const errorHandler = require('./middleware/errorHandler');
+const { createProxy } = require('./proxy-helper');
+const { connectMongoDB, closeMongoDB } = require('./services/mongodb');
+const loggingRoutes = require('./routes/loggingRoutes');
 // const routes = require('./routes'); // Commented out - using proxy middleware instead
 const swaggerSpec = require('./swagger');
+
+// Initialize Winston logger for API Gateway
+const logger = createLogger('api-gateway');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -51,8 +57,8 @@ app.use(cors({
 // Compression
 app.use(compression());
 
-// Logging
-app.use(morgan('combined'));
+// Logging - using Winston logger stream
+app.use(morgan('combined', { stream: logger.stream }));
 
 // ✅ Body parsing - Không skip cho bất kỳ route nào
 // http-proxy-middleware sẽ tự động handle body restreaming
@@ -123,322 +129,118 @@ app.get('/ready', async (req, res) => {
   });
 });
 
+// ========== LOGGING SERVICE ==========
+
+// Logging routes (internal service)
+app.use('/api/logs', loggingRoutes);
+
 // ========== SERVICE PROXIES ==========
 
 // ✅ Protected Auth endpoints (require authentication) - MUST come before general auth proxy
 app.use('/api/auth/me',
   authMiddleware.authenticate,
-  createProxyMiddleware({
+  createProxy(logger, {
     target: process.env.AUTH_SERVICE_URL || 'http://localhost:3001',
-    changeOrigin: true,
-    pathRewrite: (path, req) => {
-      return '/api/auth/me';
-    },
-    on: {
-      proxyReq: (proxyReq, req, res) => {
-        console.log(`[Gateway] Auth /me request with user ID: ${req.headers['x-user-id']}`);
-        // Forward user headers set by authenticate middleware
-        if (req.headers['x-user-id']) {
-          proxyReq.setHeader('x-user-id', req.headers['x-user-id']);
-        }
-        if (req.headers['x-user-role']) {
-          proxyReq.setHeader('x-user-role', req.headers['x-user-role']);
-        }
-        if (req.headers['x-user-permission']) {
-          proxyReq.setHeader('x-user-permission', req.headers['x-user-permission']);
-        }
-      }
-    }
+    pathRewrite: (path, req) => '/api/auth/me',
+    serviceName: 'Auth /me',
+    forwardUserHeaders: true
   })
 );
 
 app.use('/api/auth/logout',
   authMiddleware.authenticate,
-  createProxyMiddleware({
+  createProxy(logger, {
     target: process.env.AUTH_SERVICE_URL || 'http://localhost:3001',
-    changeOrigin: true,
-    pathRewrite: (path, req) => {
-      return '/api/auth/logout';
-    },
-    on: {
-      proxyReq: (proxyReq, req, res) => {
-        // Forward user headers
-        if (req.headers['x-user-id']) {
-          proxyReq.setHeader('x-user-id', req.headers['x-user-id']);
-        }
-      }
-    }
+    pathRewrite: (path, req) => '/api/auth/logout',
+    serviceName: 'Auth logout',
+    forwardUserHeaders: true
+  })
+);
+
+// Protected permissions endpoints
+app.use('/api/auth/permissions',
+  authMiddleware.authenticate,
+  createProxy(logger, {
+    target: process.env.AUTH_SERVICE_URL || 'http://localhost:3001',
+    pathRewrite: (path, req) => '/api/auth/permissions' + path,
+    serviceName: 'Auth permissions',
+    forwardUserHeaders: true
   })
 );
 
 // Auth Service proxy - với body restreaming support (public endpoints like login, register)
-const authProxy = createProxyMiddleware({
+app.use('/api/auth', createProxy(logger, {
   target: process.env.AUTH_SERVICE_URL || 'http://localhost:3001',
-  changeOrigin: true,
-  // ✅ Add back /api/auth prefix vì Express đã strip nó
-  pathRewrite: (path, req) => {
-    return '/api/auth' + path;
-  },
-  timeout: 30000,
-  proxyTimeout: 30000,
-  // ✅ Để proxy tự parse body và restream (quan trọng!)
-  on: {
-    proxyReq: (proxyReq, req, res) => {
-      console.log(`[Gateway] Proxying ${req.method} ${req.url} to ${proxyReq.path}`);
+  pathRewrite: (path, req) => '/api/auth' + path,
+  serviceName: 'Auth',
+  timeout: 30000
+}));
 
-      // ✅ Restream body nếu đã được parsed bởi body-parser
-      if (req.body) {
-        const bodyData = JSON.stringify(req.body);
-        proxyReq.setHeader('Content-Type', 'application/json');
-        proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-        proxyReq.write(bodyData);
-      }
-    },
-    proxyRes: (proxyRes, req, res) => {
-      console.log(`[Gateway] Response ${proxyRes.statusCode} from ${req.url}`);
-    },
-    error: (err, req, res) => {
-      console.error('[Gateway] Auth service proxy error:', err.message);
-      if (!res.headersSent) {
-        res.status(503).json({
-          success: false,
-          message: 'Auth service unavailable',
-          error: err.message
-        });
-      }
-    }
-  }
-});
-
-app.use('/api/auth', authProxy);
-
-// User Service (protected)
+// User Service (protected) -> Now routed to Auth Service
 app.use('/api/users',
   authMiddleware.authenticate,
-  createProxyMiddleware({
-    target: process.env.USER_SERVICE_URL || 'http://localhost:3002',
-    changeOrigin: true,
-    pathRewrite: (path, req) => {
-      return '/api/users' + path;
-    },
+  createProxy(logger, {
+    target: process.env.AUTH_SERVICE_URL || 'http://localhost:3001',
+    pathRewrite: (path, req) => '/api/auth/users' + path,
+    serviceName: 'User (via Auth)',
     timeout: 30000,
-    proxyTimeout: 30000,
-    on: {
-      proxyReq: (proxyReq, req, res) => {
-        console.log(`[Gateway] User request: ${req.method} ${req.url} -> ${proxyReq.path}`);
-
-        // Forward user headers
-        if (req.headers['x-user-id']) {
-          proxyReq.setHeader('x-user-id', req.headers['x-user-id']);
-        }
-        if (req.headers['x-user-role']) {
-          proxyReq.setHeader('x-user-role', req.headers['x-user-role']);
-        }
-
-        // ✅ Restream body nếu đã được parsed
-        if (req.body && Object.keys(req.body).length > 0) {
-          const bodyData = JSON.stringify(req.body);
-          proxyReq.setHeader('Content-Type', 'application/json');
-          proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-          proxyReq.write(bodyData);
-        }
-      },
-      error: (err, req, res) => {
-        console.error('[Gateway] User service proxy error:', err.message);
-        if (!res.headersSent) {
-          res.status(503).json({
-            success: false,
-            message: 'User service unavailable',
-            error: err.message
-          });
-        }
-      }
-    }
+    forwardUserHeaders: true
   })
 );
 
 // GIS Service - Mat Rung endpoints
 app.use('/api/mat-rung',
-  createProxyMiddleware({
+  createProxy(logger, {
     target: process.env.GIS_SERVICE_URL || 'http://localhost:3003',
-    changeOrigin: true,
-    timeout: 120000, // 2 minutes timeout for mat-rung queries
-    proxyTimeout: 120000,
-    pathRewrite: (path, req) => {
-      return '/api/mat-rung' + path;
-    },
-    on: {
-      proxyReq: (proxyReq, req, res) => {
-        console.log(`[Gateway] Mat Rung request: ${req.method} ${req.url} -> ${proxyReq.path}`);
-
-        // Restream body for POST requests
-        if (req.body && Object.keys(req.body).length > 0) {
-          const bodyData = JSON.stringify(req.body);
-          proxyReq.setHeader('Content-Type', 'application/json');
-          proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-          proxyReq.write(bodyData);
-        }
-      },
-      proxyRes: (proxyRes, req, res) => {
-        console.log(`[Gateway] Mat Rung response ${proxyRes.statusCode} from ${req.url}`);
-      },
-      error: (err, req, res) => {
-        console.error('[Gateway] Mat Rung proxy error:', err.message);
-        if (!res.headersSent) {
-          res.status(503).json({
-            success: false,
-            message: 'Mat Rung service unavailable',
-            error: err.message
-          });
-        }
-      }
-    }
+    pathRewrite: (path, req) => '/api/mat-rung' + path,
+    serviceName: 'Mat Rung',
+    timeout: 120000 // 2 minutes timeout for mat-rung queries
   })
 );
 
 app.use('/api/import-shapefile',
   authMiddleware.authenticate,
-  createProxyMiddleware({
+  createProxy(logger, {
     target: process.env.GIS_SERVICE_URL || 'http://localhost:3003',
-    changeOrigin: true,
-    pathRewrite: (path, req) => {
-      return '/api/import-shapefile' + path;
-    },
+    pathRewrite: (path, req) => '/api/import-shapefile' + path,
+    serviceName: 'Import Shapefile',
     timeout: 60000, // Longer timeout for shapefile uploads
-    proxyTimeout: 60000,
-    on: {
-      proxyReq: (proxyReq, req, res) => {
-        console.log(`[Gateway] Import shapefile request: ${req.method} ${req.url}`);
-
-        // Forward user headers
-        if (req.headers['x-user-id']) {
-          proxyReq.setHeader('x-user-id', req.headers['x-user-id']);
-        }
-
-        // ✅ Restream body nếu đã được parsed
-        if (req.body && Object.keys(req.body).length > 0) {
-          const bodyData = JSON.stringify(req.body);
-          proxyReq.setHeader('Content-Type', 'application/json');
-          proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-          proxyReq.write(bodyData);
-        }
-      },
-      error: (err, req, res) => {
-        console.error('[Gateway] Import shapefile proxy error:', err.message);
-        if (!res.headersSent) {
-          res.status(503).json({
-            success: false,
-            message: 'Import shapefile service unavailable',
-            error: err.message
-          });
-        }
-      }
-    }
+    forwardUserHeaders: true
   })
 );
 
 // Import from Google Earth Engine URL
 app.use('/api/import-gee-url',
   authMiddleware.authenticate,
-  createProxyMiddleware({
+  createProxy(logger, {
     target: process.env.GIS_SERVICE_URL || 'http://localhost:3003',
-    changeOrigin: true,
-    pathRewrite: (path, req) => {
-      return '/api/import-gee-url' + path;
-    },
+    pathRewrite: (path, req) => '/api/import-gee-url' + path,
+    serviceName: 'Import GEE URL',
     timeout: 300000, // 5 minutes timeout for GEE requests
-    proxyTimeout: 300000,
-    on: {
-      proxyReq: (proxyReq, req, res) => {
-        console.log(`[Gateway] Import GEE URL request: ${req.method} ${req.url}`);
-
-        // Forward user headers
-        if (req.headers['x-user-id']) {
-          proxyReq.setHeader('x-user-id', req.headers['x-user-id']);
-        }
-
-        // ✅ Restream body nếu đã được parsed
-        if (req.body && Object.keys(req.body).length > 0) {
-          const bodyData = JSON.stringify(req.body);
-          proxyReq.setHeader('Content-Type', 'application/json');
-          proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-          proxyReq.write(bodyData);
-        }
-      },
-      error: (err, req, res) => {
-        console.error('[Gateway] Import GEE URL proxy error:', err.message);
-        if (!res.headersSent) {
-          res.status(503).json({
-            success: false,
-            message: 'Import GEE URL service unavailable',
-            error: err.message
-          });
-        }
-      }
-    }
+    forwardUserHeaders: true
   })
 );
 
 app.use('/api/layer-data',
-  createProxyMiddleware({
+  createProxy(logger, {
     target: process.env.GIS_SERVICE_URL || 'http://localhost:3003',
-    changeOrigin: true,
-    pathRewrite: (path, req) => {
-      // Add back the /api/layer-data prefix since Express strips it
-      return '/api/layer-data' + path;
-    }
+    pathRewrite: (path, req) => '/api/layer-data' + path,
+    serviceName: 'Layer Data'
   })
 );
 
 app.use('/api/verification',
   authMiddleware.authenticate,
-  createProxyMiddleware({
+  createProxy(logger, {
     target: process.env.GIS_SERVICE_URL || 'http://localhost:3003',
-    changeOrigin: true,
-    pathRewrite: (path, req) => {
-      return '/api/verification' + path;
-    },
+    pathRewrite: (path, req) => '/api/verification' + path,
+    serviceName: 'Verification',
     timeout: 30000,
-    proxyTimeout: 30000,
-    on: {
-      proxyReq: (proxyReq, req, res) => {
-        console.log(`[Gateway] Verification request: ${req.method} ${req.url} -> ${proxyReq.path}`);
-
-        // Forward user headers set by authenticate middleware
-        if (req.headers['x-user-id']) {
-          proxyReq.setHeader('x-user-id', req.headers['x-user-id']);
-        }
-        if (req.headers['x-user-role']) {
-          proxyReq.setHeader('x-user-role', req.headers['x-user-role']);
-        }
-        if (req.headers['x-user-username']) {
-          proxyReq.setHeader('x-user-username', req.headers['x-user-username']);
-        }
-        if (req.headers['x-user-name']) {
-          proxyReq.setHeader('x-user-name', req.headers['x-user-name']);
-        }
-
-        // ✅ Restream body nếu đã được parsed bởi body-parser
-        if (req.body && Object.keys(req.body).length > 0) {
-          const bodyData = JSON.stringify(req.body);
-          proxyReq.setHeader('Content-Type', 'application/json');
-          proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-          proxyReq.write(bodyData);
-          console.log(`[Gateway] Restreaming body for verification:`, req.body);
-        }
-      },
-      proxyRes: (proxyRes, req, res) => {
-        console.log(`[Gateway] Verification response ${proxyRes.statusCode} from ${req.url}`);
-      },
-      error: (err, req, res) => {
-        console.error('[Gateway] Verification service proxy error:', err.message);
-        if (!res.headersSent) {
-          res.status(503).json({
-            success: false,
-            message: 'Verification service unavailable',
-            error: err.message
-          });
-        }
+    forwardUserHeaders: true,
+    onProxyReq: (proxyReq, req, res) => {
+      // Additional logging for verification body restreaming
+      if (req.body && Object.keys(req.body).length > 0) {
+        logger.debug('Restreaming body for verification:', { body: req.body });
       }
     }
   })
@@ -446,89 +248,49 @@ app.use('/api/verification',
 
 // Report Service
 app.use('/api/bao-cao',
-  authMiddleware.authenticate,
-  createProxyMiddleware({
+  authMiddleware.authenticateFlexible, // Support token from header or query parameter
+  createProxy(logger, {
     target: process.env.REPORT_SERVICE_URL || 'http://localhost:3004',
-    changeOrigin: true,
-    pathRewrite: (path, req) => {
-      return '/api/bao-cao' + path;
-    },
+    pathRewrite: (path, req) => '/api/bao-cao' + path,
+    serviceName: 'Report',
     timeout: 60000, // Longer timeout for report generation
-    proxyTimeout: 60000,
-    on: {
-      proxyReq: (proxyReq, req, res) => {
-        console.log(`[Gateway] Report request: ${req.method} ${req.url} -> ${proxyReq.path}`);
-
-        // Forward user headers
-        if (req.headers['x-user-id']) {
-          proxyReq.setHeader('x-user-id', req.headers['x-user-id']);
-        }
-        if (req.headers['x-user-role']) {
-          proxyReq.setHeader('x-user-role', req.headers['x-user-role']);
-        }
-
-        // ✅ Restream body nếu đã được parsed
-        if (req.body && Object.keys(req.body).length > 0) {
-          const bodyData = JSON.stringify(req.body);
-          proxyReq.setHeader('Content-Type', 'application/json');
-          proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-          proxyReq.write(bodyData);
-        }
-      },
-      error: (err, req, res) => {
-        console.error('[Gateway] Report service proxy error:', err.message);
-        if (!res.headersSent) {
-          res.status(503).json({
-            success: false,
-            message: 'Report service unavailable',
-            error: err.message
-          });
-        }
-      }
-    }
+    forwardUserHeaders: true
   })
 );
 
 // Admin Service
 app.use('/api/dropdown',
-  createProxyMiddleware({
+  createProxy(logger, {
     target: process.env.ADMIN_SERVICE_URL || 'http://localhost:3005',
-    changeOrigin: true,
-    pathRewrite: (path, req) => {
-      return '/api/dropdown' + path;
-    }
+    pathRewrite: (path, req) => '/api/dropdown' + path,
+    serviceName: 'Admin Dropdown'
   })
 );
 
 app.use('/api/hanhchinh',
-  createProxyMiddleware({
+  createProxy(logger, {
     target: process.env.ADMIN_SERVICE_URL || 'http://localhost:3005',
-    changeOrigin: true,
-    pathRewrite: (path, req) => {
-      return '/api/hanhchinh' + path;
-    }
+    pathRewrite: (path, req) => '/api/hanhchinh' + path,
+    serviceName: 'Admin Hanhchinh'
   })
 );
 
 // Search Service
 app.use('/api/search',
-  createProxyMiddleware({
+  createProxy(logger, {
     target: process.env.SEARCH_SERVICE_URL || 'http://localhost:3006',
-    changeOrigin: true,
-    pathRewrite: (path, req) => {
-      return '/api/search' + path;
-    }
+    pathRewrite: (path, req) => '/api/search' + path,
+    serviceName: 'Search'
   })
 );
 
 // MapServer WMS/WFS Service (for static layers)
 app.use('/api/mapserver',
-  createProxyMiddleware({
-    target: process.env.MAPSERVER_SERVICE_URL || 'http://127.0.0.1:3008', // Corrected target port
-    changeOrigin: true,
+  createProxy(logger, {
+    target: process.env.MAPSERVER_SERVICE_URL || 'http://127.0.0.1:3008',
     pathRewrite: (path, req) => {
-      const url = new URL(`http://localhost${path}`); // Create a URL object to easily parse query params
-      const serviceType = url.searchParams.get('service'); // Get 'service' query param (WMS or WFS)
+      const url = new URL(`http://localhost${path}`);
+      const serviceType = url.searchParams.get('service');
       let newPath = '';
 
       if (serviceType && serviceType.toUpperCase() === 'WFS') {
@@ -541,24 +303,7 @@ app.use('/api/mapserver',
       const queryString = url.search;
       return newPath + queryString;
     },
-    on: {
-      // proxyReq: (proxyReq, req, res) => {
-      //   console.log(`[Gateway] MapServer WMS request: ${req.url} -> ${proxyReq.path}`);
-      // },
-      // proxyRes: (proxyRes, req, res) => {
-      //   console.log(`[Gateway] MapServer WMS response ${proxyRes.statusCode} for ${req.url}`);
-      // },
-      error: (err, req, res) => {
-        console.error('[Gateway] MapServer proxy error:', err.message);
-        if (!res.headersSent) {
-          res.status(503).json({
-            success: false,
-            message: 'MapServer unavailable',
-            error: err.message
-          });
-        }
-      }
-    }
+    serviceName: 'MapServer'
   })
 );
 
@@ -579,30 +324,42 @@ app.use(errorHandler);
 
 // ========== START SERVER ==========
 
+// Initialize MongoDB connection before starting server
+connectMongoDB()
+  .then(() => {
+    logger.info('MongoDB logging service initialized');
+  })
+  .catch((error) => {
+    logger.warn('MongoDB connection failed, logging service will not be available:', error.message);
+  });
+
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 API Gateway running on port ${PORT}`);
-  console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Services configured:`);
-  console.log(`   - Auth: ${process.env.AUTH_SERVICE_URL || 'http://localhost:3001/api-docs'}`);
-  console.log(`   - User: ${process.env.USER_SERVICE_URL || 'http://localhost:3002/api-docs'}`);
-  console.log(`   - GIS: ${process.env.GIS_SERVICE_URL || 'http://localhost:3003/api-docs'}`);
-  console.log(`   - Report: ${process.env.REPORT_SERVICE_URL || 'http://localhost:3004/api-docs'}`);
-  console.log(`   - Admin: ${process.env.ADMIN_SERVICE_URL || 'http://localhost:3005/api-docs'}`);
-  console.log(`   - Search: ${process.env.SEARCH_SERVICE_URL || 'http://localhost:3006/api-docs'}`);
+  logger.info(`API Gateway running on port ${PORT}`);
+  logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.info('Services configured:', {
+    auth: process.env.AUTH_SERVICE_URL || 'http://localhost:3001/api-docs',
+    user: process.env.USER_SERVICE_URL || 'http://localhost:3002/api-docs',
+    gis: process.env.GIS_SERVICE_URL || 'http://localhost:3003/api-docs',
+    report: process.env.REPORT_SERVICE_URL || 'http://localhost:3004/api-docs',
+    admin: process.env.ADMIN_SERVICE_URL || 'http://localhost:3005/api-docs',
+    search: process.env.SEARCH_SERVICE_URL || 'http://localhost:3006/api-docs'
+  });
 });
 
 server.on('error', (error) => {
-  console.error('Server error:', error);
+  logger.error('Server error:', { error });
   process.exit(1);
 });
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, closing server gracefully...');
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM received, closing server gracefully...');
+  await closeMongoDB();
   process.exit(0);
 });
 
-process.on('SIGINT', () => {
-  console.log('SIGINT received, closing server gracefully...');
+process.on('SIGINT', async () => {
+  logger.info('SIGINT received, closing server gracefully...');
+  await closeMongoDB();
   process.exit(0);
 });

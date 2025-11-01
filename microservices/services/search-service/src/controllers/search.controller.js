@@ -1,27 +1,31 @@
 // search-service/src/controllers/search.controller.js
 const { formatResponse } = require('../../../../shared/utils');
+const { convertTcvn3ToUnicode } = require('../../../../shared/utils/tcvn3-converter');
 const createLogger = require('../../../../shared/logger');
 
 const logger = createLogger('search-controller');
 
-// Search mat rung
+// Search mat rung - OPTIMIZED VERSION
 exports.searchMatRung = async (req, res, next) => {
+  let adminDb = null;
+
   try {
-    const { q, status, fromDate, toDate, limit = 100 } = req.query;
+    const { q, status, fromDate, toDate, limit = 100, huyen, xa, xacMinh } = req.query;
 
     const db = req.app.locals.db;
     const redis = req.app.locals.redis;
 
-    const cacheKey = `search:${q || ''}:${status || ''}:${fromDate || ''}:${toDate || ''}`;
+    const cacheKey = `search:${q || ''}:${status || ''}:${fromDate || ''}:${toDate || ''}:${huyen || ''}:${xa || ''}:${xacMinh || ''}`;
     const cached = await redis.get(cacheKey);
 
     if (cached) {
+      logger.info('Cache hit for search');
       return res.json({ ...cached, cached: true });
     }
 
-    logger.info('Searching mat rung', { q, status, fromDate, toDate });
+    logger.info('Searching mat rung', { q, status, fromDate, toDate, huyen, xa, xacMinh });
 
-    let whereClause = 'WHERE m.geom IS NOT NULL';
+    let whereClause = 'WHERE m.geom IS NOT NULL AND ST_IsValid(m.geom)';
     const params = [];
     let paramIndex = 1;
 
@@ -31,7 +35,7 @@ exports.searchMatRung = async (req, res, next) => {
       params.push(`%${q}%`, `%${q}%`);
     }
 
-    if (status === 'true') {
+    if (status === 'true' || xacMinh === 'true') {
       whereClause += ` AND m.detection_status = $${paramIndex++}`;
       params.push('Đã xác minh');
     }
@@ -46,13 +50,79 @@ exports.searchMatRung = async (req, res, next) => {
       params.push(toDate);
     }
 
-    const query = `
+    // ✅ Build query with proper admin_db spatial filtering
+    let query;
+    let needsAdminJoin = huyen || xa;
+
+    if (needsAdminJoin) {
+      // Connect to admin_db for spatial filtering
+      const { Pool } = require('pg');
+      adminDb = new Pool({
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT || 5433,
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD,
+        database: 'admin_db',
+        max: 5,
+        idleTimeoutMillis: 5000
+      });
+
+      // First, get GIDs that match spatial filter from admin_db
+      let spatialWhereClause = '';
+      const spatialParams = [];
+      let spatialParamIndex = 1;
+
+      if (huyen) {
+        spatialWhereClause += ` WHERE r.huyen = $${spatialParamIndex++}`;
+        spatialParams.push(huyen);
+      }
+
+      if (xa) {
+        spatialWhereClause += huyen ? ' AND' : ' WHERE';
+        spatialWhereClause += ` r.xa = $${spatialParamIndex++}`;
+        spatialParams.push(xa);
+      }
+
+      // Get matching geometries from admin_db
+      const spatialQuery = `
+        SELECT ST_AsText(ST_Union(r.geom)) as union_geom_wkt
+        FROM laocai_ranhgioihc r
+        ${spatialWhereClause}
+      `;
+
+      const spatialResult = await adminDb.query(spatialQuery, spatialParams);
+
+      if (!spatialResult.rows[0] || !spatialResult.rows[0].union_geom_wkt) {
+        logger.warn('No matching admin boundaries found', { huyen, xa });
+        return res.json(formatResponse(true, 'No data found', {
+          type: 'FeatureCollection',
+          features: []
+        }));
+      }
+
+      // Now query mat_rung with spatial intersection using WKT
+      whereClause += ` AND ST_Intersects(m.geom, ST_GeomFromText($${paramIndex++}, 4326))`;
+      params.push(spatialResult.rows[0].union_geom_wkt);
+    }
+
+    // ✅ OPTIMIZED: Query với tất cả thông tin cần thiết
+    query = `
       SELECT
         m.gid,
         m.area,
+        m.start_dau,
+        m.end_sau,
+        m.mahuyen,
+        CONCAT('CB-', m.gid) as lo_canbao,
+        ROUND(ST_X(ST_Centroid(m.geom))::numeric, 0) as x,
+        ROUND(ST_Y(ST_Centroid(m.geom))::numeric, 0) as y,
+        m.area as dtich,
+        m.verified_area as dtichXM,
+        m.verification_reason,
         m.detection_status,
         m.verification_notes,
-        ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
+        ST_AsGeoJSON(m.geom) as geometry,
+        ST_AsText(ST_Centroid(m.geom)) as centroid_wkt
       FROM mat_rung m
       ${whereClause}
       ORDER BY m.gid DESC
@@ -63,16 +133,112 @@ exports.searchMatRung = async (req, res, next) => {
 
     const result = await db.query(query, params);
 
-    const features = result.rows.map(row => ({
-      type: 'Feature',
-      geometry: JSON.parse(row.geometry),
-      properties: {
-        gid: row.gid,
-        area: row.area,
-        detection_status: row.detection_status,
-        verification_notes: row.verification_notes
+    logger.info(`Found ${result.rows.length} mat_rung records`);
+
+    // ✅ OPTIMIZED: Get admin info for all results
+    if (result.rows.length === 0) {
+      return res.json(formatResponse(true, 'No data found', {
+        type: 'FeatureCollection',
+        features: []
+      }));
+    }
+
+    // Connect to admin_db for admin info lookup (if not already connected)
+    if (!adminDb) {
+      const { Pool } = require('pg');
+      adminDb = new Pool({
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT || 5433,
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD,
+        database: 'admin_db',
+        max: 5,
+        idleTimeoutMillis: 5000,
+        connectionTimeoutMillis: 10000
+      });
+    }
+
+    // ✅ OPTIMIZED: Batch query thay vì query từng record
+    // Lấy tất cả centroids
+    const centroids = result.rows.map(row => row.centroid_wkt);
+
+    // Query admin info cho tất cả records trong 1 lần
+    let adminInfoMap = {};
+
+    if (centroids.length > 0) {
+      try {
+        // Tạo temporary table với centroids
+        const tempTableQuery = `
+          WITH centroids AS (
+            SELECT
+              unnest(ARRAY[${centroids.map((_, idx) => `$${idx + 1}::text`).join(',')}]) as point_wkt
+          )
+          SELECT
+            r.huyen,
+            r.xa,
+            r.tieukhu,
+            r.khoanh,
+            c.point_wkt as centroid_key
+          FROM centroids c
+          LEFT JOIN laocai_ranhgioihc r
+            ON ST_Intersects(r.geom, ST_GeomFromText(c.point_wkt, 4326))
+        `;
+
+        const adminResult = await adminDb.query(tempTableQuery, centroids);
+
+        // Map kết quả theo centroid
+        adminResult.rows.forEach(row => {
+          if (row.centroid_key) {
+            adminInfoMap[row.centroid_key] = {
+              huyen_name: convertTcvn3ToUnicode(row.huyen),
+              xa_name: convertTcvn3ToUnicode(row.xa),
+              tk: row.tieukhu,
+              khoanh: row.khoanh
+            };
+          }
+        });
+
+        logger.info(`Retrieved admin info for ${Object.keys(adminInfoMap).length} locations`);
+      } catch (err) {
+        logger.error('Failed to batch query admin info:', err.message);
       }
-    }));
+    }
+
+    // ✅ Map kết quả với admin info
+    const features = result.rows.map((row) => {
+      const adminInfo = adminInfoMap[row.centroid_wkt] || {
+        huyen_name: row.mahuyen,
+        xa_name: null,
+        tk: null,
+        khoanh: null
+      };
+
+      return {
+        type: 'Feature',
+        geometry: JSON.parse(row.geometry),
+        properties: {
+          gid: row.gid,
+          area: row.area,
+          start_dau: row.start_dau,
+          end_sau: row.end_sau,
+          mahuyen: row.mahuyen,
+          xa: adminInfo.xa_name,
+          lo_canbao: row.lo_canbao,
+          tk: adminInfo.tk,
+          khoanh: adminInfo.khoanh,
+          x: row.x,
+          y: row.y,
+          dtich: row.dtich,
+          dtichXM: row.dtichXM,
+          verification_reason: row.verification_reason,
+          detection_status: row.detection_status,
+          verification_notes: row.verification_notes,
+          xacminh: row.detection_status === 'Đã xác minh' ? 1 : 0,
+          huyen_name: adminInfo.huyen_name,
+          xa_name: adminInfo.xa_name
+        }
+      };
+    });
 
     const geoJSON = {
       type: 'FeatureCollection',
@@ -80,16 +246,31 @@ exports.searchMatRung = async (req, res, next) => {
     };
 
     const response = formatResponse(true, `Found ${features.length} results`, geoJSON);
-    await redis.set(cacheKey, response, 300); // Cache 5 min
+
+    // ✅ Cache lâu hơn nếu không có search query động
+    const cacheTime = q ? 60 : 300; // 1 min nếu có search, 5 min nếu filter tĩnh
+    await redis.set(cacheKey, response, cacheTime);
 
     res.json(response);
   } catch (error) {
+    logger.error('Error in searchMatRung:', error);
     next(error);
+  } finally {
+    // ✅ Đảm bảo đóng connection
+    if (adminDb) {
+      try {
+        await adminDb.end();
+      } catch (err) {
+        logger.warn('Error closing admin_db pool:', err.message);
+      }
+    }
   }
 };
 
 // ✅ NEW: Search mat rung by ID with surrounding features
 exports.searchMatRungById = async (req, res, next) => {
+  let adminDb = null;
+
   try {
     const { id } = req.params;
     const { radius = 5000 } = req.query; // Default 5km radius
@@ -238,6 +419,71 @@ exports.searchMatRungById = async (req, res, next) => {
 
     logger.info(`Found ${surroundingFeatures.length} features within ${radius}m of CB-${gid}`);
 
+    // ✅ Step 2.5: Get admin info for all features
+    const allRows = [targetResult.rows[0], ...surroundingResult.rows];
+
+    try {
+      const { Pool } = require('pg');
+      adminDb = new Pool({
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT || 5433,
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD,
+        database: 'admin_db',
+        max: 5,
+        idleTimeoutMillis: 5000
+      });
+
+      const geometries = allRows.map(row => row.geometry);
+      const placeholders = geometries.map((_, idx) => `$${idx + 1}`).join(',');
+
+      const adminQuery = `
+        WITH geoms AS (
+          SELECT
+            unnest(ARRAY[${placeholders}])::text as geom_json,
+            generate_series(1, ${geometries.length}) as idx
+        )
+        SELECT idx, r.huyen, r.xa, r.tieukhu, r.khoanh
+        FROM geoms g
+        LEFT JOIN laocai_ranhgioihc r
+          ON ST_Intersects(r.geom, ST_SetSRID(ST_GeomFromGeoJSON(g.geom_json), 4326))
+      `;
+
+      const adminResult = await adminDb.query(adminQuery, geometries);
+      const adminInfoMap = {};
+
+      adminResult.rows.forEach(row => {
+        if (row.idx) {
+          adminInfoMap[row.idx - 1] = {
+            huyen_name: convertTcvn3ToUnicode(row.huyen),
+            xa_name: convertTcvn3ToUnicode(row.xa),
+            tk: row.tieukhu,
+            khoanh: row.khoanh
+          };
+        }
+      });
+
+      // Add admin info to target feature
+      const targetAdminInfo = adminInfoMap[0] || {};
+      targetFeature.properties.huyen_name = targetAdminInfo.huyen_name;
+      targetFeature.properties.xa_name = targetAdminInfo.xa_name;
+      targetFeature.properties.tk = targetAdminInfo.tk;
+      targetFeature.properties.khoanh = targetAdminInfo.khoanh;
+
+      // Add admin info to surrounding features
+      surroundingFeatures.forEach((feature, idx) => {
+        const adminInfo = adminInfoMap[idx + 1] || {};
+        feature.properties.huyen_name = adminInfo.huyen_name;
+        feature.properties.xa_name = adminInfo.xa_name;
+        feature.properties.tk = adminInfo.tk;
+        feature.properties.khoanh = adminInfo.khoanh;
+      });
+
+      logger.info(`Added admin info for ${Object.keys(adminInfoMap).length} features`);
+    } catch (err) {
+      logger.error('Failed to get admin info:', err.message);
+    }
+
     // Step 3: Combine all features (target first)
     const allFeatures = [targetFeature, ...surroundingFeatures];
 
@@ -267,6 +513,14 @@ exports.searchMatRungById = async (req, res, next) => {
   } catch (error) {
     logger.error(`Error searching for mat rung by ID:`, error);
     next(error);
+  } finally {
+    if (adminDb) {
+      try {
+        await adminDb.end();
+      } catch (err) {
+        logger.warn('Error closing admin_db:', err.message);
+      }
+    }
   }
 };
 

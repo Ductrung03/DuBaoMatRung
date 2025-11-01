@@ -46,7 +46,6 @@ const SmartMapLayer = ({ layerKey, layerConfig, visible, onError }) => {
     // Tạo viewport key để check cache
     const viewportKey = `${bbox}_${zoom}`;
     if (lastViewportRef.current === viewportKey) {
-      console.log(`🔄 Viewport unchanged for ${layerKey}, skipping load`);
       return;
     }
     
@@ -62,7 +61,6 @@ const SmartMapLayer = ({ layerKey, layerConfig, visible, onError }) => {
     setError(null);
     
     try {
-      console.log(`📍 Loading ${layerKey} data for zoom ${zoom}, bbox: ${bbox}`);
       
       const startTime = Date.now();
       
@@ -90,11 +88,9 @@ const SmartMapLayer = ({ layerKey, layerConfig, visible, onError }) => {
       setCurrentData(data);
       lastViewportRef.current = viewportKey;
       
-      console.log(`✅ ${layerKey} loaded: ${data.features.length} features in ${loadTime}ms (zoom ${zoom})`);
       
       // Log performance metrics
       if (data.metadata) {
-        console.log(`📊 ${layerKey} metadata:`, {
           strategy: data.metadata.load_strategy,
           dataType: data.metadata.data_type,
           queryTime: data.metadata.query_time_ms,
@@ -104,7 +100,6 @@ const SmartMapLayer = ({ layerKey, layerConfig, visible, onError }) => {
       
     } catch (error) {
       if (error.name === 'AbortError') {
-        console.log(`🚫 Request aborted for ${layerKey}`);
         return;
       }
       
@@ -134,7 +129,6 @@ const SmartMapLayer = ({ layerKey, layerConfig, visible, onError }) => {
     const zoom = map.getZoom();
     const featureCount = currentData.features.length;
     
-    console.log(`🗺️ Rendering ${featureCount} features for ${layerKey} at zoom ${zoom}`);
     
     // Clear existing layers
     if (layerGroupRef.current && map.hasLayer(layerGroupRef.current)) {
@@ -181,7 +175,6 @@ const SmartMapLayer = ({ layerKey, layerConfig, visible, onError }) => {
       chunkLoading: featureCount > 1000,
       chunkProgress: featureCount > 1000 ? (processed, total) => {
         if (processed % 500 === 0 || processed === total) {
-          console.log(`🔄 ${layerKey} chunk progress: ${processed}/${total}`);
         }
       } : undefined
     });
@@ -190,7 +183,6 @@ const SmartMapLayer = ({ layerKey, layerConfig, visible, onError }) => {
     layerGroupRef.current.addLayer(geoJsonLayer);
     map.addLayer(layerGroupRef.current);
     
-    console.log(`✅ ${layerKey} rendered successfully`);
 
   }, [currentData, visible, map, layerKey]);
 

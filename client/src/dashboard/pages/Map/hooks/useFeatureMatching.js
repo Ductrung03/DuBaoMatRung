@@ -36,8 +36,6 @@ export const useFeatureMatching = ({
     setLoadingDetails(true);
     setLoadingMessage("Đang tìm vị trí trên bản đồ...");
 
-    console.log("Đã click vào hàng:", row);
-    console.log("Chi tiết dòng đã chọn:", JSON.stringify(row, null, 2));
 
     // Kiểm tra dữ liệu GeoJSON
     if (!geoData || !geoData.features || geoData.features.length === 0) {
@@ -46,7 +44,6 @@ export const useFeatureMatching = ({
       return;
     }
 
-    console.log("Tổng số features:", geoData.features.length);
 
     try {
       // Chuẩn bị các giá trị để so sánh
@@ -58,12 +55,7 @@ export const useFeatureMatching = ({
       const rowStartDau = row.start_dau;
       const rowEndSau = row.end_sau;
 
-      console.log(
-        `Tìm feature với: TK=${rowTk}, Khoảnh=${rowKhoanh}, Diện tích=${rowArea}, Mã huyện=${rowMahuyen}, Từ=${rowStartDau}, Đến=${rowEndSau}`
-      );
-
       const rowVirtualId = createVirtualId(row);
-      console.log("ID ảo của dòng:", rowVirtualId);
 
       // Tìm feature khớp chính xác nhất
       let matchedFeature = null;
@@ -131,14 +123,11 @@ export const useFeatureMatching = ({
         if (matchScore > bestMatchScore) {
           bestMatchScore = matchScore;
           matchedFeature = feature;
-          console.log(`Feature #${i} có điểm khớp: ${matchScore}, hiện là feature tốt nhất`);
         }
       }
 
       setTimeout(() => {
         if (matchedFeature) {
-          console.log("Tìm thấy feature khớp tốt nhất với điểm:", bestMatchScore);
-          console.log("Feature:", matchedFeature);
 
           // Đánh dấu feature được chọn
           setSelectedFeature(matchedFeature);

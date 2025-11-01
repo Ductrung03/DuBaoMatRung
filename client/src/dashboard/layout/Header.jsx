@@ -1,4 +1,4 @@
-// client/src/dashboard/layout/Header.jsx - FIXED JSX SYNTAX
+// client/src/dashboard/layout/Header.jsx - WITH PERMISSION-BASED NAVIGATION
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -29,14 +29,45 @@ const Header = () => {
 
   const isActive = (path) => currentPath === path;
 
-  // ✅ FIXED: Get permission level display - ƯU TIÊN ROLE TRƯỚC
+  // Kiểm tra quyền truy cập page
+  const hasPagePermission = (pageKey) => {
+    if (isAdmin()) return true;
+    if (!user || !user.permissions) return false;
+
+    // Kiểm tra nếu user có ít nhất 1 permission của page đó
+    const pagePermissionPrefixes = {
+      'forecast': 'forecast.',
+      'data_management': 'data_management.',
+      'reports': 'reports.',
+      'detection': 'detection.',
+      'user_management': 'user_management.',
+      'role_management': 'role_management.'
+    };
+
+    const prefix = pagePermissionPrefixes[pageKey];
+    if (!prefix) return false;
+
+    return user.permissions.some(p => p.startsWith(prefix));
+  };
+
+  // ✅ FIXED: Get permission level display - Hiển thị theo role thực tế
   const getPermissionLevelDisplay = () => {
-    // Ưu tiên kiểm tra role === 'admin' trước
-    if (user?.role === 'admin') {
-      return 'Quản trị viên hệ thống';
+    // Ưu tiên hiển thị role từ userRoles
+    if (user?.userRoles && user.userRoles.length > 0) {
+      const roleName = user.userRoles[0].role.name;
+      const roleDescriptions = {
+        'super_admin': 'Quản trị viên tối cao',
+        'admin': 'Quản trị viên hệ thống',
+        'gis_manager': 'Quản lý GIS',
+        'gis_specialist': 'Chuyên viên GIS',
+        'verifier': 'Người xác minh',
+        'reporter': 'Người báo cáo',
+        'viewer': 'Người xem'
+      };
+      return roleDescriptions[roleName] || roleName;
     }
 
-    // Nếu không phải admin, check permission_level
+    // Fallback: nếu không có userRoles, check permission_level
     const levels = {
       'national': 'Người dùng cấp quốc gia',
       'province': 'Người dùng cấp tỉnh',
@@ -68,39 +99,49 @@ const Header = () => {
             Hệ thống phát hiện sớm mất rừng tỉnh Lào Cai
           </h1>
           <div className="flex gap-8 mt-1">
-            <Link 
-              to="/dashboard/dubaomatrung"
-              className={`text-base font-semibold hover:underline transition-colors ${
-                isActive("/dashboard/dubaomatrung")
-                  ? "text-red-600"
-                  : "text-white"
-              }`}
-            >
-              Dự báo mất rừng
-            </Link>
+            {/* Dự báo mất rừng - Hiển thị nếu có quyền forecast */}
+            {hasPagePermission('forecast') && (
+              <Link
+                to="/dashboard/dubaomatrung"
+                className={`text-base font-semibold hover:underline transition-colors ${
+                  isActive("/dashboard/dubaomatrung")
+                    ? "text-red-600"
+                    : "text-white"
+                }`}
+              >
+                Dự báo mất rừng
+              </Link>
+            )}
 
-            <Link 
-              to="/dashboard/quanlydulieu"
-              className={`text-base font-semibold hover:underline transition-colors ${
-                isActive("/dashboard/quanlydulieu")
-                  ? "text-red-600"
-                  : "text-white"
-              }`}
-            >
-              Quản lý dữ liệu
-            </Link>
+            {/* Quản lý dữ liệu - Hiển thị nếu có quyền data_management */}
+            {hasPagePermission('data_management') && (
+              <Link
+                to="/dashboard/quanlydulieu"
+                className={`text-base font-semibold hover:underline transition-colors ${
+                  isActive("/dashboard/quanlydulieu")
+                    ? "text-red-600"
+                    : "text-white"
+                }`}
+              >
+                Quản lý dữ liệu
+              </Link>
+            )}
 
-            <Link 
-              to="/dashboard/baocao"
-              className={`text-base font-semibold hover:underline transition-colors ${
-                isActive("/dashboard/baocao") ? "text-red-600" : "text-white"
-              }`}
-            >
-              Báo cáo
-            </Link>
+            {/* Báo cáo - Hiển thị nếu có quyền reports */}
+            {hasPagePermission('reports') && (
+              <Link
+                to="/dashboard/baocao"
+                className={`text-base font-semibold hover:underline transition-colors ${
+                  isActive("/dashboard/baocao") ? "text-red-600" : "text-white"
+                }`}
+              >
+                Báo cáo
+              </Link>
+            )}
 
-            {isAdmin() && (
-              <Link 
+            {/* Phát hiện mất rừng - Hiển thị nếu có quyền detection */}
+            {hasPagePermission('detection') && (
+              <Link
                 to="/dashboard/phathienmatrung"
                 className={`text-base font-semibold hover:underline transition-colors ${
                   isActive("/dashboard/phathienmatrung")
@@ -111,9 +152,10 @@ const Header = () => {
                 Phát hiện mất rừng
               </Link>
             )}
-            
-            {isAdmin() && (
-              <Link 
+
+            {/* Quản lý người dùng - Hiển thị nếu có quyền user_management */}
+            {hasPagePermission('user_management') && (
+              <Link
                 to="/dashboard/quanlynguoidung"
                 className={`text-base font-semibold hover:underline transition-colors ${
                   isActive("/dashboard/quanlynguoidung")
@@ -122,6 +164,20 @@ const Header = () => {
                 }`}
               >
                 Quản lý người dùng
+              </Link>
+            )}
+
+            {/* Quản lý role - Hiển thị nếu có quyền role_management */}
+            {hasPagePermission('role_management') && (
+              <Link
+                to="/dashboard/quanlyrole"
+                className={`text-base font-semibold hover:underline transition-colors ${
+                  isActive("/dashboard/quanlyrole")
+                    ? "text-red-600"
+                    : "text-white"
+                }`}
+              >
+                Quản lý Roles
               </Link>
             )}
           </div>

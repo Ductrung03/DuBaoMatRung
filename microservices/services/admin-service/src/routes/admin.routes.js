@@ -1,7 +1,8 @@
 // admin-service/src/routes/admin.routes.js
 const express = require('express');
 const router = express.Router();
-const adminController = require('../controllers/admin.controller');
+// Use Kysely-based controller for better query building
+const adminController = require('../controllers/admin.controller.kysely');
 const { asyncHandler } = require('../../../../shared/errors');
 
 /**

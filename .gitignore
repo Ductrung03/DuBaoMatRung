@@ -2,6 +2,7 @@ microservices/migrations/logs/
 
 # Dependencies
 /node_modules
+node_modules/
 client/node_modules
 microservices/node_modules
 microservices/gateway/node_modules
@@ -11,12 +12,17 @@ microservices/shared/node_modules
 microservices/load-tests/node_modules
 microservices/tests/node_modules
 
-
 # Build output
 /dist
+/build
 client/dist
+client/build
+*.tsbuildinfo
 
 # Environment variables
+.env
+.env.*
+!.env.example
 
 # Logs
 /logs
@@ -25,6 +31,9 @@ client/dist
 /microservices/migrations/logs
 /microservices/services/admin-service/logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # IDE specific
 .vscode/
@@ -32,3 +41,23 @@ client/dist
 
 # OS specific
 .DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+
+# Test coverage
+coverage/
+.nyc_output/
+.aider*
+
+#AI agent
+.claude
+.gemini
+.qodo
+.specify
+specs
+
