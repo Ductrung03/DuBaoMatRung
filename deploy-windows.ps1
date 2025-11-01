@@ -59,111 +59,102 @@ function Check-Command {
 }
 
 function Check-Prerequisites {
-    Write-ColorOutput "" "Yellow"
-    Write-ColorOutput "=== Kiểm tra yêu cầu hệ thống ===" "Yellow"
+    Write-Host ""
+    Write-Host "=== Kiểm tra yêu cầu hệ thống ===" -ForegroundColor Yellow
 
-    # Kiểm tra Node.js
     if (Check-Command "node") {
         $nodeVersion = node --version
-        Write-ColorOutput "  Node.js: $nodeVersion" "Green"
+        Write-Host "  Node.js: $nodeVersion" -ForegroundColor Green
     } else {
-        Write-ColorOutput "  Node.js chưa cài đặt!" "Red"
-        Write-ColorOutput "  Tải và cài đặt từ: https://nodejs.org" "Yellow"
+        Write-Host "  Node.js chưa cài đặt!" -ForegroundColor Red
+        Write-Host "  Tải và cài đặt từ: https://nodejs.org" -ForegroundColor Yellow
         exit 1
     }
 
-    # Kiểm tra npm
     if (Check-Command "npm") {
         $npmVersion = npm --version
-        Write-ColorOutput "  npm: v$npmVersion" "Green"
+        Write-Host "  npm: v$npmVersion" -ForegroundColor Green
     } else {
-        Write-ColorOutput "  npm chưa cài đặt!" "Red"
+        Write-Host "  npm chưa cài đặt!" -ForegroundColor Red
         exit 1
     }
 
-    # Kiểm tra Git
     if (Check-Command "git") {
         $gitVersion = git --version
-        Write-ColorOutput "  Git: $gitVersion" "Green"
+        Write-Host "  Git: $gitVersion" -ForegroundColor Green
     } else {
-        Write-ColorOutput "  Git chưa cài đặt!" "Red"
-        Write-ColorOutput "  Tải và cài đặt từ: https://git-scm.com" "Yellow"
+        Write-Host "  Git chưa cài đặt!" -ForegroundColor Red
+        Write-Host "  Tải và cài đặt từ: https://git-scm.com" -ForegroundColor Yellow
         exit 1
     }
 
-    # Kiểm tra PostgreSQL
     if (Check-Command "psql") {
-        Write-ColorOutput "  PostgreSQL: Đã cài đặt" "Green"
+        Write-Host "  PostgreSQL: Đã cài đặt" -ForegroundColor Green
     } else {
-        Write-ColorOutput "  PostgreSQL chưa cài đặt!" "Red"
-        Write-ColorOutput "  Tải và cài đặt từ: https://www.postgresql.org/download/windows/" "Yellow"
+        Write-Host "  PostgreSQL chưa cài đặt!" -ForegroundColor Red
+        Write-Host "  Tải và cài đặt từ: https://www.postgresql.org/download/windows/" -ForegroundColor Yellow
         exit 1
     }
 
-    # Kiểm tra PM2
     if (Check-Command "pm2") {
-        Write-ColorOutput "  PM2: Đã cài đặt" "Green"
+        Write-Host "  PM2: Đã cài đặt" -ForegroundColor Green
     } else {
-        Write-ColorOutput "  PM2 chưa cài đặt. Đang cài đặt..." "Yellow"
+        Write-Host "  PM2 chưa cài đặt. Đang cài đặt..." -ForegroundColor Yellow
         npm install -g pm2
         npm install -g pm2-windows-startup
         pm2-startup install
-        Write-ColorOutput "  PM2 đã được cài đặt" "Green"
+        Write-Host "  PM2 đã được cài đặt" -ForegroundColor Green
     }
 }
 
 function Stop-Services {
-    Write-ColorOutput "" "Yellow"
-    Write-ColorOutput "=== Dừng các services đang chạy ===" "Yellow"
+    Write-Host ""
+    Write-Host "=== Dừng các services đang chạy ===" -ForegroundColor Yellow
 
-    # Dừng PM2 nếu đang chạy
     if (Check-Command "pm2") {
         pm2 stop all 2>$null
         pm2 delete all 2>$null
     }
 
-    # Kill các port đang sử dụng
-    $ports = @($GATEWAY_PORT, $AUTH_PORT, $USER_PORT, $GIS_PORT, $REPORT_PORT,
-               $ADMIN_PORT, $SEARCH_PORT, $MAPSERVER_PORT, $CLIENT_PORT)
+    $ports = @($GATEWAY_PORT, $AUTH_PORT, $USER_PORT, $GIS_PORT, $REPORT_PORT, $ADMIN_PORT, $SEARCH_PORT, $MAPSERVER_PORT, $CLIENT_PORT)
 
     foreach ($port in $ports) {
         $connection = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
         if ($connection) {
             $processId = $connection.OwningProcess
-            Write-ColorOutput "  Đang dừng process trên port $port (PID: $processId)" "Cyan"
+            Write-Host "  Đang dừng process trên port $port (PID: $processId)" -ForegroundColor Cyan
             Stop-Process -Id $processId -Force -ErrorAction SilentlyContinue
         }
     }
 
-    Write-ColorOutput "  Đã dừng tất cả services" "Green"
+    Write-Host "  Đã dừng tất cả services" -ForegroundColor Green
 }
 
 function Clone-Or-Pull {
-    Write-ColorOutput "" "Yellow"
-    Write-ColorOutput "=== Lấy code từ Git ===" "Yellow"
+    Write-Host ""
+    Write-Host "=== Lấy code từ Git ===" -ForegroundColor Yellow
 
     if (Test-Path $DEPLOY_PATH) {
-        Write-ColorOutput "  Thư mục đã tồn tại, đang cập nhật code..." "Cyan"
+        Write-Host "  Thư mục đã tồn tại, đang cập nhật code..." -ForegroundColor Cyan
         Set-Location $DEPLOY_PATH
         git fetch origin
         git reset --hard origin/main
         git pull origin main
     } else {
-        Write-ColorOutput "  Đang clone repository..." "Cyan"
+        Write-Host "  Đang clone repository..." -ForegroundColor Cyan
         New-Item -ItemType Directory -Path $DEPLOY_PATH -Force | Out-Null
         Set-Location (Split-Path $DEPLOY_PATH -Parent)
         git clone $GIT_REPO $PROJECT_NAME
         Set-Location $DEPLOY_PATH
     }
 
-    Write-ColorOutput "  Code đã được cập nhật" "Green"
+    Write-Host "  Code đã được cập nhật" -ForegroundColor Green
 }
 
 function Setup-Environment {
-    Write-ColorOutput "" "Yellow"
-    Write-ColorOutput "=== Thiết lập biến môi trường ===" "Yellow"
+    Write-Host ""
+    Write-Host "=== Thiết lập biến môi trường ===" -ForegroundColor Yellow
 
-    # Tạo file .env cho microservices
     $microservicesEnv = @"
 # Database Configuration
 DB_HOST=$DB_HOST
@@ -196,83 +187,75 @@ CORS_ORIGIN=http://localhost:$CLIENT_PORT,http://103.56.161.239
 "@
 
     $microservicesEnv | Out-File -FilePath "$DEPLOY_PATH\microservices\.env" -Encoding UTF8
-    Write-ColorOutput "  Đã tạo .env cho microservices" "Green"
+    Write-Host "  Đã tạo .env cho microservices" -ForegroundColor Green
 
-    # Tạo file .env cho client
     $clientEnv = @"
 VITE_API_URL=http://localhost:$GATEWAY_PORT
 VITE_API_TIMEOUT=30000
 "@
 
     $clientEnv | Out-File -FilePath "$DEPLOY_PATH\client\.env" -Encoding UTF8
-    Write-ColorOutput "  Đã tạo .env cho client" "Green"
+    Write-Host "  Đã tạo .env cho client" -ForegroundColor Green
 }
 
 function Install-Dependencies {
-    Write-ColorOutput "" "Yellow"
-    Write-ColorOutput "=== Cài đặt dependencies ===" "Yellow"
+    Write-Host ""
+    Write-Host "=== Cài đặt dependencies ===" -ForegroundColor Yellow
 
     Set-Location $DEPLOY_PATH
 
-    # Cài đặt root dependencies
-    Write-ColorOutput "  Cài đặt root dependencies..." "Cyan"
+    Write-Host "  Cài đặt root dependencies..." -ForegroundColor Cyan
     npm install
 
-    # Cài đặt microservices dependencies
-    Write-ColorOutput "  Cài đặt microservices dependencies..." "Cyan"
+    Write-Host "  Cài đặt microservices dependencies..." -ForegroundColor Cyan
     Set-Location "$DEPLOY_PATH\microservices"
     npm install
 
-    # Cài đặt client dependencies
-    Write-ColorOutput "  Cài đặt client dependencies..." "Cyan"
+    Write-Host "  Cài đặt client dependencies..." -ForegroundColor Cyan
     Set-Location "$DEPLOY_PATH\client"
     npm install
 
-    Write-ColorOutput "  Đã cài đặt tất cả dependencies" "Green"
+    Write-Host "  Đã cài đặt tất cả dependencies" -ForegroundColor Green
 }
 
 function Setup-Database {
-    Write-ColorOutput "" "Yellow"
-    Write-ColorOutput "=== Thiết lập database ===" "Yellow"
+    Write-Host ""
+    Write-Host "=== Thiết lập database ===" -ForegroundColor Yellow
 
-    # Kiểm tra kết nối database
     $env:PGPASSWORD = $DB_PASSWORD
     $dbExists = psql -h $DB_HOST -p $DB_PORT -U $DB_USER -lqt | Select-String -Pattern $DB_NAME
 
     if (-not $dbExists) {
-        Write-ColorOutput "  Tạo database mới..." "Cyan"
+        Write-Host "  Tạo database mới..." -ForegroundColor Cyan
         psql -h $DB_HOST -p $DB_PORT -U $DB_USER -c "CREATE DATABASE $DB_NAME;"
     } else {
-        Write-ColorOutput "  Database đã tồn tại" "Cyan"
+        Write-Host "  Database đã tồn tại" -ForegroundColor Cyan
     }
 
-    # Chạy migrations nếu có
     if (Test-Path "$DEPLOY_PATH\microservices\migrations") {
-        Write-ColorOutput "  Chạy database migrations..." "Cyan"
+        Write-Host "  Chạy database migrations..." -ForegroundColor Cyan
         Set-Location "$DEPLOY_PATH\microservices"
-        # Thêm lệnh chạy migrations ở đây nếu có
     }
 
-    Write-ColorOutput "  Database đã sẵn sàng" "Green"
+    Write-Host "  Database đã sẵn sàng" -ForegroundColor Green
 }
 
 function Build-Frontend {
-    Write-ColorOutput "" "Yellow"
-    Write-ColorOutput "=== Build Frontend ===" "Yellow"
+    Write-Host ""
+    Write-Host "=== Build Frontend ===" -ForegroundColor Yellow
 
     Set-Location "$DEPLOY_PATH\client"
     npm run build
 
-    Write-ColorOutput "  Frontend đã được build" "Green"
+    Write-Host "  Frontend đã được build" -ForegroundColor Green
 }
 
 function Start-Services {
-    Write-ColorOutput "" "Yellow"
-    Write-ColorOutput "=== Khởi động services ===" "Yellow"
+    Write-Host ""
+    Write-Host "=== Khởi động services ===" -ForegroundColor Yellow
 
     Set-Location "$DEPLOY_PATH\microservices"
 
-    # Khởi động các microservices với PM2
     $services = @(
         @{Name="gateway"; Path="gateway"; Script="src/index.js"; Port=$GATEWAY_PORT},
         @{Name="auth-service"; Path="services/auth-service"; Script="src/index.js"; Port=$AUTH_PORT},
@@ -285,72 +268,66 @@ function Start-Services {
     )
 
     foreach ($service in $services) {
-        Write-ColorOutput "  Khởi động $($service.Name) trên port $($service.Port)..." "Cyan"
-        pm2 start "$DEPLOY_PATH\microservices\$($service.Path)\$($service.Script)" --name $service.Name --node-args="--max-old-space-size=2048"
+        $serviceName = $service.Name
+        $servicePort = $service.Port
+        $servicePath = "$DEPLOY_PATH\microservices\$($service.Path)\$($service.Script)"
+        Write-Host "  Khởi động $serviceName trên port $servicePort..." -ForegroundColor Cyan
+        pm2 start $servicePath --name $serviceName --node-args="--max-old-space-size=2048"
     }
 
-    # Khởi động frontend
-    Write-ColorOutput "  Khởi động frontend trên port $CLIENT_PORT..." "Cyan"
+    Write-Host "  Khởi động frontend trên port $CLIENT_PORT..." -ForegroundColor Cyan
     pm2 serve "$DEPLOY_PATH\client\dist" $CLIENT_PORT --name "client" --spa
 
-    # Lưu PM2 configuration
     pm2 save
 
-    Write-ColorOutput "  Tất cả services đã khởi động" "Green"
+    Write-Host "  Tất cả services đã khởi động" -ForegroundColor Green
 }
 
 function Show-Status {
-    Write-ColorOutput "" "Yellow"
-    Write-ColorOutput "=== Trạng thái hệ thống ===" "Yellow"
+    Write-Host ""
+    Write-Host "=== Trạng thái hệ thống ===" -ForegroundColor Yellow
 
     pm2 status
 
-    Write-ColorOutput "" "Green"
-    Write-ColorOutput "=== Thông tin truy cập ===" "Green"
-    Write-ColorOutput "  Frontend: http://103.56.161.239:$CLIENT_PORT" "Cyan"
-    Write-ColorOutput "  API Gateway: http://103.56.161.239:$GATEWAY_PORT" "Cyan"
-    Write-ColorOutput "  Swagger Docs: http://103.56.161.239:$GATEWAY_PORT/api-docs" "Cyan"
+    Write-Host ""
+    Write-Host "=== Thông tin truy cập ===" -ForegroundColor Green
+    Write-Host "  Frontend: http://103.56.161.239:$CLIENT_PORT" -ForegroundColor Cyan
+    Write-Host "  API Gateway: http://103.56.161.239:$GATEWAY_PORT" -ForegroundColor Cyan
+    Write-Host "  Swagger Docs: http://103.56.161.239:$GATEWAY_PORT/api-docs" -ForegroundColor Cyan
 
-    Write-ColorOutput "" "Yellow"
-    Write-ColorOutput "=== Lệnh quản lý ===" "Yellow"
-    Write-ColorOutput "  Xem logs:      pm2 logs" "White"
-    Write-ColorOutput "  Dừng services: pm2 stop all" "White"
-    Write-ColorOutput "  Khởi động lại: pm2 restart all" "White"
-    Write-ColorOutput "  Xóa services:  pm2 delete all" "White"
+    Write-Host ""
+    Write-Host "=== Lệnh quản lý ===" -ForegroundColor Yellow
+    Write-Host "  Xem logs:      pm2 logs" -ForegroundColor White
+    Write-Host "  Dừng services: pm2 stop all" -ForegroundColor White
+    Write-Host "  Khởi động lại: pm2 restart all" -ForegroundColor White
+    Write-Host "  Xóa services:  pm2 delete all" -ForegroundColor White
 }
 
 # ===================================================================
 # MAIN EXECUTION
 # ===================================================================
 
-$banner = @"
-
-===================================================================
-  HỆ THỐNG DEPLOYMENT - DU BÁO MẤT RỪNG
-===================================================================
-
-"@
-
-Write-ColorOutput $banner "Cyan"
+Write-Host ""
+Write-Host "===================================================================" -ForegroundColor Cyan
+Write-Host "  HỆ THỐNG DEPLOYMENT - DU BÁO MẤT RỪNG" -ForegroundColor Cyan
+Write-Host "===================================================================" -ForegroundColor Cyan
+Write-Host ""
 
 try {
-    # Kiểm tra yêu cầu hệ thống
     Check-Prerequisites
 
     if ($UpdateOnly) {
-        # Chỉ cập nhật code
-        Write-ColorOutput "" "Green"
-        Write-ColorOutput "=== CHẾ ĐỘ CẬP NHẬT NHANH ===" "Green"
+        Write-Host ""
+        Write-Host "=== CHẾ ĐỘ CẬP NHẬT NHANH ===" -ForegroundColor Green
         Stop-Services
         Clone-Or-Pull
         Install-Dependencies
         Build-Frontend
         Start-Services
     } else {
-        # Deploy đầy đủ
         if ($FirstTime) {
-            Write-ColorOutput "" "Green"
-            Write-ColorOutput "=== CHẾ ĐỘ DEPLOYMENT LẦN ĐẦU ===" "Green"
+            Write-Host ""
+            Write-Host "=== CHẾ ĐỘ DEPLOYMENT LẦN ĐẦU ===" -ForegroundColor Green
             Setup-Database
         }
 
@@ -364,14 +341,14 @@ try {
 
     Show-Status
 
-    Write-ColorOutput "" "Green"
-    Write-ColorOutput "=== DEPLOYMENT THÀNH CÔNG! ===" "Green"
-    Write-ColorOutput "" "White"
+    Write-Host ""
+    Write-Host "=== DEPLOYMENT THÀNH CÔNG! ===" -ForegroundColor Green
+    Write-Host ""
 
 } catch {
-    Write-ColorOutput "" "Red"
-    Write-ColorOutput "=== LỖI TRONG QUÁ TRÌNH DEPLOYMENT ===" "Red"
-    Write-ColorOutput $_.Exception.Message "Red"
+    Write-Host ""
+    Write-Host "=== LỖI TRONG QUÁ TRÌNH DEPLOYMENT ===" -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Red
     Write-Host $_.ScriptStackTrace -ForegroundColor Red
     exit 1
 }
