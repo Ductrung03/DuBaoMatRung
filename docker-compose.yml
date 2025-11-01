@@ -11,7 +11,6 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres123}
-      POSTGRES_DB: auth_db
     ports:
       - "5432:5432"
     volumes:
@@ -32,13 +31,32 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres123}
-      POSTGRES_DB: gis_db
     ports:
       - "5433:5432"
     volumes:
       - postgis_data:/var/lib/postgresql/data
       # Mount SQL init scripts - will auto-import on first run
       - ./docker-init/postgis:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostGIS for Admin Service  
+  admin-postgis:
+    image: postgis/postgis:15-3.3-alpine
+    container_name: dubaomatrung-admin-postgis
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres123}
+    ports:
+      - "5434:5432"
+    volumes:
+      - admin_postgis_data:/var/lib/postgresql/data
+      # Mount admin SQL init script
+      - ./docker-init/admin-postgis:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -128,7 +146,7 @@ services:
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres123}
-      - DB_NAME=dubaomatrung
+      - DB_NAME=auth_db
       - JWT_SECRET=${JWT_SECRET}
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
       - GATEWAY_URL=http://gateway:3000
@@ -159,7 +177,7 @@ services:
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres123}
-      - DB_NAME=dubaomatrung
+      - DB_NAME=auth_db
       - JWT_SECRET=${JWT_SECRET}
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
       - GATEWAY_URL=http://gateway:3000
@@ -185,7 +203,7 @@ services:
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres123}
-      - DB_NAME=gis_data
+      - DB_NAME=gis_db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
@@ -217,7 +235,7 @@ services:
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres123}
-      - DB_NAME=dubaomatrung
+      - DB_NAME=auth_db
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
       - GATEWAY_URL=http://gateway:3000
     depends_on:
@@ -238,15 +256,15 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3005
-      - DB_HOST=postgres
+      - DB_HOST=admin-postgis
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres123}
-      - DB_NAME=dubaomatrung
+      - DB_NAME=admin_db
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
       - GATEWAY_URL=http://gateway:3000
     depends_on:
-      postgres:
+      admin-postgis:
         condition: service_healthy
       mongodb:
         condition: service_healthy
@@ -267,7 +285,7 @@ services:
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres123}
-      - DB_NAME=dubaomatrung
+      - DB_NAME=auth_db
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
       - GATEWAY_URL=http://gateway:3000
     depends_on:
@@ -318,6 +336,7 @@ services:
 volumes:
   postgres_data:
   postgis_data:
+  admin_postgis_data:
   mongodb_data:
   redis_data:
   gis_uploads:

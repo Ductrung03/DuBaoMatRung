@@ -124,11 +124,11 @@ function Initialize-Databases {
 
     # Start only database services
     Write-Host "  Starting database containers..." -ForegroundColor Cyan
-    docker-compose up -d postgres postgis mongodb redis
+    docker-compose up -d postgres postgis admin-postgis mongodb redis
 
     # Wait for databases to be ready
     Write-Host "  Waiting for databases to be ready..." -ForegroundColor Cyan
-    Start-Sleep -Seconds 10
+    Start-Sleep -Seconds 15
 
     # Check health
     $healthy = $false
@@ -140,14 +140,20 @@ function Initialize-Databases {
         Write-Host "  Checking database health (attempt $retries/$maxRetries)..." -ForegroundColor Cyan
 
         $pgHealth = docker-compose exec -T postgres pg_isready -U postgres 2>&1
+        $postgisHealth = docker-compose exec -T postgis pg_isready -U postgres 2>&1
+        $adminHealth = docker-compose exec -T admin-postgis pg_isready -U postgres 2>&1
         $mongoHealth = docker-compose exec -T mongodb mongosh --eval "db.adminCommand('ping')" 2>&1
         $redisHealth = docker-compose exec -T redis redis-cli ping 2>&1
 
-        if ($pgHealth -match "accepting connections" -and $mongoHealth -match "ok" -and $redisHealth -match "PONG") {
+        if ($pgHealth -match "accepting connections" -and 
+            $postgisHealth -match "accepting connections" -and
+            $adminHealth -match "accepting connections" -and
+            $mongoHealth -match "ok" -and 
+            $redisHealth -match "PONG") {
             $healthy = $true
             Write-Host "  All databases are healthy" -ForegroundColor Green
         } else {
-            Start-Sleep -Seconds 2
+            Start-Sleep -Seconds 3
         }
     }
 
@@ -155,9 +161,10 @@ function Initialize-Databases {
         Write-Host "  WARNING: Databases may not be fully ready" -ForegroundColor Yellow
     }
 
-    # Create PostGIS extension
-    Write-Host "  Creating PostGIS extension..." -ForegroundColor Cyan
-    docker-compose exec -T postgis psql -U postgres -d gis_data -c "CREATE EXTENSION IF NOT EXISTS postgis;" 2>&1 | Out-Null
+    # Create PostGIS extensions
+    Write-Host "  Creating PostGIS extensions..." -ForegroundColor Cyan
+    docker-compose exec -T postgis psql -U postgres -d gis_db -c "CREATE EXTENSION IF NOT EXISTS postgis;" 2>&1 | Out-Null
+    docker-compose exec -T admin-postgis psql -U postgres -d admin_db -c "CREATE EXTENSION IF NOT EXISTS postgis;" 2>&1 | Out-Null
 }
 
 function Start-Services {
