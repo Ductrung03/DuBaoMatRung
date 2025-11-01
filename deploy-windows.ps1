@@ -2,7 +2,7 @@
 # SCRIPT DEPLOYMENT CHO WINDOWS SERVER
 # Hệ thống Dự Báo Mất Rừng - DuBaoMatRung
 # ===================================================================
-#
+
 param(
     [switch]$FirstTime,
     [switch]$UpdateOnly
@@ -15,15 +15,15 @@ $ErrorActionPreference = "Stop"
 # ===================================================================
 $PROJECT_NAME = "DuBaoMatRung"
 $DEPLOY_PATH = "C:\Projects\$PROJECT_NAME"
-$GIT_REPO = "https://github.com/luckyboiz/dubaomatrung.git"  # Thay đổi nếu dùng repo khác
-$NODE_VERSION = "18.0.0"  # Phiên bản Node.js yêu cầu
+$GIT_REPO = "https://github.com/luckyboiz/dubaomatrung.git"
+$NODE_VERSION = "18.0.0"
 
 # Cấu hình database
 $DB_HOST = "localhost"
 $DB_PORT = "5432"
 $DB_NAME = "dubaomatrung"
 $DB_USER = "postgres"
-$DB_PASSWORD = "your_password_here"  # Thay đổi password
+$DB_PASSWORD = "your_password_here"
 
 # Cấu hình ports
 $GATEWAY_PORT = 3000
@@ -59,7 +59,8 @@ function Check-Command {
 }
 
 function Check-Prerequisites {
-    Write-ColorOutput "`n=== Kiểm tra yêu cầu hệ thống ===" "Yellow"
+    Write-ColorOutput "" "Yellow"
+    Write-ColorOutput "=== Kiểm tra yêu cầu hệ thống ===" "Yellow"
 
     # Kiểm tra Node.js
     if (Check-Command "node") {
@@ -99,7 +100,7 @@ function Check-Prerequisites {
         exit 1
     }
 
-    # Kiểm tra PM2 (optional nhưng khuyến nghị)
+    # Kiểm tra PM2
     if (Check-Command "pm2") {
         Write-ColorOutput "  PM2: Đã cài đặt" "Green"
     } else {
@@ -112,12 +113,13 @@ function Check-Prerequisites {
 }
 
 function Stop-Services {
-    Write-ColorOutput "`n=== Dừng các services đang chạy ===" "Yellow"
+    Write-ColorOutput "" "Yellow"
+    Write-ColorOutput "=== Dừng các services đang chạy ===" "Yellow"
 
     # Dừng PM2 nếu đang chạy
     if (Check-Command "pm2") {
-        pm2 stop all
-        pm2 delete all
+        pm2 stop all 2>$null
+        pm2 delete all 2>$null
     }
 
     # Kill các port đang sử dụng
@@ -137,7 +139,8 @@ function Stop-Services {
 }
 
 function Clone-Or-Pull {
-    Write-ColorOutput "`n=== Lấy code từ Git ===" "Yellow"
+    Write-ColorOutput "" "Yellow"
+    Write-ColorOutput "=== Lấy code từ Git ===" "Yellow"
 
     if (Test-Path $DEPLOY_PATH) {
         Write-ColorOutput "  Thư mục đã tồn tại, đang cập nhật code..." "Cyan"
@@ -157,7 +160,8 @@ function Clone-Or-Pull {
 }
 
 function Setup-Environment {
-    Write-ColorOutput "`n=== Thiết lập biến môi trường ===" "Yellow"
+    Write-ColorOutput "" "Yellow"
+    Write-ColorOutput "=== Thiết lập biến môi trường ===" "Yellow"
 
     # Tạo file .env cho microservices
     $microservicesEnv = @"
@@ -168,7 +172,7 @@ DB_NAME=$DB_NAME
 DB_USER=$DB_USER
 DB_PASSWORD=$DB_PASSWORD
 
-# JWT Secret (Tạo secret key mạnh hơn)
+# JWT Secret
 JWT_SECRET=$(New-Guid)
 JWT_REFRESH_SECRET=$(New-Guid)
 JWT_EXPIRES_IN=24h
@@ -205,7 +209,8 @@ VITE_API_TIMEOUT=30000
 }
 
 function Install-Dependencies {
-    Write-ColorOutput "`n=== Cài đặt dependencies ===" "Yellow"
+    Write-ColorOutput "" "Yellow"
+    Write-ColorOutput "=== Cài đặt dependencies ===" "Yellow"
 
     Set-Location $DEPLOY_PATH
 
@@ -227,7 +232,8 @@ function Install-Dependencies {
 }
 
 function Setup-Database {
-    Write-ColorOutput "`n=== Thiết lập database ===" "Yellow"
+    Write-ColorOutput "" "Yellow"
+    Write-ColorOutput "=== Thiết lập database ===" "Yellow"
 
     # Kiểm tra kết nối database
     $env:PGPASSWORD = $DB_PASSWORD
@@ -251,7 +257,8 @@ function Setup-Database {
 }
 
 function Build-Frontend {
-    Write-ColorOutput "`n=== Build Frontend ===" "Yellow"
+    Write-ColorOutput "" "Yellow"
+    Write-ColorOutput "=== Build Frontend ===" "Yellow"
 
     Set-Location "$DEPLOY_PATH\client"
     npm run build
@@ -260,7 +267,8 @@ function Build-Frontend {
 }
 
 function Start-Services {
-    Write-ColorOutput "`n=== Khởi động services ===" "Yellow"
+    Write-ColorOutput "" "Yellow"
+    Write-ColorOutput "=== Khởi động services ===" "Yellow"
 
     Set-Location "$DEPLOY_PATH\microservices"
 
@@ -278,12 +286,10 @@ function Start-Services {
 
     foreach ($service in $services) {
         Write-ColorOutput "  Khởi động $($service.Name) trên port $($service.Port)..." "Cyan"
-        pm2 start "$DEPLOY_PATH\microservices\$($service.Path)\$($service.Script)" `
-            --name $service.Name `
-            --node-args="--max-old-space-size=2048"
+        pm2 start "$DEPLOY_PATH\microservices\$($service.Path)\$($service.Script)" --name $service.Name --node-args="--max-old-space-size=2048"
     }
 
-    # Khởi động frontend (serve static files)
+    # Khởi động frontend
     Write-ColorOutput "  Khởi động frontend trên port $CLIENT_PORT..." "Cyan"
     pm2 serve "$DEPLOY_PATH\client\dist" $CLIENT_PORT --name "client" --spa
 
@@ -294,16 +300,19 @@ function Start-Services {
 }
 
 function Show-Status {
-    Write-ColorOutput "`n=== Trạng thái hệ thống ===" "Yellow"
+    Write-ColorOutput "" "Yellow"
+    Write-ColorOutput "=== Trạng thái hệ thống ===" "Yellow"
 
     pm2 status
 
-    Write-ColorOutput "`n=== Thông tin truy cập ===" "Green"
+    Write-ColorOutput "" "Green"
+    Write-ColorOutput "=== Thông tin truy cập ===" "Green"
     Write-ColorOutput "  Frontend: http://103.56.161.239:$CLIENT_PORT" "Cyan"
     Write-ColorOutput "  API Gateway: http://103.56.161.239:$GATEWAY_PORT" "Cyan"
     Write-ColorOutput "  Swagger Docs: http://103.56.161.239:$GATEWAY_PORT/api-docs" "Cyan"
 
-    Write-ColorOutput "`n=== Lệnh quản lý ===" "Yellow"
+    Write-ColorOutput "" "Yellow"
+    Write-ColorOutput "=== Lệnh quản lý ===" "Yellow"
     Write-ColorOutput "  Xem logs:      pm2 logs" "White"
     Write-ColorOutput "  Dừng services: pm2 stop all" "White"
     Write-ColorOutput "  Khởi động lại: pm2 restart all" "White"
@@ -314,13 +323,15 @@ function Show-Status {
 # MAIN EXECUTION
 # ===================================================================
 
-Write-ColorOutput @"
+$banner = @"
 
 ===================================================================
   HỆ THỐNG DEPLOYMENT - DU BÁO MẤT RỪNG
 ===================================================================
 
-"@ "Cyan"
+"@
+
+Write-ColorOutput $banner "Cyan"
 
 try {
     # Kiểm tra yêu cầu hệ thống
@@ -328,7 +339,8 @@ try {
 
     if ($UpdateOnly) {
         # Chỉ cập nhật code
-        Write-ColorOutput "`n=== CHẾ ĐỘ CẬP NHẬT NHANH ===" "Green"
+        Write-ColorOutput "" "Green"
+        Write-ColorOutput "=== CHẾ ĐỘ CẬP NHẬT NHANH ===" "Green"
         Stop-Services
         Clone-Or-Pull
         Install-Dependencies
@@ -337,7 +349,8 @@ try {
     } else {
         # Deploy đầy đủ
         if ($FirstTime) {
-            Write-ColorOutput "`n=== CHẾ ĐỘ DEPLOYMENT LẦN ĐẦU ===" "Green"
+            Write-ColorOutput "" "Green"
+            Write-ColorOutput "=== CHẾ ĐỘ DEPLOYMENT LẦN ĐẦU ===" "Green"
             Setup-Database
         }
 
@@ -351,11 +364,14 @@ try {
 
     Show-Status
 
-    Write-ColorOutput "`n=== DEPLOYMENT THÀNH CÔNG! ===" "Green"
+    Write-ColorOutput "" "Green"
+    Write-ColorOutput "=== DEPLOYMENT THÀNH CÔNG! ===" "Green"
+    Write-ColorOutput "" "White"
 
 } catch {
-    Write-ColorOutput "`n=== LỖI TRONG QUÁ TRÌNH DEPLOYMENT ===" "Red"
+    Write-ColorOutput "" "Red"
+    Write-ColorOutput "=== LỖI TRONG QUÁ TRÌNH DEPLOYMENT ===" "Red"
     Write-ColorOutput $_.Exception.Message "Red"
-    Write-ColorOutput $_.ScriptStackTrace "Red"
+    Write-Host $_.ScriptStackTrace -ForegroundColor Red
     exit 1
 }
