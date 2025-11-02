@@ -2848,3 +2848,5 @@
 {"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles/8","service":"auth-service","timestamp":"2025-11-02 20:11:24","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
 {"ip":"127.0.0.1","level":"info","message":"DELETE /api/auth/roles/8/permissions/77","service":"auth-service","timestamp":"2025-11-02 20:11:24","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
 {"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles","service":"auth-service","timestamp":"2025-11-02 20:11:24","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-02 21:49:27"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-02 21:49:27"}

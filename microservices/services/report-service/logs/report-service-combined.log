@@ -864,3 +864,6 @@
 {"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-11-02T13:06:28.936Z"}
 {"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-11-02 20:06:28"}
 {"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-11-02 20:06:28"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2025-11-02T14:49:27.566Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2025-11-02 21:49:27"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2025-11-02 21:49:27"}
