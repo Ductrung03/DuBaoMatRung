@@ -67,7 +67,7 @@ services:
       - NODE_ENV=development
     command: npm run dev
 
-  # Override client for development
+  # Override client for development - Hot reload enabled
   client:
     build:
       context: ./client
@@ -77,9 +77,14 @@ services:
     volumes:
       - ./client/src:/app/src
       - ./client/public:/app/public
+      - ./client/index.html:/app/index.html
+      - ./client/vite.config.js:/app/vite.config.js
       - ./client/.env:/app/.env
+      # Exclude node_modules to use container's version
+      - /app/node_modules
     ports:
       - "5173:5173"
     environment:
       - NODE_ENV=development
-    command: npm run dev
+      - VITE_API_URL=http://103.56.161.239:3000
+    command: npm run dev -- --host 0.0.0.0

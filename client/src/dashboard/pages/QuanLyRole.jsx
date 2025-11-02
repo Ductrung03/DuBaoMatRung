@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import { FaUserShield, FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaUsers, FaKey, FaCog } from 'react-icons/fa';
 
@@ -29,7 +29,7 @@ const QuanLyRoleUltraModern = () => {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get('/api/auth/roles?include_permissions=true');
+      const response = await api.get('/auth/roles?include_permissions=true');
       if (response.data.success) {
         console.log('Roles data:', response.data.data); // Debug log
         setRoles(response.data.data);
@@ -43,7 +43,7 @@ const QuanLyRoleUltraModern = () => {
   const fetchPermissions = async () => {
     try {
       // Sử dụng endpoint mới cho feature-based permissions tree
-      const response = await axios.get('/api/auth/permissions/role-management-tree');
+      const response = await api.get('/auth/permissions/role-management-tree');
       if (response.data.success) {
         setPermissions(response.data.data);
       }
@@ -55,12 +55,12 @@ const QuanLyRoleUltraModern = () => {
 
   const fetchRolePermissions = async (roleId) => {
     try {
-      const response = await axios.get(`/api/auth/roles/${roleId}`);
+      const response = await api.get(`/auth/roles/${roleId}`);
       if (response.data.success) {
         const role = response.data.data;
         console.log('Full role data:', role); // Debug log
         console.log('Role permissions:', role.permissions); // Debug log
-        const permissionCodes = role.permissions ? 
+        const permissionCodes = role.permissions ?
           role.permissions.map(p => p.code) : [];
         console.log('Permission codes:', permissionCodes); // Debug log
         setSelectedPermissions(new Set(permissionCodes));
@@ -77,7 +77,7 @@ const QuanLyRoleUltraModern = () => {
     try {
       setLoading(true);
 
-      const roleDetail = await axios.get(`/api/auth/roles/${selectedRole.id}`);
+      const roleDetail = await api.get(`/auth/roles/${selectedRole.id}`);
       if (!roleDetail.data.success) {
         throw new Error('Failed to fetch role details');
       }
@@ -108,7 +108,7 @@ const QuanLyRoleUltraModern = () => {
         const permissionId = permissionCodeToId[code];
         if (permissionId) {
           console.log(`Removing permission: ${code} (ID: ${permissionId})`);
-          await axios.delete(`/api/auth/roles/${selectedRole.id}/permissions/${permissionId}`);
+          await api.delete(`/auth/roles/${selectedRole.id}/permissions/${permissionId}`);
         }
       }
 
@@ -117,7 +117,7 @@ const QuanLyRoleUltraModern = () => {
         const permissionId = permissionCodeToId[code];
         if (permissionId) {
           console.log(`Adding permission: ${code} (ID: ${permissionId})`);
-          await axios.post('/api/auth/roles/permissions', {
+          await api.post('/auth/roles/permissions', {
             roleId: selectedRole.id,
             permissionId: permissionId
           });

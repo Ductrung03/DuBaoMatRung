@@ -1,112 +1,88 @@
-# ⚡ Quick Start - 3 Bước Deploy
+# ⚡ Quick Start Guide - Windows Deployment
 
-## Bước 1: Cài Docker Desktop
+## 🚀 Deployment trong 3 bước
 
-Download: https://www.docker.com/products/docker-desktop
-
-- Cài đặt và khởi động Docker Desktop
-- Đợi đến khi Docker icon hiển thị "Docker Desktop is running"
-
----
-
-## Bước 2: Setup môi trường
-
-Mở PowerShell:
-
+### Bước 1: Chuẩn bị
 ```powershell
+# Mở PowerShell as Administrator
 cd C:\DuBaoMatRung
 
-# Copy file .env
-Copy-Item .env.docker .env
+# Kiểm tra Docker đang chạy
+docker --version
+```
 
-# Sửa password
+### Bước 2: Tạo file .env
+```powershell
+# Copy .env.example thành .env
+copy .env.example .env
+
+# Sửa file .env (thay đổi password, JWT secret, API URL)
 notepad .env
 ```
 
-**Thay đổi 2 dòng này:**
-```env
-DB_PASSWORD=your_secure_password_here  # ← Đổi thành password của bạn
-JWT_SECRET=your_jwt_secret_here        # ← Đổi thành bất kỳ chuỗi ngẫu nhiên
+**Quan trọng:** Đổi các giá trị sau trong `.env`:
+- `DB_PASSWORD` - Password cho database
+- `JWT_SECRET` - JWT secret key (tối thiểu 32 ký tự)
+- `VITE_API_URL` - URL API của server (http://YOUR_SERVER_IP:3000)
+
+### Bước 3: Deploy
+```powershell
+# Deploy lần đầu (10-20 phút)
+.\deploy.ps1 -FirstTime
 ```
 
-Ví dụ:
-```env
-DB_PASSWORD=MySecurePass123!
-JWT_SECRET=my-super-secret-jwt-key-2025
-```
-
-Save và đóng.
+**Xong!** Truy cập:
+- Frontend: http://localhost:5173 hoặc http://YOUR_SERVER_IP:5173
+- API Gateway: http://localhost:3000 hoặc http://YOUR_SERVER_IP:3000
 
 ---
 
-## Bước 3: Deploy!
+## 🔄 Update code
 
 ```powershell
-.\deploy-docker.ps1 -FirstTime
+# Sau khi sửa code, chạy:
+.\update.ps1 -AutoDetect
+
+# Hoặc update service cụ thể:
+.\update.ps1 -Services client,auth-service
 ```
 
-**Chờ 5-10 phút** (lần đầu tiên)
-
-Docker sẽ tự động:
-- ✅ Tạo tất cả databases (PostgreSQL, PostGIS, MongoDB, Redis)
-- ✅ Build tất cả services
-- ✅ Khởi động ứng dụng
-- ✅ Chạy database migrations và seed data
-
 ---
 
-## ✅ Xong!
-
-Truy cập:
-
-- **Website**: http://103.56.161.239:5173
-- **API**: http://103.56.161.239:3000
-- **API Docs**: http://103.56.161.239:3000/api-docs
-
-**Đăng nhập với:**
-- Username: `admin`
-- Password: `admin123`
-
----
-
-## 🔄 Update code sau này
-
-Khi có code mới:
+## 🛠️ Các lệnh hữu ích
 
 ```powershell
-cd C:\DuBaoMatRung
-.\deploy-docker.ps1
-```
+# Xem logs
+.\deploy.ps1 -Logs
 
-Chỉ mất 2-5 phút!
+# Stop services
+.\deploy.ps1 -Stop
 
----
+# Restart services
+.\deploy.ps1 -Restart
 
-## 📋 Các lệnh hay dùng
+# Rebuild tất cả
+.\deploy.ps1 -Rebuild
 
-```powershell
-# Xem logs tất cả
-docker-compose logs -f
-
-# Xem logs 1 service cụ thể
-docker-compose logs -f gateway
-docker-compose logs -f auth-service
-
-# Xem trạng thái
+# Xem status
 docker-compose ps
-
-# Restart 1 service
-docker-compose restart gateway
-
-# Stop tất cả
-.\deploy-docker.ps1 -Stop
-
-# Rebuild từ đầu
-.\deploy-docker.ps1 -Rebuild
 ```
 
 ---
 
-## 🆘 Gặp vấn đề?
+## 📖 Tài liệu đầy đủ
 
-Xem hướng dẫn chi tiết: [DOCKER_SETUP.md](DOCKER_SETUP.md)
+Xem file [DEPLOYMENT.md](DEPLOYMENT.md) để biết thêm chi tiết.
+
+---
+
+## ❓ Gặp vấn đề?
+
+1. Xem logs: `.\deploy.ps1 -Logs`
+2. Check status: `docker-compose ps`
+3. Restart: `.\deploy.ps1 -Restart`
+4. Full reset: `docker-compose down -v && .\deploy.ps1 -FirstTime`
+
+---
+
+**Lưu ý:** Database lớn (2.5GB) nên lần đầu import có thể mất 5-10 phút. Kiên nhẫn chờ nhé!

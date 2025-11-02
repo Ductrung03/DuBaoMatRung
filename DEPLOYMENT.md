@@ -1,255 +1,479 @@
-# 🚀 Deployment Guide - Du Bao Mat Rung
+# 🚀 Hướng Dẫn Deployment - Du Bao Mat Rung
 
 ## 📋 Tổng quan
 
-Có 3 chế độ deployment:
+Hệ thống được deploy hoàn toàn bằng **Docker** trên **Windows Server**.
 
-1. **Production Mode** - Build optimized, không hot reload
-2. **Development Mode** - Hot reload enabled, không cần rebuild
-3. **Quick Update** - Tự động detect changes và chỉ restart service cần thiết
-
----
-
-## 🏭 Production Mode (Khuyến nghị cho production server)
-
-### Lần đầu tiên
-```powershell
-cd C:\DuBaoMatRung
-.\deploy-docker.ps1 -FirstTime
-```
-
-### Update code (rebuild toàn bộ)
-```powershell
-.\deploy-docker.ps1
-```
-
-### Rebuild với cache clear
-```powershell
-.\deploy-docker.ps1 -Rebuild
-```
-
-### Dừng services
-```powershell
-.\deploy-docker.ps1 -Stop
-```
-
-**Ưu điểm:**
-- ✅ Build optimized cho production
-- ✅ Image size nhỏ
-- ✅ Performance tốt nhất
-
-**Nhược điểm:**
-- ❌ Phải rebuild mỗi lần sửa code (chậm)
+### Đặc điểm
+- ✅ **Không cần Git Clone** - Code đã được tải sẵn trên server
+- ✅ **Auto Import Database** - Database tự động import từ `docker-init/` lần đầu chạy
+- ✅ **One-Command Deploy** - Chỉ cần 1 lệnh để deploy
+- ✅ **Fast Update** - Update code cực nhanh với script thông minh
 
 ---
 
-## 🔥 Development Mode (Hot Reload - Không cần rebuild!)
+## 🎯 Yêu cầu hệ thống
 
-### Lần đầu tiên
-```powershell
-cd C:\DuBaoMatRung
-.\deploy-docker-dev.ps1 -FirstTime
-```
+### Windows Server
+- Windows 10/11 hoặc Windows Server 2019+
+- RAM: 8GB+ (khuyến nghị 16GB do admin database lớn)
+- Disk: 20GB+ free space
+- Docker Desktop for Windows
 
-### Chạy dev mode (lần sau)
-```powershell
-.\deploy-docker-dev.ps1
-```
-
-### Dừng dev mode
-```powershell
-.\deploy-docker-dev.ps1 -Stop
-```
-
-**Ưu điểm:**
-- ✅ Code changes tự động reload
-- ✅ Không cần rebuild
-- ✅ Dev workflow nhanh
-- ✅ Live debugging
-
-**Nhược điểm:**
-- ❌ Không optimize cho production
-- ❌ Image size lớn hơn
-
-**Cách hoạt động:**
-- Sửa file trong `client/src` → Frontend tự reload
-- Sửa file trong `microservices/*/src` → Backend tự reload
-- Không cần chạy lệnh gì!
+### Cài đặt Docker Desktop
+1. Download: https://www.docker.com/products/docker-desktop
+2. Install và restart Windows
+3. Mở PowerShell và test: `docker --version`
 
 ---
 
-## ⚡ Quick Update (Smart Restart - Khuyến nghị cho cập nhật nhỏ)
+## 📁 Cấu trúc thư mục
 
-### Tự động detect và restart
-```powershell
-.\quick-update.ps1
 ```
-
-Script sẽ:
-1. Pull latest code từ git
-2. Tự động phát hiện file nào thay đổi
-3. Chỉ rebuild và restart service bị ảnh hưởng
-
-### Restart service cụ thể
-```powershell
-# Chỉ restart client
-.\quick-update.ps1 -Services @("client")
-
-# Restart nhiều services
-.\quick-update.ps1 -Services @("client", "auth-service", "gateway")
+C:\DuBaoMatRung\                    # Root folder trên server
+├── docker-init/                    # Database dumps (QUAN TRỌNG!)
+│   ├── postgres/                   # Auth database (~31KB)
+│   │   └── 01-auth-db.sql
+│   ├── postgis/                    # GIS database (~12MB)
+│   │   └── 01-gis-db.sql
+│   └── admin-postgis/              # Admin database (~2.5GB)
+│       ├── 01-admin-db.sql
+│       └── 01-gis-db.sql
+├── client/                         # React frontend
+├── microservices/                  # Backend services
+├── docker-compose.yml              # Docker configuration
+├── deploy.ps1                      # Main deployment script
+├── update.ps1                      # Quick update script
+└── .env                            # Environment variables
 ```
-
-**Ưu điểm:**
-- ✅ Nhanh (chỉ rebuild service cần thiết)
-- ✅ Tự động detect changes
-- ✅ Production-ready builds
 
 ---
 
-## 🛠️ Rebuild từng service riêng lẻ
+## 🏁 Deployment Lần Đầu Tiên
 
-### Không dùng script (Manual)
+### 1. Chuẩn bị
 
+Đảm bảo code và database dumps đã có trên server:
 ```powershell
+# Mở PowerShell as Administrator
 cd C:\DuBaoMatRung
 
-# Chỉ rebuild client
-docker-compose build client
-docker-compose up -d client
-
-# Chỉ rebuild auth-service
-docker-compose build auth-service
-docker-compose up -d auth-service
-
-# Rebuild nhiều services cùng lúc
-docker-compose build client auth-service gateway
-docker-compose up -d client auth-service gateway
+# Kiểm tra database dumps
+dir docker-init\postgres\
+dir docker-init\postgis\
+dir docker-init\admin-postgis\
 ```
 
----
+### 2. Tạo file .env
 
-## 📊 Kiểm tra trạng thái
-
-### Xem status tất cả services
+Tạo file `.env` trong root folder:
 ```powershell
+notepad .env
+```
+
+Nội dung `.env`:
+```env
+# Database Password
+DB_PASSWORD=your_secure_password_here
+
+# JWT Secret (generate random string)
+JWT_SECRET=your_jwt_secret_key_min_32_characters
+
+# API URL (thay bằng IP server của bạn)
+VITE_API_URL=http://103.56.161.239:3000
+```
+
+### 3. Deploy
+
+```powershell
+# Chạy deployment lần đầu (10-20 phút)
+.\deploy.ps1 -FirstTime
+```
+
+Script sẽ tự động:
+- ✅ Pull Docker images
+- ✅ Build tất cả services
+- ✅ Start containers
+- ✅ Auto-import database từ `docker-init/`
+
+### 4. Kiểm tra
+
+```powershell
+# Xem trạng thái containers
 docker-compose ps
+
+# Xem logs
+.\deploy.ps1 -Logs
 ```
 
-### Xem logs
-```powershell
-# Logs của một service
-docker-compose logs -f client
-docker-compose logs -f auth-service
+Truy cập:
+- **Frontend**: http://localhost:5173
+- **API Gateway**: http://localhost:3000
+- **API Docs**: http://localhost:3000/api-docs
 
-# Logs của tất cả services
-docker-compose logs -f
+---
+
+## 🔄 Update Code (Sau khi sửa code)
+
+### Phương pháp 1: Auto-detect Changes (Khuyến nghị)
+
+```powershell
+# Script tự động phát hiện service nào thay đổi và rebuild
+.\update.ps1 -AutoDetect
+```
+
+### Phương pháp 2: Update Service Cụ Thể
+
+```powershell
+# Update 1 service
+.\update.ps1 -Services client
+
+# Update nhiều services
+.\update.ps1 -Services client,auth-service,gateway
+```
+
+### Phương pháp 3: Interactive Mode
+
+```powershell
+# Chọn services từ menu
+.\update.ps1
+```
+
+### Phương pháp 4: Update Tất Cả
+
+```powershell
+# Rebuild toàn bộ (lâu hơn)
+.\update.ps1 -All
+
+# Hoặc dùng deploy.ps1
+.\deploy.ps1 -Rebuild
+```
+
+---
+
+## 🛠️ Các Lệnh Thường Dùng
+
+### Deploy & Management
+
+```powershell
+# Deploy lần đầu
+.\deploy.ps1 -FirstTime
+
+# Start services (nếu đã build rồi)
+.\deploy.ps1
+
+# Stop tất cả services
+.\deploy.ps1 -Stop
+
+# Restart services (không rebuild)
+.\deploy.ps1 -Restart
+
+# Rebuild tất cả
+.\deploy.ps1 -Rebuild
+
+# Rebuild 1 service cụ thể
+.\deploy.ps1 -Rebuild -Service client
+```
+
+### Logs
+
+```powershell
+# Xem logs tất cả services
+.\deploy.ps1 -Logs
+
+# Xem logs 1 service
+.\deploy.ps1 -Logs -Service auth-service
 
 # Logs 100 dòng cuối
 docker-compose logs --tail=100 client
+
+# Follow logs (real-time)
+docker-compose logs -f gateway
 ```
 
-### Xem resource usage
+### Status & Debug
+
 ```powershell
+# Xem status containers
+docker-compose ps
+
+# Xem resource usage
 docker stats
+
+# Kiểm tra health
+docker inspect dubaomatrung-postgres | findstr Health
+
+# Vào bên trong container
+docker exec -it dubaomatrung-client sh
+```
+
+### Database
+
+```powershell
+# Kết nối PostgreSQL
+docker exec -it dubaomatrung-postgres psql -U postgres auth_db
+
+# Kết nối PostGIS
+docker exec -it dubaomatrung-postgis psql -U postgres gis_db
+
+# Export database
+docker exec dubaomatrung-postgres pg_dump -U postgres auth_db > backup.sql
+
+# Import database manual
+docker exec -i dubaomatrung-postgres psql -U postgres auth_db < backup.sql
 ```
 
 ---
 
-## 🔍 Troubleshooting
+## 🔧 Troubleshooting
 
-### Service không start được
+### 1. Container không start
+
 ```powershell
-# Xem logs chi tiết
-docker-compose logs [service-name]
+# Xem logs lỗi
+.\deploy.ps1 -Logs -Service <service-name>
 
 # Restart service
-docker-compose restart [service-name]
+.\deploy.ps1 -Restart -Service <service-name>
 
-# Rebuild và restart
-docker-compose build [service-name]
-docker-compose up -d [service-name]
+# Rebuild service
+.\deploy.ps1 -Rebuild -Service <service-name>
 ```
 
-### Database issues
-```powershell
-# Reset database (XÓA TẤT CẢ DỮ LIỆU!)
-docker-compose down -v
-.\deploy-docker.ps1 -FirstTime
-```
+### 2. Port bị chiếm
 
-### Port conflicts
 ```powershell
-# Xem process đang dùng port
+# Kiểm tra port đang bị dùng
 netstat -ano | findstr :3000
 netstat -ano | findstr :5173
 
 # Kill process theo PID
-taskkill /F /PID [PID]
+taskkill /F /PID <PID>
 ```
 
-### Clear Docker cache
+### 3. Database lỗi / Muốn reset
+
 ```powershell
-# Clean up unused images
+# CẢNH BÁO: Lệnh này XÓA TẤT CẢ DỮ LIỆU!
+docker-compose down -v
+
+# Import lại từ đầu
+.\deploy.ps1 -FirstTime
+```
+
+### 4. Docker build chậm / Cache lỗi
+
+```powershell
+# Rebuild without cache
+docker-compose build --no-cache
+
+# Clean Docker cache
+docker system prune -a
+```
+
+### 5. Service crashed / unhealthy
+
+```powershell
+# Xem logs chi tiết
+.\deploy.ps1 -Logs -Service <service-name>
+
+# Check environment variables
+docker exec dubaomatrung-<service> env
+
+# Restart service
+.\deploy.ps1 -Restart -Service <service-name>
+```
+
+### 6. Database không import tự động
+
+```powershell
+# Check xem database đã tồn tại chưa
+docker exec -it dubaomatrung-postgres psql -U postgres auth_db -c "\dt"
+
+# Nếu đã có data, PostgreSQL sẽ skip auto-import
+# Phải xóa volume để import lại:
+docker-compose down -v
+.\deploy.ps1 -FirstTime
+```
+
+### 7. Out of memory (OOM)
+
+Admin database rất lớn (2.5GB), có thể gây OOM khi import:
+
+```powershell
+# Tăng Docker memory limit (Docker Desktop > Settings > Resources)
+# Khuyến nghị: 8GB+
+
+# Hoặc import database manual sau:
+docker exec -i dubaomatrung-admin-postgis psql -U postgres admin_db < docker-init/admin-postgis/01-admin-db.sql
+```
+
+---
+
+## 🔐 Security Best Practices
+
+### Production Server
+
+1. **Đổi password mặc định**
+   ```env
+   DB_PASSWORD=use_strong_password_here
+   JWT_SECRET=generate_random_32_chars_minimum
+   ```
+
+2. **Firewall rules**
+   ```powershell
+   # Chỉ mở port cần thiết
+   # Frontend: 5173
+   # Gateway: 3000
+   # Block các port database từ internet
+   ```
+
+3. **Regular backups**
+   ```powershell
+   # Tạo script backup tự động
+   docker exec dubaomatrung-postgres pg_dump -U postgres auth_db > backup-$(Get-Date -Format 'yyyy-MM-dd').sql
+   ```
+
+4. **Update Docker images định kỳ**
+   ```powershell
+   docker-compose pull
+   .\deploy.ps1 -Rebuild
+   ```
+
+---
+
+## 📊 Service Ports
+
+| Service | Port | Internal |
+|---------|------|----------|
+| Client (Frontend) | 5173 | ✅ |
+| Gateway | 3000 | ✅ |
+| Auth Service | 3001 | ❌ |
+| User Service | 3002 | ❌ |
+| GIS Service | 3003 | ❌ |
+| Report Service | 3004 | ❌ |
+| Admin Service | 3005 | ❌ |
+| Search Service | 3006 | ❌ |
+| MapServer | 3007 | ❌ |
+| PostgreSQL | 5432 | ❌ |
+| PostGIS | 5433 | ❌ |
+| Admin PostGIS | 5434 | ❌ |
+| MongoDB | 27017 | ❌ |
+| Redis | 6379 | ❌ |
+
+**Internal** = Nên expose ra internet
+Chỉ mở port **5173** (frontend) và **3000** (API gateway) ra ngoài.
+
+---
+
+## 🎓 Workflow Khuyến Nghị
+
+### Develop trên local machine
+```powershell
+# Clone code về máy local
+git clone ...
+
+# Sửa code ở local
+# Test với npm run dev
+
+# Commit và push
+git commit -m "Fix bug ABC"
+git push origin main
+```
+
+### Deploy lên server
+```powershell
+# SSH hoặc Remote Desktop vào server
+cd C:\DuBaoMatRung
+
+# Pull code mới
+git pull origin main
+
+# Update services đã thay đổi
+.\update.ps1 -AutoDetect
+
+# Hoặc update thủ công
+.\update.ps1 -Services client,auth-service
+
+# Check logs
+.\deploy.ps1 -Logs
+```
+
+### Hotfix nhanh
+```powershell
+# Sửa trực tiếp trên server (không khuyến khích nhưng đôi khi cần)
+notepad microservices\services\auth-service\src\controllers\auth.js
+
+# Update service
+.\update.ps1 -Services auth-service
+
+# Commit để sync với git
+git add .
+git commit -m "Hotfix: ..."
+git push
+```
+
+---
+
+## 📚 Tài liệu tham khảo
+
+- **Docker Compose**: https://docs.docker.com/compose/
+- **PostgreSQL Docker**: https://hub.docker.com/_/postgres
+- **PostGIS Docker**: https://hub.docker.com/r/postgis/postgis
+- **Nginx Docker**: https://hub.docker.com/_/nginx
+
+---
+
+## 💡 Tips & Tricks
+
+### 1. Xem logs nhiều services cùng lúc
+```powershell
+# Mở nhiều PowerShell windows và chạy
+.\deploy.ps1 -Logs -Service auth-service   # Window 1
+.\deploy.ps1 -Logs -Service gateway        # Window 2
+.\deploy.ps1 -Logs -Service client         # Window 3
+```
+
+### 2. Quick restart 1 service
+```powershell
+docker-compose restart auth-service
+```
+
+### 3. Update chỉ frontend (cực nhanh)
+```powershell
+.\update.ps1 -Services client
+# Chỉ mất ~1 phút
+```
+
+### 4. Monitor resource usage
+```powershell
+# Realtime CPU, Memory usage
+docker stats
+```
+
+### 5. Clean up disk space
+```powershell
+# Xóa images và containers không dùng
 docker system prune -a
 
-# Remove all containers
-docker-compose down
-docker rm $(docker ps -a -q)
-
-# Remove all images
-docker rmi $(docker images -q)
+# Xóa volumes không dùng
+docker volume prune
 ```
 
 ---
 
-## 📝 So sánh các phương pháp
+## 🆘 Support
 
-| Phương pháp | Rebuild Time | Hot Reload | Use Case |
-|------------|--------------|------------|----------|
-| `deploy-docker.ps1` | ~5-10 phút | ❌ | Production deployment |
-| `deploy-docker-dev.ps1` | ~2-3 phút (1 lần) | ✅ | Active development |
-| `quick-update.ps1` | ~1-3 phút | ❌ | Quick fixes/updates |
-| Manual rebuild | ~30s - 2 phút | ❌ | Single service update |
+Nếu gặp vấn đề:
 
----
-
-## 💡 Khuyến nghị
-
-**Đang develop (local/test server):**
-```powershell
-.\deploy-docker-dev.ps1
-# Sau đó chỉ cần sửa code, tự động reload!
-```
-
-**Fix bug nhỏ (production):**
-```powershell
-.\quick-update.ps1
-# Auto-detect và chỉ restart service cần thiết
-```
-
-**Deploy major update (production):**
-```powershell
-.\deploy-docker.ps1
-# Full rebuild với optimization
-```
-
-**Update một service cụ thể:**
-```powershell
-docker-compose build [service-name]
-docker-compose up -d [service-name]
-```
+1. **Check logs**: `.\deploy.ps1 -Logs`
+2. **Check status**: `docker-compose ps`
+3. **Restart service**: `.\deploy.ps1 -Restart`
+4. **Rebuild service**: `.\deploy.ps1 -Rebuild`
+5. **Full reset**: `docker-compose down -v && .\deploy.ps1 -FirstTime`
 
 ---
 
-## 🔐 Security Notes
-
-**Production:**
-- ✅ Sử dụng `.env` riêng với mật khẩu mạnh
-- ✅ Set `NODE_ENV=production`
-- ✅ Enable firewall và chỉ mở cần thiết
-- ✅ Regular backup databases
-
-**Development:**
-- ⚠️ Không expose dev server ra internet
-- ⚠️ Sử dụng dev credentials riêng
-- ⚠️ Không commit `.env` vào git
+**Version**: 2.0
+**Last Updated**: 2025-01-02
+**Maintainer**: LuckyBoiz

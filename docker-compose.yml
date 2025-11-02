@@ -11,17 +11,19 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres123}
+      POSTGRES_DB: auth_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # Mount SQL init scripts - will auto-import on first run
-      - ./docker-init/postgres:/docker-entrypoint-initdb.d
+      # Auto-import SQL on first run (if database doesn't exist)
+      - ./docker-init/postgres:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   # PostGIS for GIS Service
   postgis:
@@ -31,19 +33,21 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres123}
+      POSTGRES_DB: gis_db
     ports:
       - "5433:5432"
     volumes:
       - postgis_data:/var/lib/postgresql/data
-      # Mount SQL init scripts - will auto-import on first run
-      - ./docker-init/postgis:/docker-entrypoint-initdb.d
+      # Auto-import SQL on first run
+      - ./docker-init/postgis:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gis_db"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
-  # PostGIS for Admin Service  
+  # PostGIS for Admin Service
   admin-postgis:
     image: postgis/postgis:15-3.3-alpine
     container_name: dubaomatrung-admin-postgis
@@ -51,17 +55,19 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres123}
+      POSTGRES_DB: admin_db
     ports:
       - "5434:5432"
     volumes:
       - admin_postgis_data:/var/lib/postgresql/data
-      # Mount admin SQL init script
-      - ./docker-init/admin-postgis:/docker-entrypoint-initdb.d
+      # Auto-import SQL on first run (2.5GB database)
+      - ./docker-init/admin-postgis:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d admin_db"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 120s
 
   # MongoDB for Logging
   mongodb:

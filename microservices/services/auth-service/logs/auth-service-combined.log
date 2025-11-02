@@ -2813,3 +2813,38 @@
 {"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-01 13:37:28"}
 {"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-01 13:37:28"}
 {"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-01 15:11:39"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-01 18:23:20"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-01 18:23:20"}
+{"level":"info","message":"Shutting down auth service...","service":"auth-service","timestamp":"2025-11-01 18:23:21"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-01 18:23:32"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-01 18:23:32"}
+{"level":"info","message":"Shutting down auth service...","service":"auth-service","timestamp":"2025-11-01 18:23:34"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-01 18:23:49"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-01 18:23:49"}
+{"level":"info","message":"Shutting down auth service...","service":"auth-service","timestamp":"2025-11-01 18:23:59"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-02 20:06:28"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-02 20:06:28"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/auth/login","service":"auth-service","timestamp":"2025-11-02 20:06:39","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/auth/logout","service":"auth-service","timestamp":"2025-11-02 20:06:44","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/auth/login","service":"auth-service","timestamp":"2025-11-02 20:06:49","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles","service":"auth-service","timestamp":"2025-11-02 20:06:54","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/users/","service":"auth-service","timestamp":"2025-11-02 20:06:54","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles","service":"auth-service","timestamp":"2025-11-02 20:06:54","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/users/","service":"auth-service","timestamp":"2025-11-02 20:06:54","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles","service":"auth-service","timestamp":"2025-11-02 20:06:57","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/permissions/role-management-tree","service":"auth-service","timestamp":"2025-11-02 20:06:57","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles","service":"auth-service","timestamp":"2025-11-02 20:06:57","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-02 20:11:13","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-02 20:11:13","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles","service":"auth-service","timestamp":"2025-11-02 20:11:13","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/permissions/role-management-tree","service":"auth-service","timestamp":"2025-11-02 20:11:13","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles","service":"auth-service","timestamp":"2025-11-02 20:11:13","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/permissions/role-management-tree","service":"auth-service","timestamp":"2025-11-02 20:11:13","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles/8","service":"auth-service","timestamp":"2025-11-02 20:11:16","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles/8","service":"auth-service","timestamp":"2025-11-02 20:11:19","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/auth/roles/permissions","service":"auth-service","timestamp":"2025-11-02 20:11:19","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles","service":"auth-service","timestamp":"2025-11-02 20:11:19","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles/8","service":"auth-service","timestamp":"2025-11-02 20:11:21","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles/8","service":"auth-service","timestamp":"2025-11-02 20:11:24","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"DELETE /api/auth/roles/8/permissions/77","service":"auth-service","timestamp":"2025-11-02 20:11:24","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/roles","service":"auth-service","timestamp":"2025-11-02 20:11:24","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
