@@ -40,7 +40,11 @@ notepad .env
 ## 🔄 Update code
 
 ```powershell
-# Sau khi sửa code, chạy:
+# Pull code mới và tự động update (KHUYẾN NGHỊ) ⭐
+.\update.ps1 -Pull
+
+# Hoặc tự pull rồi auto-detect:
+git pull
 .\update.ps1 -AutoDetect
 
 # Hoặc update service cụ thể:

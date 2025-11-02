@@ -6,6 +6,7 @@ param(
     [string[]]$Services = @(),
     [switch]$AutoDetect,
     [switch]$All,
+    [switch]$Pull,
     [switch]$Help
 )
 
@@ -28,12 +29,16 @@ Usage:
 
 Options:
   -AutoDetect       Auto-detect changed files from git and rebuild affected services
+  -Pull             Git pull first, then auto-detect changes (RECOMMENDED)
   -All              Rebuild all services (same as deploy.ps1 -Rebuild)
   -Services <list>  Rebuild specific services
   -Help             Show this help message
 
 Examples:
-  # Auto-detect changes from git
+  # Pull code và auto-detect changes (RECOMMENDED)
+  .\update.ps1 -Pull
+
+  # Chỉ auto-detect (không pull)
   .\update.ps1 -AutoDetect
 
   # Update specific services
@@ -66,6 +71,31 @@ $dockerRunning = docker info 2>&1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Docker is not running! Please start Docker Desktop first."
     exit 1
+}
+
+# Git pull if requested
+if ($Pull) {
+    Write-Info "Pulling latest code from git..."
+
+    # Check if git repo
+    git status 2>&1 | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Not a git repository!"
+        exit 1
+    }
+
+    # Pull code
+    git pull
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Git pull failed! Please fix conflicts manually."
+        exit 1
+    }
+
+    Write-Success "Code pulled successfully"
+
+    # Auto enable AutoDetect after pull
+    $AutoDetect = $true
 }
 
 # All available services
