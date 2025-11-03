@@ -97,3 +97,17 @@ Xem file [DEPLOYMENT.md](DEPLOYMENT.md) để biết thêm chi tiết.
 
 
 
+
+
+  # Pull code mới
+  git pull
+
+  # Rebuild CHÍNH gateway
+  docker-compose build gateway
+
+  # Restart gateway
+  docker-compose up -d gateway
+
+  # Check
+  docker ps | findstr gateway
+  docker logs dubaomatrung-gateway --tail 20
