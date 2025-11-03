@@ -1,15 +1,14 @@
-FROM node:20-alpine
+FROM node:20-bullseye-slim
 
-# Install MapServer and dependencies
-RUN apk add --no-cache \
-    mapserver \
-    mapserver-dev \
-    gdal \
-    gdal-dev \
-    proj \
-    proj-dev \
-    geos \
-    geos-dev
+# Install MapServer and dependencies from Debian repos
+RUN apt-get update && apt-get install -y \
+    cgi-mapserver \
+    mapserver-bin \
+    gdal-bin \
+    libgdal-dev \
+    libproj-dev \
+    libgeos-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
