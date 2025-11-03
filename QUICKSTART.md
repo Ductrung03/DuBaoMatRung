@@ -86,6 +86,3 @@ Xem file [DEPLOYMENT.md](DEPLOYMENT.md) để biết thêm chi tiết.
 2. Check status: `docker-compose ps`
 3. Restart: `.\deploy.ps1 -Restart`
 4. Full reset: `docker-compose down -v && .\deploy.ps1 -FirstTime`
-
----
-
