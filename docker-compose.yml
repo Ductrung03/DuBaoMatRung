@@ -110,8 +110,8 @@ services:
   # API Gateway
   gateway:
     build:
-      context: ./microservices/gateway
-      dockerfile: Dockerfile
+      context: ./microservices
+      dockerfile: gateway/Dockerfile
     container_name: dubaomatrung-gateway
     restart: unless-stopped
     ports:

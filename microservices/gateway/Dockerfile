@@ -2,21 +2,30 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Copy root package files first (for shared dependencies)
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Copy gateway package files
+COPY gateway/package*.json ./gateway/
 
-# Copy source code
-COPY . .
+# Install root dependencies (for shared modules)
+RUN npm install --omit=dev
+
+# Install gateway dependencies
+WORKDIR /app/gateway
+RUN npm install --omit=dev
+
+# Copy shared libraries
+WORKDIR /app
+COPY shared ./shared
+
+# Copy gateway source code
+COPY gateway ./gateway
 
 # Expose port
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+WORKDIR /app/gateway
 
 # Start the application
 CMD ["node", "src/index.js"]
