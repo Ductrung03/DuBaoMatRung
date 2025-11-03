@@ -2,17 +2,30 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Copy root package files first (for shared dependencies)
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Copy service package files
+COPY services/mapserver-service/package*.json ./services/mapserver-service/
 
-# Copy source code
-COPY . .
+# Install root dependencies (for shared modules)
+RUN npm install --omit=dev
+
+# Install service dependencies
+WORKDIR /app/services/mapserver-service
+RUN npm install --omit=dev
+
+# Copy shared libraries
+WORKDIR /app
+COPY shared ./shared
+
+# Copy service source code
+COPY services/mapserver-service ./services/mapserver-service
 
 # Expose port
 EXPOSE 3007
+
+WORKDIR /app/services/mapserver-service
 
 # Start the application
 CMD ["node", "src/index.js"]

@@ -140,8 +140,8 @@ services:
   # Auth Service
   auth-service:
     build:
-      context: ./microservices/services/auth-service
-      dockerfile: Dockerfile
+      context: ./microservices
+      dockerfile: services/auth-service/Dockerfile
     container_name: dubaomatrung-auth
     restart: unless-stopped
     ports:
@@ -171,8 +171,8 @@ services:
   # User Service
   user-service:
     build:
-      context: ./microservices/services/user-service
-      dockerfile: Dockerfile
+      context: ./microservices
+      dockerfile: services/user-service/Dockerfile
     container_name: dubaomatrung-user
     restart: unless-stopped
     ports:
@@ -197,8 +197,8 @@ services:
   # GIS Service
   gis-service:
     build:
-      context: ./microservices/services/gis-service
-      dockerfile: Dockerfile
+      context: ./microservices
+      dockerfile: services/gis-service/Dockerfile
     container_name: dubaomatrung-gis
     restart: unless-stopped
     ports:
@@ -229,8 +229,8 @@ services:
   # Report Service
   report-service:
     build:
-      context: ./microservices/services/report-service
-      dockerfile: Dockerfile
+      context: ./microservices
+      dockerfile: services/report-service/Dockerfile
     container_name: dubaomatrung-report
     restart: unless-stopped
     ports:
@@ -254,8 +254,8 @@ services:
   # Admin Service
   admin-service:
     build:
-      context: ./microservices/services/admin-service
-      dockerfile: Dockerfile
+      context: ./microservices
+      dockerfile: services/admin-service/Dockerfile
     container_name: dubaomatrung-admin
     restart: unless-stopped
     ports:
@@ -279,8 +279,8 @@ services:
   # Search Service
   search-service:
     build:
-      context: ./microservices/services/search-service
-      dockerfile: Dockerfile
+      context: ./microservices
+      dockerfile: services/search-service/Dockerfile
     container_name: dubaomatrung-search
     restart: unless-stopped
     ports:
@@ -304,8 +304,8 @@ services:
   # MapServer Service
   mapserver-service:
     build:
-      context: ./microservices/services/mapserver-service
-      dockerfile: Dockerfile
+      context: ./microservices
+      dockerfile: services/mapserver-service/Dockerfile
     container_name: dubaomatrung-mapserver
     restart: unless-stopped
     ports:

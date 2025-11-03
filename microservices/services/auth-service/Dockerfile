@@ -2,25 +2,32 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Copy root package files first (for shared dependencies)
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Copy service package files
+COPY services/auth-service/package*.json ./services/auth-service/
 
-# Copy source code
-COPY . .
+# Install root dependencies (for shared modules)
+RUN npm install --omit=dev
+
+# Install service dependencies
+WORKDIR /app/services/auth-service
+RUN npm install --omit=dev
+
+# Copy shared libraries
+WORKDIR /app
+COPY shared ./shared
+
+# Copy service source code
+COPY services/auth-service ./services/auth-service
 
 # Generate Prisma Client
+WORKDIR /app/services/auth-service
 RUN npx prisma generate
 
 # Expose port
 EXPOSE 3001
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3001/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
-
 # Start the application
-# NOTE: Database is pre-imported via SQL files, no migrations needed
 CMD ["node", "src/index.js"]
