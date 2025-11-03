@@ -89,25 +89,3 @@ Xem file [DEPLOYMENT.md](DEPLOYMENT.md) để biết thêm chi tiết.
 
 ---
 
-**Lưu ý:** Database lớn (2.5GB) nên lần đầu import có thể mất 5-10 phút. Kiên nhẫn chờ nhé!
-
-
-
-
-
-
-
-
-
-  # Pull code mới
-  git pull
-
-  # Rebuild CHÍNH gateway
-  docker-compose build gateway
-
-  # Restart gateway
-  docker-compose up -d gateway
-
-  # Check
-  docker ps | findstr gateway
-  docker logs dubaomatrung-gateway --tail 20
