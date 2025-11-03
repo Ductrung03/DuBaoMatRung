@@ -1,56 +1,57 @@
-Write-Host "🔍 Bước 1: Kiểm tra trạng thái containers..." -ForegroundColor Cyan
-  docker-compose ps
+# ===== SCRIPT CHECK AND FIX AUTH SERVICE =====
 
-  Write-Host "`n📋 Bước 2: Kiểm tra logs auth-service (20 dòng cuối)..." -ForegroundColor Cyan
-  docker-compose logs auth-service --tail=20
+Write-Host "Step 1: Check container status..." -ForegroundColor Cyan
+docker-compose ps
 
-  Write-Host "`n📋 Bước 3: Kiểm tra logs gateway (20 dòng cuối)..." -ForegroundColor Cyan
-  docker-compose logs gateway --tail=20
+Write-Host "`nStep 2: Check auth-service logs (last 20 lines)..." -ForegroundColor Cyan
+docker-compose logs auth-service --tail=20
 
-  Write-Host "`n📋 Bước 4: Kiểm tra logs postgres..." -ForegroundColor Cyan
-  docker-compose logs postgres --tail=20
+Write-Host "`nStep 3: Check gateway logs (last 20 lines)..." -ForegroundColor Cyan
+docker-compose logs gateway --tail=20
 
-  Write-Host "`n🩺 Bước 5: Test kết nối trực tiếp đến auth-service..." -ForegroundColor Cyan
-  docker exec dubaomatrung-auth node -e "require('http').get('http://localhost:3001/health', (r) => { let data = ''; r.on('data', chunk => data += chunk); r.on('end', () => 
-  console.log(data)); });"
+Write-Host "`nStep 4: Check postgres logs..." -ForegroundColor Cyan
+docker-compose logs postgres --tail=20
 
-  Write-Host "`n🔧 Bước 6: Restart auth-service và gateway..." -ForegroundColor Cyan
-  docker-compose restart auth-service gateway
+Write-Host "`nStep 5: Test direct connection to auth-service..." -ForegroundColor Cyan
+docker exec dubaomatrung-auth node -e "require('http').get('http://localhost:3001/health', (r) => { let data = ''; r.on('data', chunk => data += chunk); r.on('end', () => console.log(data)); });"
 
-  Write-Host "`n⏳ Đợi 10 giây để services khởi động..." -ForegroundColor Yellow
-  Start-Sleep -Seconds 10
+Write-Host "`nStep 6: Restart auth-service and gateway..." -ForegroundColor Cyan
+docker-compose restart auth-service gateway
 
-  Write-Host "`n✅ Bước 7: Kiểm tra lại trạng thái..." -ForegroundColor Cyan
-  docker-compose ps
+Write-Host "`nWait 10 seconds for services to start..." -ForegroundColor Yellow
+Start-Sleep -Seconds 10
 
-  Write-Host "`n🧪 Bước 8: Test API login từ host..." -ForegroundColor Cyan
-  $loginBody = @{
-      username = "admin"
-      password = "Admin@123"
-  } | ConvertTo-Json
+Write-Host "`nStep 7: Check status again..." -ForegroundColor Cyan
+docker-compose ps
 
-  try {
-      $response = Invoke-WebRequest -Uri "http://localhost:3000/api/auth/login" `
-          -Method POST `
-          -ContentType "application/json" `
-          -Body $loginBody `
-          -UseBasicParsing
+Write-Host "`nStep 8: Test API login from host..." -ForegroundColor Cyan
+$loginBody = @{
+    username = "admin"
+    password = "Admin@123"
+} | ConvertTo-Json
 
-      Write-Host "✅ Login thành công!" -ForegroundColor Green
-      Write-Host "Status: $($response.StatusCode)"
-      Write-Host "Response: $($response.Content)"
-  } catch {
-      Write-Host "❌ Login thất bại!" -ForegroundColor Red
-      Write-Host "Error: $($_.Exception.Message)"
+try {
+    $response = Invoke-WebRequest -Uri "http://localhost:3000/api/auth/login" `
+        -Method POST `
+        -ContentType "application/json" `
+        -Body $loginBody `
+        -UseBasicParsing
 
-      if ($_.Exception.Response) {
-          $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
-          $responseBody = $reader.ReadToEnd()
-          Write-Host "Response Body: $responseBody"
-      }
-  }
+    Write-Host "SUCCESS! Login works!" -ForegroundColor Green
+    Write-Host "Status: $($response.StatusCode)"
+    Write-Host "Response: $($response.Content)"
+} catch {
+    Write-Host "FAILED! Login error!" -ForegroundColor Red
+    Write-Host "Error: $($_.Exception.Message)"
 
-  Write-Host "`n📊 Tổng kết:" -ForegroundColor Cyan
-  Write-Host "- Nếu vẫn lỗi 503, chạy: docker-compose logs auth-service --tail=50" -ForegroundColor Yellow
-  Write-Host "- Có thể cần chờ database import xong (5-10 phút)" -ForegroundColor Yellow
-  Write-Host "- Kiểm tra file .env trong container: docker exec dubaomatrung-auth cat .env" -ForegroundColor Yellow
+    if ($_.Exception.Response) {
+        $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
+        $responseBody = $reader.ReadToEnd()
+        Write-Host "Response Body: $responseBody"
+    }
+}
+
+Write-Host "`nSummary:" -ForegroundColor Cyan
+Write-Host "- If still error 503, run: docker-compose logs auth-service --tail=50" -ForegroundColor Yellow
+Write-Host "- May need to wait for database import (5-10 minutes)" -ForegroundColor Yellow
+Write-Host "- Check .env in container: docker exec dubaomatrung-auth cat .env" -ForegroundColor Yellow
