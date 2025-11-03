@@ -83,9 +83,9 @@ services:
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
 
   # Redis for GIS Cache
   redis:
@@ -130,7 +130,7 @@ services:
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
     depends_on:
       mongodb:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
       interval: 30s
@@ -161,7 +161,7 @@ services:
       postgres:
         condition: service_healthy
       mongodb:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
       interval: 30s
@@ -192,7 +192,7 @@ services:
       postgres:
         condition: service_healthy
       mongodb:
-        condition: service_healthy
+        condition: service_started
 
   # GIS Service
   gis-service:
@@ -222,7 +222,7 @@ services:
       redis:
         condition: service_healthy
       mongodb:
-        condition: service_healthy
+        condition: service_started
     volumes:
       - gis_uploads:/app/uploads
 
@@ -249,7 +249,7 @@ services:
       postgres:
         condition: service_healthy
       mongodb:
-        condition: service_healthy
+        condition: service_started
 
   # Admin Service
   admin-service:
@@ -274,7 +274,7 @@ services:
       admin-postgis:
         condition: service_healthy
       mongodb:
-        condition: service_healthy
+        condition: service_started
 
   # Search Service
   search-service:
@@ -299,7 +299,7 @@ services:
       postgres:
         condition: service_healthy
       mongodb:
-        condition: service_healthy
+        condition: service_started
 
   # MapServer Service
   mapserver-service:
@@ -317,7 +317,7 @@ services:
       - GATEWAY_URL=http://gateway:3000
     depends_on:
       mongodb:
-        condition: service_healthy
+        condition: service_started
 
   # ===================================================================
   # FRONTEND
