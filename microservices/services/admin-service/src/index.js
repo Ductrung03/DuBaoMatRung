@@ -6,7 +6,7 @@ const path = require('path');
 require('dotenv').config();
 
 const DatabaseManager = require('../../../shared/database');
-const RedisManager = require('../../../shared/redis');
+// const RedisManager = require('../../../shared/redis'); // Admin service doesn't need Redis
 const createLogger = require('../../../shared/logger');
 const { errorHandler } = require('../../../shared/errors');
 const { createSwaggerConfig, setupSwagger } = require('../../../shared/swagger');
@@ -19,7 +19,7 @@ const app = express();
 const PORT = process.env.PORT || 3005;
 const logger = createLogger('admin-service');
 
-let dbManager, kyselyDb, redisManager;
+let dbManager, kyselyDb; // redisManager removed - not needed
 
 app.use(helmet());
 app.use(cors());
@@ -51,10 +51,11 @@ const startServer = async () => {
       database: process.env.DB_NAME
     });
 
-    redisManager = new RedisManager('admin-service', {
-      host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT
-    });
+    // Redis not needed for admin service
+    // redisManager = new RedisManager('admin-service', {
+    //   host: process.env.REDIS_HOST,
+    //   port: process.env.REDIS_PORT
+    // });
 
     await dbManager.initialize();
 
@@ -63,11 +64,11 @@ const startServer = async () => {
     kyselyDb = createKyselyAdminDb(adminDbUrl);
     logger.info('Kysely Query Builder initialized for admin_db');
 
-    await redisManager.initialize();
+    // await redisManager.initialize(); // Disabled
 
     app.locals.db = dbManager;           // Legacy connection
     app.locals.kyselyDb = kyselyDb;      // Kysely Query Builder
-    app.locals.redis = redisManager;
+    // app.locals.redis = redisManager;  // Disabled
 
     const server = app.listen(PORT, '0.0.0.0', () => {
       logger.info(`Admin Service running on port ${PORT}`);

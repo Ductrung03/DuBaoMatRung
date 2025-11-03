@@ -6,7 +6,7 @@ const path = require('path');
 require('dotenv').config();
 
 const DatabaseManager = require('../../../shared/database');
-const RedisManager = require('../../../shared/redis');
+// const RedisManager = require('../../../shared/redis'); // Search service doesn't need Redis
 const createLogger = require('../../../shared/logger');
 const { errorHandler } = require('../../../shared/errors');
 const { createSwaggerConfig, setupSwagger } = require('../../../shared/swagger');
@@ -16,7 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 3006;
 const logger = createLogger('search-service');
 
-let dbManager, redisManager;
+let dbManager; // redisManager removed - not needed
 
 app.use(helmet());
 app.use(cors());
@@ -47,16 +47,17 @@ const startServer = async () => {
     database: process.env.DB_NAME
   });
 
-  redisManager = new RedisManager('search-service', {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT
-  });
+  // Redis not needed for search service
+  // redisManager = new RedisManager('search-service', {
+  //   host: process.env.REDIS_HOST,
+  //   port: process.env.REDIS_PORT
+  // });
 
   await dbManager.initialize();
-  await redisManager.initialize();
+  // await redisManager.initialize(); // Disabled
 
   app.locals.db = dbManager;
-  app.locals.redis = redisManager;
+  // app.locals.redis = redisManager; // Disabled
 
   const server = app.listen(PORT, '0.0.0.0', () => {
     logger.info(`Search Service running on port ${PORT}`);
