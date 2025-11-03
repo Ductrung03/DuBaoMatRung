@@ -1,5 +1,16 @@
 FROM node:20-alpine
 
+# Install MapServer and dependencies
+RUN apk add --no-cache \
+    mapserver \
+    mapserver-dev \
+    gdal \
+    gdal-dev \
+    proj \
+    proj-dev \
+    geos \
+    geos-dev
+
 WORKDIR /app
 
 # Copy root package files first (for shared dependencies)

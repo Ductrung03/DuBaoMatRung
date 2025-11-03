@@ -11,14 +11,6 @@ const logger = createLogger('admin-controller-kysely');
 exports.getHuyen = async (req, res, next) => {
   try {
     const kyselyDb = req.app.locals.kyselyDb;
-    const redis = req.app.locals.redis;
-
-    const cacheKey = 'dropdown:kysely:huyen';
-    const cached = await redis.get(cacheKey);
-
-    if (cached) {
-      return res.json({ ...cached, cached: true });
-    }
 
     const adminService = new AdminService(kyselyDb);
     const results = await adminService.getHuyen();
@@ -29,8 +21,6 @@ exports.getHuyen = async (req, res, next) => {
     }));
 
     const response = formatResponse(true, 'Huyen list retrieved', data);
-    await redis.set(cacheKey, response, 86400); // Cache 24h
-
     res.json(response);
   } catch (error) {
     next(error);
@@ -42,14 +32,6 @@ exports.getXa = async (req, res, next) => {
   try {
     const { huyen } = req.query;
     const kyselyDb = req.app.locals.kyselyDb;
-    const redis = req.app.locals.redis;
-
-    const cacheKey = `dropdown:kysely:xa:${huyen || 'all'}`;
-    const cached = await redis.get(cacheKey);
-
-    if (cached) {
-      return res.json({ ...cached, cached: true });
-    }
 
     const adminService = new AdminService(kyselyDb);
     const results = await adminService.getXa(huyen);
@@ -60,8 +42,6 @@ exports.getXa = async (req, res, next) => {
     }));
 
     const response = formatResponse(true, 'Xa list retrieved', data);
-    await redis.set(cacheKey, response, 86400);
-
     res.json(response);
   } catch (error) {
     next(error);
@@ -73,14 +53,6 @@ exports.getTieuKhu = async (req, res, next) => {
   try {
     const { huyen, xa } = req.query;
     const kyselyDb = req.app.locals.kyselyDb;
-    const redis = req.app.locals.redis;
-
-    const cacheKey = `dropdown:kysely:tk:${huyen || 'all'}:${xa || 'all'}`;
-    const cached = await redis.get(cacheKey);
-
-    if (cached) {
-      return res.json({ ...cached, cached: true });
-    }
 
     const adminService = new AdminService(kyselyDb);
     const results = await adminService.getTieuKhu(huyen, xa);
@@ -91,8 +63,6 @@ exports.getTieuKhu = async (req, res, next) => {
     }));
 
     const response = formatResponse(true, 'Tieu khu list retrieved', data);
-    await redis.set(cacheKey, response, 86400);
-
     res.json(response);
   } catch (error) {
     next(error);
@@ -103,14 +73,6 @@ exports.getTieuKhu = async (req, res, next) => {
 exports.getKhoanh = async (req, res, next) => {
   try {
     const kyselyDb = req.app.locals.kyselyDb;
-    const redis = req.app.locals.redis;
-
-    const cacheKey = 'dropdown:kysely:khoanh';
-    const cached = await redis.get(cacheKey);
-
-    if (cached) {
-      return res.json({ ...cached, cached: true });
-    }
 
     const adminService = new AdminService(kyselyDb);
     const results = await adminService.getKhoanh();
@@ -121,8 +83,6 @@ exports.getKhoanh = async (req, res, next) => {
     }));
 
     const response = formatResponse(true, 'Khoanh list retrieved', data);
-    await redis.set(cacheKey, response, 86400); // Cache 24h
-
     res.json(response);
   } catch (error) {
     next(error);
@@ -133,14 +93,6 @@ exports.getKhoanh = async (req, res, next) => {
 exports.getChurung = async (req, res, next) => {
   try {
     const kyselyDb = req.app.locals.kyselyDb;
-    const redis = req.app.locals.redis;
-
-    const cacheKey = 'dropdown:kysely:churung';
-    const cached = await redis.get(cacheKey);
-
-    if (cached) {
-      return res.json({ ...cached, cached: true });
-    }
 
     const adminService = new AdminService(kyselyDb);
     const results = await adminService.getChurung();
@@ -151,8 +103,6 @@ exports.getChurung = async (req, res, next) => {
     }));
 
     const response = formatResponse(true, 'Churung list retrieved', data);
-    await redis.set(cacheKey, response, 86400); // Cache 24h
-
     res.json(response);
   } catch (error) {
     next(error);
@@ -193,14 +143,6 @@ exports.getHanhChinh = async (req, res, next) => {
 exports.getChucNangRung = async (req, res, next) => {
   try {
     const kyselyDb = req.app.locals.kyselyDb;
-    const redis = req.app.locals.redis;
-
-    const cacheKey = 'dropdown:kysely:chucnangrung';
-    const cached = await redis.get(cacheKey);
-
-    if (cached) {
-      return res.json({ ...cached, cached: true });
-    }
 
     const adminService = new AdminService(kyselyDb);
     const results = await adminService.getChucNangRung();
@@ -211,8 +153,6 @@ exports.getChucNangRung = async (req, res, next) => {
     }));
 
     const response = formatResponse(true, 'Chuc nang rung list retrieved', data);
-    await redis.set(cacheKey, response, 86400); // Cache 24h
-
     res.json(response);
   } catch (error) {
     next(error);
@@ -223,14 +163,6 @@ exports.getChucNangRung = async (req, res, next) => {
 exports.getTrangThaiXacMinh = async (req, res, next) => {
   try {
     const kyselyDb = req.app.locals.kyselyDb;
-    const redis = req.app.locals.redis;
-
-    const cacheKey = 'dropdown:kysely:trangthaixacminh';
-    const cached = await redis.get(cacheKey);
-
-    if (cached) {
-      return res.json({ ...cached, cached: true });
-    }
 
     const adminService = new AdminService(kyselyDb);
     const results = await adminService.getTrangThaiXacMinh();
@@ -241,8 +173,6 @@ exports.getTrangThaiXacMinh = async (req, res, next) => {
     }));
 
     const response = formatResponse(true, 'Trang thai xac minh list retrieved', data);
-    await redis.set(cacheKey, response, 86400); // Cache 24h
-
     res.json(response);
   } catch (error) {
     next(error);
@@ -253,14 +183,6 @@ exports.getTrangThaiXacMinh = async (req, res, next) => {
 exports.getNguyenNhan = async (req, res, next) => {
   try {
     const kyselyDb = req.app.locals.kyselyDb;
-    const redis = req.app.locals.redis;
-
-    const cacheKey = 'dropdown:kysely:nguyennhan';
-    const cached = await redis.get(cacheKey);
-
-    if (cached) {
-      return res.json({ ...cached, cached: true });
-    }
 
     const adminService = new AdminService(kyselyDb);
     const results = await adminService.getNguyenNhan();
@@ -271,8 +193,6 @@ exports.getNguyenNhan = async (req, res, next) => {
     }));
 
     const response = formatResponse(true, 'Nguyen nhan list retrieved', data);
-    await redis.set(cacheKey, response, 86400); // Cache 24h
-
     res.json(response);
   } catch (error) {
     next(error);
