@@ -21,7 +21,7 @@ docker exec dubaomatrung-mapserver ls -lh /mapserver/mapfiles/
 
 # Step 5: Check mapfile content
 Write-Host "`n[5] Checking mapfile CONNECTION strings:" -ForegroundColor Cyan
-docker exec dubaomatrung-mapserver grep -A 2 "CONNECTION" /mapserver/mapfiles/laocai.map | head -20
+docker exec dubaomatrung-mapserver grep -A 2 "CONNECTION" /mapserver/mapfiles/laocai.map
 
 # Step 6: Test WMS
 Write-Host "`n[6] Testing WMS GetCapabilities:" -ForegroundColor Cyan
