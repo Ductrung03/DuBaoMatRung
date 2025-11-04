@@ -85,27 +85,11 @@ try {
 
 # Kiểm tra kết quả
 Write-Host "`n[7] Kiểm tra dữ liệu đã import:" -ForegroundColor Yellow
-docker exec dubaomatrung-admin-postgis psql -U postgres -d admin_db -c "
-SELECT 
-    schemaname,
-    tablename,
-    n_tup_ins as rows
-FROM pg_stat_user_tables 
-ORDER BY n_tup_ins DESC 
-LIMIT 10;
-"
+docker exec dubaomatrung-admin-postgis psql -U postgres -d admin_db -c "SELECT schemaname, tablename, n_tup_ins as rows FROM pg_stat_user_tables ORDER BY n_tup_ins DESC LIMIT 10;"
 
 # Kiểm tra bảng laocai_ranhgioihc cụ thể
 Write-Host "`n[8] Kiểm tra bảng laocai_ranhgioihc:" -ForegroundColor Yellow
-docker exec dubaomatrung-admin-postgis psql -U postgres -d admin_db -c "
-SELECT 
-    COUNT(*) as total_rows,
-    COUNT(geom) as rows_with_geometry,
-    ST_SRID(geom) as srid
-FROM laocai_ranhgioihc
-GROUP BY ST_SRID(geom)
-LIMIT 1;
-" 2>$null
+docker exec dubaomatrung-admin-postgis psql -U postgres -d admin_db -c "SELECT COUNT(*) as total_rows, COUNT(geom) as rows_with_geometry, ST_SRID(geom) as srid FROM laocai_ranhgioihc GROUP BY ST_SRID(geom) LIMIT 1;" 2>$null
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "  ✅ Bảng laocai_ranhgioihc có dữ liệu" -ForegroundColor Green
