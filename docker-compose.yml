@@ -315,6 +315,8 @@ services:
       - PORT=3007
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
       - GATEWAY_URL=http://gateway:3000
+    volumes:
+      - ./mapserver:/mapserver:ro
     depends_on:
       mongodb:
         condition: service_started
