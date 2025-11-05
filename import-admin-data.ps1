@@ -41,34 +41,20 @@ try {
 Write-Host "`n[3] Kiem tra database admin_db..." -ForegroundColor Yellow
 try {
     $dbExists = docker exec dubaomatrung-admin-postgis psql -U postgres -lqt | Select-String "admin_db"
-    if ($dbExists -and -not $Force) {
-        Write-Host "  [WARNING] Database admin_db da ton tai!" -ForegroundColor Yellow
-        $confirm = Read-Host "Ban co muon xoa va tao lai? (y/N)"
-        if ($confirm -ne "y" -and $confirm -ne "Y") {
-            Write-Host "  [ERROR] Huy import" -ForegroundColor Red
-            exit 1
-        }
-        $Force = $true
+    if ($dbExists) {
+        Write-Host "  [OK] Database admin_db da ton tai" -ForegroundColor Green
+    } else {
+        Write-Host "  [WARNING] Database admin_db khong ton tai, dang tao..." -ForegroundColor Yellow
+        docker exec dubaomatrung-admin-postgis psql -U postgres -c "CREATE DATABASE admin_db;"
+        docker exec dubaomatrung-admin-postgis psql -U postgres -d admin_db -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+        Write-Host "  [OK] Da tao database voi PostGIS extension" -ForegroundColor Green
     }
 } catch {
     Write-Host "  [WARNING] Khong the kiem tra database, tiep tuc import..." -ForegroundColor Yellow
 }
 
-# Xoa database cu neu can
-if ($Force) {
-    Write-Host "`n[4] Xoa database cu..." -ForegroundColor Yellow
-    docker exec dubaomatrung-admin-postgis psql -U postgres -c "DROP DATABASE IF EXISTS admin_db;"
-    Write-Host "  [OK] Da xoa database cu" -ForegroundColor Green
-}
-
-# Tao database moi
-Write-Host "`n[5] Tao database admin_db..." -ForegroundColor Yellow
-docker exec dubaomatrung-admin-postgis psql -U postgres -c "CREATE DATABASE admin_db;"
-docker exec dubaomatrung-admin-postgis psql -U postgres -d admin_db -c "CREATE EXTENSION IF NOT EXISTS postgis;"
-Write-Host "  [OK] Da tao database voi PostGIS extension" -ForegroundColor Green
-
 # Import du lieu
-Write-Host "`n[6] Import du lieu tu file SQL..." -ForegroundColor Yellow
+Write-Host "`n[4] Import du lieu tu file SQL..." -ForegroundColor Yellow
 Write-Host "  [WAIT] Dang import du lieu... (co the mat vai phut)" -ForegroundColor Cyan
 
 try {
