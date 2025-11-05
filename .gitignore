@@ -67,3 +67,7 @@ specs
 *.env.local
 init
 docker-init
+# Large database dumps (use alternative transfer method)
+docker-init/admin-postgis/01-admin-db.sql
+docker-init/postgis/01-admin-db.sql
+*.sql.gz

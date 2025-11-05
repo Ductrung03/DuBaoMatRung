@@ -74,54 +74,52 @@ try {
     exit 1
 }
 
-# Tao temp file da xu ly (fix compatibility issues)
-Write-Host "`n[4] Xu ly compatibility Postgres 17 -> Postgres 15..." -ForegroundColor Yellow
-$tempSqlFile = [System.IO.Path]::GetTempFileName() -replace '\.tmp$', '.sql'
+# Kiem tra va xu ly compatibility (neu can)
+Write-Host "`n[4] Kiem tra file SQL..." -ForegroundColor Yellow
 
-try {
-    $sqlContent = Get-Content -Path $SqlFile -Encoding UTF8 -Raw
+$fileSize = (Get-Item $SqlFile).Length / 1MB
 
-    # Fix 1: Loai bo SET statements khong ho tro trong Postgres 15
-    Write-Host "  [PROCESS] Loai bo SET statements khong ho tro..." -ForegroundColor Cyan
-    $sqlContent = $sqlContent -replace "(?m)^SET search_path.*$", ""
-    $sqlContent = $sqlContent -replace "(?m)^SET default_table_access_method.*$", ""
-    $sqlContent = $sqlContent -replace "(?m)^SET xmloption.*$", ""
-    $sqlContent = $sqlContent -replace "(?m)^SET client_encoding.*$", ""
-    $sqlContent = $sqlContent -replace "(?m)^SET row_security.*$", ""
-    $sqlContent = $sqlContent -replace "(?m)^SET default_tablespace.*$", ""
+# Neu file > 500MB, skip xu ly (gia su da xu ly tu truoc)
+if ($fileSize -gt 500) {
+    Write-Host "  [INFO] File lon ($([math]::Round($fileSize, 2)) MB), su dung truc tiep (da xu ly compatibility)" -ForegroundColor Cyan
+    Write-Host "  [SKIP] Bo qua buoc xu ly de tranh Out Of Memory" -ForegroundColor Yellow
+    $tempSqlFile = $SqlFile
+} else {
+    Write-Host "  [PROCESS] Xu ly compatibility Postgres 17 -> Postgres 15..." -ForegroundColor Cyan
+    $tempSqlFile = [System.IO.Path]::GetTempFileName() -replace '\.tmp$', '.sql'
 
-    # Fix 2: Giu lai cac SET quan trong
-    Write-Host "  [PROCESS] Dam bao cac SET statement can thiet..." -ForegroundColor Cyan
-    if ($sqlContent -notmatch "SET statement_timeout") {
-        $sqlContent = "SET statement_timeout = 0;`n" + $sqlContent
+    try {
+        $sqlContent = Get-Content -Path $SqlFile -Encoding UTF8 -Raw
+
+        # Fix 1: Loai bo SET statements khong ho tro trong Postgres 15
+        Write-Host "    - Loai bo SET statements khong ho tro..." -ForegroundColor Gray
+        $sqlContent = $sqlContent -replace "(?m)^SET search_path.*$", ""
+        $sqlContent = $sqlContent -replace "(?m)^SET default_table_access_method.*$", ""
+        $sqlContent = $sqlContent -replace "(?m)^SET xmloption.*$", ""
+        $sqlContent = $sqlContent -replace "(?m)^SET client_encoding.*$", ""
+        $sqlContent = $sqlContent -replace "(?m)^SET row_security.*$", ""
+        $sqlContent = $sqlContent -replace "(?m)^SET default_tablespace.*$", ""
+        $sqlContent = $sqlContent -replace "(?m)^SET transaction_timeout.*$", ""
+
+        # Fix 2: Xu ly PostGIS extensions
+        Write-Host "    - Xu ly PostGIS extensions..." -ForegroundColor Gray
+        $sqlContent = $sqlContent -replace "(?m)^CREATE EXTENSION IF NOT EXISTS.*postgis.*WITH SCHEMA.*$", "CREATE EXTENSION IF NOT EXISTS postgis;"
+        $sqlContent = $sqlContent -replace "(?m)^CREATE EXTENSION IF NOT EXISTS.*postgis_topology.*WITH SCHEMA.*$", "CREATE EXTENSION IF NOT EXISTS postgis_topology;"
+
+        # Fix 3: Xu ly OID references
+        Write-Host "    - Xu ly OID references..." -ForegroundColor Gray
+        $sqlContent = $sqlContent -replace "WITH \(oids = (true|false)\)", ""
+        $sqlContent = $sqlContent -replace "WITHOUT OIDS", ""
+
+        # Ghi vao temp file
+        Set-Content -Path $tempSqlFile -Value $sqlContent -Encoding UTF8
+        Write-Host "  [OK] File da xu ly" -ForegroundColor Green
+
+    } catch {
+        Write-Host "  [ERROR] Loi xu ly file SQL: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "  [INFO] Se thu import truc tiep file goc..." -ForegroundColor Yellow
+        $tempSqlFile = $SqlFile
     }
-    if ($sqlContent -notmatch "SET client_encoding") {
-        $sqlContent = "SET client_encoding = 'UTF8';`n" + $sqlContent
-    }
-
-    # Fix 3: Xu ly PostGIS extensions
-    Write-Host "  [PROCESS] Xu ly PostGIS extensions..." -ForegroundColor Cyan
-    $sqlContent = $sqlContent -replace "(?m)^CREATE EXTENSION IF NOT EXISTS.*postgis.*WITH SCHEMA.*$", "CREATE EXTENSION IF NOT EXISTS postgis;"
-    $sqlContent = $sqlContent -replace "(?m)^CREATE EXTENSION IF NOT EXISTS.*postgis_topology.*WITH SCHEMA.*$", "CREATE EXTENSION IF NOT EXISTS postgis_topology;"
-
-    # Fix 4: Xu ly OID references va OIDS option
-    Write-Host "  [PROCESS] Xu ly OID references..." -ForegroundColor Cyan
-    $sqlContent = $sqlContent -replace "WITH \(oids = (true|false)\)", ""
-    $sqlContent = $sqlContent -replace "WITHOUT OIDS", ""
-
-    # Fix 5: Xu ly SEQUENCE compatibility
-    Write-Host "  [PROCESS] Xu ly sequences..." -ForegroundColor Cyan
-    # Giu nguyen cac setval statements vi chung van hoat dong tren Postgres 15
-
-    # Ghi vao temp file
-    Set-Content -Path $tempSqlFile -Value $sqlContent -Encoding UTF8
-    Write-Host "  [OK] File da xu ly: $tempSqlFile" -ForegroundColor Green
-    Write-Host "  - Kich thuoc sau xu ly: $([math]::Round((Get-Item $tempSqlFile).Length/1MB, 2)) MB" -ForegroundColor Cyan
-
-} catch {
-    Write-Host "  [ERROR] Loi xu ly file SQL: $($_.Exception.Message)" -ForegroundColor Red
-    Remove-Item -Path $tempSqlFile -Force -ErrorAction SilentlyContinue
-    exit 1
 }
 
 # Import du lieu
@@ -169,8 +167,10 @@ try {
     docker exec $ContainerName rm -f "/tmp/admin_db_import.sql" -ErrorAction SilentlyContinue
     exit 1
 } finally {
-    # Xoa temp file local
-    Remove-Item -Path $tempSqlFile -Force -ErrorAction SilentlyContinue
+    # Xoa temp file local (chi xoa neu khac file goc)
+    if ($tempSqlFile -ne $SqlFile) {
+        Remove-Item -Path $tempSqlFile -Force -ErrorAction SilentlyContinue
+    }
 }
 
 # Kiem tra ket qua
