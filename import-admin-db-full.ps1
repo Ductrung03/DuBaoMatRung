@@ -52,7 +52,7 @@ try {
             Write-Host "  [OK] Da xoa database cu" -ForegroundColor Green
         } else {
             $confirm = Read-Host "  Ban co muon xoa va tao lai? (y/N)"
-            if ($confirm -eq "y" -o $confirm -eq "Y") {
+            if ($confirm -eq "y" -or $confirm -eq "Y") {
                 docker exec $ContainerName psql -U $DbUser -c "DROP DATABASE IF EXISTS $DbName;"
                 Write-Host "  [OK] Da xoa database cu" -ForegroundColor Green
             } else {
@@ -83,22 +83,35 @@ try {
 
     # Fix 1: Loai bo SET statements khong ho tro trong Postgres 15
     Write-Host "  [PROCESS] Loai bo SET statements khong ho tro..." -ForegroundColor Cyan
-    $sqlContent = $sqlContent -replace "SET search_path = public, pg_catalog;", ""
-    $sqlContent = $sqlContent -replace "SET default_table_access_method = heap;", ""
-    $sqlContent = $sqlContent -replace "SET xmloption = content;", ""
-    $sqlContent = $sqlContent -replace "SET client_encoding = 'UTF8';", ""
+    $sqlContent = $sqlContent -replace "(?m)^SET search_path.*$", ""
+    $sqlContent = $sqlContent -replace "(?m)^SET default_table_access_method.*$", ""
+    $sqlContent = $sqlContent -replace "(?m)^SET xmloption.*$", ""
+    $sqlContent = $sqlContent -replace "(?m)^SET client_encoding.*$", ""
+    $sqlContent = $sqlContent -replace "(?m)^SET row_security.*$", ""
+    $sqlContent = $sqlContent -replace "(?m)^SET default_tablespace.*$", ""
 
-    # Fix 2: Thay doi CONSTRAINT syntax neu can
-    Write-Host "  [PROCESS] Xu ly constraint syntax..." -ForegroundColor Cyan
-    $sqlContent = $sqlContent -replace "ALTER TABLE ONLY public\.(\w+)", "ALTER TABLE ONLY `$1"
+    # Fix 2: Giu lai cac SET quan trong
+    Write-Host "  [PROCESS] Dam bao cac SET statement can thiet..." -ForegroundColor Cyan
+    if ($sqlContent -notmatch "SET statement_timeout") {
+        $sqlContent = "SET statement_timeout = 0;`n" + $sqlContent
+    }
+    if ($sqlContent -notmatch "SET client_encoding") {
+        $sqlContent = "SET client_encoding = 'UTF8';`n" + $sqlContent
+    }
 
-    # Fix 3: Xu ly OID references
+    # Fix 3: Xu ly PostGIS extensions
+    Write-Host "  [PROCESS] Xu ly PostGIS extensions..." -ForegroundColor Cyan
+    $sqlContent = $sqlContent -replace "(?m)^CREATE EXTENSION IF NOT EXISTS.*postgis.*WITH SCHEMA.*$", "CREATE EXTENSION IF NOT EXISTS postgis;"
+    $sqlContent = $sqlContent -replace "(?m)^CREATE EXTENSION IF NOT EXISTS.*postgis_topology.*WITH SCHEMA.*$", "CREATE EXTENSION IF NOT EXISTS postgis_topology;"
+
+    # Fix 4: Xu ly OID references va OIDS option
     Write-Host "  [PROCESS] Xu ly OID references..." -ForegroundColor Cyan
-    $sqlContent = $sqlContent -replace "WITH \(oids = true\)", ""
+    $sqlContent = $sqlContent -replace "WITH \(oids = (true|false)\)", ""
+    $sqlContent = $sqlContent -replace "WITHOUT OIDS", ""
 
-    # Fix 4: Loai bo thua sua phuc tap (nếu có)
-    Write-Host "  [PROCESS] Loai bo phieu xu ly UUID..." -ForegroundColor Cyan
-    $sqlContent = $sqlContent -replace "SELECT pg_catalog\.setval\('(\w+)', (\d+), (true|false)\);", ""
+    # Fix 5: Xu ly SEQUENCE compatibility
+    Write-Host "  [PROCESS] Xu ly sequences..." -ForegroundColor Cyan
+    # Giu nguyen cac setval statements vi chung van hoat dong tren Postgres 15
 
     # Ghi vao temp file
     Set-Content -Path $tempSqlFile -Value $sqlContent -Encoding UTF8
@@ -117,16 +130,39 @@ Write-Host "  [WAIT] Dang xu ly..." -ForegroundColor Cyan
 
 try {
     # Copy file vao container
+    Write-Host "  [PROCESS] Copy file vao container..." -ForegroundColor Cyan
     docker cp $tempSqlFile "${ContainerName}:/tmp/admin_db_import.sql"
 
-    # Import voi error handling
-    Write-Host "  [PROCESS] Dang import du lieu..." -ForegroundColor Cyan
-    docker exec $ContainerName psql -U $DbUser -d $DbName -f "/tmp/admin_db_import.sql" 2>&1 | Tee-Object -Variable importOutput
+    # Kiem tra version Postgres trong container
+    Write-Host "  [INFO] Kiem tra PostgreSQL version..." -ForegroundColor Cyan
+    $pgVersion = docker exec $ContainerName psql -U $DbUser -t -c "SELECT version();" 2>$null
+    Write-Host "  - $($pgVersion.Trim())" -ForegroundColor Gray
+
+    # Import voi error handling va logging
+    Write-Host "  [PROCESS] Dang import du lieu (se hien thi warnings neu co)..." -ForegroundColor Cyan
+    $importLog = docker exec $ContainerName psql -U $DbUser -d $DbName -v ON_ERROR_STOP=0 -f "/tmp/admin_db_import.sql" 2>&1
+
+    # Phan tich ket qua
+    $errors = $importLog | Where-Object { $_ -match "ERROR:" }
+    $warnings = $importLog | Where-Object { $_ -match "WARNING:|NOTICE:" }
+
+    if ($errors.Count -gt 0) {
+        Write-Host "`n  [WARNING] Co $($errors.Count) loi khi import:" -ForegroundColor Yellow
+        $errors | ForEach-Object { Write-Host "    - $_" -ForegroundColor Red }
+    }
+
+    if ($warnings.Count -gt 0) {
+        Write-Host "`n  [INFO] Co $($warnings.Count) canh bao (binh thuong):" -ForegroundColor Cyan
+        $warnings | Select-Object -First 5 | ForEach-Object { Write-Host "    - $_" -ForegroundColor Yellow }
+        if ($warnings.Count -gt 5) {
+            Write-Host "    ... va $($warnings.Count - 5) canh bao khac" -ForegroundColor Gray
+        }
+    }
 
     # Xoa temp file trong container
-    docker exec $ContainerName rm -f "/tmp/admin_db_import.sql"
+    docker exec $ContainerName rm -f "/tmp/admin_db_import.sql" 2>$null
 
-    Write-Host "  [OK] Import thanh cong!" -ForegroundColor Green
+    Write-Host "`n  [OK] Import hoan tat!" -ForegroundColor Green
 
 } catch {
     Write-Host "  [ERROR] Loi import: $($_.Exception.Message)" -ForegroundColor Red
