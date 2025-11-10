@@ -1,133 +1,76 @@
 #!/bin/bash
-
-# Export Databases Script
-# This script exports all databases to SQL files for Docker deployment
+# ===================================================================
+# Database Export Script
+# Exports all databases from Docker containers
+# ===================================================================
 
 set -e
 
-echo "=========================================="
-echo "Exporting Databases"
-echo "=========================================="
-
-# Create exports directory
-mkdir -p docker-init/postgres
-mkdir -p docker-init/postgis
-mkdir -p docker-init/mongodb
-
-# Colors for output
-GREEN='\033[0;32m'
+# Colors
 RED='\033[0;31m'
+GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Database credentials from .env files
-POSTGRES_USER="postgres"
-POSTGRES_PASSWORD="4"
-POSTGRES_HOST="localhost"
-POSTGRES_PORT="5433"
+echo -e "${CYAN}====================================================================${NC}"
+echo -e "${CYAN}EXPORTING ALL DATABASES${NC}"
+echo -e "${CYAN}====================================================================${NC}"
 
-# Export auth_db (dubaomatrung database)
-echo ""
-echo -e "${YELLOW}[1/3] Exporting auth_db (dubaomatrung)...${NC}"
-export PGPASSWORD="$POSTGRES_PASSWORD"
-
-if pg_dump -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d "dubaomatrung" \
-    --clean --if-exists --create \
-    -f docker-init/postgres/01-auth-db.sql 2>/dev/null; then
-    echo -e "${GREEN}✓ Successfully exported auth_db${NC}"
-    echo "  File: docker-init/postgres/01-auth-db.sql"
-    echo "  Size: $(du -h docker-init/postgres/01-auth-db.sql | cut -f1)"
-else
-    echo -e "${RED}✗ Failed to export auth_db${NC}"
-    echo "  Trying alternative database name: auth_db"
-    if pg_dump -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d "auth_db" \
-        --clean --if-exists --create \
-        -f docker-init/postgres/01-auth-db.sql 2>/dev/null; then
-        echo -e "${GREEN}✓ Successfully exported auth_db${NC}"
-    else
-        echo -e "${RED}✗ Could not find auth_db or dubaomatrung database${NC}"
-        echo "Available databases:"
-        psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -l
-    fi
+# Check if containers are running
+if ! docker-compose ps | grep -q "Up"; then
+    echo -e "${RED}Error: No services are running!${NC}"
+    echo -e "${YELLOW}Please start services first: docker-compose up -d${NC}"
+    exit 1
 fi
 
-# Export gis_db (gis_data database)
-echo ""
-echo -e "${YELLOW}[2/3] Exporting gis_db (gis_data) with PostGIS...${NC}"
+# Create export directories
+mkdir -p docker-init/postgres
+mkdir -p docker-init/postgis
+mkdir -p docker-init/admin-postgis
+mkdir -p docker-init/mongodb
 
-if pg_dump -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d "gis_db" \
-    --clean --if-exists --create \
-    -f docker-init/postgis/01-gis-db.sql 2>/dev/null; then
-    echo -e "${GREEN}✓ Successfully exported gis_db${NC}"
-    echo "  File: docker-init/postgis/01-gis-db.sql"
-    echo "  Size: $(du -h docker-init/postgis/01-gis-db.sql | cut -f1)"
-else
-    echo -e "${RED}✗ Failed to export gis_db${NC}"
-    echo "  Trying alternative database name: gis_data"
-    if pg_dump -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d "gis_data" \
-        --clean --if-exists --create \
-        -f docker-init/postgis/01-gis-db.sql 2>/dev/null; then
-        echo -e "${GREEN}✓ Successfully exported gis_data${NC}"
-    else
-        echo -e "${RED}✗ Could not find gis_db or gis_data database${NC}"
-    fi
-fi
+# Export auth_db (PostgreSQL 17)
+echo -e "\n${CYAN}[1/4] Exporting auth_db (PostgreSQL 17)...${NC}"
+docker exec dubaomatrung-postgres pg_dump -U postgres -d auth_db \
+    --clean --if-exists \
+    > docker-init/postgres/01-auth-db.sql
+echo -e "${GREEN}✓ auth_db exported to docker-init/postgres/01-auth-db.sql${NC}"
 
-echo ""
-echo -e "${YELLOW}[2/3] Exporting admin_db (gis_data) with PostGIS...${NC}"
+# Export gis_db (PostGIS 17)
+echo -e "\n${CYAN}[2/4] Exporting gis_db (PostGIS 17)...${NC}"
+docker exec dubaomatrung-postgis pg_dump -U postgres -d gis_db \
+    --clean --if-exists \
+    > docker-init/postgis/01-gis-db.sql
+echo -e "${GREEN}✓ gis_db exported to docker-init/postgis/01-gis-db.sql${NC}"
 
-if pg_dump -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d "admin_db" \
-    --clean --if-exists --create \
-    -f docker-init/postgis/01-admin-db.sql 2>/dev/null; then
-    echo -e "${GREEN}✓ Successfully exported admin_db${NC}"
-    echo "  File: docker-init/postgis/01-gis-db.sql"
-    echo "  Size: $(du -h docker-init/postgis/01-gis-db.sql | cut -f1)"
-else
-    echo -e "${RED}✗ Failed to export admin_db${NC}"
-    echo "  Trying alternative database name: gis_data"
-    if pg_dump -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d "gis_data" \
-        --clean --if-exists --create \
-        -f docker-init/postgis/01-gis-db.sql 2>/dev/null; then
-        echo -e "${GREEN}✓ Successfully exported gis_data${NC}"
-    else
-        echo -e "${RED}✗ Could not find admin_db or gis_data database${NC}"
-    fi
-fi
+# Export admin_db (PostGIS 17) - This may take several minutes
+echo -e "\n${CYAN}[3/4] Exporting admin_db (PostGIS 17)...${NC}"
+echo -e "${YELLOW}This may take 5-10 minutes for large database...${NC}"
+START_TIME=$(date +%s)
+docker exec dubaomatrung-admin-postgis pg_dump -U postgres -d admin_db \
+    --clean --if-exists \
+    > docker-init/admin-postgis/01-admin-db.sql
+END_TIME=$(date +%s)
+DURATION=$((END_TIME - START_TIME))
+echo -e "${GREEN}✓ admin_db exported to docker-init/admin-postgis/01-admin-db.sql (${DURATION}s)${NC}"
 
+# Export MongoDB
+echo -e "\n${CYAN}[4/4] Exporting MongoDB logging_db...${NC}"
+docker exec dubaomatrung-mongodb mongodump \
+    --db=logging_db \
+    --archive > docker-init/mongodb/logging_db.archive
+echo -e "${GREEN}✓ MongoDB logging_db exported to docker-init/mongodb/logging_db.archive${NC}"
 
-# Export MongoDB logging_db
-echo ""
-echo -e "${YELLOW}[3/3] Exporting MongoDB logging_db...${NC}"
+# Show file sizes
+echo -e "\n${CYAN}Exported file sizes:${NC}"
+du -h docker-init/postgres/01-auth-db.sql 2>/dev/null || echo "auth_db: Not found"
+du -h docker-init/postgis/01-gis-db.sql 2>/dev/null || echo "gis_db: Not found"
+du -h docker-init/admin-postgis/01-admin-db.sql 2>/dev/null || echo "admin_db: Not found"
+du -h docker-init/mongodb/logging_db.archive 2>/dev/null || echo "MongoDB: Not found"
 
-if command -v mongodump &> /dev/null; then
-    if mongodump --uri="mongodb://localhost:27017/logging_db" \
-        --out=docker-init/mongodb/dump 2>/dev/null; then
-        echo -e "${GREEN}✓ Successfully exported logging_db${NC}"
-        echo "  Directory: docker-init/mongodb/dump/logging_db"
-        echo "  Size: $(du -sh docker-init/mongodb/dump/logging_db 2>/dev/null | cut -f1 || echo '0')"
-    else
-        echo -e "${YELLOW}⚠ MongoDB export failed or database is empty${NC}"
-        echo "  This is OK if you don't have logging data yet"
-    fi
-else
-    echo -e "${YELLOW}⚠ mongodump not installed, skipping MongoDB export${NC}"
-    echo "  Install with: sudo pacman -S mongodb-tools"
-    echo "  This is OK if you don't need logging data"
-fi
-
-unset PGPASSWORD
-
-echo ""
-echo "=========================================="
-echo -e "${GREEN}Export Complete!${NC}"
-echo "=========================================="
-echo ""
-echo "Exported files:"
-echo "  1. docker-init/postgres/01-auth-db.sql"
-echo "  2. docker-init/postgis/01-gis-db.sql"
-echo "  3. docker-init/mongodb/dump/ (if available)"
-echo ""
-echo "Next steps:"
-echo "  1. Review the SQL files to ensure they contain data"
-echo "  2. Run docker-compose up to import into containers"
-echo ""
+echo -e "\n${GREEN}====================================================================${NC}"
+echo -e "${GREEN}DATABASE EXPORT COMPLETED!${NC}"
+echo -e "${GREEN}====================================================================${NC}"
+echo -e "${CYAN}Files are saved in docker-init/ directory${NC}"
+echo -e "${CYAN}These will be automatically imported on first container start${NC}"

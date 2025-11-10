@@ -3,9 +3,9 @@ services:
   # DATABASES
   # ===================================================================
 
-  # PostgreSQL for Auth Service
+  # PostgreSQL 17 for Auth Service
   postgres:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     container_name: dubaomatrung-postgres
     restart: unless-stopped
     environment:
@@ -25,9 +25,9 @@ services:
       retries: 5
       start_period: 30s
 
-  # PostGIS for GIS Service
+  # PostGIS 17 for GIS Service
   postgis:
-    image: postgis/postgis:15-3.3-alpine
+    image: postgis/postgis:17-3.5-alpine
     container_name: dubaomatrung-postgis
     restart: unless-stopped
     environment:
@@ -47,9 +47,9 @@ services:
       retries: 5
       start_period: 30s
 
-  # PostGIS for Admin Service
+  # PostGIS 17 for Admin Service
   admin-postgis:
-    image: postgis/postgis:15-3.3-alpine
+    image: postgis/postgis:17-3.5-alpine
     container_name: dubaomatrung-admin-postgis
     restart: unless-stopped
     environment:
@@ -68,6 +68,12 @@ services:
       timeout: 5s
       retries: 5
       start_period: 120s
+    # Increase resources for large database import
+    shm_size: 256mb
+    deploy:
+      resources:
+        limits:
+          memory: 4G
 
   # MongoDB for Logging
   mongodb:
@@ -80,6 +86,8 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+      # Auto-import MongoDB data if exists
+      - ./docker-init/mongodb:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
@@ -130,7 +138,7 @@ services:
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
     depends_on:
       mongodb:
-        condition: service_started
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
       interval: 30s
@@ -161,7 +169,7 @@ services:
       postgres:
         condition: service_healthy
       mongodb:
-        condition: service_started
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
       interval: 30s
@@ -192,7 +200,7 @@ services:
       postgres:
         condition: service_healthy
       mongodb:
-        condition: service_started
+        condition: service_healthy
 
   # GIS Service
   gis-service:
@@ -222,7 +230,7 @@ services:
       redis:
         condition: service_healthy
       mongodb:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - gis_uploads:/app/uploads
 
@@ -249,7 +257,7 @@ services:
       postgres:
         condition: service_healthy
       mongodb:
-        condition: service_started
+        condition: service_healthy
 
   # Admin Service
   admin-service:
@@ -274,7 +282,7 @@ services:
       admin-postgis:
         condition: service_healthy
       mongodb:
-        condition: service_started
+        condition: service_healthy
 
   # Search Service
   search-service:
@@ -299,7 +307,7 @@ services:
       postgres:
         condition: service_healthy
       mongodb:
-        condition: service_started
+        condition: service_healthy
 
   # MapServer Service
   mapserver-service:
@@ -319,7 +327,7 @@ services:
       - ./mapserver:/mapserver:ro
     depends_on:
       mongodb:
-        condition: service_started
+        condition: service_healthy
 
   # ===================================================================
   # FRONTEND
