@@ -38,7 +38,7 @@ MAP
     TYPE LINE
     STATUS ON
     CONNECTIONTYPE POSTGIS
-    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    CONNECTION "host=admin-postgis port=5432 dbname=admin_db user=postgres password=4"
     DATA "geom FROM laocai_ranhgioihc USING UNIQUE gid USING SRID=4326"
 
     PROCESSING "CLOSE_CONNECTION=DEFER"
@@ -134,7 +134,7 @@ MAP
     TYPE POLYGON
     STATUS ON
     CONNECTIONTYPE POSTGIS
-    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    CONNECTION "host=admin-postgis port=5432 dbname=admin_db user=postgres password=4"
     DATA "geom FROM laocai_rg3lr USING UNIQUE gid USING SRID=4326"
 
     PROCESSING "CLOSE_CONNECTION=DEFER"
@@ -239,7 +239,7 @@ MAP
     TYPE POLYGON
     STATUS ON
     CONNECTIONTYPE POSTGIS
-    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    CONNECTION "host=admin-postgis port=5432 dbname=admin_db user=postgres password=4"
     DATA "geom FROM laocai_nendiahinh USING UNIQUE gid USING SRID=4326"
 
     PROCESSING "CLOSE_CONNECTION=DEFER"
@@ -286,7 +286,7 @@ MAP
     TYPE LINE
     STATUS ON
     CONNECTIONTYPE POSTGIS
-    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    CONNECTION "host=admin-postgis port=5432 dbname=admin_db user=postgres password=4"
     DATA "geom FROM laocai_nendiahinh_line USING UNIQUE gid USING SRID=4236"
 
     PROCESSING "CLOSE_CONNECTION=DEFER"
@@ -396,7 +396,7 @@ MAP
     TYPE POLYGON
     STATUS ON
     CONNECTIONTYPE POSTGIS
-    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    CONNECTION "host=admin-postgis port=5432 dbname=admin_db user=postgres password=4"
     DATA "geom_simplified FROM laocai_chuquanly USING UNIQUE gid USING SRID=4326"
 
     PROCESSING "CLOSE_CONNECTION=DEFER"
@@ -442,7 +442,7 @@ MAP
     TYPE POLYGON
     STATUS ON
     CONNECTIONTYPE POSTGIS
-    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    CONNECTION "host=admin-postgis port=5432 dbname=admin_db user=postgres password=4"
     DATA "geom FROM laocai_huyen USING UNIQUE gid USING SRID=4326"
 
     PROCESSING "CLOSE_CONNECTION=DEFER"
@@ -490,7 +490,7 @@ MAP
     TYPE POLYGON
     STATUS ON
     CONNECTIONTYPE POSTGIS
-    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    CONNECTION "host=admin-postgis port=5432 dbname=admin_db user=postgres password=4"
     DATA "geom FROM laocai_rg3lr USING UNIQUE gid USING SRID=4326"
 
     PROCESSING "CLOSE_CONNECTION=DEFER"
