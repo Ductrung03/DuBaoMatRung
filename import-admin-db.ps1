@@ -79,8 +79,22 @@ Write-Host ""
 
 $startTime = Get-Date
 
-# Import SQL file
-Get-Content $SQL_FILE | docker exec -i $CONTAINER psql -U postgres -d admin_db 2>&1 | Out-Null
+# Copy file into container first
+Write-Host "  [Step 1/2] Copying SQL file to container..." -ForegroundColor Gray
+docker cp $SQL_FILE ${CONTAINER}:/tmp/import.sql 2>&1 | Out-Null
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host ""
+    Write-Host "  [ERROR] Failed to copy file to container!" -ForegroundColor Red
+    exit 1
+}
+
+# Import SQL file inside container (much faster and no memory issues)
+Write-Host "  [Step 2/2] Importing SQL (this takes 10-20 min)..." -ForegroundColor Gray
+docker exec $CONTAINER psql -U postgres -d admin_db -f /tmp/import.sql 2>&1 | Out-Null
+
+# Clean up
+docker exec $CONTAINER rm /tmp/import.sql 2>&1 | Out-Null
 
 $endTime = Get-Date
 $duration = ($endTime - $startTime).TotalMinutes
