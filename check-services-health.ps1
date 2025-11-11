@@ -22,17 +22,17 @@ $starting = docker-compose ps --filter "health=starting" --format "{{.Name}}"
 $exited = docker-compose ps --filter "status=exited" --format "{{.Name}}"
 
 if ($unhealthy) {
-    Write-Host "  ⚠ Unhealthy containers:" -ForegroundColor Red
+    Write-Host "  [!] Unhealthy containers:" -ForegroundColor Red
     $unhealthy | ForEach-Object { Write-Host "    - $_" -ForegroundColor Red }
 }
 
 if ($starting) {
-    Write-Host "  ⏳ Starting containers:" -ForegroundColor Yellow
+    Write-Host "  [~] Starting containers:" -ForegroundColor Yellow
     $starting | ForEach-Object { Write-Host "    - $_" -ForegroundColor Yellow }
 }
 
 if ($exited) {
-    Write-Host "  ❌ Exited containers:" -ForegroundColor Red
+    Write-Host "  [X] Exited containers:" -ForegroundColor Red
     $exited | ForEach-Object { Write-Host "    - $_" -ForegroundColor Red }
     Write-Host ""
     Write-Host "  Run: .\deploy.ps1 -Logs to see error details" -ForegroundColor Yellow
@@ -47,60 +47,60 @@ Write-Host ""
 try {
     $pgTest = docker exec dubaomatrung-postgres pg_isready -U postgres 2>&1
     if ($pgTest -like "*accepting connections*") {
-        Write-Host "  ✓ PostgreSQL (auth_db) - OK" -ForegroundColor Green
+        Write-Host "  [OK] PostgreSQL (auth_db) - OK" -ForegroundColor Green
     } else {
-        Write-Host "  ✗ PostgreSQL (auth_db) - NOT READY" -ForegroundColor Red
+        Write-Host "  [X] PostgreSQL (auth_db) - NOT READY" -ForegroundColor Red
     }
 } catch {
-    Write-Host "  ✗ PostgreSQL (auth_db) - ERROR" -ForegroundColor Red
+    Write-Host "  [X] PostgreSQL (auth_db) - ERROR" -ForegroundColor Red
 }
 
 # PostGIS (gis_db)
 try {
     $pgisTest = docker exec dubaomatrung-postgis pg_isready -U postgres 2>&1
     if ($pgisTest -like "*accepting connections*") {
-        Write-Host "  ✓ PostGIS (gis_db) - OK" -ForegroundColor Green
+        Write-Host "  [OK] PostGIS (gis_db) - OK" -ForegroundColor Green
     } else {
-        Write-Host "  ✗ PostGIS (gis_db) - NOT READY" -ForegroundColor Red
+        Write-Host "  [X] PostGIS (gis_db) - NOT READY" -ForegroundColor Red
     }
 } catch {
-    Write-Host "  ✗ PostGIS (gis_db) - ERROR" -ForegroundColor Red
+    Write-Host "  [X] PostGIS (gis_db) - ERROR" -ForegroundColor Red
 }
 
 # PostGIS (admin_db)
 try {
     $adminTest = docker exec dubaomatrung-admin-postgis pg_isready -U postgres 2>&1
     if ($adminTest -like "*accepting connections*") {
-        Write-Host "  ✓ PostGIS (admin_db) - OK" -ForegroundColor Green
+        Write-Host "  [OK] PostGIS (admin_db) - OK" -ForegroundColor Green
     } else {
-        Write-Host "  ✗ PostGIS (admin_db) - NOT READY" -ForegroundColor Red
+        Write-Host "  [X] PostGIS (admin_db) - NOT READY" -ForegroundColor Red
     }
 } catch {
-    Write-Host "  ✗ PostGIS (admin_db) - ERROR" -ForegroundColor Red
+    Write-Host "  [X] PostGIS (admin_db) - ERROR" -ForegroundColor Red
 }
 
 # MongoDB
 try {
     $mongoTest = docker exec dubaomatrung-mongodb mongosh --eval "db.adminCommand('ping')" 2>&1
     if ($mongoTest -like "*ok*1*") {
-        Write-Host "  ✓ MongoDB - OK" -ForegroundColor Green
+        Write-Host "  [OK] MongoDB - OK" -ForegroundColor Green
     } else {
-        Write-Host "  ✗ MongoDB - NOT READY" -ForegroundColor Red
+        Write-Host "  [X] MongoDB - NOT READY" -ForegroundColor Red
     }
 } catch {
-    Write-Host "  ✗ MongoDB - ERROR" -ForegroundColor Red
+    Write-Host "  [X] MongoDB - ERROR" -ForegroundColor Red
 }
 
 # Redis
 try {
     $redisTest = docker exec dubaomatrung-redis redis-cli ping 2>&1
     if ($redisTest -like "*PONG*") {
-        Write-Host "  ✓ Redis - OK" -ForegroundColor Green
+        Write-Host "  [OK] Redis - OK" -ForegroundColor Green
     } else {
-        Write-Host "  ✗ Redis - NOT READY" -ForegroundColor Red
+        Write-Host "  [X] Redis - NOT READY" -ForegroundColor Red
     }
 } catch {
-    Write-Host "  ✗ Redis - ERROR" -ForegroundColor Red
+    Write-Host "  [X] Redis - ERROR" -ForegroundColor Red
 }
 
 # Check services endpoints
@@ -127,13 +127,13 @@ foreach ($service in $services) {
     try {
         $response = Invoke-WebRequest -Uri $url -TimeoutSec 5 -UseBasicParsing -ErrorAction Stop
         if ($response.StatusCode -eq 200) {
-            Write-Host "  ✓ $($service.Name) (port $($service.Port)) - OK" -ForegroundColor Green
+            Write-Host "  [OK] $($service.Name) (port $($service.Port)) - OK" -ForegroundColor Green
         } else {
-            Write-Host "  ⚠ $($service.Name) (port $($service.Port)) - HTTP $($response.StatusCode)" -ForegroundColor Yellow
+            Write-Host "  [!] $($service.Name) (port $($service.Port)) - HTTP $($response.StatusCode)" -ForegroundColor Yellow
             $failedServices += $service.Name
         }
     } catch {
-        Write-Host "  ✗ $($service.Name) (port $($service.Port)) - NOT RESPONDING" -ForegroundColor Red
+        Write-Host "  [X] $($service.Name) (port $($service.Port)) - NOT RESPONDING" -ForegroundColor Red
         $failedServices += $service.Name
     }
     Start-Sleep -Milliseconds 100
@@ -149,7 +149,7 @@ $errorContainers = @("dubaomatrung-gateway", "dubaomatrung-auth")
 foreach ($container in $errorContainers) {
     $logs = docker logs $container --tail 10 2>&1 | Select-String -Pattern "error|ERROR|Error|fail|FAIL|exception|Exception"
     if ($logs) {
-        Write-Host "  ⚠ Errors in $container:" -ForegroundColor Yellow
+        Write-Host "  [!] Errors in ${container}:" -ForegroundColor Yellow
         $logs | ForEach-Object { Write-Host "    $_" -ForegroundColor Gray }
     }
 }
@@ -160,15 +160,15 @@ Write-Host "[5/5] Summary and recommendations..." -ForegroundColor Cyan
 Write-Host ""
 
 if ($failedServices.Count -eq 0) {
-    Write-Host "  ✓ All services are healthy!" -ForegroundColor Green
+    Write-Host "  [OK] All services are healthy!" -ForegroundColor Green
 } else {
-    Write-Host "  ⚠ Failed services:" -ForegroundColor Red
+    Write-Host "  [!] Failed services:" -ForegroundColor Red
     $failedServices | ForEach-Object { Write-Host "    - $_" -ForegroundColor Red }
     Write-Host ""
     Write-Host "  Recommended actions:" -ForegroundColor Yellow
     Write-Host "    1. Wait 30-60 seconds for services to fully start" -ForegroundColor White
     Write-Host "    2. Check logs: .\deploy.ps1 -Logs" -ForegroundColor White
-    Write-Host "    3. Restart failed services: docker-compose restart <service>" -ForegroundColor White
+    Write-Host "    3. Restart failed services: docker-compose restart SERVICE_NAME" -ForegroundColor White
     Write-Host "    4. If persists, rebuild: .\deploy.ps1 -Rebuild" -ForegroundColor White
 }
 
@@ -204,18 +204,18 @@ if ($failedServices -contains "Gateway" -or $failedServices -contains "Auth Serv
 
         # Test gateway
         try {
-            $gwTest = Invoke-WebRequest -Uri "http://localhost:3000/health" -TimeoutSec 5 -UseBasicParsing
-            Write-Host "  ✓ Gateway is now responding" -ForegroundColor Green
+            $gwTest = Invoke-WebRequest -Uri "http://localhost:3000/health" -TimeoutSec 5 -UseBasicParsing -ErrorAction Stop
+            Write-Host "  [OK] Gateway is now responding" -ForegroundColor Green
         } catch {
-            Write-Host "  ✗ Gateway still not responding" -ForegroundColor Red
+            Write-Host "  [X] Gateway still not responding" -ForegroundColor Red
         }
 
         # Test auth
         try {
-            $authTest = Invoke-WebRequest -Uri "http://localhost:3001/health" -TimeoutSec 5 -UseBasicParsing
-            Write-Host "  ✓ Auth Service is now responding" -ForegroundColor Green
+            $authTest = Invoke-WebRequest -Uri "http://localhost:3001/health" -TimeoutSec 5 -UseBasicParsing -ErrorAction Stop
+            Write-Host "  [OK] Auth Service is now responding" -ForegroundColor Green
         } catch {
-            Write-Host "  ✗ Auth Service still not responding" -ForegroundColor Red
+            Write-Host "  [X] Auth Service still not responding" -ForegroundColor Red
         }
     }
 }
