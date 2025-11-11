@@ -46,6 +46,8 @@ app.use(cors({
     'http://localhost:5174',
     'http://localhost:3000',
     'http://localhost:4173',
+    'http://103.56.160.66:5173',
+    'http://103.56.160.66:3000',
     'https://dubaomatrung-frontend.onrender.com',
     process.env.FRONTEND_URL
   ].filter(Boolean),
