@@ -17,14 +17,14 @@ foreach ($view in $views) {
     if ($LASTEXITCODE -eq 0) {
         $count = $result.Trim()
         if ($count -match '^\d+$' -and [int]$count -gt 0) {
-            Write-Host " ✓ $count rows" -ForegroundColor Green
+            Write-Host " [OK] $count rows" -ForegroundColor Green
         } elseif ($count -eq "0") {
-            Write-Host " ✗ EMPTY (0 rows)" -ForegroundColor Yellow
+            Write-Host " [EMPTY] 0 rows" -ForegroundColor Yellow
         } else {
-            Write-Host " ? $count" -ForegroundColor Gray
+            Write-Host " [?] $count" -ForegroundColor Gray
         }
     } else {
-        Write-Host " ✗ ERROR" -ForegroundColor Red
+        Write-Host " [ERROR]" -ForegroundColor Red
         Write-Host "  $result" -ForegroundColor Gray
     }
 }
@@ -43,14 +43,14 @@ foreach ($table in $tables) {
     if ($LASTEXITCODE -eq 0) {
         $count = $result.Trim()
         if ($count -match '^\d+$' -and [int]$count -gt 0) {
-            Write-Host " ✓ $count rows" -ForegroundColor Green
+            Write-Host " [OK] $count rows" -ForegroundColor Green
         } elseif ($count -eq "0") {
-            Write-Host " ✗ EMPTY (0 rows)" -ForegroundColor Yellow
+            Write-Host " [EMPTY] 0 rows" -ForegroundColor Yellow
         } else {
-            Write-Host " ? $count" -ForegroundColor Gray
+            Write-Host " [?] $count" -ForegroundColor Gray
         }
     } else {
-        Write-Host " ✗ ERROR" -ForegroundColor Red
+        Write-Host " [ERROR]" -ForegroundColor Red
     }
 }
 

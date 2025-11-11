@@ -13,9 +13,9 @@ try {
     } | ConvertTo-Json) -ContentType "application/json" -ErrorAction Stop
 
     $token = $loginResponse.token
-    Write-Host " ✓" -ForegroundColor Green
+    Write-Host " [OK]" -ForegroundColor Green
 } catch {
-    Write-Host " ✗ Failed to login" -ForegroundColor Red
+    Write-Host " [FAILED] Failed to login" -ForegroundColor Red
     Write-Host "Using test without token..." -ForegroundColor Yellow
     $token = $null
 }
@@ -56,7 +56,7 @@ foreach ($endpoint in $endpoints) {
             }
 
             Write-Host "  Status: " -NoNewline
-            Write-Host "✓ SUCCESS" -ForegroundColor Green
+            Write-Host "[OK] SUCCESS" -ForegroundColor Green
             Write-Host "  Items: $count" -ForegroundColor Cyan
 
             if ($count -gt 0) {
@@ -68,13 +68,13 @@ foreach ($endpoint in $endpoints) {
             $success++
         } else {
             Write-Host "  Status: " -NoNewline
-            Write-Host "✗ FAILED" -ForegroundColor Red
+            Write-Host "[FAILED]" -ForegroundColor Red
             Write-Host "  Message: $($response.message)" -ForegroundColor Gray
             $failed++
         }
     } catch {
         Write-Host "  Status: " -NoNewline
-        Write-Host "✗ ERROR" -ForegroundColor Red
+        Write-Host "[ERROR]" -ForegroundColor Red
         Write-Host "  Error: $($_.Exception.Message)" -ForegroundColor Gray
         $failed++
     }
@@ -88,12 +88,12 @@ Write-Host "Failed: $failed" -ForegroundColor Red
 Write-Host ""
 
 if ($failed -eq 0) {
-    Write-Host "✅ All endpoints are working!" -ForegroundColor Green
+    Write-Host "[SUCCESS] All endpoints are working!" -ForegroundColor Green
     Write-Host ""
     Write-Host "Your web application should now work correctly." -ForegroundColor Cyan
     Write-Host "Visit: http://103.56.160.66:5173" -ForegroundColor Cyan
 } else {
-    Write-Host "⚠️  Some endpoints are still failing." -ForegroundColor Yellow
+    Write-Host "[WARNING] Some endpoints are still failing." -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Next steps:" -ForegroundColor Yellow
     Write-Host "1. Run: .\check-views-status.ps1" -ForegroundColor Gray
