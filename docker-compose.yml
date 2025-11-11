@@ -162,6 +162,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres123}
       - DB_NAME=auth_db
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-postgres123}@postgres:5432/auth_db
       - JWT_SECRET=${JWT_SECRET}
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
       - GATEWAY_URL=http://gateway:3000
@@ -193,6 +194,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres123}
       - DB_NAME=auth_db
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-postgres123}@postgres:5432/auth_db
       - JWT_SECRET=${JWT_SECRET}
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
       - GATEWAY_URL=http://gateway:3000
@@ -219,6 +221,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres123}
       - DB_NAME=gis_db
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-postgres123}@postgis:5432/gis_db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
@@ -251,6 +254,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres123}
       - DB_NAME=auth_db
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-postgres123}@postgres:5432/auth_db
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
       - GATEWAY_URL=http://gateway:3000
     depends_on:
@@ -276,6 +280,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres123}
       - DB_NAME=admin_db
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-postgres123}@admin-postgis:5432/admin_db
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
       - GATEWAY_URL=http://gateway:3000
     depends_on:
@@ -301,6 +306,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres123}
       - DB_NAME=auth_db
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-postgres123}@postgres:5432/auth_db
       - MONGODB_URI=mongodb://mongodb:27017/logging_db
       - GATEWAY_URL=http://gateway:3000
     depends_on:
