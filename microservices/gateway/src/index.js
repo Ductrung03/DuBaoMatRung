@@ -33,28 +33,55 @@ app.use(helmet({
       frameSrc: ["'self'", "https://earthengine.googleapis.com", "https://ee-phathiensommatrung.projects.earthengine.app"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://earthengine.googleapis.com"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://earthengine.googleapis.com"]
+      // Allow images from self and same host on port 3000 (gateway) to avoid NotSameOrigin blocks
+      imgSrc: ["'self'", "data:", "https:", "http://103.56.160.66:3000"],
+      // Allow connecting to gateway and earth engine
+      connectSrc: ["'self'", "http://103.56.160.66:3000", "https://earthengine.googleapis.com"]
     }
-  }
+  },
+  crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
 // CORS configuration
-app.use(cors({
-  origin: [
+app.use((req, res, next) => {
+  // Dynamic CORS to reflect allowed origins and ensure images can be consumed cross-origin
+  const allowed = new Set([
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:3000',
     'http://localhost:4173',
     'http://103.56.160.66:5173',
+    'http://103.56.160.66',
     'http://103.56.160.66:3000',
     'https://dubaomatrung-frontend.onrender.com',
     process.env.FRONTEND_URL
-  ].filter(Boolean),
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'Cache-Control']
-}));
+  ].filter(Boolean));
+
+  const origin = req.headers.origin;
+  if (origin && allowed.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  } else {
+    // For public image/tile GET requests, allow all if not using credentials
+    if (req.method === 'GET' && req.path.startsWith('/api/mapserver')) {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS,PATCH');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control');
+  // Only allow credentials for known origins
+  if (origin && allowed.has(origin)) {
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  }
+  // Help CORB/CORP for images
+  if (req.path.startsWith('/api/mapserver')) {
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Compression
 app.use(compression());
@@ -305,7 +332,27 @@ app.use('/api/mapserver',
       const queryString = url.search;
       return newPath + queryString;
     },
-    serviceName: 'MapServer'
+    serviceName: 'MapServer',
+    onProxyRes: (proxyRes, req, res) => {
+      // Ensure correct headers for images to avoid CORB/NotSameOrigin
+      if (req.method === 'GET') {
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+        const origin = req.headers.origin;
+        if (origin) {
+          res.setHeader('Access-Control-Allow-Origin', origin);
+          res.setHeader('Vary', 'Origin');
+        } else {
+          res.setHeader('Access-Control-Allow-Origin', '*');
+        }
+      }
+      // Preserve upstream Content-Type; do not override
+      // If upstream misses it, try to infer for GetMap
+      const urlStr = req.url.toLowerCase();
+      const hasGetMap = urlStr.includes('request=getmap') || urlStr.includes('service=wms');
+      if (hasGetMap && !proxyRes.headers['content-type']) {
+        res.setHeader('Content-Type', 'image/png');
+      }
+    }
   })
 );
 
