@@ -24,7 +24,7 @@ Write-Host ""
 Write-Host "[2/5] Testing WMS GetCapabilities (via Gateway)..." -ForegroundColor Yellow
 try {
     $wms = "$BASE_URL/api/mapserver/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities"
-    $response = Invoke-WebRequest -Uri $wms -Method Get -ErrorAction Stop
+    $response = Invoke-WebRequest -Uri $wms -Method Get -UseBasicParsing -ErrorAction Stop
 
     if ($response.StatusCode -eq 200 -and $response.Content -match "WMS_Capabilities") {
         Write-Host "  [OK] WMS GetCapabilities working" -ForegroundColor Green
@@ -44,7 +44,7 @@ Write-Host ""
 Write-Host "[3/5] Testing WMS GetCapabilities (Direct)..." -ForegroundColor Yellow
 try {
     $wmsDirect = "$MAPSERVER_DIRECT/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities"
-    $response = Invoke-WebRequest -Uri $wmsDirect -Method Get -ErrorAction Stop
+    $response = Invoke-WebRequest -Uri $wmsDirect -Method Get -UseBasicParsing -ErrorAction Stop
 
     if ($response.StatusCode -eq 200 -and $response.Content -match "WMS_Capabilities") {
         Write-Host "  [OK] Direct WMS access working" -ForegroundColor Green
@@ -69,7 +69,7 @@ Write-Host "[4/5] Testing WMS GetMap request..." -ForegroundColor Yellow
 try {
     $getMap = "$MAPSERVER_DIRECT/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=huyen&STYLES=&CRS=EPSG:4326&BBOX=103.5,21.8,104.5,23.0&WIDTH=400&HEIGHT=400&FORMAT=image/png"
 
-    $response = Invoke-WebRequest -Uri $getMap -Method Get -ErrorAction Stop
+    $response = Invoke-WebRequest -Uri $getMap -Method Get -UseBasicParsing -ErrorAction Stop
 
     if ($response.StatusCode -eq 200 -and $response.Headers.'Content-Type' -match "image") {
         Write-Host "  [OK] GetMap request successful" -ForegroundColor Green
