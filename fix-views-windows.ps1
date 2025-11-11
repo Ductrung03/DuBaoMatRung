@@ -31,18 +31,29 @@ $tables = @(
 $hasData = $true
 foreach ($table in $tables) {
     $tableName = $table.name
-    $count = docker exec $CONTAINER psql -U postgres -d admin_db -t -c "SELECT COUNT(*) FROM $tableName;" 2>&1
+    $countRaw = docker exec $CONTAINER psql -U postgres -d admin_db -t -c "SELECT COUNT(*) FROM $tableName;" 2>&1
 
     if ($LASTEXITCODE -eq 0) {
-        $count = $count.Trim()
+        # Convert to string array if needed, take first line, and trim
+        if ($countRaw -is [array]) {
+            $count = ($countRaw[0]).ToString().Trim()
+        } else {
+            $count = $countRaw.ToString().Trim()
+        }
+
         Write-Host "  $tableName : $count rows" -ForegroundColor Cyan
 
-        if ([int]$count -eq 0) {
-            Write-Host "    WARNING: Table is empty! Views depending on this will be empty too." -ForegroundColor Yellow
-            $hasData = $false
+        try {
+            $countInt = [int]$count
+            if ($countInt -eq 0) {
+                Write-Host "    WARNING: Table is empty! Views depending on this will be empty too." -ForegroundColor Yellow
+                $hasData = $false
+            }
+        } catch {
+            Write-Host "    WARNING: Could not parse count: $count" -ForegroundColor Yellow
         }
     } else {
-        Write-Host "  $tableName : ERROR - $count" -ForegroundColor Red
+        Write-Host "  $tableName : ERROR - $countRaw" -ForegroundColor Red
         $hasData = $false
     }
 }
@@ -91,15 +102,26 @@ Write-Host "[Step 4/4] Verifying view data..." -ForegroundColor Yellow
 
 $allGood = $true
 foreach ($view in $views) {
-    $count = docker exec $CONTAINER psql -U postgres -d admin_db -t -c "SELECT COUNT(*) FROM $view;" 2>&1
+    $countRaw = docker exec $CONTAINER psql -U postgres -d admin_db -t -c "SELECT COUNT(*) FROM $view;" 2>&1
 
     if ($LASTEXITCODE -eq 0) {
-        $count = $count.Trim()
-
-        if ([int]$count -gt 0) {
-            Write-Host "  $view : $count rows" -ForegroundColor Green
+        # Convert to string array if needed, take first line, and trim
+        if ($countRaw -is [array]) {
+            $count = ($countRaw[0]).ToString().Trim()
         } else {
-            Write-Host "  $view : 0 rows (EMPTY)" -ForegroundColor Yellow
+            $count = $countRaw.ToString().Trim()
+        }
+
+        try {
+            $countInt = [int]$count
+            if ($countInt -gt 0) {
+                Write-Host "  $view : $count rows" -ForegroundColor Green
+            } else {
+                Write-Host "  $view : 0 rows (EMPTY)" -ForegroundColor Yellow
+                $allGood = $false
+            }
+        } catch {
+            Write-Host "  $view : Could not parse count - $count" -ForegroundColor Yellow
             $allGood = $false
         }
     } else {
