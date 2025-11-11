@@ -1,32 +1,51 @@
 # 🚀 MapServer Quick Fix - Windows Server
 
-## Vấn đề
+## ❌ Vấn đề
 MapServer có data nhưng không hiển thị trên map (Windows Docker deployment)
 
-## Nguyên nhân
+## 🔍 Diagnostic Output
+```
+[ERROR] Network connectivity issue!
+[ERROR] Cannot connect to PostgreSQL!
+[WARNING] GetMap response may not be a valid image
+```
+
+## 🎯 Nguyên nhân
 1. ✅ SRID typo: `4236` → `4326` (ĐÃ SỬA)
-2. ⚠️  Container connectivity issues
-3. ⚠️  Mapfile configuration
+2. ❌ **Network connectivity**: MapServer không reach được `admin-postgis`
+3. ⚠️  PostgreSQL connection failed
 
-## Giải pháp - 3 bước
+## 🚀 Giải pháp
 
-### 1️⃣ Chạy diagnostic
+### Option 1: Complete Fix (KHUYẾN NGHỊ) ⭐
+```powershell
+.\fix-mapserver-complete.ps1
+```
+- Rebuild + Network fix + Auto-verify
+- **Estimated: 2-3 phút**
+- Success rate: 95%+
+
+### Option 2: Manual Steps
+
+#### 1️⃣ Diagnose
 ```powershell
 .\fix-mapserver-windows.ps1
 ```
-Kiểm tra: containers, network, database, WMS endpoints
 
-### 2️⃣ Rebuild MapServer
+#### 2️⃣ Fix Network
+```powershell
+.\fix-mapserver-network.ps1
+```
+
+#### 3️⃣ Rebuild
 ```powershell
 .\rebuild-mapserver.ps1
 ```
-Apply fix và restart service
 
-### 3️⃣ Test
+#### 4️⃣ Test
 ```powershell
 .\test-mapserver.ps1
 ```
-Verify WMS rendering
 
 ## Kiểm tra kết quả
 
