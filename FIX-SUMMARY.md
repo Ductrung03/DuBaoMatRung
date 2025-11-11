@@ -1,14 +1,20 @@
 # 🔧 FIX MAPSERVER DISPLAY - SUMMARY
 
-## ❌ VẤN ĐỀ PHÁT HIỆN
+## ❌ VẤN ĐỀ PHÁT HIỆN (UPDATE: 2025-11-11)
 
-MapServer WMS layers không hiển thị trên web `http://103.56.160.66:5173/` mặc dù database đã có đầy đủ dữ liệu.
+MapServer WMS layers không hiển thị trên web `http://103.56.160.66:5173/` trên **Windows Server** mặc dù database đã có đầy đủ dữ liệu và local (Linux/Mac) chạy bình thường.
 
 ---
 
 ## 🔍 NGUYÊN NHÂN
 
-### 1. **Connection String sai trong MapServer**
+### 1. **SRID Typo trong laocai.map** ✅ ĐÃ SỬA
+- File: `mapserver/mapfiles/laocai.map` - Dòng 290
+- Lỗi: `SRID=4236` (typo - SRID không tồn tại)
+- Đúng: `SRID=4326` (WGS84 standard)
+- **Impact**: Layer `nendiahinh_line` không render được
+
+### 2. **Connection String sai trong MapServer** ✅ ĐÃ SỬA TRƯỚC ĐÓ
 - File: `mapserver/mapfiles/laocai.map`
 - Lỗi: Tất cả layers kết nối tới `host=localhost port=5433`
 - **Vấn đề**: Trong Docker network, MapServer container không thể kết nối tới `localhost:5433`
@@ -89,26 +95,30 @@ const WMS_URL = `${config.API_URL}/api/mapserver`;
 
 ---
 
-## 🚀 CÁCH CHẠY (Trên Windows Server)
+## 🚀 CÁCH CHẠY (Trên Windows Server) - UPDATE 2025-11-11
 
-### Bước 1: Restart MapServer service
+### Bước 1: Chạy diagnostic script
 ```powershell
-.\restart-mapserver.ps1
+.\fix-mapserver-windows.ps1
 ```
-- Apply connection string changes
-- Mất ~10 giây
+- Kiểm tra toàn bộ: network, database, mapfile, WMS endpoints
+- Báo cáo chi tiết từng issue
+- Mất ~30 giây
 
-### Bước 2: Rebuild Client container
+### Bước 2: Rebuild MapServer container
 ```powershell
-.\rebuild-client.ps1
+.\rebuild-mapserver.ps1
 ```
-- Rebuild với IP đúng và full URL
-- Mất 2-5 phút
+- Apply SRID fix và connection string changes
+- Mất ~1-2 phút
 
-### Bước 3: Verify tất cả hoạt động
+### Bước 3: Test WMS endpoints
 ```powershell
-.\verify-map-display.ps1
+.\test-mapserver.ps1
 ```
+- Test GetCapabilities, GetMap, database connection
+- Verify layers rendering correctly
+- Mất ~20 giây
 
 ### Bước 4: Kiểm tra trên Browser
 1. Mở: `http://103.56.160.66:5173`
@@ -179,13 +189,48 @@ Browser receives PNG images → Display on map! 🗺️
 
 ## 🛠️ SCRIPTS ĐÃ TẠO
 
+### Scripts cũ (đã có):
 1. `restart-mapserver.ps1` - Restart MapServer service
 2. `rebuild-client.ps1` - Rebuild client container
 3. `test-mapserver.ps1` - Test WMS endpoints
 4. `verify-map-display.ps1` - Verify toàn bộ hệ thống
 
-Chạy tuần tự: 1 → 2 → 3 → 4
+### Scripts mới (2025-11-11):
+5. **`fix-mapserver-windows.ps1`** ⭐ - Comprehensive diagnostic tool
+   - Kiểm tra 7 bước: containers, network, database, mapfile, WMS, gateway
+   - Output chi tiết từng issue
+   - Recommended actions
+
+6. **`rebuild-mapserver.ps1`** ⭐ - Quick rebuild with verification
+   - Stop → Remove → Build → Start → Health check
+   - Auto-verify service ready
+
+7. **`FIX-MAPSERVER-WINDOWS.md`** 📄 - Complete troubleshooting guide
+   - Common issues & solutions
+   - Debugging commands
+   - Success checklist
+
+### Chạy tuần tự (Windows deployment):
+```
+fix-mapserver-windows.ps1 → rebuild-mapserver.ps1 → test-mapserver.ps1
+```
 
 ---
 
-**Hoàn thành**: MapServer đã sẵn sàng hiển thị map với 231K+ features! 🎉
+## 📋 CHANGELOG
+
+### 2025-11-11 - MapServer Windows Fix
+- ✅ Fixed SRID typo: 4236 → 4326 in laocai.map:290
+- ✅ Created comprehensive diagnostic script
+- ✅ Created rebuild script with health checks
+- ✅ Created troubleshooting documentation
+
+### Previous fixes:
+- ✅ Fixed connection strings: localhost:5433 → admin-postgis:5432
+- ✅ Fixed frontend API URL configuration
+- ✅ Fixed CORS for MapServer endpoints
+
+---
+
+**Status**: ✅ Ready for Windows deployment testing
+**Docs**: See `FIX-MAPSERVER-WINDOWS.md` for complete guide
