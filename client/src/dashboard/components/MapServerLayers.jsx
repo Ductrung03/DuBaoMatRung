@@ -1,9 +1,10 @@
 // MapServerLayers.jsx - WMS layers from MapServer
 import { WMSTileLayer } from 'react-leaflet';
 import PropTypes from 'prop-types';
+import config from '../../config';
 
-// ✅ WMS Base URL - Qua API Gateway
-const WMS_URL = '/api/mapserver';
+// ✅ WMS Base URL - Qua API Gateway với full URL
+const WMS_URL = `${config.API_URL}/api/mapserver`;
 
 /**
  * MapServer WMS Layers Component

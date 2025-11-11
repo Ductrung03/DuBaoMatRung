@@ -347,7 +347,7 @@ services:
       context: ./client
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=http://103.56.161.239:3000
+        - VITE_API_URL=http://103.56.160.66:3000
     container_name: dubaomatrung-client
     restart: unless-stopped
     ports:

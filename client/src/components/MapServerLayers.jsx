@@ -1,7 +1,8 @@
 import { WMSTileLayer } from 'react-leaflet';
+import config from '../config';
 
-// WMS Base URL
-const WMS_URL = '/api/mapserver'; // Qua API Gateway
+// WMS Base URL - Qua API Gateway với full URL
+const WMS_URL = `${config.API_URL}/api/mapserver`;
 
 // Cấu hình cho các layer
 const layerConfigs = [
