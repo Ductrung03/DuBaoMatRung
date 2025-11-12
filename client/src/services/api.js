@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+// Use relative path for production, absolute URL for development
+const API_BASE_URL = import.meta.env.PROD
+  ? '/api'  // Production: use relative path to go through Nginx proxy
+  : 'http://localhost:3000/api';  // Development: direct to gateway
 
 const api = axios.create({
   baseURL: API_BASE_URL,

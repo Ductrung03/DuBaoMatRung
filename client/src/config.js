@@ -1,6 +1,7 @@
 const config = {
+  // Use relative path for production (to go through Nginx), absolute URL for development
   API_URL: import.meta.env.VITE_API_URL ||
-           (import.meta.env.PROD ? "http://103.56.160.66:3000" : "http://localhost:3000")
+           (import.meta.env.PROD ? "" : "http://localhost:3000")
 };
 
 // Log để debug
