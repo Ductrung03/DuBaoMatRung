@@ -104,7 +104,7 @@ module.exports = {
       script: 'src/index.js',
       env: {
         NODE_ENV: 'production',
-        PORT: 3007
+        PORT: 3008
       },
       instances: 1,
       exec_mode: 'fork',
