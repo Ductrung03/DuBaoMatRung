@@ -924,3 +924,13 @@
 {"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-11-12T01:05:54.261Z"}
 {"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-11-12 08:05:54"}
 {"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-11-12 08:05:54"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"user-service","timestamp":"2025-11-12 16:28:16"}
+{"error":"","level":"error","message":"Failed to start user service","service":"user-service","timestamp":"2025-11-12 16:28:16"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-11-12T09:28:41.163Z"}
+{"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3002","port":3002,"service":"user-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3002\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)","syscall":"listen","timestamp":"2025-11-12 16:28:41"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-11-12T09:29:02.780Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-11-12 16:29:02"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-11-12 16:29:02"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-11-12T15:52:35.645Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-11-12 22:52:35"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-11-12 22:52:35"}
