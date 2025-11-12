@@ -359,3 +359,5 @@
 {"level":"info","message":"User logout","service":"auth-controller","timestamp":"2025-11-02 20:06:44","userId":"3"}
 {"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-11-02 20:06:49","username":"admin"}
 {"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-11-02 20:06:49","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-11-12 08:06:21","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-11-12 08:06:21","userId":1,"username":"admin"}
