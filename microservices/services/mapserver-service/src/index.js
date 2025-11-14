@@ -77,8 +77,9 @@ const handleMapServerRequest = async (req, res) => {
       REQUEST_METHOD: 'GET',
       MS_MAPFILE: MAPFILE_PATH,
       MS_MAP_PATTERN: '.*',
-      MS_MAP_NO_PATH: '1',
-      MS_CONFIG_FILE: MS_CONFIG_FILE
+      MS_MAP_NO_PATH: '1'
+      // Note: MS_CONFIG_FILE removed - let MapServer find config automatically
+      // Create empty 'mapserver.conf' in working directory instead
     };
 
     // Spawn MapServer process
