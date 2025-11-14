@@ -2249,3 +2249,12 @@
 {"database":"gis_db","level":"info","message":"Database connection test successful","service":"search-service","timestamp":"2025-11-12T15:52:35.635Z"}
 {"level":"info","message":"Search Service running on port 3006","service":"search-service","timestamp":"2025-11-12 22:52:35"}
 {"level":"info","message":"Database pool initialized successfully","service":"search-service","timestamp":"2025-11-12 22:52:35"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"search-service","timestamp":"2025-11-14T12:48:41.242Z"}
+{"level":"info","message":"Search Service running on port 3006","service":"search-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"Database pool initialized successfully","service":"search-service","timestamp":"2025-11-14 19:48:41"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"search-service","timestamp":"2025-11-14T12:48:56.504Z"}
+{"level":"info","message":"Search Service running on port 3006","service":"search-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Database pool initialized successfully","service":"search-service","timestamp":"2025-11-14 19:48:56"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"search-service","timestamp":"2025-11-14T12:49:34.361Z"}
+{"level":"info","message":"Search Service running on port 3006","service":"search-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"Database pool initialized successfully","service":"search-service","timestamp":"2025-11-14 19:49:34"}

@@ -1873,3 +1873,18 @@
 {"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-11-12 22:52:35"}
 {"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-11-12 22:52:35"}
 {"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-11-12 22:52:35"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-11-14T12:48:41.399Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-11-14 19:48:41"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-11-14T12:48:56.610Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-11-14 19:48:56"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-11-14T12:49:34.420Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-11-14 19:49:34"}

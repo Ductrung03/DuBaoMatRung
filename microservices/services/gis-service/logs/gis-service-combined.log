@@ -4381,3 +4381,36 @@
 {"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-11-12 22:53:20"}
 {"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-11-12 22:53:20"}
 {"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-11-12 22:53:20"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-11-14T12:48:41.619Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-11-14 19:48:41"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-11-14T12:48:56.810Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-11-14 19:49:28"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-11-14 19:49:28"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-11-14 19:49:28"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-11-14T12:49:34.561Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-11-14 19:49:34"}

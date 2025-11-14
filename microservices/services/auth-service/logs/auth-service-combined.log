@@ -2877,3 +2877,11 @@
 {"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-12 23:45:57"}
 {"level":"info","message":"Shutting down auth service...","service":"auth-service","timestamp":"2025-11-12 23:45:58"}
 {"level":"info","message":"Shutting down auth service...","service":"auth-service","timestamp":"2025-11-12 23:45:58"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Shutting down auth service...","service":"auth-service","timestamp":"2025-11-14 19:49:28"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-14 19:49:34"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/auth/login","service":"auth-service","timestamp":"2025-11-14 19:49:46","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}

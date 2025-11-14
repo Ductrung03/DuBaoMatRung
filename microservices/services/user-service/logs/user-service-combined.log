@@ -934,3 +934,12 @@
 {"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-11-12T15:52:35.645Z"}
 {"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-11-12 22:52:35"}
 {"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-11-12 22:52:35"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-11-14T12:48:41.275Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-11-14 19:48:41"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-11-14 19:48:41"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-11-14T12:48:56.529Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-11-14 19:48:56"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-11-14 19:48:56"}
+{"database":"auth_db","level":"info","message":"Database connection test successful","service":"user-service","timestamp":"2025-11-14T12:49:34.334Z"}
+{"level":"info","message":"User Service running on port 3002","service":"user-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"Database pool initialized successfully","service":"user-service","timestamp":"2025-11-14 19:49:34"}
