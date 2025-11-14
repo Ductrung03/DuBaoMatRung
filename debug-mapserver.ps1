@@ -1,8 +1,8 @@
 # ============================================================================
 # MapServer Debug Script - Comprehensive Diagnostic Tool
 # ============================================================================
-# Mục đích: Tìm nguyên nhân MapServer không xuất được dữ liệu lên map
-# Cách dùng: powershell -ExecutionPolicy Bypass -File debug-mapserver.ps1
+# Muc dich: Tim nguyen nhan MapServer khong xuat duoc du lieu len map
+# Cach dung: powershell -ExecutionPolicy Bypass -File debug-mapserver.ps1
 # ============================================================================
 
 Write-Host "`n============================================" -ForegroundColor Cyan
@@ -14,39 +14,43 @@ $SuccessCount = 0
 $FailCount = 0
 
 # ============================================================================
-# 1. Kiểm tra MS4W Installation
+# 1. Kiem tra MS4W Installation
 # ============================================================================
 Write-Host "[1/10] Checking MS4W Installation..." -ForegroundColor Yellow
 
 $mapservPath = "C:\ms4w\Apache\cgi-bin\mapserv.exe"
 if (Test-Path $mapservPath) {
-    Write-Host "   ✓ mapserv.exe found at: $mapservPath" -ForegroundColor Green
+    Write-Host "   [OK] mapserv.exe found at: $mapservPath" -ForegroundColor Green
     $SuccessCount++
 
-    # Kiểm tra version
+    # Kiem tra version
     Write-Host "   Testing MapServer version..." -ForegroundColor Gray
-    $versionOutput = & $mapservPath -v 2>&1
-    Write-Host "   $versionOutput" -ForegroundColor Gray
+    try {
+        $versionOutput = & $mapservPath -v 2>&1
+        Write-Host "   $versionOutput" -ForegroundColor Gray
+    } catch {
+        Write-Host "   [WARN] Could not get version: $_" -ForegroundColor Yellow
+    }
 } else {
-    Write-Host "   ✗ mapserv.exe NOT FOUND!" -ForegroundColor Red
+    Write-Host "   [ERROR] mapserv.exe NOT FOUND!" -ForegroundColor Red
     Write-Host "   Expected path: $mapservPath" -ForegroundColor Red
     Write-Host "   ACTION REQUIRED: Install MS4W from https://ms4w.com/" -ForegroundColor Yellow
     $FailCount++
 }
 
 # ============================================================================
-# 2. Kiểm tra MapFile
+# 2. Kiem tra MapFile
 # ============================================================================
 Write-Host "`n[2/10] Checking MapFile..." -ForegroundColor Yellow
 
 $mapfilePath = "C:\DuBaoMatRung\mapserver\mapfiles\laocai-windows.map"
 if (Test-Path $mapfilePath) {
-    Write-Host "   ✓ laocai-windows.map found" -ForegroundColor Green
+    Write-Host "   [OK] laocai-windows.map found" -ForegroundColor Green
     $fileSize = (Get-Item $mapfilePath).Length
     Write-Host "   File size: $fileSize bytes" -ForegroundColor Gray
     $SuccessCount++
 
-    # Kiểm tra nội dung file
+    # Kiem tra noi dung file
     $content = Get-Content $mapfilePath -Raw
     if ($content -match 'port=(\d+)') {
         Write-Host "   PostgreSQL Port in mapfile: $($Matches[1])" -ForegroundColor Gray
@@ -55,20 +59,20 @@ if (Test-Path $mapfilePath) {
         Write-Host "   PostgreSQL Password in mapfile: [DETECTED]" -ForegroundColor Gray
     }
 } else {
-    Write-Host "   ✗ laocai-windows.map NOT FOUND!" -ForegroundColor Red
+    Write-Host "   [ERROR] laocai-windows.map NOT FOUND!" -ForegroundColor Red
     Write-Host "   Expected path: $mapfilePath" -ForegroundColor Red
 
-    # Kiểm tra file laocai.map có không
+    # Kiem tra file laocai.map co khong
     $altMapfile = "C:\DuBaoMatRung\mapserver\mapfiles\laocai.map"
     if (Test-Path $altMapfile) {
-        Write-Host "   ℹ Found laocai.map instead" -ForegroundColor Yellow
+        Write-Host "   [INFO] Found laocai.map instead" -ForegroundColor Yellow
         Write-Host "   ACTION REQUIRED: Create laocai-windows.map or update .env to use laocai.map" -ForegroundColor Yellow
     }
     $FailCount++
 }
 
 # ============================================================================
-# 3. Kiểm tra Directories
+# 3. Kiem tra Directories
 # ============================================================================
 Write-Host "`n[3/10] Checking Required Directories..." -ForegroundColor Yellow
 
@@ -80,16 +84,16 @@ $dirs = @(
 
 foreach ($dir in $dirs) {
     if (Test-Path $dir) {
-        Write-Host "   ✓ $dir exists" -ForegroundColor Green
+        Write-Host "   [OK] $dir exists" -ForegroundColor Green
         $SuccessCount++
     } else {
-        Write-Host "   ✗ $dir NOT FOUND, creating..." -ForegroundColor Yellow
+        Write-Host "   [WARN] $dir NOT FOUND, creating..." -ForegroundColor Yellow
         try {
             New-Item -ItemType Directory -Force -Path $dir | Out-Null
-            Write-Host "   ✓ Created: $dir" -ForegroundColor Green
+            Write-Host "   [OK] Created: $dir" -ForegroundColor Green
             $SuccessCount++
         } catch {
-            Write-Host "   ✗ Failed to create: $dir" -ForegroundColor Red
+            Write-Host "   [ERROR] Failed to create: $dir" -ForegroundColor Red
             Write-Host "   Error: $_" -ForegroundColor Red
             $FailCount++
         }
@@ -97,7 +101,7 @@ foreach ($dir in $dirs) {
 }
 
 # ============================================================================
-# 4. Kiểm tra PostgreSQL Service
+# 4. Kiem tra PostgreSQL Service
 # ============================================================================
 Write-Host "`n[4/10] Checking PostgreSQL Service..." -ForegroundColor Yellow
 
@@ -105,148 +109,158 @@ try {
     $pgService = Get-Service -Name "*postgresql*" -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($pgService) {
         if ($pgService.Status -eq "Running") {
-            Write-Host "   ✓ PostgreSQL service is running" -ForegroundColor Green
+            Write-Host "   [OK] PostgreSQL service is running" -ForegroundColor Green
             Write-Host "   Service: $($pgService.Name)" -ForegroundColor Gray
             $SuccessCount++
         } else {
-            Write-Host "   ✗ PostgreSQL service is NOT running" -ForegroundColor Red
+            Write-Host "   [ERROR] PostgreSQL service is NOT running" -ForegroundColor Red
             Write-Host "   Status: $($pgService.Status)" -ForegroundColor Red
             Write-Host "   ACTION REQUIRED: Start PostgreSQL service" -ForegroundColor Yellow
             $FailCount++
         }
     } else {
-        Write-Host "   ⚠ PostgreSQL service not found via Get-Service" -ForegroundColor Yellow
+        Write-Host "   [WARN] PostgreSQL service not found via Get-Service" -ForegroundColor Yellow
         Write-Host "   Will test connection in next step..." -ForegroundColor Gray
     }
 } catch {
-    Write-Host "   ⚠ Could not check service status: $_" -ForegroundColor Yellow
+    Write-Host "   [WARN] Could not check service status: $_" -ForegroundColor Yellow
 }
 
 # ============================================================================
-# 5. Kiểm tra PostgreSQL Connection
+# 5. Kiem tra PostgreSQL Connection
 # ============================================================================
 Write-Host "`n[5/10] Testing PostgreSQL Connection..." -ForegroundColor Yellow
 
 # Test psql command
 $psqlExists = Get-Command psql -ErrorAction SilentlyContinue
 if ($psqlExists) {
-    Write-Host "   ✓ psql command found" -ForegroundColor Green
+    Write-Host "   [OK] psql command found" -ForegroundColor Green
 
     # Test connection
     Write-Host "   Testing connection to admin_db..." -ForegroundColor Gray
-    $env:PGPASSWORD = "4"  # Password từ mapfile
+    $env:PGPASSWORD = "4"
 
-    $testQuery = "SELECT version();"
+    $testQuery = "SELECT version()"
     $result = psql -U postgres -d admin_db -t -c $testQuery 2>&1
 
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "   ✓ Connected to PostgreSQL successfully" -ForegroundColor Green
-        Write-Host "   $($result.Trim().Substring(0, [Math]::Min(80, $result.Trim().Length)))..." -ForegroundColor Gray
+        Write-Host "   [OK] Connected to PostgreSQL successfully" -ForegroundColor Green
+        $resultStr = $result.ToString().Trim()
+        if ($resultStr.Length -gt 80) {
+            $resultStr = $resultStr.Substring(0, 80) + "..."
+        }
+        Write-Host "   $resultStr" -ForegroundColor Gray
         $SuccessCount++
     } else {
-        Write-Host "   ✗ Failed to connect to PostgreSQL" -ForegroundColor Red
+        Write-Host "   [ERROR] Failed to connect to PostgreSQL" -ForegroundColor Red
         Write-Host "   Error: $result" -ForegroundColor Red
         Write-Host "   ACTION REQUIRED: Check PostgreSQL password and credentials" -ForegroundColor Yellow
         $FailCount++
     }
 } else {
-    Write-Host "   ✗ psql command NOT FOUND" -ForegroundColor Red
+    Write-Host "   [ERROR] psql command NOT FOUND" -ForegroundColor Red
     Write-Host "   ACTION REQUIRED: Add PostgreSQL bin directory to PATH" -ForegroundColor Yellow
     $FailCount++
 }
 
 # ============================================================================
-# 6. Kiểm tra PostGIS Extension
+# 6. Kiem tra PostGIS Extension
 # ============================================================================
 Write-Host "`n[6/10] Checking PostGIS Extension..." -ForegroundColor Yellow
 
 if ($psqlExists -and $LASTEXITCODE -eq 0) {
     $env:PGPASSWORD = "4"
-    $postgisQuery = "SELECT PostGIS_Version();"
+    $postgisQuery = "SELECT PostGIS_Version()"
     $postgisResult = psql -U postgres -d admin_db -t -c $postgisQuery 2>&1
 
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "   ✓ PostGIS is installed" -ForegroundColor Green
-        Write-Host "   Version: $($postgisResult.Trim())" -ForegroundColor Gray
+        Write-Host "   [OK] PostGIS is installed" -ForegroundColor Green
+        Write-Host "   Version: $($postgisResult.ToString().Trim())" -ForegroundColor Gray
         $SuccessCount++
     } else {
-        Write-Host "   ✗ PostGIS is NOT installed" -ForegroundColor Red
+        Write-Host "   [ERROR] PostGIS is NOT installed" -ForegroundColor Red
         Write-Host "   ACTION REQUIRED: Install PostGIS extension" -ForegroundColor Yellow
         Write-Host "   Run: CREATE EXTENSION postgis;" -ForegroundColor Yellow
         $FailCount++
     }
 } else {
-    Write-Host "   ⊘ Skipped (PostgreSQL not available)" -ForegroundColor Gray
+    Write-Host "   [SKIP] Skipped (PostgreSQL not available)" -ForegroundColor Gray
 }
 
 # ============================================================================
-# 7. Kiểm tra GIS Tables
+# 7. Kiem tra GIS Tables
 # ============================================================================
 Write-Host "`n[7/10] Checking GIS Tables..." -ForegroundColor Yellow
 
-if ($psqlExists -and $LASTEXITCODE -eq 0) {
+if ($psqlExists) {
     $tables = @("laocai_huyen", "laocai_ranhgioihc", "laocai_rg3lr", "laocai_nendiahinh", "laocai_nendiahinh_line", "laocai_chuquanly")
 
     foreach ($table in $tables) {
         $env:PGPASSWORD = "4"
-        $countQuery = "SELECT COUNT(*) FROM $table;"
+        $countQuery = "SELECT COUNT(*) FROM $table"
         $count = psql -U postgres -d admin_db -t -c $countQuery 2>&1
 
         if ($LASTEXITCODE -eq 0) {
-            $count = $count.Trim()
+            $count = $count.ToString().Trim()
             if ([int]$count -gt 0) {
-                Write-Host "   ✓ $table : $count records" -ForegroundColor Green
+                Write-Host "   [OK] $table : $count records" -ForegroundColor Green
                 $SuccessCount++
             } else {
-                Write-Host "   ⚠ $table : 0 records (EMPTY!)" -ForegroundColor Yellow
+                Write-Host "   [WARN] $table : 0 records (EMPTY!)" -ForegroundColor Yellow
                 $FailCount++
             }
         } else {
-            Write-Host "   ✗ $table : NOT FOUND or ERROR" -ForegroundColor Red
+            Write-Host "   [ERROR] $table : NOT FOUND or ERROR" -ForegroundColor Red
             Write-Host "     $count" -ForegroundColor Gray
             $FailCount++
         }
     }
 } else {
-    Write-Host "   ⊘ Skipped (PostgreSQL not available)" -ForegroundColor Gray
+    Write-Host "   [SKIP] Skipped (PostgreSQL not available)" -ForegroundColor Gray
 }
 
 # ============================================================================
-# 8. Kiểm tra MapServer Service (PM2)
+# 8. Kiem tra MapServer Service (PM2)
 # ============================================================================
 Write-Host "`n[8/10] Checking MapServer Service (PM2)..." -ForegroundColor Yellow
 
 $pm2Exists = Get-Command pm2 -ErrorAction SilentlyContinue
 if ($pm2Exists) {
-    Write-Host "   ✓ PM2 command found" -ForegroundColor Green
+    Write-Host "   [OK] PM2 command found" -ForegroundColor Green
 
-    # Get service status
-    $pm2Status = pm2 jlist | ConvertFrom-Json | Where-Object { $_.name -eq "mapserver-service" }
+    try {
+        # Get service status
+        $pm2Json = pm2 jlist 2>&1 | Out-String
+        $pm2List = $pm2Json | ConvertFrom-Json
+        $pm2Status = $pm2List | Where-Object { $_.name -eq "mapserver-service" }
 
-    if ($pm2Status) {
-        if ($pm2Status.pm2_env.status -eq "online") {
-            Write-Host "   ✓ mapserver-service is online" -ForegroundColor Green
-            Write-Host "   PID: $($pm2Status.pid)" -ForegroundColor Gray
-            Write-Host "   Uptime: $($pm2Status.pm2_env.pm_uptime)" -ForegroundColor Gray
-            Write-Host "   Restarts: $($pm2Status.pm2_env.restart_time)" -ForegroundColor Gray
-            $SuccessCount++
+        if ($pm2Status) {
+            if ($pm2Status.pm2_env.status -eq "online") {
+                Write-Host "   [OK] mapserver-service is online" -ForegroundColor Green
+                Write-Host "   PID: $($pm2Status.pid)" -ForegroundColor Gray
+                Write-Host "   Restarts: $($pm2Status.pm2_env.restart_time)" -ForegroundColor Gray
+                $SuccessCount++
 
-            # Check environment variables
-            if ($pm2Status.pm2_env.MAPFILE_PATH) {
-                Write-Host "   MAPFILE_PATH: $($pm2Status.pm2_env.MAPFILE_PATH)" -ForegroundColor Gray
+                # Check environment variables
+                if ($pm2Status.pm2_env.MAPFILE_PATH) {
+                    Write-Host "   MAPFILE_PATH: $($pm2Status.pm2_env.MAPFILE_PATH)" -ForegroundColor Gray
+                }
+            } else {
+                Write-Host "   [ERROR] mapserver-service is NOT online" -ForegroundColor Red
+                Write-Host "   Status: $($pm2Status.pm2_env.status)" -ForegroundColor Red
+                $FailCount++
             }
         } else {
-            Write-Host "   ✗ mapserver-service is NOT online" -ForegroundColor Red
-            Write-Host "   Status: $($pm2Status.pm2_env.status)" -ForegroundColor Red
+            Write-Host "   [ERROR] mapserver-service NOT FOUND in PM2" -ForegroundColor Red
+            Write-Host "   ACTION REQUIRED: Start mapserver-service with PM2" -ForegroundColor Yellow
             $FailCount++
         }
-    } else {
-        Write-Host "   ✗ mapserver-service NOT FOUND in PM2" -ForegroundColor Red
-        Write-Host "   ACTION REQUIRED: Start mapserver-service with PM2" -ForegroundColor Yellow
+    } catch {
+        Write-Host "   [ERROR] Failed to parse PM2 output: $_" -ForegroundColor Red
         $FailCount++
     }
 } else {
-    Write-Host "   ✗ PM2 command NOT FOUND" -ForegroundColor Red
+    Write-Host "   [ERROR] PM2 command NOT FOUND" -ForegroundColor Red
     Write-Host "   ACTION REQUIRED: Install PM2 (npm install -g pm2)" -ForegroundColor Yellow
     $FailCount++
 }
@@ -262,17 +276,17 @@ try {
     $healthResponse = Invoke-WebRequest -Uri $healthUrl -UseBasicParsing -TimeoutSec 5
 
     if ($healthResponse.StatusCode -eq 200) {
-        Write-Host "   ✓ Health endpoint OK" -ForegroundColor Green
+        Write-Host "   [OK] Health endpoint OK" -ForegroundColor Green
         $healthData = $healthResponse.Content | ConvertFrom-Json
         Write-Host "   Service: $($healthData.service)" -ForegroundColor Gray
         Write-Host "   Mapfile: $($healthData.mapfile)" -ForegroundColor Gray
         $SuccessCount++
     } else {
-        Write-Host "   ✗ Health endpoint returned status: $($healthResponse.StatusCode)" -ForegroundColor Red
+        Write-Host "   [ERROR] Health endpoint returned status: $($healthResponse.StatusCode)" -ForegroundColor Red
         $FailCount++
     }
 } catch {
-    Write-Host "   ✗ Failed to connect to health endpoint" -ForegroundColor Red
+    Write-Host "   [ERROR] Failed to connect to health endpoint" -ForegroundColor Red
     Write-Host "   Error: $_" -ForegroundColor Red
     Write-Host "   ACTION REQUIRED: Check if mapserver-service is running on port 3008" -ForegroundColor Yellow
     $FailCount++
@@ -285,7 +299,7 @@ try {
     $wmsResponse = Invoke-WebRequest -Uri $wmsUrl -UseBasicParsing -TimeoutSec 10
 
     if ($wmsResponse.Content -match "WMS_Capabilities") {
-        Write-Host "   ✓ GetCapabilities returned valid WMS response" -ForegroundColor Green
+        Write-Host "   [OK] GetCapabilities returned valid WMS response" -ForegroundColor Green
 
         # Count layers
         $layerMatches = [regex]::Matches($wmsResponse.Content, "<Layer")
@@ -294,7 +308,7 @@ try {
         # Save to file
         $outputPath = "C:\DuBaoMatRung\debug_wms_capabilities.xml"
         $wmsResponse.Content | Out-File -FilePath $outputPath -Encoding UTF8
-        Write-Host "   ✓ Saved response to: $outputPath" -ForegroundColor Green
+        Write-Host "   [OK] Saved response to: $outputPath" -ForegroundColor Green
 
         # Extract layer names
         $layerNames = [regex]::Matches($wmsResponse.Content, "<Name>([^<]+)</Name>") | ForEach-Object { $_.Groups[1].Value }
@@ -303,29 +317,30 @@ try {
             foreach ($layerName in $layerNames) {
                 Write-Host "     - $layerName" -ForegroundColor Cyan
             }
+            $SuccessCount++
         } else {
-            Write-Host "   ⚠ No layer names found in response!" -ForegroundColor Yellow
+            Write-Host "   [WARN] No layer names found in response!" -ForegroundColor Yellow
+            $FailCount++
         }
-
-        $SuccessCount++
     } else {
-        Write-Host "   ✗ GetCapabilities returned invalid response" -ForegroundColor Red
-        Write-Host "   Response preview: $($wmsResponse.Content.Substring(0, [Math]::Min(200, $wmsResponse.Content.Length)))" -ForegroundColor Gray
+        Write-Host "   [ERROR] GetCapabilities returned invalid response" -ForegroundColor Red
+        $previewLen = [Math]::Min(200, $wmsResponse.Content.Length)
+        Write-Host "   Response preview: $($wmsResponse.Content.Substring(0, $previewLen))" -ForegroundColor Gray
 
         # Save error response
         $errorPath = "C:\DuBaoMatRung\debug_wms_error.txt"
         $wmsResponse.Content | Out-File -FilePath $errorPath -Encoding UTF8
-        Write-Host "   ✗ Saved error response to: $errorPath" -ForegroundColor Red
+        Write-Host "   [ERROR] Saved error response to: $errorPath" -ForegroundColor Red
         $FailCount++
     }
 } catch {
-    Write-Host "   ✗ WMS GetCapabilities failed" -ForegroundColor Red
+    Write-Host "   [ERROR] WMS GetCapabilities failed" -ForegroundColor Red
     Write-Host "   Error: $_" -ForegroundColor Red
 
     # Save exception
     $exceptionPath = "C:\DuBaoMatRung\debug_wms_exception.txt"
-    $_ | Out-File -FilePath $exceptionPath -Encoding UTF8
-    Write-Host "   ✗ Saved exception to: $exceptionPath" -ForegroundColor Red
+    $_.ToString() | Out-File -FilePath $exceptionPath -Encoding UTF8
+    Write-Host "   [ERROR] Saved exception to: $exceptionPath" -ForegroundColor Red
     $FailCount++
 }
 
@@ -343,24 +358,25 @@ if (Test-Path $mapservPath) {
     $env:MS_ERRORFILE = "C:\DuBaoMatRung\mapserver\logs\mapserver_debug.log"
 
     try {
-        $directOutput = & $mapservPath 2>&1
+        $directOutput = & $mapservPath 2>&1 | Out-String
 
         if ($directOutput -match "WMS_Capabilities") {
-            Write-Host "   ✓ Direct execution returned valid WMS response" -ForegroundColor Green
+            Write-Host "   [OK] Direct execution returned valid WMS response" -ForegroundColor Green
 
             # Save output
             $directPath = "C:\DuBaoMatRung\debug_direct_mapserv.xml"
             $directOutput | Out-File -FilePath $directPath -Encoding UTF8
-            Write-Host "   ✓ Saved to: $directPath" -ForegroundColor Green
+            Write-Host "   [OK] Saved to: $directPath" -ForegroundColor Green
             $SuccessCount++
         } else {
-            Write-Host "   ✗ Direct execution failed or returned invalid response" -ForegroundColor Red
-            Write-Host "   Output preview: $($directOutput.ToString().Substring(0, [Math]::Min(300, $directOutput.ToString().Length)))" -ForegroundColor Gray
+            Write-Host "   [ERROR] Direct execution failed or returned invalid response" -ForegroundColor Red
+            $previewLen = [Math]::Min(300, $directOutput.Length)
+            Write-Host "   Output preview: $($directOutput.Substring(0, $previewLen))" -ForegroundColor Gray
 
             # Save error
             $directErrorPath = "C:\DuBaoMatRung\debug_direct_error.txt"
             $directOutput | Out-File -FilePath $directErrorPath -Encoding UTF8
-            Write-Host "   ✗ Saved error to: $directErrorPath" -ForegroundColor Red
+            Write-Host "   [ERROR] Saved error to: $directErrorPath" -ForegroundColor Red
 
             # Check error log
             if (Test-Path $env:MS_ERRORFILE) {
@@ -373,12 +389,12 @@ if (Test-Path $mapservPath) {
             $FailCount++
         }
     } catch {
-        Write-Host "   ✗ Exception during direct execution" -ForegroundColor Red
+        Write-Host "   [ERROR] Exception during direct execution" -ForegroundColor Red
         Write-Host "   Error: $_" -ForegroundColor Red
         $FailCount++
     }
 } else {
-    Write-Host "   ⊘ Skipped (mapserv.exe not available)" -ForegroundColor Gray
+    Write-Host "   [SKIP] Skipped (mapserv.exe not available)" -ForegroundColor Gray
 }
 
 # ============================================================================
@@ -388,17 +404,17 @@ Write-Host "`n============================================" -ForegroundColor Cya
 Write-Host "   DIAGNOSTIC SUMMARY" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 
-Write-Host "`n✓ Successful checks: $SuccessCount" -ForegroundColor Green
-Write-Host "✗ Failed checks: $FailCount" -ForegroundColor Red
+Write-Host "`n[OK] Successful checks: $SuccessCount" -ForegroundColor Green
+Write-Host "[ERROR] Failed checks: $FailCount" -ForegroundColor Red
 
 if ($FailCount -eq 0) {
-    Write-Host "`n🎉 All checks passed! MapServer should be working." -ForegroundColor Green
+    Write-Host "`nAll checks passed! MapServer should be working." -ForegroundColor Green
     Write-Host "If you still don't see data on map, check:" -ForegroundColor Yellow
     Write-Host "  1. Frontend is calling correct WMS URL" -ForegroundColor Yellow
     Write-Host "  2. CORS settings allow requests" -ForegroundColor Yellow
     Write-Host "  3. Check browser console for errors" -ForegroundColor Yellow
 } else {
-    Write-Host "`n⚠ Issues detected! Review the errors above." -ForegroundColor Yellow
+    Write-Host "`nIssues detected! Review the errors above." -ForegroundColor Yellow
     Write-Host "Common fixes:" -ForegroundColor Yellow
     Write-Host "  1. Install missing software (MS4W, PostgreSQL, PostGIS)" -ForegroundColor Yellow
     Write-Host "  2. Start required services" -ForegroundColor Yellow
