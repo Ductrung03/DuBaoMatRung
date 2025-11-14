@@ -69,7 +69,9 @@ const handleMapServerRequest = async (req, res) => {
       ...process.env,
       QUERY_STRING: queryString,
       REQUEST_METHOD: 'GET',
-      MS_MAP_PATTERN: '.*'
+      MS_MAPFILE: MAPFILE_PATH,
+      MS_MAP_PATTERN: '.*',
+      MS_MAP_NO_PATH: '1'
     };
 
     // Spawn MapServer process
