@@ -4414,3 +4414,6 @@
 {"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-11-14 19:49:34"}
 {"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-11-14 19:49:34"}
 {"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-11-14 19:49:34"}
+{"level":"info","message":"Shutting down GIS service...","service":"gis-service","timestamp":"2025-11-14 20:05:58"}
+{"level":"info","message":"Database pool closed","service":"gis-service","timestamp":"2025-11-14 20:05:58"}
+{"level":"info","message":"Redis client closed","service":"gis-service","timestamp":"2025-11-14 20:05:58"}
