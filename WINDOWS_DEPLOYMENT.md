@@ -299,11 +299,16 @@ MONGODB_URI=mongodb://localhost:27017/gis_db
 ```env
 # File: microservices/services/mapserver-service/.env
 NODE_ENV=production
-PORT=3007
+PORT=3008
 
-# MapServer
-MAPSERVER_PATH=C:\ms4w\Apache\cgi-bin\mapserv.exe
-MAPFILE_PATH=C:\DuBaoMatRung\mapserver\mapfiles
+# MapServer for Windows (MS4W)
+MAPSERV_BIN=C:\ms4w\Apache\cgi-bin\mapserv.exe
+MAPFILE_PATH=C:\DuBaoMatRung\mapserver\mapfiles\laocai.map
+
+# Lưu ý:
+# - MAPSERV_BIN: Đường dẫn đến mapserv.exe (MS4W)
+# - MAPFILE_PATH: Đường dẫn tuyệt đối đến file .map
+# - Cần tạo thư mục C:\DuBaoMatRung\mapserver\tmp cho MapServer
 ```
 
 ---
@@ -483,7 +488,9 @@ module.exports = {
       script: 'src/index.js',
       env: {
         NODE_ENV: 'production',
-        PORT: 3007
+        PORT: 3008,
+        MAPSERV_BIN: 'C:\\ms4w\\Apache\\cgi-bin\\mapserv.exe',
+        MAPFILE_PATH: 'C:\\DuBaoMatRung\\mapserver\\mapfiles\\laocai.map'
       },
       instances: 1,
       exec_mode: 'fork',
@@ -889,7 +896,7 @@ nginx -s reload
 | Report Service | 3004 |
 | Admin Service | 3005 |
 | Search Service | 3006 |
-| MapServer Service | 3007 |
+| MapServer Service | 3008 |
 | PostgreSQL | 5432 |
 | MongoDB | 27017 |
 | Redis | 6379 |

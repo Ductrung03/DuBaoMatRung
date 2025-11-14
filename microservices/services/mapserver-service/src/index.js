@@ -31,9 +31,15 @@ const logger = winston.createLogger({
 app.use(cors());
 app.use(compression());
 
-// MapServer config
-const MAPFILE_PATH = path.join(__dirname, '../../../..', 'mapserver/mapfiles/laocai.map');
-const MAPSERV_BIN = '/usr/bin/mapserv';
+// MapServer config - Support both Linux and Windows
+const MAPSERV_BIN = process.env.MAPSERV_BIN ||
+  (process.platform === 'win32'
+    ? 'C:\\ms4w\\Apache\\cgi-bin\\mapserv.exe'
+    : '/usr/bin/mapserv');
+
+const MAPFILE_PATH = process.env.MAPFILE_PATH
+  ? path.resolve(process.env.MAPFILE_PATH)
+  : path.join(__dirname, '../../../..', 'mapserver/mapfiles/laocai.map');
 
 // Health check
 app.get('/health', (req, res) => {
