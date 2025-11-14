@@ -41,6 +41,12 @@ const MAPFILE_PATH = process.env.MAPFILE_PATH
   ? path.resolve(process.env.MAPFILE_PATH)
   : path.join(__dirname, '../../../..', 'mapserver/mapfiles/laocai.map');
 
+// MapServer config file - Auto detect Windows
+const MS_CONFIG_FILE = process.env.MS_CONFIG_FILE ||
+  (process.platform === 'win32'
+    ? path.join(__dirname, '../../../..', 'mapserver/mapserver-windows.conf')
+    : path.join(__dirname, '../../../..', 'mapserver/mapserver.conf'));
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({
@@ -71,7 +77,8 @@ const handleMapServerRequest = async (req, res) => {
       REQUEST_METHOD: 'GET',
       MS_MAPFILE: MAPFILE_PATH,
       MS_MAP_PATTERN: '.*',
-      MS_MAP_NO_PATH: '1'
+      MS_MAP_NO_PATH: '1',
+      MS_CONFIG_FILE: MS_CONFIG_FILE
     };
 
     // Spawn MapServer process
@@ -158,6 +165,7 @@ app.listen(PORT, '0.0.0.0', () => {
   logger.info(`MapServer Service running on port ${PORT}`);
   logger.info(`Mapfile: ${MAPFILE_PATH}`);
   logger.info(`MapServer binary: ${MAPSERV_BIN}`);
+  logger.info(`Config file: ${MS_CONFIG_FILE}`);
 });
 
 // Graceful shutdown
