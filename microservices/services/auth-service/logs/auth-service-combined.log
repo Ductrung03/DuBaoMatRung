@@ -2886,3 +2886,49 @@
 {"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-14 19:49:34"}
 {"ip":"127.0.0.1","level":"info","message":"POST /api/auth/login","service":"auth-service","timestamp":"2025-11-14 19:49:46","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
 {"level":"info","message":"Shutting down auth service...","service":"auth-service","timestamp":"2025-11-14 20:05:58"}
+{"error":"Can't reach database server at `localhost:5433`\n\nPlease make sure your database server is running at `localhost:5433`.","level":"error","message":"Failed to start auth service","service":"auth-service","timestamp":"2025-11-21 16:14:59"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-21 16:15:22"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-21 16:15:22"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-21 16:15:41"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-21 16:15:41"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/auth/login","service":"auth-service","timestamp":"2025-11-21 16:15:49","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-21 16:17:01","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-21 16:17:01","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-21 16:28:12"}
+{"error":"Can't reach database server at `localhost:5433`\n\nPlease make sure your database server is running at `localhost:5433`.","level":"error","message":"Failed to start auth service","service":"auth-service","timestamp":"2025-11-24 15:33:11"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-24 15:33:47"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-24 15:33:47"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-24 15:36:31"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-24 15:36:31"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/auth/login","service":"auth-service","timestamp":"2025-11-24 15:36:36","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"level":"info","message":"Shutting down auth service...","service":"auth-service","timestamp":"2025-11-24 16:04:07"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-25 23:29:09"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-25 23:29:09"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/auth/login","service":"auth-service","timestamp":"2025-11-25 23:29:28","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-25 23:46:35","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-25 23:46:35","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"level":"info","message":"Shutting down auth service...","service":"auth-service","timestamp":"2025-11-26 00:05:36"}
+{"error":"Can't reach database server at `localhost:5433`\n\nPlease make sure your database server is running at `localhost:5433`.","level":"error","message":"Failed to start auth service","service":"auth-service","timestamp":"2025-11-27 21:15:13"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-27 21:15:39"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-27 21:15:39"}
+{"level":"info","message":"Shutting down auth service...","service":"auth-service","timestamp":"2025-11-27 21:15:42"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-27 21:15:59"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-27 21:15:59"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/auth/login","service":"auth-service","timestamp":"2025-11-27 21:16:24","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-27 22:30:04","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-27 22:34:20","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-27 22:39:03","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-27 22:39:03","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-27 22:39:03","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-27 22:39:03","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-27 22:39:04","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-27 22:39:04","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-27 22:40:22","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"level":"info","message":"Shutting down auth service...","service":"auth-service","timestamp":"2025-11-27 22:40:40"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-27 23:10:44"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-27 23:10:44"}
+{"level":"info","message":"Prisma connected to database","service":"auth-service","timestamp":"2025-11-27 23:11:08"}
+{"level":"info","message":"Auth Service running on port 3001","service":"auth-service","timestamp":"2025-11-27 23:11:08"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/auth/login","service":"auth-service","timestamp":"2025-11-27 23:11:22","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-27 23:19:06","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/auth/me","service":"auth-service","timestamp":"2025-11-27 23:19:06","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}

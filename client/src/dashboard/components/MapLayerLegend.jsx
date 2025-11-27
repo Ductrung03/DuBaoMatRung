@@ -76,11 +76,11 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
       `;
     };
 
-    // Create layer sections based on MapServer layers
+    // Create layer sections based on MapServer layers (Sơn La - 3 layers)
     const createLayerSections = () => {
       const sections = [];
 
-      // 1. Lớp ranh giới hành chính
+      // 1. Lớp Ranh Giới Xã (sonla_rgx)
       sections.push(`
         <div class="legend-layer" style="margin-bottom: 12px;">
           <div style="
@@ -93,9 +93,9 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
             cursor: pointer;
             transition: background 0.2s;
           " onmouseover="this.style.background='#e8f5e9'" onmouseout="this.style.background='#f5f5f5'">
-            <input type="checkbox" id="layer-ranhgioihc" ${mapLayers?.administrative?.visible !== false ? 'checked' : ''}
+            <input type="checkbox" id="layer-ranhgioixa" ${mapLayers?.ranhgioixa?.visible !== false ? 'checked' : ''}
               style="width: 16px; height: 16px; cursor: pointer; accent-color: #4CAF50;">
-            <label for="layer-ranhgioihc" style="
+            <label for="layer-ranhgioixa" style="
               font-weight: 600;
               color: #333;
               font-size: 13px;
@@ -103,92 +103,19 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
               user-select: none;
               flex: 1;
             ">
-              👁️ Lớp ranh giới hành chính
+              🏘️ Ranh Giới Xã (75 xã)
             </label>
           </div>
           <div style="padding: 8px 12px 4px 28px; font-size: 11px; line-height: 1.8;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-              <svg width="30" height="2" style="flex-shrink: 0;">
-                <line x1="0" y1="1" x2="30" y2="1" stroke="#000" stroke-width="2"/>
-              </svg>
-              <span style="color: #555;">Ranh giới tỉnh</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-              <svg width="30" height="2" style="flex-shrink: 0;">
-                <line x1="0" y1="1" x2="30" y2="1" stroke="#000" stroke-width="2" stroke-dasharray="6,3"/>
-              </svg>
-              <span style="color: #555;">Ranh giới huyện</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-              <svg width="30" height="2" style="flex-shrink: 0;">
-                <line x1="0" y1="1" x2="30" y2="1" stroke="#333" stroke-width="1.5" stroke-dasharray="3,2"/>
-              </svg>
-              <span style="color: #555;">Ranh giới xã</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-              <svg width="30" height="2" style="flex-shrink: 0;">
-                <line x1="0" y1="1" x2="30" y2="1" stroke="#555" stroke-width="1" stroke-dasharray="5,1,1,1"/>
-              </svg>
-              <span style="color: #555;">Ranh giới tiểu khu</span>
-            </div>
             <div style="display: flex; align-items: center; gap: 8px;">
-              <svg width="30" height="2" style="flex-shrink: 0;">
-                <line x1="0" y1="1" x2="30" y2="1" stroke="#777" stroke-width="0.8" stroke-dasharray="2,1"/>
-              </svg>
-              <span style="color: #555;">Ranh giới khoảnh</span>
+              <div style="width: 24px; height: 14px; border: 2px solid #000; border-radius: 2px; background: rgba(240,240,240,0.2); flex-shrink: 0;"></div>
+              <span style="color: #555;">Ranh giới xã Sơn La</span>
             </div>
           </div>
         </div>
       `);
 
-      // 2. Lớp ranh giới 3 loại rừng
-      sections.push(`
-        <div class="legend-layer" style="margin-bottom: 12px;">
-          <div style="
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 8px;
-            background: #f5f5f5;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-          " onmouseover="this.style.background='#e8f5e9'" onmouseout="this.style.background='#f5f5f5'">
-            <input type="checkbox" id="layer-rg3lr" ${mapLayers?.forestTypes?.visible !== false ? 'checked' : ''}
-              style="width: 16px; height: 16px; cursor: pointer; accent-color: #4CAF50;">
-            <label for="layer-rg3lr" style="
-              font-weight: 600;
-              color: #333;
-              font-size: 13px;
-              cursor: pointer;
-              user-select: none;
-              flex: 1;
-            ">
-              🌲 Lớp ranh giới 3 loại rừng
-            </label>
-          </div>
-          <div style="padding: 8px 12px 4px 28px; font-size: 11px; line-height: 1.8;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-              <div style="width: 20px; height: 14px; background: rgba(0, 100, 0, 0.8); border: 1px solid rgba(0, 70, 0, 0.9); border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #555;">Rừng đặc dụng (46k)</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-              <div style="width: 20px; height: 14px; background: rgba(255, 140, 0, 0.8); border: 1px solid rgba(200, 100, 0, 0.9); border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #555;">Rừng phòng hộ (8k)</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-              <div style="width: 20px; height: 14px; background: rgba(152, 251, 152, 0.8); border: 1px solid rgba(100, 200, 100, 0.9); border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #555;">Rừng sản xuất (154k)</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="width: 20px; height: 14px; background: rgba(245, 222, 179, 0.6); border: 1px solid rgba(210, 180, 140, 0.7); border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #555;">Đất chưa có rừng (25k)</span>
-            </div>
-          </div>
-        </div>
-      `);
-
-      // 3. Lớp địa hình, thủy văn, giao thông
+      // 2. Lớp Tiểu Khu Khoảnh Lô (sonla_tkkl)
       sections.push(`
         <div class="legend-layer" style="margin-bottom: 12px;">
           <div style="
@@ -201,9 +128,9 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
             cursor: pointer;
             transition: background 0.2s;
           " onmouseover="this.style.background='#e3f2fd'" onmouseout="this.style.background='#f5f5f5'">
-            <input type="checkbox" id="layer-nendiahinh-line" ${mapLayers?.terrainLine?.visible !== false ? 'checked' : ''}
+            <input type="checkbox" id="layer-tieukukhoanh" ${mapLayers?.tieukukhoanh?.visible !== false ? 'checked' : ''}
               style="width: 16px; height: 16px; cursor: pointer; accent-color: #2196F3;">
-            <label for="layer-nendiahinh-line" style="
+            <label for="layer-tieukukhoanh" style="
               font-weight: 600;
               color: #333;
               font-size: 13px;
@@ -211,91 +138,19 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
               user-select: none;
               flex: 1;
             ">
-              🏔️ Lớp địa hình, thủy văn, giao thông
-            </label>
-          </div>
-          <div style="padding: 8px 12px 4px 28px; font-size: 11px; line-height: 1.8;">
-            <div style="font-weight: 600; color: #8B4513; margin-bottom: 3px;">Đường đồng mức</div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-left: 8px;">
-              <svg width="24" height="2" style="flex-shrink: 0;">
-                <line x1="0" y1="1" x2="24" y2="1" stroke="#8B4513" stroke-width="0.5"/>
-              </svg>
-              <span style="color: #666; font-size: 10px;">Đường đồng mức</span>
-            </div>
-
-            <div style="font-weight: 600; color: #0070C0; margin-bottom: 3px; margin-top: 6px;">Thủy văn</div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px; padding-left: 8px;">
-              <svg width="24" height="3" style="flex-shrink: 0;">
-                <line x1="0" y1="1.5" x2="24" y2="1.5" stroke="#0070C0" stroke-width="3"/>
-              </svg>
-              <span style="color: #666; font-size: 10px;">Sông suối lớn</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-left: 8px;">
-              <svg width="24" height="2" style="flex-shrink: 0;">
-                <line x1="0" y1="1" x2="24" y2="1" stroke="#40A4DF" stroke-width="1.5"/>
-              </svg>
-              <span style="color: #666; font-size: 10px;">Suối nhỏ</span>
-            </div>
-
-            <div style="font-weight: 600; color: #666; margin-bottom: 3px; margin-top: 6px;">Giao thông</div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px; padding-left: 8px;">
-              <svg width="24" height="3" style="flex-shrink: 0;">
-                <line x1="0" y1="1.5" x2="24" y2="1.5" stroke="#FF0000" stroke-width="3"/>
-              </svg>
-              <span style="color: #666; font-size: 10px;">Đường quốc lộ</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px; padding-left: 8px;">
-              <svg width="24" height="2.5" style="flex-shrink: 0;">
-                <line x1="0" y1="1.25" x2="24" y2="1.25" stroke="#FF8C00" stroke-width="2.5"/>
-              </svg>
-              <span style="color: #666; font-size: 10px;">Đường tỉnh lộ</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; padding-left: 8px;">
-              <svg width="24" height="2" style="flex-shrink: 0;">
-                <line x1="0" y1="1" x2="24" y2="1" stroke="#000" stroke-width="2" stroke-dasharray="5,2"/>
-              </svg>
-              <span style="color: #666; font-size: 10px;">Đường sắt</span>
-            </div>
-          </div>
-        </div>
-      `);
-
-      // 4. Lớp ranh giới chủ quản lý rừng
-      sections.push(`
-        <div class="legend-layer" style="margin-bottom: 12px;">
-          <div style="
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 8px;
-            background: #f5f5f5;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-          " onmouseover="this.style.background='#e1f5fe'" onmouseout="this.style.background='#f5f5f5'">
-            <input type="checkbox" id="layer-chuquanly" ${mapLayers?.forestManagement?.visible !== false ? 'checked' : ''}
-              style="width: 16px; height: 16px; cursor: pointer; accent-color: #2196F3;">
-            <label for="layer-chuquanly" style="
-              font-weight: 600;
-              color: #333;
-              font-size: 13px;
-              cursor: pointer;
-              user-select: none;
-              flex: 1;
-            ">
-              🏢 Lớp ranh giới chủ quản lý rừng
+              📐 Tiểu Khu Khoảnh Lô (30k khoảnh)
             </label>
           </div>
           <div style="padding: 8px 12px 4px 28px; font-size: 11px; line-height: 1.8;">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="width: 20px; height: 14px; background: rgba(173, 216, 230, 0.6); border: 2px solid rgba(30, 144, 255, 0.85); border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #555;">Đơn vị quản lý rừng</span>
+              <div style="width: 24px; height: 14px; border: 1px solid #646464; border-radius: 2px; background: rgba(220,220,220,0.15); flex-shrink: 0;"></div>
+              <span style="color: #555;">Ranh giới tiểu khu khoảnh lô</span>
             </div>
           </div>
         </div>
       `);
 
-      // 5. Lớp hiện trạng rừng
+      // 3. Lớp Hiện Trạng Rừng (sonla_hientrangrung - PRIMARY LAYER)
       sections.push(`
         <div class="legend-layer" style="margin-bottom: 12px;">
           <div style="
@@ -308,7 +163,7 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
             cursor: pointer;
             transition: background 0.2s;
           " onmouseover="this.style.background='#f1f8e9'" onmouseout="this.style.background='#f5f5f5'">
-            <input type="checkbox" id="layer-hientrangrung" ${mapLayers?.forestStatus?.visible !== false ? 'checked' : ''}
+            <input type="checkbox" id="layer-hientrangrung" ${mapLayers?.hientrangrung?.visible !== false ? 'checked' : ''}
               style="width: 16px; height: 16px; cursor: pointer; accent-color: #8BC34A;">
             <label for="layer-hientrangrung" style="
               font-weight: 600;
@@ -318,81 +173,84 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
               user-select: none;
               flex: 1;
             ">
-              🌳 Lớp hiện trạng rừng
+              🌳 Hiện Trạng Rừng (280k khoảnh)
             </label>
           </div>
           <div style="padding: 8px 12px 4px 28px; font-size: 10px; line-height: 1.6; max-height: 300px; overflow-y: auto;">
-            <div style="font-weight: 600; color: #2e7d32; margin-bottom: 4px;">🌲 Rừng trồng</div>
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px; padding-left: 8px;">
-              <div style="width: 16px; height: 12px; background: rgba(34, 139, 34, 0.75); border: 1px solid rgba(0, 100, 0, 0.85); border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #666; font-size: 9px;">Rừng trồng giàu - RTG (94k)</span>
+            <div style="font-weight: 700; color: #005000; margin-bottom: 6px; font-size: 11px; border-bottom: 2px solid #4CAF50; padding-bottom: 3px;">🌲 Rừng giàu</div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(0, 130, 0); border: 1.5px solid rgb(0, 80, 0); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Rừng giàu 1 - HG1</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px; padding-left: 8px;">
-              <div style="width: 16px; height: 12px; background: rgba(107, 142, 35, 0.75); border: 1px solid rgba(85, 107, 47, 0.85); border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #666; font-size: 9px;">Trồng xen nghèo - TXN (31k)</span>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(34, 170, 34); border: 1.5px solid rgb(20, 120, 20); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Rừng giàu 2 - HG2</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px; padding-left: 8px;">
-              <div style="width: 16px; height: 12px; background: rgba(124, 252, 0, 0.7); border: 1px solid rgba(85, 180, 0, 0.8); border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #666; font-size: 9px;">Rừng trồng khác - RTK (14k)</span>
-            </div>
-
-            <div style="font-weight: 600; color: #d84315; margin-bottom: 4px; margin-top: 6px;">🏜️ Đất trống</div>
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px; padding-left: 8px;">
-              <div style="width: 16px; height: 12px; background: rgba(244, 164, 96, 0.65); border: 1px solid rgba(210, 105, 30, 0.75); border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #666; font-size: 9px;">Đất trống loại 1 - DT1 (27k)</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px; padding-left: 8px;">
-              <div style="width: 16px; height: 12px; background: rgba(255, 222, 173, 0.65); border: 1px solid rgba(222, 184, 135, 0.75); border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #666; font-size: 9px;">Đất trống rừng - DTR (21k)</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px; padding-left: 8px;">
-              <div style="width: 16px; height: 12px; background: rgba(250, 235, 215, 0.6); border: 1px solid rgba(210, 180, 140, 0.7); border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #666; font-size: 9px;">Đất trống loại 2 - DT2 (8k)</span>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 6px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(0, 150, 0); border: 1.5px solid rgb(0, 100, 0); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Rừng giàu đặc biệt - HGD</span>
             </div>
 
-            <div style="font-weight: 600; color: #f57c00; margin-bottom: 4px; margin-top: 6px;">🌾 Khác</div>
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px; padding-left: 8px;">
-              <div style="width: 16px; height: 12px; background: rgba(255, 250, 205, 0.6); border: 1px solid rgba(189, 183, 107, 0.7); border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #666; font-size: 9px;">Đất nông nghiệp - DNN (9k)</span>
+            <div style="font-weight: 700; color: #2e7d32; margin-bottom: 6px; margin-top: 6px; font-size: 11px; border-bottom: 2px solid #66BB6A; padding-bottom: 3px;">🌱 Rừng trồng</div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(60, 220, 60); border: 1.5px solid rgb(40, 160, 40); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Rừng trồng giàu - RTG</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px; padding-left: 8px;">
-              <div style="width: 16px; height: 12px; background: rgba(143, 188, 143, 0.7); border: 1px solid rgba(85, 107, 47, 0.8); border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #666; font-size: 9px;">Trồng xen khác - TXK (8k)</span>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(120, 160, 50); border: 1.5px solid rgb(90, 120, 40); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Rừng trồng nghèo - RTN</span>
             </div>
-          </div>
-        </div>
-      `);
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(140, 255, 50); border: 1.5px solid rgb(100, 200, 30); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Rừng trồng khác - RTK</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(160, 250, 160); border: 1.5px solid rgb(80, 200, 120); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Trồng xen giàu - TXG</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(160, 200, 160); border: 1.5px solid rgb(100, 140, 60); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Trồng xen nghèo - TXN</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 6px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(170, 255, 170); border: 1.5px solid rgb(120, 180, 50); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Trồng xen khác - TXK</span>
+            </div>
 
-      // 6. Lớp dự báo mất rừng mới nhất
-      sections.push(`
-        <div class="legend-layer" style="margin-bottom: 12px;">
-          <div style="
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 8px;
-            background: #f5f5f5;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-          " onmouseover="this.style.background='#ffebee'" onmouseout="this.style.background='#f5f5f5'">
-            <input type="checkbox" id="layer-deforestation" ${mapLayers?.deforestationAlerts?.visible !== false ? 'checked' : ''}
-              style="width: 16px; height: 16px; cursor: pointer; accent-color: #F44336;">
-            <label for="layer-deforestation" style="
-              font-weight: 600;
-              color: #333;
-              font-size: 13px;
-              cursor: pointer;
-              user-select: none;
-              flex: 1;
-            ">
-              ⚠️ Lớp dự báo mất rừng mới nhất
-            </label>
-          </div>
-          <div style="padding: 8px 12px 4px 28px; font-size: 11px; line-height: 1.8;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="width: 20px; height: 14px; background: #DC143C; border-radius: 2px; flex-shrink: 0;"></div>
-              <span style="color: #555; font-weight: 500;">Lô có khả năng mất rừng</span>
+            <div style="font-weight: 700; color: #d84315; margin-bottom: 6px; margin-top: 6px; font-size: 11px; border-bottom: 2px solid #FF7043; padding-bottom: 3px;">🏜️ Đất trống</div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(255, 180, 110); border: 1.5px solid rgb(230, 120, 50); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Đất trống loại 1 - DT1</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(255, 240, 220); border: 1.5px solid rgb(230, 200, 160); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Đất trống loại 2 - DT2</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(255, 230, 190); border: 1.5px solid rgb(240, 200, 150); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Đất trống rừng - DTR</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 6px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(255, 252, 220); border: 1.5px solid rgb(210, 200, 130); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Đất nông nghiệp - DNN</span>
+            </div>
+
+            <div style="font-weight: 700; color: #f57c00; margin-bottom: 6px; margin-top: 6px; font-size: 11px; border-bottom: 2px solid #FFB74D; padding-bottom: 3px;">🌾 Lúa & Khác</div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(210, 200, 130); border: 1.5px solid rgb(160, 150, 50); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Lúa khác giàu - LKG</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(240, 180, 50); border: 1.5px solid rgb(200, 140, 20); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Lúa khác nghèo - LKN</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(250, 245, 190); border: 1.5px solid rgb(210, 200, 130); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Lúa khác khác - LKK</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(240, 240, 240); border: 1.5px solid rgb(180, 180, 180); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Đất khác - DKH</span>
             </div>
           </div>
         </div>
@@ -418,14 +276,11 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
         icon.style.transform = `rotate(${newState ? '0' : '-90'}deg)`;
       };
 
-      // Layer checkboxes - Map checkbox IDs to GeoDataContext layer keys
+      // Layer checkboxes - Map checkbox IDs to layer keys (Sơn La 3 layers)
       const layerMapping = {
-        'layer-ranhgioihc': 'administrative',
-        'layer-rg3lr': 'forestTypes',
-        'layer-nendiahinh-line': 'terrainLine',
-        'layer-chuquanly': 'forestManagement',
-        'layer-hientrangrung': 'forestStatus',
-        'layer-deforestation': 'deforestationAlerts'
+        'layer-ranhgioixa': 'ranhgioixa',
+        'layer-tieukukhoanh': 'tieukukhoanh',
+        'layer-hientrangrung': 'hientrangrung'
       };
 
       Object.entries(layerMapping).forEach(([checkboxId, layerKey]) => {

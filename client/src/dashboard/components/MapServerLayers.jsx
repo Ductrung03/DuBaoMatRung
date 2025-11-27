@@ -22,97 +22,37 @@ export function MapServerLayers({ visibleLayers = [] }) {
 
   return (
     <>
-      {/* Layer: Ranh giới hành chính (Administrative Boundaries) */}
-      {visibleLayers.includes('ranhgioihc') && (
+      {/* SƠN LA LAYER 1: Ranh Giới Xã (75 xã) */}
+      {visibleLayers.includes('ranhgioixa') && (
         <WMSTileLayer
           url={WMS_URL}
           params={{
             ...baseParams,
-            LAYERS: 'ranhgioihc'
+            LAYERS: 'ranhgioixa'
           }}
-          layers="ranhgioihc"
+          layers="ranhgioixa"
           format="image/png"
           transparent={true}
           opacity={0.8}
         />
       )}
 
-      {/* Layer: 3 Loại rừng (Forest Types) - 231,963 records! */}
-      {visibleLayers.includes('rg3lr') && (
+      {/* SƠN LA LAYER 2: Tiểu Khu Khoảnh Lô (30k khoảnh) */}
+      {visibleLayers.includes('tieukukhoanh') && (
         <WMSTileLayer
           url={WMS_URL}
           params={{
             ...baseParams,
-            LAYERS: 'rg3lr'
+            LAYERS: 'tieukukhoanh'
           }}
-          layers="rg3lr"
+          layers="tieukukhoanh"
           format="image/png"
           transparent={true}
           opacity={0.7}
         />
       )}
 
-      {/* Layer: Nền địa hình (Terrain) */}
-      {visibleLayers.includes('nendiahinh') && (
-        <WMSTileLayer
-          url={WMS_URL}
-          params={{
-            ...baseParams,
-            LAYERS: 'nendiahinh'
-          }}
-          layers="nendiahinh"
-          format="image/png"
-          transparent={true}
-          opacity={0.5}
-        />
-      )}
-
-      {/* Layer: Chủ quản lý rừng (Management Authority) */}
-      {visibleLayers.includes('chuquanly') && (
-        <WMSTileLayer
-          url={WMS_URL}
-          params={{
-            ...baseParams,
-            LAYERS: 'chuquanly'
-          }}
-          layers="chuquanly"
-          format="image/png"
-          transparent={true}
-          opacity={0.6}
-        />
-      )}
-
-      {/* Layer: Ranh giới huyện (District Boundaries) */}
-      {visibleLayers.includes('huyen') && (
-        <WMSTileLayer
-          url={WMS_URL}
-          params={{
-            ...baseParams,
-            LAYERS: 'huyen'
-          }}
-          layers="huyen"
-          format="image/png"
-          transparent={true}
-          opacity={0.9}
-        />
-      )}
-
-      {/* Layer: Địa hình, Thủy văn, Giao thông (Line Features) */}
-      {visibleLayers.includes('nendiahinh_line') && (
-        <WMSTileLayer
-          url={WMS_URL}
-          params={{
-            ...baseParams,
-            LAYERS: 'nendiahinh_line'
-          }}
-          layers="nendiahinh_line"
-          format="image/png"
-          transparent={true}
-          opacity={0.8}
-        />
-      )}
-
-      {/* Layer: Hiện trạng rừng (Forest Status/Coverage) */}
+      {/* SƠN LA LAYER 3: Hiện Trạng Rừng (280k khoảnh - PRIMARY) */}
       {visibleLayers.includes('hientrangrung') && (
         <WMSTileLayer
           url={WMS_URL}
@@ -123,7 +63,7 @@ export function MapServerLayers({ visibleLayers = [] }) {
           layers="hientrangrung"
           format="image/png"
           transparent={true}
-          opacity={0.7}
+          opacity={0.75}
         />
       )}
     </>

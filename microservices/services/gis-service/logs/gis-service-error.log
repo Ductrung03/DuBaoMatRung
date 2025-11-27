@@ -331,3 +331,9 @@
 {"error":"","level":"error","message":"Failed to start GIS service","service":"gis-service","timestamp":"2025-10-30 14:03:06"}
 {"code":"ECONNREFUSED","level":"error","message":"","service":"gis-service","timestamp":"2025-11-12 16:28:17"}
 {"error":"","level":"error","message":"Failed to start GIS service","service":"gis-service","timestamp":"2025-11-12 16:28:17"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"gis-service","timestamp":"2025-11-21 16:14:59"}
+{"error":"","level":"error","message":"Failed to start GIS service","service":"gis-service","timestamp":"2025-11-21 16:14:59"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"gis-service","timestamp":"2025-11-24 15:33:11"}
+{"error":"","level":"error","message":"Failed to start GIS service","service":"gis-service","timestamp":"2025-11-24 15:33:11"}
+{"code":"ECONNREFUSED","level":"error","message":"","service":"gis-service","timestamp":"2025-11-27 21:15:13"}
+{"error":"","level":"error","message":"Failed to start GIS service","service":"gis-service","timestamp":"2025-11-27 21:15:13"}

@@ -123,7 +123,7 @@ exports.getStats = async (req, res, next) => {
         AVG(area) as avg_area,
         COUNT(CASE WHEN detection_status = 'Đã xác minh' THEN 1 END) as verified_count,
         COUNT(DISTINCT mahuyen) as district_count
-      FROM mat_rung
+      FROM son_la_mat_rung
       ${whereClause}
     `;
 

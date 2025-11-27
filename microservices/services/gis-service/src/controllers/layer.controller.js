@@ -5,15 +5,17 @@ const { convertTcvn3ToUnicode } = require('../../../../shared/utils/tcvn3-conver
 
 const logger = createLogger('layer-controller');
 
-// Map frontend layer names to database tables
+// Map frontend layer names to database tables (Sơn La)
 const layerMapping = {
-  'administrative': 'laocai_ranhgioihc',
-  'forest-management': 'laocai_rg3lr',
-  'terrain': 'laocai_terrain',
-  'deforestation-alerts': 'mat_rung',
-  'ranhgioihc': 'laocai_ranhgioihc',
-  'rg3lr': 'laocai_rg3lr',
-  'matrung': 'mat_rung'
+  // New Sơn La layers
+  'hientrangrung': 'sonla_hientrangrung',
+  'ranhgioixa': 'sonla_rgx',
+  'tieukukhoanh': 'sonla_tkkl',
+  // Legacy endpoints
+  'administrative': 'sonla_rgx',
+  'forest-management': 'sonla_hientrangrung',
+  'deforestation-alerts': 'son_la_mat_rung',
+  'matrung': 'son_la_mat_rung'
 };
 
 // Get layer data by path parameter (new endpoint for frontend)
@@ -130,16 +132,23 @@ exports.getLayerDataByPath = async (req, res, next) => {
         const geometries = result.rows.map(row => row.geometry);
         const placeholders = geometries.map((_, idx) => `$${idx + 1}`).join(',');
 
+        // Query admin info từ sonla_rgx và sonla_tkkl
         const adminQuery = `
           WITH geoms AS (
             SELECT
               unnest(ARRAY[${placeholders}])::text as geom_json,
               generate_series(1, ${geometries.length}) as idx
           )
-          SELECT idx, r.huyen, r.xa, r.tieukhu, r.khoanh
+          SELECT
+            g.idx,
+            rgx.xa,
+            tkkl.tieukhu as tk,
+            tkkl.khoanh
           FROM geoms g
-          LEFT JOIN laocai_ranhgioihc r
-            ON ST_Intersects(r.geom, ST_GeomFromGeoJSON(g.geom_json))
+          LEFT JOIN sonla_rgx rgx
+            ON ST_Intersects(rgx.geom, ST_GeomFromGeoJSON(g.geom_json))
+          LEFT JOIN sonla_tkkl tkkl
+            ON ST_Intersects(tkkl.geom, ST_GeomFromGeoJSON(g.geom_json))
         `;
 
         const adminResult = await adminDb.query(adminQuery, geometries);
@@ -148,10 +157,9 @@ exports.getLayerDataByPath = async (req, res, next) => {
         adminResult.rows.forEach(row => {
           if (row.idx) {
             adminInfoMap[row.idx - 1] = {
-              huyen: convertTcvn3ToUnicode(row.huyen),
-              xa: convertTcvn3ToUnicode(row.xa),
-              tk: row.tieukhu,
-              khoanh: row.khoanh
+              xa: row.xa || null,
+              tk: row.tk || null,
+              khoanh: row.khoanh || null
             };
           }
         });
@@ -161,7 +169,6 @@ exports.getLayerDataByPath = async (req, res, next) => {
           const adminInfo = adminInfoMap[idx] || {};
           return {
             ...row,
-            huyen: adminInfo.huyen || null,
             xa: adminInfo.xa || null,
             tk: adminInfo.tk || null,
             khoanh: adminInfo.khoanh || null
@@ -243,16 +250,19 @@ exports.getLayerData = async (req, res, next) => {
     let query;
     let tableName;
 
-    // Determine table based on layer
+    // Determine table based on layer (Sơn La)
     switch (layer) {
-      case 'ranhgioihc':
-        tableName = 'laocai_ranhgioihc';
+      case 'hientrangrung':
+        tableName = 'sonla_hientrangrung';
         break;
-      case 'rg3lr':
-        tableName = 'laocai_rg3lr';
+      case 'ranhgioixa':
+        tableName = 'sonla_rgx';
+        break;
+      case 'tieukukhoanh':
+        tableName = 'sonla_tkkl';
         break;
       case 'matrung':
-        tableName = 'mat_rung';
+        tableName = 'son_la_mat_rung';
         break;
       default:
         tableName = layer;
@@ -319,14 +329,17 @@ exports.getLayerBounds = async (req, res, next) => {
 
     let tableName;
     switch (layer) {
-      case 'ranhgioihc':
-        tableName = 'laocai_ranhgioihc';
+      case 'hientrangrung':
+        tableName = 'sonla_hientrangrung';
         break;
-      case 'rg3lr':
-        tableName = 'laocai_rg3lr';
+      case 'ranhgioixa':
+        tableName = 'sonla_rgx';
+        break;
+      case 'tieukukhoanh':
+        tableName = 'sonla_tkkl';
         break;
       case 'matrung':
-        tableName = 'mat_rung';
+        tableName = 'son_la_mat_rung';
         break;
       default:
         tableName = layer;

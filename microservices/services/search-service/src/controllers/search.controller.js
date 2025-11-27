@@ -123,7 +123,7 @@ exports.searchMatRung = async (req, res, next) => {
         m.verification_notes,
         ST_AsGeoJSON(m.geom) as geometry,
         ST_AsText(ST_Centroid(m.geom)) as centroid_wkt
-      FROM mat_rung m
+      FROM son_la_mat_rung m
       ${whereClause}
       ORDER BY m.gid DESC
       LIMIT $${paramIndex}
@@ -133,7 +133,7 @@ exports.searchMatRung = async (req, res, next) => {
 
     const result = await db.query(query, params);
 
-    logger.info(`Found ${result.rows.length} mat_rung records`);
+    logger.info(`Found ${result.rows.length} son_la_mat_rung records`);
 
     // ✅ OPTIMIZED: Get admin info for all results
     if (result.rows.length === 0) {
@@ -317,7 +317,7 @@ exports.searchMatRungById = async (req, res, next) => {
         ST_YMin(ST_Envelope(ST_Transform(m.geom, 4326))) as bbox_ymin,
         ST_XMax(ST_Envelope(ST_Transform(m.geom, 4326))) as bbox_xmax,
         ST_YMax(ST_Envelope(ST_Transform(m.geom, 4326))) as bbox_ymax
-      FROM mat_rung m
+      FROM son_la_mat_rung m
       WHERE m.gid = $1 AND m.geom IS NOT NULL
     `;
 
@@ -381,14 +381,14 @@ exports.searchMatRungById = async (req, res, next) => {
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry,
         ST_Distance(
           ST_Transform(m.geom, 3857),
-          (SELECT ST_Transform(geom, 3857) FROM mat_rung WHERE gid = $1)
+          (SELECT ST_Transform(geom, 3857) FROM son_la_mat_rung WHERE gid = $1)
         ) as distance
-      FROM mat_rung m
+      FROM son_la_mat_rung m
       WHERE m.gid != $1
         AND m.geom IS NOT NULL
         AND ST_DWithin(
           ST_Transform(m.geom, 3857),
-          (SELECT ST_Transform(geom, 3857) FROM mat_rung WHERE gid = $1),
+          (SELECT ST_Transform(geom, 3857) FROM son_la_mat_rung WHERE gid = $1),
           $2
         )
       ORDER BY distance ASC

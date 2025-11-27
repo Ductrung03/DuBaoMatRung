@@ -61,12 +61,14 @@ const handleMapServerRequest = async (req, res) => {
   try {
     // Build query string from request
     const queryParams = new URLSearchParams(req.query);
-    queryParams.set('map', MAPFILE_PATH);
+    // ❌ KHÔNG set 'map' trong query params - dùng MS_MAPFILE env var thay vì
+    // queryParams.set('map', MAPFILE_PATH);
 
     const queryString = queryParams.toString();
 
     logger.info('Executing MapServer', {
       binary: MAPSERV_BIN,
+      mapfile: MAPFILE_PATH,
       queryString: queryString
     });
 
@@ -75,11 +77,9 @@ const handleMapServerRequest = async (req, res) => {
       ...process.env,
       QUERY_STRING: queryString,
       REQUEST_METHOD: 'GET',
-      MS_MAPFILE: MAPFILE_PATH,
+      MS_MAPFILE: MAPFILE_PATH,  // ✅ Sử dụng MS_MAPFILE để MapServer tự động load
       MS_MAP_PATTERN: '.*',
       MS_MAP_NO_PATH: '1'
-      // Note: MS_CONFIG_FILE removed - let MapServer find config automatically
-      // Create empty 'mapserver.conf' in working directory instead
     };
 
     // Spawn MapServer process

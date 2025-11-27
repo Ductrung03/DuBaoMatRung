@@ -156,6 +156,61 @@ class AdminService {
 
     return result;
   }
+
+  /**
+   * Get list of xa from Sơn La (sonla_rgx table)
+   */
+  async getSonLaXa() {
+    const result = await this.db
+      .selectFrom('sonla_rgx')
+      .select('xa')
+      .where('xa', 'is not', null)
+      .distinct()
+      .orderBy('xa')
+      .execute();
+
+    return result;
+  }
+
+  /**
+   * Get list of tieu khu from Sơn La filtered by xa
+   */
+  async getSonLaTieuKhu(xa) {
+    let query = this.db
+      .selectFrom('sonla_tkkl')
+      .select('tieukhu')
+      .where('tieukhu', 'is not', null)
+      .distinct();
+
+    if (xa) {
+      query = query.where('xa', '=', xa);
+    }
+
+    const result = await query.orderBy('tieukhu').execute();
+    return result;
+  }
+
+  /**
+   * Get list of khoanh from Sơn La filtered by xa and tieu khu
+   */
+  async getSonLaKhoanh(xa, tieuKhu) {
+    let query = this.db
+      .selectFrom('sonla_hientrangrung')
+      .select('khoanh')
+      .where('khoanh', 'is not', null)
+      .distinct();
+
+    if (xa) {
+      query = query.where('xa', '=', xa);
+    }
+
+    if (tieuKhu) {
+      query = query.where('tk', '=', tieuKhu);
+    }
+
+    const result = await query.orderBy('khoanh').execute();
+    return result;
+  }
 }
 
 module.exports = AdminService;

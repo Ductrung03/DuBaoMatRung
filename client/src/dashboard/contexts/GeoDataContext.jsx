@@ -8,13 +8,11 @@ const GeoDataContext = createContext();
 
 export const useGeoData = () => useContext(GeoDataContext);
 
-// ✅ MAPSERVER CONSTANTS - Static layers via WMS
+// ✅ MAPSERVER CONSTANTS - Sơn La 3 layers via WMS
 export const MAPSERVER_LAYERS = {
-  ADMINISTRATIVE: 'ranhgioihc',      // Ranh giới hành chính
-  FOREST_TYPES: 'rg3lr',              // 3 Loại rừng (231K records!)
-  TERRAIN: 'nendiahinh',              // Nền địa hình
-  MANAGEMENT: 'chuquanly',            // Chủ quản lý rừng
-  DISTRICT: 'huyen'                   // Ranh giới huyện
+  RANH_GIOI_XA: 'ranhgioixa',         // Ranh giới xã (75 xã)
+  TIEU_KU_KHOANH: 'tieukukhoanh',     // Tiểu khu khoảnh lô (30k khoảnh)
+  HIEN_TRANG_RUNG: 'hientrangrung'    // Hiện trạng rừng (280k khoảnh - PRIMARY)
 };
 
 // ✅ MapServer WMS qua API Gateway
@@ -24,72 +22,51 @@ export const GeoDataProvider = ({ children }) => {
   const [geoData, setGeoData] = useState(null);
   const [loading, setLoading] = useState(false);
   
-  // Enhanced map layers config - Phân biệt WMS và GeoJSON layers
+  // Enhanced map layers config - SƠN LA 3 LAYERS
   const [mapLayers, setMapLayers] = useState({
-    // ✅ WMS LAYERS - Render qua MapServer, không cần load GeoJSON data
-    administrative: {
+    // ✅ SƠN LA 3 WMS LAYERS - Render qua MapServer
+
+    // 1. Ranh Giới Xã (75 xã)
+    ranhgioixa: {
       data: null,
       visible: true,
       loading: false,
-      name: "Ranh giới hành chính",
-      endpoint: "administrative",
-      layerType: "wms", // WMS layer
-      wmsLayer: MAPSERVER_LAYERS.ADMINISTRATIVE
-    },
-    forestManagement: {
-      data: null,
-      visible: true,
-      loading: false,
-      name: "Chủ quản lý rừng",
-      endpoint: "forest-management",
-      layerType: "wms", // WMS layer
-      wmsLayer: MAPSERVER_LAYERS.MANAGEMENT
-    },
-    terrain: {
-      data: null,
-      visible: false,
-      loading: false,
-      name: "Nền địa hình",
-      endpoint: "terrain",
-      layerType: "wms", // WMS layer
-      wmsLayer: MAPSERVER_LAYERS.TERRAIN
-    },
-    terrainLine: {
-      data: null,
-      visible: true,
-      loading: false,
-      name: "Địa hình, thủy văn, giao thông",
-      endpoint: "terrain-line",
-      layerType: "wms", // WMS layer (line features)
-      wmsLayer: "nendiahinh_line"
-    },
-    forestTypes: {
-      data: null,
-      visible: false,
-      loading: false,
-      name: "Các loại rừng (phân loại LDLR)",
-      endpoint: "forest-types",
-      layerType: "wms", // WMS layer - 231K records!
-      wmsLayer: MAPSERVER_LAYERS.FOREST_TYPES
-    },
-    forestStatus: {
-      data: null,
-      visible: true,
-      loading: false,
-      name: "Hiện trạng rừng",
-      endpoint: "forest-status",
-      layerType: "wms", // WMS layer
-      wmsLayer: "hientrangrung"
+      name: "Ranh Giới Xã",
+      endpoint: "ranhgioixa",
+      layerType: "wms",
+      wmsLayer: MAPSERVER_LAYERS.RANH_GIOI_XA
     },
 
-    // ✅ GEOJSON LAYERS - Load data từ API
-    deforestationAlerts: {
+    // 2. Tiểu Khu Khoảnh Lô (30k khoảnh)
+    tieukukhoanh: {
       data: null,
       visible: true,
+      loading: false,
+      name: "Tiểu Khu Khoảnh Lô",
+      endpoint: "tieukukhoanh",
+      layerType: "wms",
+      wmsLayer: MAPSERVER_LAYERS.TIEU_KU_KHOANH
+    },
+
+    // 3. Hiện Trạng Rừng (280k khoảnh - PRIMARY LAYER)
+    hientrangrung: {
+      data: null,
+      visible: true,
+      loading: false,
+      name: "Hiện Trạng Rừng",
+      endpoint: "hientrangrung",
+      layerType: "wms",
+      wmsLayer: MAPSERVER_LAYERS.HIEN_TRANG_RUNG
+    },
+
+    // ✅ GEOJSON LAYERS - Load data từ API (optional)
+    deforestationAlerts: {
+      data: null,
+      visible: false,
       loading: false,
       name: "Dự báo mất rừng mới nhất",
       endpoint: "deforestation-alerts",
-      layerType: "geojson", // GeoJSON layer - cần load data
+      layerType: "geojson",
       useViewport: true
     }
   });

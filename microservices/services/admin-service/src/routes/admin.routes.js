@@ -235,6 +235,62 @@ router.get('/dropdown/nguyennhan', asyncHandler(adminController.getNguyenNhan));
 
 /**
  * @swagger
+ * /api/admin/dropdown/sonla/xa:
+ *   get:
+ *     summary: Get commune list from Sơn La (Xã Sơn La)
+ *     description: Retrieve list of communes from sonla_rgx table
+ *     tags: [Admin]
+ *     responses:
+ *       200:
+ *         description: Sơn La commune list retrieved successfully
+ */
+router.get('/dropdown/sonla/xa', asyncHandler(adminController.getSonLaXa));
+
+/**
+ * @swagger
+ * /api/admin/dropdown/sonla/tieukhu:
+ *   get:
+ *     summary: Get sub-compartment list from Sơn La (Tiểu khu Sơn La)
+ *     description: Retrieve list of sub-compartments from sonla_tkkl table
+ *     tags: [Admin]
+ *     parameters:
+ *       - in: query
+ *         name: xa
+ *         schema:
+ *           type: string
+ *         description: Commune name to filter
+ *     responses:
+ *       200:
+ *         description: Sơn La sub-compartment list retrieved successfully
+ */
+router.get('/dropdown/sonla/tieukhu', asyncHandler(adminController.getSonLaTieuKhu));
+
+/**
+ * @swagger
+ * /api/admin/dropdown/sonla/khoanh:
+ *   get:
+ *     summary: Get compartment list from Sơn La (Khoảnh Sơn La)
+ *     description: Retrieve list of compartments from sonla_hientrangrung table
+ *     tags: [Admin]
+ *     parameters:
+ *       - in: query
+ *         name: xa
+ *         schema:
+ *           type: string
+ *         description: Commune name to filter
+ *       - in: query
+ *         name: tieukhu
+ *         schema:
+ *           type: string
+ *         description: Sub-compartment to filter
+ *     responses:
+ *       200:
+ *         description: Sơn La compartment list retrieved successfully
+ */
+router.get('/dropdown/sonla/khoanh', asyncHandler(adminController.getSonLaKhoanh));
+
+/**
+ * @swagger
  * /api/admin/hanhchinh:
  *   get:
  *     summary: Get administrative boundaries (Hành chính)

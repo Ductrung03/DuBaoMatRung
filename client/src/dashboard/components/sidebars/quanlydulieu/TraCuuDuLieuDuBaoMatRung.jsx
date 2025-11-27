@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { useCascadingAdminUnits } from "../../../hooks/useCascadingAdminUnits";
+import { useSonLaAdminUnits } from "../../../hooks/useSonLaAdminUnits";
 import { getChucNangRung, getChuRung, getTrangThaiXacMinh, getNguyenNhan } from "../../../../utils/dropdownService";
-import DistrictDropdown from "../../DistrictDropdown";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useGeoData } from "../../../contexts/GeoDataContext";
 import Dropdown from "../../../../components/Dropdown";
@@ -24,12 +23,10 @@ const TraCuuDuLieuDuBaoMatRung = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  const adminUnits = useCascadingAdminUnits(user, isAdmin);
+  const adminUnits = useSonLaAdminUnits();
   const {
-    selectedHuyen,
-    handleHuyenChange,
     selectedXa,
-    selectedTieuKhu,
+    selectedTieukhu,
     selectedKhoanh,
   } = adminUnits;
 
@@ -46,24 +43,17 @@ const TraCuuDuLieuDuBaoMatRung = () => {
         toast.warning("Vui lòng nhập đầy đủ từ ngày và đến ngày");
         return;
       }
-      
-      if (isAdmin() && !selectedHuyen) {
-        toast.warning("Vui lòng chọn huyện trước khi tra cứu");
-        return;
-      }
-      
+
       setLoading(true);
 
       // Tạo query parameters theo backend API
       const queryParams = new URLSearchParams();
       queryParams.append('fromDate', fromDate);
       queryParams.append('toDate', toDate);
-      
-      if (selectedHuyen) queryParams.append('huyen', selectedHuyen);
+
       if (selectedXa) queryParams.append('xa', selectedXa);
-      if (adminUnits.selectedTieukhu) queryParams.append('tk', adminUnits.selectedTieukhu);
-      if (adminUnits.selectedKhoanh) queryParams.append('khoanh', adminUnits.selectedKhoanh);
-      if (adminUnits.selectedChuRung) queryParams.append('churung', adminUnits.selectedChuRung);
+      if (selectedTieukhu) queryParams.append('tk', selectedTieukhu);
+      if (selectedKhoanh) queryParams.append('khoanh', selectedKhoanh);
 
       // Gọi API backend đúng
       const response = await fetch(`/api/mat-rung?${queryParams.toString()}`, {
@@ -184,19 +174,6 @@ const TraCuuDuLieuDuBaoMatRung = () => {
               </div>
 
               <div className="font-medium text-sm mb-1 mt-3">Khu vực</div>
-              
-              {/* Huyện */}
-              <div className="flex items-center justify-between mb-1 pl-4">
-                <label className="text-sm">Huyện</label>
-                <div className="w-36">
-                  <DistrictDropdown
-                    value={selectedHuyen}
-                    onChange={handleHuyenChange}
-                    isLoading={adminUnits.huyen.loading}
-                    disabled={adminUnits.huyen.disabled}
-                  />
-                </div>
-              </div>
 
               {/* Xã */}
               <div className="flex items-center justify-between mb-1 pl-4">
@@ -216,7 +193,7 @@ const TraCuuDuLieuDuBaoMatRung = () => {
               <div className="flex items-center justify-between mb-1 pl-4">
                 <label className="text-sm">Tiểu khu</label>
                 <Dropdown
-                  selectedValue={selectedTieuKhu}
+                  selectedValue={selectedTieukhu}
                   onValueChange={adminUnits.tieukhu.onChange}
                   options={adminUnits.tieukhu.list}
                   placeholder="Chọn tiểu khu"

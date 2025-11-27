@@ -1,0 +1,448 @@
+MAP
+  NAME "SonLa_GIS"
+  STATUS ON
+  SIZE 800 600
+  EXTENT 103.5 20.5 104.8 22.0
+  UNITS DD
+  SHAPEPATH "/tmp"
+  IMAGECOLOR 255 255 255
+
+  # Web settings
+  WEB
+    METADATA
+      "wms_title"           "Son La GIS Services"
+      "wms_onlineresource"  "http://localhost/cgi-bin/mapserv?map=/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/mapserver/mapfiles/sonla.map&"
+      "wms_srs"             "EPSG:4326 EPSG:3857 EPSG:32648"
+      "wms_enable_request"  "*"
+      "wms_allow_getmap_without_styles" "true"
+      "wfs_title"           "Son La WFS Service"
+      "wfs_onlineresource"  "http://localhost/cgi-bin/mapserv?map=/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/mapserver/mapfiles/sonla.map&"
+      "wfs_srs"             "EPSG:4326 EPSG:3857"
+      "wfs_enable_request"  "*"
+      "ows_enable_request"  "*"
+    END
+    IMAGEPATH "/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/mapserver/tmp/"
+    IMAGEURL "/tmp/"
+  END
+
+  # Projection
+  PROJECTION
+    "init=epsg:4326"
+  END
+
+  #=============================================================================
+  # LAYER 1: Ranh Giới Xã (Commune Boundaries)
+  # Dữ liệu từ bảng sonla_rgx
+  #=============================================================================
+  LAYER
+    NAME "ranhgioixa"
+    TYPE POLYGON
+    STATUS ON
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    DATA "geom FROM sonla_rgx USING UNIQUE gid USING SRID=4326"
+
+    PROCESSING "CLOSE_CONNECTION=DEFER"
+
+    METADATA
+      "wms_title"             "Ranh Giới Xã"
+      "wms_abstract"          "Commune boundaries of Son La"
+      "wms_srs"               "EPSG:4326 EPSG:3857"
+      "wms_extent"            "103.5 20.5 104.8 22.0"
+      "wfs_title"             "Ranh Giới Xã"
+      "wfs_srs"               "EPSG:4326 EPSG:3857"
+      "gml_include_items"     "all"
+      "gml_featureid"         "gid"
+      "wms_include_items"     "all"
+    END
+
+    PROJECTION
+      "init=epsg:4326"
+    END
+
+    CLASS
+      NAME "Ranh giới xã"
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 2
+        OPACITY 90
+      END
+      STYLE
+        COLOR 240 240 240
+        OPACITY 20
+      END
+    END
+
+    TOLERANCE 10
+    TOLERANCEUNITS pixels
+  END
+
+  #=============================================================================
+  # LAYER 2: Tiểu Khu Khoảnh Lô (Sub-compartment Boundaries)
+  # Dữ liệu từ bảng sonla_tkkl
+  #=============================================================================
+  LAYER
+    NAME "tieukukhoanh"
+    TYPE POLYGON
+    STATUS ON
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    DATA "geom FROM sonla_tkkl USING UNIQUE gid USING SRID=4326"
+
+    PROCESSING "CLOSE_CONNECTION=DEFER"
+
+    METADATA
+      "wms_title"             "Tiểu Khu Khoảnh Lô"
+      "wms_abstract"          "Sub-compartment boundaries of Son La"
+      "wms_srs"               "EPSG:4326 EPSG:3857"
+      "wms_extent"            "103.5 20.5 104.8 22.0"
+      "wfs_title"             "Tiểu Khu Khoảnh Lô"
+      "wfs_srs"               "EPSG:4326 EPSG:3857"
+      "gml_include_items"     "all"
+      "gml_featureid"         "gid"
+      "wms_include_items"     "all"
+    END
+
+    PROJECTION
+      "init=epsg:4326"
+    END
+
+    CLASS
+      NAME "Tiểu khu khoảnh lô"
+      STYLE
+        OUTLINECOLOR 100 100 100
+        WIDTH 1
+        OPACITY 80
+      END
+      STYLE
+        COLOR 220 220 220
+        OPACITY 15
+      END
+    END
+
+    TOLERANCE 10
+    TOLERANCEUNITS pixels
+  END
+
+  #=============================================================================
+  # LAYER 3: Hiện Trạng Rừng (Forest Status/Coverage)
+  # Dữ liệu từ bảng sonla_hientrangrung
+  # Phân loại theo ldlr_23 - Loại đất lâm sinh
+  #=============================================================================
+  LAYER
+    NAME "hientrangrung"
+    TYPE POLYGON
+    STATUS ON
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=localhost port=5433 dbname=admin_db user=postgres password=4"
+    DATA "geom FROM sonla_hientrangrung USING UNIQUE gid USING SRID=4326"
+
+    PROCESSING "CLOSE_CONNECTION=DEFER"
+
+    METADATA
+      "wms_title"             "Hiện Trạng Rừng"
+      "wms_abstract"          "Current forest status in Son La (by ldlr_23)"
+      "wms_srs"               "EPSG:4326 EPSG:3857"
+      "wms_extent"            "103.5 20.5 104.8 22.0"
+      "wfs_title"             "Hiện Trạng Rừng"
+      "wfs_srs"               "EPSG:4326 EPSG:3857"
+      "gml_include_items"     "all"
+      "gml_featureid"         "gid"
+      "wms_include_items"     "all"
+    END
+
+    PROJECTION
+      "init=epsg:4326"
+    END
+
+    CLASSITEM "ldlr_23"
+
+    # 🌲 Rừng giàu loại 1 (HG1) - MÀU XANH ĐẬM
+    CLASS
+      NAME "Rừng giàu loại 1 (HG1)"
+      EXPRESSION /^HG1$/i
+      STYLE
+        COLOR 0 130 0
+        OPACITY 90
+      END
+      STYLE
+        OUTLINECOLOR 0 80 0
+        WIDTH 0.8
+        OPACITY 95
+      END
+    END
+
+    # 🌲 Rừng giàu loại 2 (HG2) - MÀU XANH LÁ
+    CLASS
+      NAME "Rừng giàu loại 2 (HG2)"
+      EXPRESSION /^HG2$/i
+      STYLE
+        COLOR 34 170 34
+        OPACITY 85
+      END
+      STYLE
+        OUTLINECOLOR 20 120 20
+        WIDTH 0.7
+        OPACITY 90
+      END
+    END
+
+    # 🌲 Rừng giàu đặc biệt (HGD) - MÀU XANH ĐẬM ĐẶC BIỆT
+    CLASS
+      NAME "Rừng giàu đặc biệt (HGD)"
+      EXPRESSION /^HGD$/i
+      STYLE
+        COLOR 0 150 0
+        OPACITY 92
+      END
+      STYLE
+        OUTLINECOLOR 0 100 0
+        WIDTH 0.8
+        OPACITY 95
+      END
+    END
+
+    # 🌱 Rừng trồng giàu (RTG) - MÀU XANH TƯƠI
+    CLASS
+      NAME "Rừng trồng giàu (RTG)"
+      EXPRESSION /^RTG$/i
+      STYLE
+        COLOR 60 220 60
+        OPACITY 85
+      END
+      STYLE
+        OUTLINECOLOR 40 160 40
+        WIDTH 0.6
+        OPACITY 90
+      END
+    END
+
+    # 🌱 Rừng trồng nghèo (RTN) - MÀU XANH ÔLI
+    CLASS
+      NAME "Rừng trồng nghèo (RTN)"
+      EXPRESSION /^RTN$/i
+      STYLE
+        COLOR 120 160 50
+        OPACITY 80
+      END
+      STYLE
+        OUTLINECOLOR 90 120 40
+        WIDTH 0.6
+        OPACITY 85
+      END
+    END
+
+    # 🌱 Rừng trồng khác (RTK) - MÀU XANH CHANH
+    CLASS
+      NAME "Rừng trồng khác (RTK)"
+      EXPRESSION /^RTK$/i
+      STYLE
+        COLOR 140 255 50
+        OPACITY 80
+      END
+      STYLE
+        OUTLINECOLOR 100 200 30
+        WIDTH 0.6
+        OPACITY 85
+      END
+    END
+
+    # 🌿 Trồng xen giàu (TXG) - MÀU XANH NHẠT
+    CLASS
+      NAME "Trồng xen giàu (TXG)"
+      EXPRESSION /^TXG$/i
+      STYLE
+        COLOR 160 250 160
+        OPACITY 75
+      END
+      STYLE
+        OUTLINECOLOR 80 200 120
+        WIDTH 0.5
+        OPACITY 85
+      END
+    END
+
+    # 🌿 Trồng xen nghèo (TXN) - MÀU XANH GHI
+    CLASS
+      NAME "Trồng xen nghèo (TXN)"
+      EXPRESSION /^TXN$/i
+      STYLE
+        COLOR 160 200 160
+        OPACITY 75
+      END
+      STYLE
+        OUTLINECOLOR 100 140 60
+        WIDTH 0.5
+        OPACITY 80
+      END
+    END
+
+    # 🌿 Trồng xen khác (TXK) - MÀU XANH MINT
+    CLASS
+      NAME "Trồng xen khác (TXK)"
+      EXPRESSION /^TXK$/i
+      STYLE
+        COLOR 170 255 170
+        OPACITY 70
+      END
+      STYLE
+        OUTLINECOLOR 120 180 50
+        WIDTH 0.5
+        OPACITY 80
+      END
+    END
+
+    # 🌾 Lúa khác giàu (LKG) - MÀU VÀNG GOLD
+    CLASS
+      NAME "Lúa khác giàu (LKG)"
+      EXPRESSION /^LKG$/i
+      STYLE
+        COLOR 210 200 130
+        OPACITY 75
+      END
+      STYLE
+        OUTLINECOLOR 160 150 50
+        WIDTH 0.5
+        OPACITY 85
+      END
+    END
+
+    # 🌾 Lúa khác nghèo (LKN) - MÀU VÀNG CAM
+    CLASS
+      NAME "Lúa khác nghèo (LKN)"
+      EXPRESSION /^LKN$/i
+      STYLE
+        COLOR 240 180 50
+        OPACITY 70
+      END
+      STYLE
+        OUTLINECOLOR 200 140 20
+        WIDTH 0.5
+        OPACITY 80
+      END
+    END
+
+    # 🌾 Lúa khác khác (LKK) - MÀU VÀNG NHẠT
+    CLASS
+      NAME "Lúa khác khác (LKK)"
+      EXPRESSION /^LKK$/i
+      STYLE
+        COLOR 250 245 190
+        OPACITY 70
+      END
+      STYLE
+        OUTLINECOLOR 210 200 130
+        WIDTH 0.4
+        OPACITY 80
+      END
+    END
+
+    # 🌾 Lúa khác phục hồi (LKP) - MÀU VÀNG KHAKI
+    CLASS
+      NAME "Lúa khác phục hồi (LKP)"
+      EXPRESSION /^LKP$/i
+      STYLE
+        COLOR 250 240 160
+        OPACITY 70
+      END
+      STYLE
+        OUTLINECOLOR 210 190 120
+        WIDTH 0.4
+        OPACITY 80
+      END
+    END
+
+    # 🏜️ Đất trống loại 1 (DT1, DT1D) - MÀU CAM SÁNG
+    CLASS
+      NAME "Đất trống loại 1 (DT1)"
+      EXPRESSION /^DT1[D]?$/i
+      STYLE
+        COLOR 255 180 110
+        OPACITY 70
+      END
+      STYLE
+        OUTLINECOLOR 230 120 50
+        WIDTH 0.5
+        OPACITY 80
+      END
+    END
+
+    # 🏜️ Đất trống loại 2 (DT2, DT2D) - MÀU BE NHẠT
+    CLASS
+      NAME "Đất trống loại 2 (DT2)"
+      EXPRESSION /^DT2[D]?$/i
+      STYLE
+        COLOR 255 240 220
+        OPACITY 65
+      END
+      STYLE
+        OUTLINECOLOR 230 200 160
+        WIDTH 0.4
+        OPACITY 75
+      END
+    END
+
+    # 🏜️ Đất trống rừng (DTR, DTRD) - MÀU PERSIMMON
+    CLASS
+      NAME "Đất trống rừng (DTR)"
+      EXPRESSION /^DTR[D]?$/i
+      STYLE
+        COLOR 255 230 190
+        OPACITY 70
+      END
+      STYLE
+        OUTLINECOLOR 240 200 150
+        WIDTH 0.4
+        OPACITY 80
+      END
+    END
+
+    # 🌽 Đất nông nghiệp (DNN, NND) - MÀU VÀNG NHẠt LEMON
+    CLASS
+      NAME "Đất nông nghiệp (DNN)"
+      EXPRESSION /^(DNN|NND)$/i
+      STYLE
+        COLOR 255 252 220
+        OPACITY 65
+      END
+      STYLE
+        OUTLINECOLOR 210 200 130
+        WIDTH 0.4
+        OPACITY 75
+      END
+    END
+
+    # ⚪ Đất khác (DKH) - MÀU XÁM NHẠT
+    CLASS
+      NAME "Đất khác (DKH)"
+      EXPRESSION /^DKH$/i
+      STYLE
+        COLOR 240 240 240
+        OPACITY 60
+      END
+      STYLE
+        OUTLINECOLOR 180 180 180
+        WIDTH 0.4
+        OPACITY 70
+      END
+    END
+
+    # ⚪ Các loại còn lại - MÀU XÁM
+    CLASS
+      NAME "Loại khác"
+      STYLE
+        COLOR 220 220 220
+        OPACITY 55
+      END
+      STYLE
+        OUTLINECOLOR 180 180 180
+        WIDTH 0.3
+        OPACITY 65
+      END
+    END
+
+    TOLERANCE 10
+    TOLERANCEUNITS pixels
+  END
+
+END

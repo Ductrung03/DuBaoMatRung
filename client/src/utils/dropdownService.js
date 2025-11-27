@@ -122,3 +122,54 @@ export const getNguyenNhan = async () => {
     throw error;
   }
 };
+
+/**
+ * Fetches a list of communes from Sơn La (xã).
+ * @returns {Promise<Array<{label: string, value: string}>>}
+ */
+export const getSonLaXa = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/sonla/xa`);
+    return response.data.data || [];
+  } catch (error) {
+    console.error('Error fetching Sơn La communes:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetches a list of sub-zones (tiểu khu) from Sơn La for a given commune.
+ * @param {string} communeName - The name of the commune.
+ * @returns {Promise<Array<{label: string, value: string}>>}
+ */
+export const getSonLaTieuKhu = async (communeName) => {
+  if (!communeName) return [];
+  try {
+    const response = await axios.get(`${API_URL}/sonla/tieukhu`, { params: { xa: communeName } });
+    return response.data.data || [];
+  } catch (error) {
+    console.error(`Error fetching Sơn La sub-zones for commune ${communeName}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Fetches a list of plots (khoảnh) from Sơn La for a given commune and sub-zone.
+ * @param {string} communeName - The name of the commune.
+ * @param {string} subZoneName - The name of the sub-zone (tiểu khu).
+ * @returns {Promise<Array<{label: string, value: string}>>}
+ */
+export const getSonLaKhoanh = async (communeName, subZoneName) => {
+  if (!communeName) return [];
+  try {
+    const params = { xa: communeName };
+    if (subZoneName) {
+      params.tieukhu = subZoneName;
+    }
+    const response = await axios.get(`${API_URL}/sonla/khoanh`, { params });
+    return response.data.data || [];
+  } catch (error) {
+    console.error(`Error fetching Sơn La plots:`, error);
+    throw error;
+  }
+};

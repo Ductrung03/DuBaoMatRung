@@ -1,66 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useGeoData } from "../../../contexts/GeoDataContext";
 import config from "../../../../config";
-import DistrictDropdown from "../../DistrictDropdown";
 import { toast } from "react-toastify";
-import { getCommunes } from "../../../../utils/dropdownService.js";
-import Dropdown from "../../../../components/Dropdown"; // Import the generic Dropdown
+import { useSonLaAdminUnits } from "../../../hooks/useSonLaAdminUnits";
+import Dropdown from "../../../../components/Dropdown";
 
 const DuBaoMatRungTuyBien = () => {
   const { isAdmin, user } = useAuth();
   const { setGeoData, setLoading } = useGeoData();
-  
-  const [xaList, setXaList] = useState([]);
+  const adminUnits = useSonLaAdminUnits();
+  const { selectedXa, selectedTieukhu, selectedKhoanh } = adminUnits;
+
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   const [isInputOpen, setInputOpen] = useState(true);
-  const [selectedHuyen, setSelectedHuyen] = useState("");
-  const [selectedXa, setSelectedXa] = useState("");
   const [loading, setLoadingState] = useState(false);
 
   const [kyTruocStart, setKyTruocStart] = useState("");
   const [kyTruocEnd, setKyTruocEnd] = useState("");
   const [kySauStart, setKySauStart] = useState("");
   const [kySauEnd, setKySauEnd] = useState("");
-
-  useEffect(() => {
-    // Auto-fill huyện cho user cấp huyện
-    if (!isAdmin() && user?.district_id) {
-      setSelectedHuyen(user.district_id);
-    }
-  }, [isAdmin, user]);
-
-  useEffect(() => {
-    const fetchXaList = async () => {
-      if (!selectedHuyen) {
-        setXaList([]);
-        return;
-      }
-
-      try {
-        setLoadingState(true);
-        const communes = await getCommunes(selectedHuyen);
-        setXaList(communes);
-      } catch (err) {
-        console.error("Lỗi khi tải danh sách xã:", err);
-        toast.error("Lỗi khi tải danh sách xã");
-        setXaList([]);
-      } finally {
-        setLoadingState(false);
-      }
-    };
-
-    fetchXaList();
-  }, [selectedHuyen]);
-
-  const handleHuyenChange = (value) => {
-    setSelectedHuyen(value);
-    setSelectedXa("");
-  };
-
-  const handleXaChange = (value) => {
-    setSelectedXa(value);
-  };
 
   const handleAnalyze = async () => {
     try {
@@ -81,8 +40,8 @@ const DuBaoMatRungTuyBien = () => {
         return;
       }
 
-      if (isAdmin() && !selectedHuyen) {
-        toast.warning("Vui lòng chọn huyện");
+      if (!selectedXa) {
+        toast.warning("Vui lòng chọn xã");
         return;
       }
 
@@ -92,8 +51,9 @@ const DuBaoMatRungTuyBien = () => {
       const queryParams = new URLSearchParams();
       queryParams.append('fromDate', fromDate);
       queryParams.append('toDate', toDate);
-      if (selectedHuyen) queryParams.append('huyen', selectedHuyen);
       if (selectedXa) queryParams.append('xa', selectedXa);
+      if (selectedTieukhu) queryParams.append('tk', selectedTieukhu);
+      if (selectedKhoanh) queryParams.append('khoanh', selectedKhoanh);
 
       const res = await fetch(
         `/api/mat-rung?${queryParams.toString()}`
@@ -128,7 +88,6 @@ const DuBaoMatRungTuyBien = () => {
         }
       );
 
-
       setTimeout(() => {
         const mapElement = document.querySelector('.leaflet-container');
         if (mapElement) {
@@ -154,7 +113,7 @@ const DuBaoMatRungTuyBien = () => {
       setLoadingState(false);
     }
   };
-  
+
   return (
     <div>
       <div
@@ -163,7 +122,7 @@ const DuBaoMatRungTuyBien = () => {
       >
         Dự báo mất rừng tùy biến
       </div>
-      
+
       {isForecastOpen && (
         <div className="flex flex-col gap-2 pt-3">
           <div
@@ -171,35 +130,53 @@ const DuBaoMatRungTuyBien = () => {
             onClick={() => setInputOpen(!isInputOpen)}
           >
             <span className="text-sm font-medium">Lựa chọn đầu vào</span>
-            <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-              {/* Replaced with generic Dropdown, no longer needs Select component */}
-            </div>
           </div>
 
           {isInputOpen && (
             <div className="flex flex-col gap-2 px-1 pt-1">
               <div className="px-2 ml-8">
-                <div className="font-medium text-sm mb-1 ">Khu vực</div>
-                <div className="flex items-center justify-between mb-1 pl-4 ">
-                  <label className="text-sm">Huyện</label>
-                  <div className="w-36">
-                    <DistrictDropdown
-                      value={selectedHuyen}
-                      onChange={handleHuyenChange}
-                      isLoading={loading}
-                      disabled={!isAdmin()} // ✅ Lock cho user cấp huyện
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center justify-between mb-2 pl-4">
+                <div className="font-medium text-sm mb-1">Khu vực</div>
+
+                {/* Xã */}
+                <div className="flex items-center justify-between mb-1 pl-4">
                   <label className="text-sm">Xã</label>
                   <Dropdown
                     selectedValue={selectedXa}
-                    onValueChange={handleXaChange}
-                    options={xaList}
+                    onValueChange={adminUnits.xa.onChange}
+                    options={adminUnits.xa.list}
                     placeholder="Chọn xã"
-                    disabled={loading}
-                    loading={loading}
+                    disabled={adminUnits.xa.loading || adminUnits.xa.disabled}
+                    loading={adminUnits.xa.loading}
+                    className="w-36"
+                    selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                  />
+                </div>
+
+                {/* Tiểu khu */}
+                <div className="flex items-center justify-between mb-1 pl-4">
+                  <label className="text-sm">Tiểu khu</label>
+                  <Dropdown
+                    selectedValue={selectedTieukhu}
+                    onValueChange={adminUnits.tieukhu.onChange}
+                    options={adminUnits.tieukhu.list}
+                    placeholder="Chọn tiểu khu"
+                    disabled={adminUnits.tieukhu.loading || adminUnits.tieukhu.disabled}
+                    loading={adminUnits.tieukhu.loading}
+                    className="w-36"
+                    selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                  />
+                </div>
+
+                {/* Khoảnh */}
+                <div className="flex items-center justify-between mb-2 pl-4">
+                  <label className="text-sm">Khoảnh</label>
+                  <Dropdown
+                    selectedValue={selectedKhoanh}
+                    onValueChange={adminUnits.khoanh.onChange}
+                    options={adminUnits.khoanh.list}
+                    placeholder="Chọn khoảnh"
+                    disabled={adminUnits.khoanh.loading || adminUnits.khoanh.disabled}
+                    loading={adminUnits.khoanh.loading}
                     className="w-36"
                     selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
@@ -243,9 +220,9 @@ const DuBaoMatRungTuyBien = () => {
                     className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
-                
+
               </div>
-              <button 
+              <button
                 onClick={handleAnalyze}
                 disabled={loading}
                 className="w-36 bg-forest-green-gray hover:bg-green-200 text-black-800 font-medium py-0.5 px-3 rounded-full text-center mt-2 self-center disabled:opacity-50"

@@ -13,7 +13,7 @@ const BaseRepository = require('./BaseRepository');
 
 class MatRungRepository extends BaseRepository {
   constructor(pool) {
-    super(pool, 'mat_rung');
+    super(pool, 'son_la_mat_rung');
   }
 
   // ========================================
@@ -123,7 +123,7 @@ class MatRungRepository extends BaseRepository {
         mahuyen,
         detection_status,
         ST_AsGeoJSON(geom) as geometry
-      FROM mat_rung
+      FROM son_la_mat_rung
       WHERE ST_Contains(
         geom,
         ST_SetSRID(ST_MakePoint($1, $2), 4326)
@@ -154,7 +154,7 @@ class MatRungRepository extends BaseRepository {
             ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)
           )::geography
         ) / 10000.0 as intersection_area_ha
-      FROM mat_rung
+      FROM son_la_mat_rung
       WHERE ST_Intersects(
         geom,
         ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)
@@ -201,7 +201,7 @@ class MatRungRepository extends BaseRepository {
     return await this.transaction(async (client) => {
       // Update mat_rung
       const result = await client.query(`
-        UPDATE mat_rung
+        UPDATE son_la_mat_rung
         SET
           detection_status = $1,
           verified_area = $2,
@@ -264,7 +264,7 @@ class MatRungRepository extends BaseRepository {
         old_verification_reason, new_verification_reason,
         changed_by, changed_at,
         client_ip, user_agent
-      FROM mat_rung_verification_log
+      FROM son_la_mat_rung_verification_log
       WHERE gid = $1
       ORDER BY changed_at DESC
     `, [gid]);
@@ -286,7 +286,7 @@ class MatRungRepository extends BaseRepository {
         verification_reason,
         verified_by,
         detection_date
-      FROM mat_rung
+      FROM son_la_mat_rung
       WHERE detection_status = 'Đã xác minh'
       ORDER BY detection_date DESC
       LIMIT $1
@@ -324,7 +324,7 @@ class MatRungRepository extends BaseRepository {
         verification_notes,
         ST_AsGeoJSON(geom) as geometry,
         ST_AsGeoJSON(geom_simplified) as geometry_simplified
-      FROM mat_rung
+      FROM son_la_mat_rung
       WHERE gid = $1
     `, [gid]);
 
@@ -412,7 +412,7 @@ class MatRungRepository extends BaseRepository {
         verified_by,
         detection_date,
         ST_AsGeoJSON(geom_simplified) as geometry
-      FROM mat_rung
+      FROM son_la_mat_rung
       WHERE ${whereClause}
       ORDER BY gid DESC
       LIMIT $${paramCount} OFFSET $${paramCount + 1}
@@ -439,7 +439,7 @@ class MatRungRepository extends BaseRepository {
    */
   async create(data) {
     const { rows } = await this.query(`
-      INSERT INTO mat_rung (
+      INSERT INTO son_la_mat_rung (
         start_dau,
         end_sau,
         mahuyen,
@@ -518,7 +518,7 @@ class MatRungRepository extends BaseRepository {
         COUNT(*) FILTER (WHERE detection_status = 'Đã xác minh') as verified_lots,
         SUM(area) / 10000.0 as total_area_ha,
         SUM(area) FILTER (WHERE detection_status = 'Đã xác minh') / 10000.0 as verified_area_ha
-      FROM mat_rung
+      FROM son_la_mat_rung
       GROUP BY mahuyen
       ORDER BY total_lots DESC
     `);
@@ -545,7 +545,7 @@ class MatRungRepository extends BaseRepository {
         COUNT(*) as total_lots,
         COUNT(*) FILTER (WHERE detection_status = 'Đã xác minh') as verified_lots,
         SUM(area) / 10000.0 as total_area_ha
-      FROM mat_rung
+      FROM son_la_mat_rung
       WHERE end_sau IS NOT NULL
       GROUP BY TO_CHAR(end_sau::date, $1)
       ORDER BY period DESC
@@ -567,7 +567,7 @@ class MatRungRepository extends BaseRepository {
         COUNT(*) as lot_count,
         SUM(area) / 10000.0 as total_area_ha,
         AVG(area) / 10000.0 as avg_area_ha
-      FROM mat_rung
+      FROM son_la_mat_rung
       WHERE end_sau::date >= NOW() - INTERVAL '90 days'
       GROUP BY mahuyen
       HAVING COUNT(*) > 5
@@ -592,7 +592,7 @@ class MatRungRepository extends BaseRepository {
         AVG(area) / 10000.0 as avg_area_ha,
         MIN(end_sau::date) as earliest_detection,
         MAX(end_sau::date) as latest_detection
-      FROM mat_rung
+      FROM son_la_mat_rung
     `);
 
     return rows[0];

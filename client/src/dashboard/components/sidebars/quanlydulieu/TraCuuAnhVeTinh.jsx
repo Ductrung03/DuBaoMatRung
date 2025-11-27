@@ -1,51 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import config from "../../../../config";
-import DistrictDropdown from "../../DistrictDropdown";
-import { getCommunes } from "../../../../utils/dropdownService";
+import { useSonLaAdminUnits } from "../../../hooks/useSonLaAdminUnits";
 import { toast } from "react-toastify";
-import Dropdown from "../../../../components/Dropdown"; // Import the generic Dropdown
+import Dropdown from "../../../../components/Dropdown";
 
 const TraCuuAnhVeTinh = () => {
-  const [xaList, setXaList] = useState([]);
-  const [selectedHuyen, setSelectedHuyen] = useState("");
-  const [selectedXa, setSelectedXa] = useState("");
-  const [loading, setLoading] = useState(false);
+  const adminUnits = useSonLaAdminUnits();
+  const { selectedXa, selectedTieukhu, selectedKhoanh } = adminUnits;
   const [isForecastOpen, setIsForecastOpen] = useState(true);
-  
+  const [loading, setLoading] = useState(false);
+
   const { user, isAdmin } = useAuth();
-
-  useEffect(() => {
-    const fetchXaList = async () => {
-      if (!selectedHuyen) {
-        setXaList([]);
-        return;
-      }
-      
-      try {
-        setLoading(true);
-        const communes = await getCommunes(selectedHuyen);
-        setXaList(communes);
-      } catch (err) {
-        console.error("Lỗi lấy xã:", err);
-        toast.error("Lỗi khi tải danh sách xã");
-        setXaList([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchXaList();
-  }, [selectedHuyen]);
-
-  const handleHuyenChange = (value) => {
-    setSelectedHuyen(value);
-    setSelectedXa("");
-  };
-
-  const handleXaChange = (value) => {
-    setSelectedXa(value);
-  };
 
   return (
     <div>
@@ -72,28 +38,46 @@ const TraCuuAnhVeTinh = () => {
               </div>
             </div>
 
-            {/* Huyện */}
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Huyện</label>
-              <div className="w-36">
-                <DistrictDropdown
-                  value={selectedHuyen}
-                  onChange={handleHuyenChange}
-                  isLoading={loading}
-                />
-              </div>
-            </div>
-
             {/* Xã */}
             <div className="flex items-center gap-1">
               <label className="text-sm font-medium w-40">Xã</label>
               <Dropdown
                 selectedValue={selectedXa}
-                onValueChange={handleXaChange}
-                options={xaList}
+                onValueChange={adminUnits.xa.onChange}
+                options={adminUnits.xa.list}
                 placeholder="Chọn xã"
-                disabled={loading}
-                loading={loading}
+                disabled={adminUnits.xa.loading || adminUnits.xa.disabled}
+                loading={adminUnits.xa.loading}
+                className="w-36"
+                selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              />
+            </div>
+
+            {/* Tiểu khu */}
+            <div className="flex items-center gap-1">
+              <label className="text-sm font-medium w-40">Tiểu khu</label>
+              <Dropdown
+                selectedValue={selectedTieukhu}
+                onValueChange={adminUnits.tieukhu.onChange}
+                options={adminUnits.tieukhu.list}
+                placeholder="Chọn tiểu khu"
+                disabled={adminUnits.tieukhu.loading || adminUnits.tieukhu.disabled}
+                loading={adminUnits.tieukhu.loading}
+                className="w-36"
+                selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              />
+            </div>
+
+            {/* Khoảnh */}
+            <div className="flex items-center gap-1">
+              <label className="text-sm font-medium w-40">Khoảnh</label>
+              <Dropdown
+                selectedValue={selectedKhoanh}
+                onValueChange={adminUnits.khoanh.onChange}
+                options={adminUnits.khoanh.list}
+                placeholder="Chọn khoảnh"
+                disabled={adminUnits.khoanh.loading || adminUnits.khoanh.disabled}
+                loading={adminUnits.khoanh.loading}
                 className="w-36"
                 selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
               />

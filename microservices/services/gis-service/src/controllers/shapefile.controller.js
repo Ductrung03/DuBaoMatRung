@@ -107,7 +107,7 @@ exports.importShapefile = async (req, res, next) => {
 
         // Build insert query
         const insertQuery = `
-          INSERT INTO mat_rung (
+          INSERT INTO son_la_mat_rung (
             geom,
             area,
             start_dau,
@@ -313,7 +313,7 @@ exports.importFromGeeUrl = async (req, res, next) => {
 
           // Check for duplicate based on geometry and date
           const checkQuery = `
-            SELECT COUNT(*) as count FROM mat_rung
+            SELECT COUNT(*) as count FROM son_la_mat_rung
             WHERE ST_Equals(geom, ST_GeomFromGeoJSON($1))
             AND start_dau = $2
           `;
@@ -329,7 +329,7 @@ exports.importFromGeeUrl = async (req, res, next) => {
 
           // Insert new record
           const insertQuery = `
-            INSERT INTO mat_rung (
+            INSERT INTO son_la_mat_rung (
               geom,
               area,
               start_dau,
@@ -414,7 +414,7 @@ exports.importFromGeeUrl = async (req, res, next) => {
         detection_status,
         verification_notes,
         created_at
-      FROM mat_rung
+      FROM son_la_mat_rung
       WHERE created_at >= NOW() - INTERVAL '1 minute'
       ORDER BY created_at DESC
       LIMIT 500

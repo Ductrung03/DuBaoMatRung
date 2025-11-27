@@ -1,15 +1,17 @@
-
-> api-gateway@1.0.0 dev
-> npx nodemon src/index.js
-
-[33m[nodemon] 3.1.10[39m
-[33m[nodemon] to restart at any time, enter `rs`[39m
-[33m[nodemon] watching path(s): *.*[39m
-[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
-[32m[nodemon] starting `node src/index.js`[39m
-2025-10-22 14:09:47 [api-gateway] [32minfo[39m: API Gateway running on port 3000
-2025-10-22 14:09:47 [api-gateway] [32minfo[39m: Environment: development
-2025-10-22 14:09:47 [api-gateway] [32minfo[39m: Services configured: {"auth":"http://localhost:3001","user":"http://localhost:3002","gis":"http://localhost:3003","report":"http://localhost:3004","admin":"http://localhost:3005","search":"http://localhost:3006"}
+{"level":"info","message":"API Gateway running on port 3000","service":"api-gateway","timestamp":"2025-11-26 00:18:48"}
+{"level":"info","message":"Environment: production","service":"api-gateway","timestamp":"2025-11-26 00:18:48"}
+{"admin":"http://localhost:3005","auth":"http://localhost:3001","gis":"http://localhost:3003","level":"info","message":"Services configured:","report":"http://localhost:3004","search":"http://localhost:3006","service":"api-gateway","timestamp":"2025-11-26 00:18:48","user":"http://localhost:3002"}
 MongoDB connected successfully: logging_db
-2025-10-22 14:09:47 [api-gateway] [32minfo[39m: MongoDB logging service initialized
-2025-10-22 14:09:48 [api-gateway] [32minfo[39m: 127.0.0.1 - - [22/Oct/2025:07:09:48 +0000] "GET /health HTTP/1.1" 200 210 "-" "curl/8.16.0"
+{"level":"info","message":"MongoDB logging service initialized","service":"api-gateway","timestamp":"2025-11-26 00:18:48"}
+(node:69738) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+{"level":"info","message":"MapServer request: GET /wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities -> /wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities","service":"api-gateway","timestamp":"2025-11-26 00:18:56"}
+{"level":"info","message":"MapServer response 200 from /wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities","service":"api-gateway","timestamp":"2025-11-26 00:18:56"}
+{"level":"info","message":"127.0.0.1 - - [25/Nov/2025:17:18:56 +0000] \"GET /api/mapserver?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities HTTP/1.1\" 200 11138 \"-\" \"curl/8.16.0\"","service":"api-gateway","timestamp":"2025-11-26 00:18:56"}
+{"level":"info","message":"MapServer request: GET /wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=hientrangrung&CRS=EPSG:3857&BBOX=11525000,2353500,11660000,2488500&WIDTH=256&HEIGHT=256&FORMAT=image/png -> /wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=hientrangrung&CRS=EPSG:3857&BBOX=11525000,2353500,11660000,2488500&WIDTH=256&HEIGHT=256&FORMAT=image/png","service":"api-gateway","timestamp":"2025-11-26 00:19:13"}
+{"level":"info","message":"MapServer response 200 from /wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=hientrangrung&CRS=EPSG:3857&BBOX=11525000,2353500,11660000,2488500&WIDTH=256&HEIGHT=256&FORMAT=image/png","service":"api-gateway","timestamp":"2025-11-26 00:19:14"}
+{"level":"info","message":"127.0.0.1 - - [25/Nov/2025:17:19:14 +0000] \"GET /api/mapserver?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=hientrangrung&CRS=EPSG:3857&BBOX=11525000,2353500,11660000,2488500&WIDTH=256&HEIGHT=256&FORMAT=image/png HTTP/1.1\" 200 677 \"-\" \"curl/8.16.0\"","service":"api-gateway","timestamp":"2025-11-26 00:19:14"}
+{"level":"info","message":"MapServer request: GET /wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=hientrangrung&CRS=EPSG:3857&BBOX=11525000,2353500,11660000,2488500&WIDTH=256&HEIGHT=256&FORMAT=image/png -> /wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=hientrangrung&CRS=EPSG:3857&BBOX=11525000,2353500,11660000,2488500&WIDTH=256&HEIGHT=256&FORMAT=image/png","service":"api-gateway","timestamp":"2025-11-26 00:19:54"}
+{"level":"info","message":"MapServer response 200 from /wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=hientrangrung&CRS=EPSG:3857&BBOX=11525000,2353500,11660000,2488500&WIDTH=256&HEIGHT=256&FORMAT=image/png","service":"api-gateway","timestamp":"2025-11-26 00:20:04"}
+{"level":"info","message":"127.0.0.1 - - [25/Nov/2025:17:20:04 +0000] \"GET /api/mapserver?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=hientrangrung&CRS=EPSG:3857&BBOX=11525000,2353500,11660000,2488500&WIDTH=256&HEIGHT=256&FORMAT=image/png HTTP/1.1\" 200 136966 \"-\" \"curl/8.16.0\"","service":"api-gateway","timestamp":"2025-11-26 00:20:04"}
+{"level":"info","message":"SIGTERM received, closing server gracefully...","service":"api-gateway","timestamp":"2025-11-26 00:23:09"}

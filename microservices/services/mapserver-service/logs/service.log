@@ -1,12 +1,21 @@
-
-> mapserver-service@1.0.0 dev
-> npx nodemon src/index.js
-
-[33m[nodemon] 3.1.10[39m
-[33m[nodemon] to restart at any time, enter `rs`[39m
-[33m[nodemon] watching path(s): *.*[39m
-[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
-[32m[nodemon] starting `node src/index.js`[39m
-[32minfo[39m: MapServer Service running on port 3008 {"timestamp":"2025-10-22T07:09:45.177Z"}
-[32minfo[39m: Mapfile: /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/mapserver/mapfiles/laocai.map {"timestamp":"2025-10-22T07:09:45.179Z"}
-[32minfo[39m: MapServer binary: /usr/bin/mapserv {"timestamp":"2025-10-22T07:09:45.179Z"}
+[32minfo[39m: MapServer Service running on port 3008 {"timestamp":"2025-11-25T17:17:29.130Z"}
+[32minfo[39m: Mapfile: /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/mapserver/mapfiles/sonla.map {"timestamp":"2025-11-25T17:17:29.133Z"}
+[32minfo[39m: MapServer binary: /usr/bin/mapserv {"timestamp":"2025-11-25T17:17:29.134Z"}
+[32minfo[39m: Config file: /home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/mapserver/mapserver.conf {"timestamp":"2025-11-25T17:17:29.134Z"}
+[32minfo[39m: --- NEW MAPSERVER REQUEST --- {"path":"/wms","query":{"REQUEST":"GetCapabilities","SERVICE":"WMS","VERSION":"1.3.0"},"timestamp":"2025-11-25T17:17:32.091Z"}
+[32minfo[39m: Executing MapServer {"binary":"/usr/bin/mapserv","mapfile":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/mapserver/mapfiles/sonla.map","queryString":"SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities","timestamp":"2025-11-25T17:17:32.091Z"}
+[32minfo[39m: MapServer process closed with code: 0 {"timestamp":"2025-11-25T17:17:32.176Z"}
+[32minfo[39m: Successfully sent MapServer response. {"timestamp":"2025-11-25T17:17:32.178Z"}
+[32minfo[39m: --- NEW MAPSERVER REQUEST --- {"path":"/wms","query":{"REQUEST":"GetCapabilities","SERVICE":"WMS","VERSION":"1.3.0"},"timestamp":"2025-11-25T17:18:56.629Z"}
+[32minfo[39m: Executing MapServer {"binary":"/usr/bin/mapserv","mapfile":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/mapserver/mapfiles/sonla.map","queryString":"SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities","timestamp":"2025-11-25T17:18:56.629Z"}
+[32minfo[39m: MapServer process closed with code: 0 {"timestamp":"2025-11-25T17:18:56.711Z"}
+[32minfo[39m: Successfully sent MapServer response. {"timestamp":"2025-11-25T17:18:56.712Z"}
+[32minfo[39m: --- NEW MAPSERVER REQUEST --- {"path":"/wms","query":{"BBOX":"11525000,2353500,11660000,2488500","CRS":"EPSG:3857","FORMAT":"image/png","HEIGHT":"256","LAYERS":"hientrangrung","REQUEST":"GetMap","SERVICE":"WMS","VERSION":"1.3.0","WIDTH":"256"},"timestamp":"2025-11-25T17:19:13.921Z"}
+[32minfo[39m: Executing MapServer {"binary":"/usr/bin/mapserv","mapfile":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/mapserver/mapfiles/sonla.map","queryString":"SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=hientrangrung&CRS=EPSG%3A3857&BBOX=11525000%2C2353500%2C11660000%2C2488500&WIDTH=256&HEIGHT=256&FORMAT=image%2Fpng","timestamp":"2025-11-25T17:19:13.921Z"}
+[32minfo[39m: MapServer process closed with code: 0 {"timestamp":"2025-11-25T17:19:14.000Z"}
+[32minfo[39m: Successfully sent MapServer response. {"timestamp":"2025-11-25T17:19:14.001Z"}
+[32minfo[39m: --- NEW MAPSERVER REQUEST --- {"path":"/wms","query":{"BBOX":"11525000,2353500,11660000,2488500","CRS":"EPSG:3857","FORMAT":"image/png","HEIGHT":"256","LAYERS":"hientrangrung","REQUEST":"GetMap","SERVICE":"WMS","VERSION":"1.3.0","WIDTH":"256"},"timestamp":"2025-11-25T17:19:54.365Z"}
+[32minfo[39m: Executing MapServer {"binary":"/usr/bin/mapserv","mapfile":"/home/luckyboiz/LuckyBoiz/Projects/Reacts/DuBaoMatRung/mapserver/mapfiles/sonla.map","queryString":"SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=hientrangrung&CRS=EPSG%3A3857&BBOX=11525000%2C2353500%2C11660000%2C2488500&WIDTH=256&HEIGHT=256&FORMAT=image%2Fpng","timestamp":"2025-11-25T17:19:54.365Z"}
+[32minfo[39m: MapServer process closed with code: 0 {"timestamp":"2025-11-25T17:20:04.178Z"}
+[32minfo[39m: Successfully sent MapServer response. {"timestamp":"2025-11-25T17:20:04.178Z"}
+[32minfo[39m: SIGTERM received, shutting down gracefully {"timestamp":"2025-11-25T17:23:09.215Z"}

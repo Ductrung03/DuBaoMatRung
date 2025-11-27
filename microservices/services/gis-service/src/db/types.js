@@ -43,7 +43,7 @@
 
 /**
  * @typedef {Object} GisDatabase
- * @property {MatRungTable} mat_rung
+ * @property {MatRungTable} son_la_mat_rung
  * @property {LaoCaiRg3lrTable} laocai_rg3lr
  * @property {LaoCaiRanhGioiHCTable} laocai_ranhgioihc
  */

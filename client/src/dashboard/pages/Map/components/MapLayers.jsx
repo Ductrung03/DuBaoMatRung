@@ -122,18 +122,16 @@ const MapLayers = ({
   return (
     <>
       {/* ===================================
-          ⚡ MAPSERVER WMS LAYERS (STATIC DATA - SUPER FAST!)
-          - Thay thế GeoJSON cho dữ liệu tĩnh lớn
-          - rg3lr: 231K records -> từ 50MB xuống 200KB!
+          ⚡ SƠN LA 3 WMS LAYERS (STATIC DATA - SUPER FAST!)
+          - Ranh giới xã: 75 records
+          - Tiểu khu khoảnh lô: 30k records
+          - Hiện trạng rừng: 280k records (PRIMARY)
           ================================== */}
       <MapServerLayers
         visibleLayers={[
-          mapLayers.terrain?.visible && 'nendiahinh',
-          mapLayers.terrainLine?.visible !== false && 'nendiahinh_line',
-          mapLayers.forestManagement?.visible && 'chuquanly',
-          mapLayers.forestTypes?.visible && 'rg3lr',
-          mapLayers.forestStatus?.visible !== false && 'hientrangrung',
-          mapLayers.administrative?.visible && 'ranhgioihc'
+          mapLayers.ranhgioixa?.visible !== false && 'ranhgioixa',
+          mapLayers.tieukukhoanh?.visible !== false && 'tieukukhoanh',
+          mapLayers.hientrangrung?.visible !== false && 'hientrangrung'
         ].filter(Boolean)}
       />
 

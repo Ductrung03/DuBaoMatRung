@@ -54,7 +54,7 @@ class MatRungService {
       logger.info('Loading mat rung data: 12 months default');
 
       let query = this.db
-        .selectFrom('mat_rung as m')
+        .selectFrom('son_la_mat_rung as m')
         .select([
           'm.gid',
           'm.start_sau',
@@ -111,7 +111,7 @@ class MatRungService {
     logger.info('Loading mat rung data with filters', { fromDate, toDate, huyen, xa });
 
     let query = this.db
-      .selectFrom('mat_rung as m')
+      .selectFrom('son_la_mat_rung as m')
       .select([
         'm.gid',
         'm.start_sau',
@@ -200,7 +200,7 @@ class MatRungService {
     const hasRg3lr = await this.tableExists('laocai_rg3lr');
 
     let query = this.db
-      .selectFrom('mat_rung as m')
+      .selectFrom('son_la_mat_rung as m')
       .select([
         'm.gid',
         'm.start_sau',
@@ -277,7 +277,7 @@ class MatRungService {
     const hasRg3lr = await this.tableExists('laocai_rg3lr');
 
     let query = this.db
-      .selectFrom('mat_rung as m')
+      .selectFrom('son_la_mat_rung as m')
       .select([
         sql`COUNT(*)`.as('total_records'),
         sql`COUNT(CASE WHEN m.geom IS NOT NULL THEN 1 END)`.as('records_with_geometry'),
@@ -317,7 +317,7 @@ class MatRungService {
     const startTime = Date.now();
 
     const result = await this.db
-      .selectFrom('mat_rung as m')
+      .selectFrom('son_la_mat_rung as m')
       .select([
         sql`COUNT(*)`.as('total_features'),
         sql`SUM(m.area)`.as('total_area'),
@@ -349,7 +349,7 @@ class MatRungService {
     const startTime = Date.now();
 
     let query = this.db
-      .selectFrom('mat_rung as m')
+      .selectFrom('son_la_mat_rung as m')
       .select([
         'm.gid',
         'm.start_sau',

@@ -199,4 +199,66 @@ exports.getNguyenNhan = async (req, res, next) => {
   }
 };
 
+// Get dropdown data - Xa from Sơn La
+exports.getSonLaXa = async (req, res, next) => {
+  try {
+    const kyselyDb = req.app.locals.kyselyDb;
+
+    const adminService = new AdminService(kyselyDb);
+    const results = await adminService.getSonLaXa();
+
+    const data = results.map(r => ({
+      value: r.xa,
+      label: r.xa
+    }));
+
+    const response = formatResponse(true, 'Sơn La Xa list retrieved', data);
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get dropdown data - Tieu Khu from Sơn La
+exports.getSonLaTieuKhu = async (req, res, next) => {
+  try {
+    const { xa } = req.query;
+    const kyselyDb = req.app.locals.kyselyDb;
+
+    const adminService = new AdminService(kyselyDb);
+    const results = await adminService.getSonLaTieuKhu(xa);
+
+    const data = results.map(r => ({
+      value: r.tieukhu,
+      label: r.tieukhu
+    }));
+
+    const response = formatResponse(true, 'Sơn La Tieu khu list retrieved', data);
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get dropdown data - Khoanh from Sơn La
+exports.getSonLaKhoanh = async (req, res, next) => {
+  try {
+    const { xa, tieukhu } = req.query;
+    const kyselyDb = req.app.locals.kyselyDb;
+
+    const adminService = new AdminService(kyselyDb);
+    const results = await adminService.getSonLaKhoanh(xa, tieukhu);
+
+    const data = results.map(r => ({
+      value: r.khoanh,
+      label: r.khoanh
+    }));
+
+    const response = formatResponse(true, 'Sơn La Khoanh list retrieved', data);
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = exports;

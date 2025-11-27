@@ -117,7 +117,7 @@ exports.getMatRung = async (req, res, next) => {
       limit
     });
 
-    logger.info(`Retrieved ${rows.length} mat_rung records`);
+    logger.info(`Retrieved ${rows.length} son_la_mat_rung records`);
 
     // ✅ Tạo connection đến admin_db
     const { Pool } = require('pg');

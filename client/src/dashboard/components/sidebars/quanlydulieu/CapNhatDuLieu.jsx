@@ -63,13 +63,10 @@ const CapNhatDuLieu = () => {
                 <div key={layerKey} className="flex items-center justify-between p-2 border rounded-md hover:bg-gray-50">
                   <div className="flex-1">
                     <div className="font-medium text-sm flex items-center gap-2">
-                      {/* Icon theo layer */}
-                      {layerKey === 'administrative' && '🏛️'}
-                      {layerKey === 'forestTypes' && '🌲'}
-                      {layerKey === 'forestManagement' && '🏢'}
-                      {layerKey === 'terrain' && '🏔️'}
-                      {layerKey === 'terrainLine' && '🗺️'}
-                      {layerKey === 'forestStatus' && '🌳'}
+                      {/* Icon theo layer - SƠN LA 3 LAYERS */}
+                      {layerKey === 'ranhgioixa' && '🏘️'}
+                      {layerKey === 'tieukukhoanh' && '📐'}
+                      {layerKey === 'hientrangrung' && '🌳'}
                       {layerKey === 'deforestationAlerts' && '⚠️'}
 
                       <span>{layer.name}</span>

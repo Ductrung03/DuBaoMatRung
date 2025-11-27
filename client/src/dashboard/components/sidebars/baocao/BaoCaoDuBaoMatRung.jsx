@@ -16,10 +16,8 @@ import config from "../../../../config";
 import { toast } from "react-toastify";
 import { ClipLoader } from 'react-spinners';
 import { useAuth } from "../../../contexts/AuthContext";
-import DistrictDropdown from "../../DistrictDropdown";
-import { getCommunes } from "../../../../utils/dropdownService";
+import { useSonLaAdminUnits } from "../../../hooks/useSonLaAdminUnits";
 import Dropdown from "../../../../components/Dropdown";
- // Import the generic Dropdown
 
 ChartJS.register(
   BarElement,
@@ -42,19 +40,19 @@ const LoadingOverlay = ({ message }) => (
 
 const BaoCaoDuBaoMatRung = () => {
   const loaiBaoCaoList = ["Văn bản", "Biểu đồ"];
-  const [selectedHuyen, setSelectedHuyen] = useState("");
-  const [xaList, setXaList] = useState([]);
-  const [selectedXa, setSelectedXa] = useState("");
+  const adminUnits = useSonLaAdminUnits();
+  const { selectedXa, selectedTieukhu, selectedKhoanh } = adminUnits;
+
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [reportType, setReportType] = useState("");
   const [chartData, setChartData] = useState(null);
   const [showChart, setShowChart] = useState(false);
   const [isForecastOpen, setIsForecastOpen] = useState(true);
-  
+
   // ✅ THÊM: State cho checkbox xác minh
   const [isXacMinh, setIsXacMinh] = useState(false);
-  
+
   // Thêm state cho loading
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
@@ -62,38 +60,6 @@ const BaoCaoDuBaoMatRung = () => {
   const { setReportData, setReportLoading } = useReport();
   const navigate = useNavigate();
   useAuth();
-
-  useEffect(() => {
-    const fetchXa = async () => {
-      if (selectedHuyen) {
-        try {
-          setIsLoading(true);
-          const communes = await getCommunes(selectedHuyen);
-          setXaList(communes);
-        } catch (err) {
-          console.error("Lỗi lấy xã:", err);
-          toast.error("Không thể tải danh sách xã. Vui lòng thử lại sau.");
-          setXaList([]);
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        setXaList([]);
-      }
-    };
-
-    fetchXa();
-  }, [selectedHuyen]);
-  
-  const handleHuyenChange = (e) => {
-    const value = typeof e === 'string' ? e : e.target.value;
-    setSelectedHuyen(value);
-    setSelectedXa(""); // Reset xã khi thay đổi huyện
-  };
-
-  const handleXaChange = (value) => {
-    setSelectedXa(value);
-  };
 
   const handleReportTypeChange = (value) => {
     setReportType(value);
@@ -108,11 +74,6 @@ const BaoCaoDuBaoMatRung = () => {
 
     if (!reportType) {
       toast.warning("Vui lòng chọn loại báo cáo");
-      return;
-    }
-
-    if (!selectedHuyen) {
-      toast.warning("Vui lòng chọn huyện");
       return;
     }
 
@@ -139,7 +100,6 @@ const BaoCaoDuBaoMatRung = () => {
         const params = new URLSearchParams({
           fromDate,
           toDate,
-          huyen: selectedHuyen,
           xa: selectedXa,
           xacMinh: 'false'  // Luôn lấy tất cả dữ liệu để thống kê
         });
@@ -189,7 +149,7 @@ const BaoCaoDuBaoMatRung = () => {
         setTimeout(() => {
           navigate({
             pathname: "/dashboard/baocao",
-            search: `?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(selectedHuyen)}&xa=${encodeURIComponent(selectedXa)}&xacMinh=false&type=${encodeURIComponent(reportType)}`
+            search: `?fromDate=${fromDate}&toDate=${toDate}&xa=${encodeURIComponent(selectedXa)}&xacMinh=false&type=${encodeURIComponent(reportType)}`
           });
 
           toast.success("Đã tạo biểu đồ thống kê thành công!");
@@ -201,7 +161,6 @@ const BaoCaoDuBaoMatRung = () => {
         const params = new URLSearchParams({
           fromDate,
           toDate,
-          huyen: selectedHuyen,
           xa: selectedXa,
           xacMinh: isXacMinh ? 'true' : 'false'
         });
@@ -221,7 +180,7 @@ const BaoCaoDuBaoMatRung = () => {
           setTimeout(() => {
             navigate({
               pathname: "/dashboard/baocao",
-              search: `?fromDate=${fromDate}&toDate=${toDate}&huyen=${encodeURIComponent(selectedHuyen)}&xa=${encodeURIComponent(selectedXa)}&xacMinh=${isXacMinh}&type=${encodeURIComponent(reportType)}`
+              search: `?fromDate=${fromDate}&toDate=${toDate}&xa=${encodeURIComponent(selectedXa)}&xacMinh=${isXacMinh}&type=${encodeURIComponent(reportType)}`
             });
 
             toast.success(`Đã tạo báo cáo ${isXacMinh ? 'xác minh' : ''} thành công!`);
@@ -289,31 +248,52 @@ const BaoCaoDuBaoMatRung = () => {
               />
             </div>
 
-            {/* Huyện */}
+            {/* Xã */}
             <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Huyện</label>
+              <label className="text-sm font-medium w-40">Xã</label>
               <div className="w-36">
-                <DistrictDropdown
-                  value={selectedHuyen}
-                  onChange={handleHuyenChange}
-                  isLoading={isLoading}
+                <Dropdown
+                  selectedValue={selectedXa}
+                  onValueChange={adminUnits.xa.onChange}
+                  options={adminUnits.xa.list}
+                  placeholder="Chọn xã"
+                  disabled={adminUnits.xa.loading || adminUnits.xa.disabled}
+                  loading={adminUnits.xa.loading}
+                  className="w-full border border-green-400 rounded-md px-2 py-1 bg-white"
                 />
               </div>
             </div>
 
-            {/* Xã */}
+            {/* Tiểu khu */}
             <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Xã</label>
-              <Dropdown
-                selectedValue={selectedXa}
-                onValueChange={handleXaChange}
-                options={xaList}
-                placeholder="Chọn xã"
-                disabled={isLoading}
-                loading={isLoading}
-                className="w-36"
-                selectClassName="w-full border border-green-400 rounded-md px-2 py-1 bg-white"
-              />
+              <label className="text-sm font-medium w-40">Tiểu khu</label>
+              <div className="w-36">
+                <Dropdown
+                  selectedValue={selectedTieukhu}
+                  onValueChange={adminUnits.tieukhu.onChange}
+                  options={adminUnits.tieukhu.list}
+                  placeholder="Chọn tiểu khu"
+                  disabled={adminUnits.tieukhu.loading || adminUnits.tieukhu.disabled}
+                  loading={adminUnits.tieukhu.loading}
+                  className="w-full border border-green-400 rounded-md px-2 py-1 bg-white"
+                />
+              </div>
+            </div>
+
+            {/* Khoảnh */}
+            <div className="flex items-center gap-1">
+              <label className="text-sm font-medium w-40">Khoảnh</label>
+              <div className="w-36">
+                <Dropdown
+                  selectedValue={selectedKhoanh}
+                  onValueChange={adminUnits.khoanh.onChange}
+                  options={adminUnits.khoanh.list}
+                  placeholder="Chọn khoảnh"
+                  disabled={adminUnits.khoanh.loading || adminUnits.khoanh.disabled}
+                  loading={adminUnits.khoanh.loading}
+                  className="w-full border border-green-400 rounded-md px-2 py-1 bg-white"
+                />
+              </div>
             </div>
 
             {/* ✅ THÊM: Checkbox Xác minh */}

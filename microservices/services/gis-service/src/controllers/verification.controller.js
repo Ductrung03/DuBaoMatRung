@@ -34,7 +34,7 @@ exports.verifyMatRung = async (req, res, next) => {
     logger.info('Verifying mat rung', { gid, status, userId });
 
     // Check if record exists
-    const checkQuery = 'SELECT gid FROM mat_rung WHERE gid = $1';
+    const checkQuery = 'SELECT gid FROM son_la_mat_rung WHERE gid = $1';
     const checkResult = await db.query(checkQuery, [gid]);
 
     if (checkResult.rows.length === 0) {
@@ -43,7 +43,7 @@ exports.verifyMatRung = async (req, res, next) => {
 
     // Update verification
     const updateQuery = `
-      UPDATE mat_rung
+      UPDATE son_la_mat_rung
       SET
         detection_status = $1,
         verified_by = $2,
@@ -112,7 +112,7 @@ exports.getVerificationHistory = async (req, res, next) => {
 
     logger.info('Getting verification history', { gid });
 
-    // Query mat_rung from gis_db
+    // Query son_la_mat_rung from gis_db
     const matRungQuery = `
       SELECT
         gid,
@@ -122,7 +122,7 @@ exports.getVerificationHistory = async (req, res, next) => {
         verification_reason,
         verification_notes,
         verified_area
-      FROM mat_rung
+      FROM son_la_mat_rung
       WHERE gid = $1
     `;
 
@@ -181,7 +181,7 @@ exports.batchVerify = async (req, res, next) => {
 
     // Update in batch
     const updateQuery = `
-      UPDATE mat_rung
+      UPDATE son_la_mat_rung
       SET
         detection_status = $1,
         verified_by = $2,
@@ -271,7 +271,7 @@ exports.verifyMatRungById = async (req, res, next) => {
         verified_area as current_verified_area,
         detection_status,
         verified_by
-      FROM mat_rung
+      FROM son_la_mat_rung
       WHERE gid = $1
     `;
     const checkResult = await db.query(checkQuery, [gid]);
@@ -300,7 +300,7 @@ exports.verifyMatRungById = async (req, res, next) => {
 
     // Update verification with status "Đã xác minh"
     const updateQuery = `
-      UPDATE mat_rung
+      UPDATE son_la_mat_rung
       SET
         detection_status = 'Đã xác minh',
         verified_by = $1,
