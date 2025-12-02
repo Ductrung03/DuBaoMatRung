@@ -2338,3 +2338,6 @@
 {"database":"gis_db","level":"info","message":"Database connection test successful","service":"search-service","timestamp":"2025-12-02T11:49:22.081Z"}
 {"level":"info","message":"Search Service running on port 3006","service":"search-service","timestamp":"2025-12-02 18:49:22"}
 {"level":"info","message":"Database pool initialized successfully","service":"search-service","timestamp":"2025-12-02 18:49:22"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"search-service","timestamp":"2025-12-02T13:41:34.031Z"}
+{"level":"info","message":"Search Service running on port 3006","service":"search-service","timestamp":"2025-12-02 20:41:34"}
+{"level":"info","message":"Database pool initialized successfully","service":"search-service","timestamp":"2025-12-02 20:41:34"}
