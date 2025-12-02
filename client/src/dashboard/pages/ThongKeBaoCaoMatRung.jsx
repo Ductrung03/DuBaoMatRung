@@ -171,7 +171,7 @@ const ThongKeBaoCaoMatRung = () => {
           properties: {},
           children: [
             new Paragraph({ text: reportTitle, heading: "Heading1", alignment: AlignmentType.CENTER }),
-            new Paragraph({ text: `Tỉnh: Lào Cai`, alignment: AlignmentType.LEFT }),
+            new Paragraph({ text: `Tỉnh: Sơn La`, alignment: AlignmentType.LEFT }),
             new Paragraph({ text: `Huyện: ${reportParams.huyen ? convertTcvn3ToUnicode(reportParams.huyen) : (reportData.length > 0 ? (reportData[0].properties.huyen_name || convertTcvn3ToUnicode(reportData[0].properties.huyen) || reportData[0].properties.mahuyen || '..........') : '..........')}`, alignment: AlignmentType.CENTER }),
             new Paragraph({ text: `Xã: ${reportParams.xa ? convertTcvn3ToUnicode(reportParams.xa) : (reportData.length > 0 ? (reportData[0].properties.xa_name || convertTcvn3ToUnicode(reportData[0].properties.xa) || reportData[0].properties.maxa || '..........') : '..........')}`, alignment: AlignmentType.RIGHT }),
             new Paragraph({ text: `Từ ngày: ${formatDate(reportParams.fromDate) || '..........'} Đến ngày: ${formatDate(reportParams.toDate) || '..........'}`, alignment: AlignmentType.CENTER }),
@@ -186,7 +186,7 @@ const ThongKeBaoCaoMatRung = () => {
             }),
             new Paragraph({ text: "" }), // Empty line
             new Paragraph({ text: "Người tổng hợp", alignment: AlignmentType.LEFT }),
-            new Paragraph({ text: `Lào Cai, ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}`, alignment: AlignmentType.RIGHT }),
+            new Paragraph({ text: `Sơn La, ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}`, alignment: AlignmentType.RIGHT }),
             new Paragraph({ text: "Hạt kiểm lâm", alignment: AlignmentType.RIGHT, bold: true }),
           ]
         }]
@@ -459,7 +459,7 @@ const ThongKeBaoCaoMatRung = () => {
         <div ref={reportRef} className="overflow-auto border border-gray-300 rounded shadow px-6 pt-2 pb-6">
           <div className="text-sm mb-2">
             <div className="flex justify-between font-semibold">
-              <span>Tỉnh: Lào Cai</span>
+              <span>Tỉnh: Sơn La</span>
               <span>Huyện: {reportParams.huyen ? convertTcvn3ToUnicode(reportParams.huyen) : (reportData.length > 0 ? (reportData[0].properties.huyen_name || convertTcvn3ToUnicode(reportData[0].properties.huyen) || reportData[0].properties.mahuyen || '..........') : '..........')}</span>
               <span>Xã: {reportParams.xa ? convertTcvn3ToUnicode(reportParams.xa) : (reportData.length > 0 ? (reportData[0].properties.xa_name || convertTcvn3ToUnicode(reportData[0].properties.xa) || reportData[0].properties.maxa || '..........') : '..........')}</span>
             </div>
@@ -551,7 +551,7 @@ const ThongKeBaoCaoMatRung = () => {
             </div>
             <div className="text-right">
               <div>
-                Lào Cai, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
+                Sơn La, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
               </div>
               <div className="mt-2">
                 <strong>Hạt kiểm lâm</strong>
@@ -587,7 +587,7 @@ const ThongKeBaoCaoMatRung = () => {
         {/* Hiển thị thông tin từ params thực tế */}
         <div className="text-center text-sm mb-4 bg-gray-50 p-3 rounded">
           <div className="font-semibold">
-            Tỉnh: Lào Cai |
+            Tỉnh: Sơn La |
             Từ ngày: {formatDate(reportParams.fromDate)} -
             Đến ngày: {formatDate(reportParams.toDate)}
           </div>

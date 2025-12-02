@@ -1967,3 +1967,30 @@
 {"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-11-27 23:11:08"}
 {"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-11-27 23:11:08"}
 {"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-11-27 23:11:08"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-11-27T16:53:26.886Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-11-27 23:53:26"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-11-28T14:00:11.822Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-11-28 21:00:11"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-11-28 21:00:11"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-11-28 21:00:11"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-11-28 21:00:11"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-11-29T15:37:39.724Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-11-29 22:37:39"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-11-29 22:37:39"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-11-29 22:37:39"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-11-29 22:37:39"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-12-01T14:13:07.952Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-12-01 21:13:07"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-12-01 21:13:07"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-12-01 21:13:07"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-12-01 21:13:07"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-12-01T14:13:21.714Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-12-01 21:13:21"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-12-01 21:13:21"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-12-01 21:13:21"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-12-01 21:13:21"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-12-01T15:30:36.556Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-12-01 22:30:36"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-12-01 22:30:36"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-12-01 22:30:36"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-12-01 22:30:36"}

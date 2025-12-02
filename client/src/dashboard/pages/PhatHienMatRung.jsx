@@ -379,7 +379,7 @@ export default function PhatHienMatRung() {
           <div className="flex items-center space-x-4">
             <span>Powered by Google Earth Engine</span>
             <span>•</span>
-            <span>Lào Cai Forest Monitoring</span>
+            <span>Sơn La Forest Monitoring</span>
           </div>
         </div>
       </div>

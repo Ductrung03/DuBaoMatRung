@@ -1,17 +1,17 @@
 
 /**
- * Chuyển đổi tọa độ từ WGS84 (EPSG:4326) sang VN-2000 tỉnh Lào Cai (EPSG:3405)
- * 
+ * Chuyển đổi tọa độ từ WGS84 (EPSG:4326) sang VN-2000 tỉnh Sơn La (EPSG:3405)
+ *
  * Lưu ý: Đây là phép chuyển đổi gần đúng, cho mục đích hiển thị
  * Chuyển đổi chính xác hơn nên sử dụng thư viện như Proj4js hoặc thực hiện ở server
- * 
+ *
  * @param {number} longitude - Kinh độ WGS84 (độ thập phân)
  * @param {number} latitude - Vĩ độ WGS84 (độ thập phân)
- * @returns {Object} - Tọa độ trong hệ VN-2000 tỉnh Lào Cai {x, y}
+ * @returns {Object} - Tọa độ trong hệ VN-2000 tỉnh Sơn La {x, y}
  */
 export const wgs84ToVN2000LaoCai = (longitude, latitude) => {
-  // Tham số chuyển đổi gần đúng cho Lào Cai
-  // Tâm của hệ tọa độ VN-2000 Lào Cai (EPSG:3405)
+  // Tham số chuyển đổi gần đúng cho Sơn La
+  // Tâm của hệ tọa độ VN-2000 Sơn La (EPSG:3405)
   const centralMeridian = 104.75; // Kinh tuyến trục
   const scaleFactor = 0.9999; // Hệ số tỷ lệ
   const falseEasting = 500000; // Lệch đông

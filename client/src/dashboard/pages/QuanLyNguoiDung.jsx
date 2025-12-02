@@ -1054,7 +1054,7 @@ const QuanLyNguoiDung = () => {
                                 required
                                 value={formData.organization}
                                 onChange={handleInputChange}
-                                placeholder="VD: Hạt Kiểm lâm Lào Cai, Chi cục Kiểm lâm tỉnh..."
+                                placeholder="VD: Hạt Kiểm lâm Sơn La, Chi cục Kiểm lâm tỉnh..."
                                 className="user-management-input"
                               />
                             </div>

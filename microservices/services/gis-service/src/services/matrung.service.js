@@ -12,17 +12,33 @@ class MatRungService {
   }
 
   /**
-   * Check if a table exists in the database
+   * Check if a table exists in the database (can be in different database/schema)
    */
-  async tableExists(tableName) {
-    const result = await this.db
-      .selectFrom(sql`information_schema.tables`.as('tables'))
-      .select(sql`1`.as('exists'))
-      .where('table_schema', '=', 'public')
-      .where('table_name', '=', tableName)
-      .executeTakeFirst();
+  async tableExists(tableName, schemaName = 'public', databaseName = null) {
+    try {
+      if (databaseName && databaseName !== 'gis_db') {
+        // For cross-database check (e.g., sonla_tkkl)
+        const checkQuery = sql`SELECT EXISTS (
+          SELECT FROM information_schema.tables
+          WHERE table_schema = ${schemaName}
+          AND table_name = ${tableName}
+        )`;
+        const result = await checkQuery.execute(this.db);
+        return result.rows[0]?.exists || false;
+      }
 
-    return !!result;
+      const result = await this.db
+        .selectFrom(sql`information_schema.tables`.as('tables'))
+        .select(sql`1`.as('exists'))
+        .where('table_schema', '=', schemaName)
+        .where('table_name', '=', tableName)
+        .executeTakeFirst();
+
+      return !!result;
+    } catch (error) {
+      console.error(`Error checking table ${tableName}:`, error);
+      return false;
+    }
   }
 
   /**
@@ -47,7 +63,7 @@ class MatRungService {
    */
   async getMatRung({ fromDate, toDate, huyen, xa, tk, khoanh, churung, limit = 1000 }) {
     const hasUsers = await this.tableExists('users');
-    const hasRg3lr = await this.tableExists('laocai_rg3lr');
+    const hasSonLaTkkl = await this.tableExists('sonla_tkkl');
 
     // No filters - return 12 months data
     if (!fromDate && !toDate && !huyen && !xa && !tk && !khoanh && !churung) {
@@ -94,14 +110,29 @@ class MatRungService {
         ]);
       }
 
-      // ✅ Không join với rg3lr trong service nữa - sẽ được xử lý ở controller
-      query = query.select([
-        sql`NULL`.as('huyen'),
-        sql`NULL`.as('xa'),
-        sql`NULL`.as('tk'),
-        sql`NULL`.as('khoanh'),
-        sql`NULL`.as('churung')
-      ]);
+      // ✅ Join với sonla_tkkl để lấy thông tin địa lý
+      if (hasSonLaTkkl) {
+        query = query
+          .leftJoin('sonla_tkkl as t', (join) =>
+            join.on(sql`ST_Intersects(
+              ST_Transform(m.geom, 4326),
+              ST_Transform(t.geom, 4326)
+            )`)
+          )
+          .select([
+            sql`NULL`.as('huyen'),
+            't.xa',
+            sql`t.tieukhu`.as('tk'),
+            't.khoanh'
+          ]);
+      } else {
+        query = query.select([
+          sql`NULL`.as('huyen'),
+          sql`NULL`.as('xa'),
+          sql`NULL`.as('tk'),
+          sql`NULL`.as('khoanh')
+        ]);
+      }
 
       const result = await query.execute();
       return result;
@@ -149,35 +180,45 @@ class MatRungService {
       ]);
     }
 
-    // Add spatial filters using laocai_rg3lr
-    if (hasRg3lr && (huyen || xa || tk || khoanh || churung)) {
-      query = query.leftJoin('laocai_rg3lr as r', (join) =>
+    // Add spatial filters using sonla_tkkl from admin_db
+    if (hasSonLaTkkl && (xa || tk || khoanh)) {
+      query = query.leftJoin(sql`sonla_tkkl`.as('t'), (join) =>
         join.on(sql`ST_Intersects(
           ST_Transform(m.geom, 4326),
-          ST_Transform(r.geom, 4326)
+          ST_Transform(t.geom, 4326)
         )`)
       );
 
       query = query.select([
-        'r.huyen',
-        'r.xa',
-        'r.tk',
-        'r.khoanh',
-        'r.churung'
+        sql`NULL`.as('huyen'),
+        't.xa',
+        sql`t.tieukhu`.as('tk'),
+        't.khoanh'
       ]);
 
-      if (huyen) query = query.where('r.huyen', '=', huyen);
-      if (xa) query = query.where('r.xa', '=', xa);
-      if (tk) query = query.where('r.tk', '=', tk);
-      if (khoanh) query = query.where('r.khoanh', '=', khoanh);
-      if (churung) query = query.where('r.churung', 'ilike', `%${churung}%`);
-    } else if (hasRg3lr) {
+      if (xa) query = query.where('t.xa', '=', xa);
+      if (tk) query = query.where('t.tieukhu', '=', tk);
+      if (khoanh) query = query.where('t.khoanh', '=', khoanh);
+    } else if (hasSonLaTkkl) {
+      query = query
+        .leftJoin(sql`sonla_tkkl`.as('t'), (join) =>
+          join.on(sql`ST_Intersects(
+            ST_Transform(m.geom, 4326),
+            ST_Transform(t.geom, 4326)
+          )`)
+        )
+        .select([
+          sql`NULL`.as('huyen'),
+          't.xa',
+          sql`t.tieukhu`.as('tk'),
+          't.khoanh'
+        ]);
+    } else {
       query = query.select([
         sql`NULL`.as('huyen'),
         sql`NULL`.as('xa'),
         sql`NULL`.as('tk'),
-        sql`NULL`.as('khoanh'),
-        sql`NULL`.as('churung')
+        sql`NULL`.as('khoanh')
       ]);
     }
 
@@ -197,7 +238,7 @@ class MatRungService {
     logger.info(`Loading all mat rung data: ${months} months, limit: ${limit}`);
 
     const hasUsers = await this.tableExists('users');
-    const hasRg3lr = await this.tableExists('laocai_rg3lr');
+    const hasSonLaTkkl = await this.tableExists('sonla_tkkl');
 
     let query = this.db
       .selectFrom('son_la_mat_rung as m')
@@ -239,28 +280,26 @@ class MatRungService {
       ]);
     }
 
-    if (hasRg3lr) {
+    if (hasSonLaTkkl) {
       query = query
-        .leftJoin('laocai_rg3lr as r', (join) =>
+        .leftJoin(sql`sonla_tkkl`.as('t'), (join) =>
           join.on(sql`ST_Intersects(
             ST_Transform(m.geom, 4326),
-            ST_Transform(r.geom, 4326)
+            ST_Transform(t.geom, 4326)
           )`)
         )
         .select([
-          'r.huyen',
-          'r.xa',
-          'r.tk',
-          'r.khoanh',
-          'r.churung'
+          sql`NULL`.as('huyen'),
+          't.xa',
+          sql`t.tieukhu`.as('tk'),
+          't.khoanh'
         ]);
     } else {
       query = query.select([
         sql`NULL`.as('huyen'),
         sql`NULL`.as('xa'),
         sql`NULL`.as('tk'),
-        sql`NULL`.as('khoanh'),
-        sql`NULL`.as('churung')
+        sql`NULL`.as('khoanh')
       ]);
     }
 
@@ -274,7 +313,7 @@ class MatRungService {
   async getStats() {
     logger.info('Calculating mat rung statistics');
 
-    const hasRg3lr = await this.tableExists('laocai_rg3lr');
+    const hasSonLaTkkl = await this.tableExists('sonla_tkkl');
 
     let query = this.db
       .selectFrom('son_la_mat_rung as m')
@@ -291,15 +330,15 @@ class MatRungService {
         sql`COUNT(CASE WHEN m.verified_by IS NOT NULL THEN 1 END)`.as('records_with_verifier')
       ]);
 
-    if (hasRg3lr) {
+    if (hasSonLaTkkl) {
       query = query
-        .leftJoin('laocai_rg3lr as r', (join) =>
+        .leftJoin(sql`sonla_tkkl`.as('t'), (join) =>
           join.on(sql`ST_Intersects(
             ST_Transform(m.geom, 4326),
-            ST_Transform(r.geom, 4326)
+            ST_Transform(t.geom, 4326)
           )`)
         )
-        .select(sql`COUNT(CASE WHEN r.gid IS NOT NULL THEN 1 END)`.as('records_with_spatial_data'));
+        .select(sql`COUNT(CASE WHEN t.gid IS NOT NULL THEN 1 END)`.as('records_with_spatial_data'));
     } else {
       query = query.select(sql`0`.as('records_with_spatial_data'));
     }
@@ -344,7 +383,7 @@ class MatRungService {
     logger.info('Auto forecast request', { fromDate, toDate });
 
     const hasUsers = await this.tableExists('users');
-    const hasRg3lr = await this.tableExists('laocai_rg3lr');
+    const hasSonLaTkkl = await this.tableExists('sonla_tkkl');
 
     const startTime = Date.now();
 
@@ -389,28 +428,26 @@ class MatRungService {
       ]);
     }
 
-    if (hasRg3lr) {
+    if (hasSonLaTkkl) {
       query = query
-        .leftJoin('laocai_rg3lr as r', (join) =>
+        .leftJoin(sql`sonla_tkkl`.as('t'), (join) =>
           join.on(sql`ST_Intersects(
             ST_Transform(m.geom, 4326),
-            ST_Transform(r.geom, 4326)
+            ST_Transform(t.geom, 4326)
           )`)
         )
         .select([
-          'r.huyen',
-          'r.xa',
-          'r.tk',
-          'r.khoanh',
-          'r.churung'
+          sql`NULL`.as('huyen'),
+          't.xa',
+          sql`t.tieukhu`.as('tk'),
+          't.khoanh'
         ]);
     } else {
       query = query.select([
         sql`NULL`.as('huyen'),
         sql`NULL`.as('xa'),
         sql`NULL`.as('tk'),
-        sql`NULL`.as('khoanh'),
-        sql`NULL`.as('churung')
+        sql`NULL`.as('khoanh')
       ]);
     }
 

@@ -13,14 +13,17 @@ exports.searchMatRung = async (req, res, next) => {
     const { q, status, fromDate, toDate, limit = 100, huyen, xa, xacMinh } = req.query;
 
     const db = req.app.locals.db;
-    const redis = req.app.locals.redis;
+    const redis = req.app.locals.redis; // Có thể undefined nếu Redis bị disable
 
-    const cacheKey = `search:${q || ''}:${status || ''}:${fromDate || ''}:${toDate || ''}:${huyen || ''}:${xa || ''}:${xacMinh || ''}`;
-    const cached = await redis.get(cacheKey);
+    // ✅ Kiểm tra Redis có available không
+    if (redis) {
+      const cacheKey = `search:${q || ''}:${status || ''}:${fromDate || ''}:${toDate || ''}:${huyen || ''}:${xa || ''}:${xacMinh || ''}`;
+      const cached = await redis.get(cacheKey);
 
-    if (cached) {
-      logger.info('Cache hit for search');
-      return res.json({ ...cached, cached: true });
+      if (cached) {
+        logger.info('Cache hit for search');
+        return res.json({ ...cached, cached: true });
+      }
     }
 
     logger.info('Searching mat rung', { q, status, fromDate, toDate, huyen, xa, xacMinh });
@@ -247,9 +250,12 @@ exports.searchMatRung = async (req, res, next) => {
 
     const response = formatResponse(true, `Found ${features.length} results`, geoJSON);
 
-    // ✅ Cache lâu hơn nếu không có search query động
-    const cacheTime = q ? 60 : 300; // 1 min nếu có search, 5 min nếu filter tĩnh
-    await redis.set(cacheKey, response, cacheTime);
+    // ✅ Cache lâu hơn nếu không có search query động (nếu Redis available)
+    if (redis) {
+      const cacheTime = q ? 60 : 300; // 1 min nếu có search, 5 min nếu filter tĩnh
+      const cacheKey = `search:${q || ''}:${status || ''}:${fromDate || ''}:${toDate || ''}:${huyen || ''}:${xa || ''}:${xacMinh || ''}`;
+      await redis.set(cacheKey, response, cacheTime);
+    }
 
     res.json(response);
   } catch (error) {
@@ -276,7 +282,7 @@ exports.searchMatRungById = async (req, res, next) => {
     const { radius = 5000 } = req.query; // Default 5km radius
 
     const db = req.app.locals.db;
-    const redis = req.app.locals.redis;
+    const redis = req.app.locals.redis; // Có thể undefined
 
     // Validate ID
     if (!id || isNaN(parseInt(id))) {
@@ -286,12 +292,16 @@ exports.searchMatRungById = async (req, res, next) => {
     }
 
     const gid = parseInt(id);
-    const cacheKey = `search:id:${gid}:radius:${radius}`;
-    const cached = await redis.get(cacheKey);
 
-    if (cached) {
-      logger.info(`Cache hit for CB-${gid}`);
-      return res.json({ ...cached, cached: true });
+    // ✅ Check cache nếu Redis available
+    if (redis) {
+      const cacheKey = `search:id:${gid}:radius:${radius}`;
+      const cached = await redis.get(cacheKey);
+
+      if (cached) {
+        logger.info(`Cache hit for CB-${gid}`);
+        return res.json({ ...cached, cached: true });
+      }
     }
 
     logger.info(`Searching for CB-${gid} with radius ${radius}m`);
@@ -505,8 +515,11 @@ exports.searchMatRungById = async (req, res, next) => {
       }
     );
 
-    // Cache for 5 minutes
-    await redis.set(cacheKey, response, 300);
+    // Cache for 5 minutes (nếu Redis available)
+    if (redis) {
+      const cacheKey = `search:id:${gid}:radius:${radius}`;
+      await redis.set(cacheKey, response, 300);
+    }
 
     res.json(response);
 

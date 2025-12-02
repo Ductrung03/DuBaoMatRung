@@ -96,7 +96,7 @@ const Header = () => {
         {/* ✅ FIXED: Tiêu đề với navigation links đúng syntax */}
         <div>
           <h1 className="text-xl font-bold uppercase">
-            Hệ thống phát hiện sớm mất rừng tỉnh Lào Cai
+            Hệ thống phát hiện sớm mất rừng tỉnh Sơn La
           </h1>
           <div className="flex gap-8 mt-1">
             {/* Dự báo mất rừng - Hiển thị nếu có quyền forecast */}

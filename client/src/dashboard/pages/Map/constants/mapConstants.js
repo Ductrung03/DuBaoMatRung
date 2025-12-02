@@ -250,7 +250,7 @@ export const PRIORITY_FIELDS_BY_TYPE = {
 // CẤU HÌNH BẢN ĐỒ
 // ===================================
 export const MAP_CONFIG = {
-  center: [22.1702, 104.1225], // Tọa độ trung tâm tỉnh Lào Cai
+  center: [21.3276, 103.9144], // Tọa độ trung tâm tỉnh Sơn La
   defaultZoom: 8,
   maxZoom: 18,
   minZoom: 6,

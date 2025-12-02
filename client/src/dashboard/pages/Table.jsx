@@ -20,8 +20,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   // ✅ MAPPING CHÍNH XÁC với spatial intersection và user info
   const columnMapping = {
     loCB: "gid",
-    dtich: "area", 
-    huyen: "huyen",
+    dtich: "area",
     xa: "xa",
     tk: "tk",
     khoanh: "khoanh",
@@ -39,7 +38,6 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     const displayNames = {
       loCB: "Lô CB",
       dtich: "Diện tích",
-      huyen: "Huyện",
       xa: "Xã",
       tk: "Tiểu khu",
       khoanh: "Khoảnh",
@@ -66,7 +64,6 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     const fallbackNames = {
       loCB: ["gid", "GID", "id"],
       dtich: ["area", "AREA", "dtich"],
-      huyen: ["huyen", "HUYEN", "huyen_name"],
       xa: ["xa", "XA", "xa_name"],
       tk: ["tk", "TK", "tieukhu", "TIEUKHU"],
       khoanh: ["khoanh", "KHOANH"],
@@ -91,7 +88,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
 
   // ✅ Cột hiển thị theo thứ tự
   const requiredColumns = [
-    "loCB", "dtich", "huyen", "xa", "tk", "khoanh", 
+    "loCB", "dtich", "xa", "tk", "khoanh",
     "X", "Y", "xacminh", "DtichXM", "ngnhan", "NguoiXM", "NgayXM"
   ];
 

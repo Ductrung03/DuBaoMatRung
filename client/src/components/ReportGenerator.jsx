@@ -152,7 +152,7 @@ const ReportGenerator = ({ reportData, reportParams }) => {
         {/* Thông tin header */}
         <div className="text-sm mb-2">
           <div className="flex justify-between font-semibold">
-            <span>Tỉnh: Lào Cai</span>
+            <span>Tỉnh: Sơn La</span>
             <span>Huyện: {reportData.length > 0 ? (reportData[0].properties.huyen_name || convertTcvn3ToUnicode(reportParams.huyen)) : (reportParams.huyen ? convertTcvn3ToUnicode(reportParams.huyen) : '..........')}</span>
             <span>Xã: {reportData.length > 0 ? (reportData[0].properties.xa_name || convertTcvn3ToUnicode(reportParams.xa)) : (reportParams.xa ? convertTcvn3ToUnicode(reportParams.xa) : '..........')}</span>
           </div>
@@ -247,7 +247,7 @@ const ReportGenerator = ({ reportData, reportParams }) => {
           </div>
           <div className="text-right">
             <div>
-              Lào Cai, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
+              Sơn La, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
             </div>
             <div className="mt-2">
               <strong>Hạt kiểm lâm</strong>
