@@ -813,3 +813,6 @@
 {"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-01 21:25:26"}
 {"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-01 21:25:54"}
 {"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-01 22:30:09"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-02 18:49:31"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-02 18:49:42"}
+{"level":"info","message":"Added admin info for 78/78 features","service":"layer-controller","timestamp":"2025-12-02 18:49:42"}

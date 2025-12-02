@@ -1,0 +1,190 @@
+╔══════════════════════════════════════════════════════════════╗
+║           HƯỚNG DẪN TRIỂN KHAI DOCKER - WINDOWS SERVER       ║
+║                    DuBaoMatRung Project                      ║
+╚══════════════════════════════════════════════════════════════╝
+
+📋 ĐÃ CHUẨN BỊ XONG:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ 5 Dockerfiles cho tất cả services
+✅ docker-compose.yml với 11 containers
+✅ Scripts backup/restore database
+✅ Script deploy một lệnh cho Windows
+✅ Exported toàn bộ data (2.8 GB)
+✅ Tài liệu đầy đủ (5 markdown files)
+✅ Configuration templates
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 TRIỂN KHAI NHANH (5 BƯỚC)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BƯỚC 1: ĐÓNG GÓI (2 phút) - Linux
+──────────────────────────────────────────────────────────────
+cd /home/luckyboiz/LuckyBoiz/Projects/Reacts
+tar -czf DuBaoMatRung-deploy.tar.gz \
+  --exclude=DuBaoMatRung/node_modules \
+  --exclude=DuBaoMatRung/*/node_modules \
+  --exclude=DuBaoMatRung/*/*/node_modules \
+  --exclude=DuBaoMatRung/microservices/services/*/logs \
+  DuBaoMatRung/
+
+Kết quả: File ~3-4 GB
+
+
+BƯỚC 2: CHUYỂN SANG WINDOWS SERVER (5 phút)
+──────────────────────────────────────────────────────────────
+Cách 1: SCP
+  scp DuBaoMatRung-deploy.tar.gz administrator@103.56.160.66:C:/Deploy/
+
+Cách 2: RDP
+  - Kết nối Remote Desktop tới 103.56.160.66
+  - Copy/Paste file qua clipboard
+
+Cách 3: Cloud
+  - Upload Google Drive/OneDrive
+  - Download trên Windows Server
+
+
+BƯỚC 3: GIẢI NÉN (1 phút) - Windows PowerShell
+──────────────────────────────────────────────────────────────
+cd C:\Deploy
+tar -xzf DuBaoMatRung-deploy.tar.gz
+cd DuBaoMatRung
+
+
+BƯỚC 4: CẤU HÌNH (2 phút)
+──────────────────────────────────────────────────────────────
+# Copy template
+Copy-Item env.docker.example .env
+
+# Generate JWT secrets
+$jwt1 = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 32 | % {[char]$_})
+$jwt2 = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 32 | % {[char]$_})
+
+Write-Host "DB_PASSWORD=MatKhauManhMe123!@#"
+Write-Host "JWT_SECRET=$jwt1"
+Write-Host "REFRESH_TOKEN_SECRET=$jwt2"
+Write-Host "SERVER_IP=103.56.160.66"
+
+# Mở file và paste 4 dòng trên
+notepad .env
+
+
+BƯỚC 5: DEPLOY! (15-20 phút)
+──────────────────────────────────────────────────────────────
+.\deploy-windows.ps1
+
+Script sẽ tự động:
+• Kiểm tra Docker
+• Build 11 Docker images
+• Start PostgreSQL 17 + Redis
+• Import 2.8 GB data
+• Start 9 microservices
+• Start React frontend
+• Health check tất cả
+
+Kết quả: http://103.56.160.66
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 KIẾN TRÚC HỆ THỐNG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+11 Docker Containers:
+
+1.  postgres          PostgreSQL 17 (port 5433)
+2.  redis             Redis 7 (port 6379)
+3.  gateway           API Gateway (port 3000)
+4.  auth-service      Authentication (port 3001)
+5.  user-service      User management (port 3002)
+6.  gis-service       GIS processing (port 3003)
+7.  report-service    Reports (port 3004)
+8.  admin-service     Admin (port 3005)
+9.  search-service    Search (port 3006)
+10. mapserver-service MapServer (port 3007)
+11. frontend          React + Nginx (port 80)
+
+3 Databases:
+• auth_db   (35 KB)   - Authentication & Users
+• gis_db    (124 MB)  - GIS data & Shapefiles
+• admin_db  (2.7 GB)  - Admin & System data
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔍 KIỂM TRA SAU DEPLOY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Xem status
+docker compose ps
+
+# Xem logs
+docker compose logs -f
+
+# Test frontend
+Start-Process http://103.56.160.66
+
+# Test API
+curl http://103.56.160.66:3000/health
+
+Kết quả mong đợi: Tất cả services "Up" và healthy
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛠️ QUẢN LÝ HỆ THỐNG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Menu Tương Tác:
+  .\docker\docker-quick-commands.ps1
+
+Lệnh Thường Dùng:
+  docker compose ps              # Xem status
+  docker compose logs -f         # Xem logs
+  docker compose restart         # Restart tất cả
+  docker compose down            # Stop tất cả
+  docker compose up -d           # Start tất cả
+
+Backup Database:
+  .\docker\backup-databases.ps1
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 TÀI LIỆU CHI TIẾT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+QUICKSTART.md              Deploy trong 5 phút
+DOCKER_DEPLOYMENT.md       Hướng dẫn đầy đủ
+DEPLOYMENT_CHECKLIST.md    Checklist hoàn chỉnh
+README.DOCKER.md           Tổng quan
+DOCKER_SETUP_SUMMARY.md    Tóm tắt setup
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ LƯU Ý QUAN TRỌNG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Đổi password mặc định trước khi production
+2. Sử dụng JWT secret mạnh (32+ ký tự random)
+3. Cấu hình Windows Firewall đúng cách
+4. Backup database định kỳ
+5. Monitor logs thường xuyên
+6. Keep Docker images updated
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📞 HỖ TRỢ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Gặp vấn đề? Export debug info:
+  docker compose ps > status.txt
+  docker compose logs > logs.txt
+
+Xem tài liệu troubleshooting trong DOCKER_DEPLOYMENT.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Built by LuckyBoiz 🚀
+Date: 2 Dec 2025
+Total Time: ~25-35 minutes
+
+╚══════════════════════════════════════════════════════════════╝

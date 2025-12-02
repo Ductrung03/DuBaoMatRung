@@ -4902,3 +4902,16 @@
 {"address":"0.0.0.0","code":"EADDRINUSE","errno":-98,"level":"error","message":"Server error: listen EADDRINUSE: address already in use 0.0.0.0:3003","port":3003,"service":"gis-service","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3003\n    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n    at listenInCluster (node:net:1997:12)\n    at node:net:2206:7\n    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)","syscall":"listen","timestamp":"2025-12-01 22:13:55"}
 {"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung","service":"gis-service","timestamp":"2025-12-01 22:14:05"}
 {"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-12-01 22:30:09"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2025-12-02T11:49:22.391Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2025-12-02 18:49:22"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2025-12-02 18:49:22"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2025-12-02 18:49:22"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2025-12-02 18:49:22"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2025-12-02 18:49:22"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2025-12-02 18:49:22"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2025-12-02 18:49:22"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2025-12-02 18:49:22"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2025-12-02 18:49:22"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-12-02 18:49:31"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2025-12-02 18:49:42"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2025-12-02 18:50:11"}

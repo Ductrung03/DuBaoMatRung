@@ -1,0 +1,328 @@
+version: '3.8'
+
+# =====================================
+# DuBaoMatRung - Docker Compose
+# Production-ready setup for Windows Server
+# =====================================
+
+services:
+  # ========== PostgreSQL 17 Database ==========
+  postgres:
+    image: postgres:17-alpine
+    container_name: dubaomatrung-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-4}
+      POSTGRES_DB: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/01-init-databases.sql
+    networks:
+      - dubaomatrung-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ========== Redis Cache ==========
+  redis:
+    image: redis:7-alpine
+    container_name: dubaomatrung-redis
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD:-}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - dubaomatrung-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ========== API Gateway ==========
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.gateway
+    container_name: dubaomatrung-gateway
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      JWT_SECRET: ${JWT_SECRET:-dubaomatrung_secret_key_change_this_in_production}
+      JWT_EXPIRES_IN: 7d
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-dubaomatrung_refresh_secret_key}
+      REFRESH_TOKEN_EXPIRES_IN: 30d
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      AUTH_SERVICE_URL: http://auth-service:3001
+      USER_SERVICE_URL: http://user-service:3002
+      GIS_SERVICE_URL: http://gis-service:3003
+      REPORT_SERVICE_URL: http://report-service:3004
+      ADMIN_SERVICE_URL: http://admin-service:3005
+      SEARCH_SERVICE_URL: http://search-service:3006
+      FRONTEND_URL: http://frontend
+    depends_on:
+      redis:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    networks:
+      - dubaomatrung-network
+
+  # ========== Auth Service (Prisma) ==========
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.auth
+    container_name: dubaomatrung-auth
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD:-4}@postgres:5432/auth_db?schema=public
+      JWT_SECRET: ${JWT_SECRET:-dubaomatrung_secret_key_change_this_in_production}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - dubaomatrung-network
+    volumes:
+      - ./microservices/services/auth-service/logs:/app/logs
+
+  # ========== User Service ==========
+  user-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE_NAME: user-service
+    container_name: dubaomatrung-user
+    restart: always
+    ports:
+      - "3002:3002"
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-4}
+      DB_NAME: auth_db
+      JWT_SECRET: ${JWT_SECRET:-dubaomatrung_secret_key_change_this_in_production}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - dubaomatrung-network
+    volumes:
+      - ./microservices/services/user-service/logs:/app/logs
+
+  # ========== GIS Service ==========
+  gis-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE_NAME: gis-service
+    container_name: dubaomatrung-gis
+    restart: always
+    ports:
+      - "3003:3003"
+    environment:
+      NODE_ENV: production
+      PORT: 3003
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-4}
+      DB_NAME: gis_db
+      JWT_SECRET: ${JWT_SECRET:-dubaomatrung_secret_key_change_this_in_production}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      UPLOAD_DIR: /app/uploads
+      MAX_FILE_SIZE: 52428800
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - dubaomatrung-network
+    volumes:
+      - gis_uploads:/app/uploads
+      - ./microservices/services/gis-service/logs:/app/logs
+
+  # ========== Report Service ==========
+  report-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE_NAME: report-service
+    container_name: dubaomatrung-report
+    restart: always
+    ports:
+      - "3004:3004"
+    environment:
+      NODE_ENV: production
+      PORT: 3004
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-4}
+      DB_NAME: gis_db
+      JWT_SECRET: ${JWT_SECRET:-dubaomatrung_secret_key_change_this_in_production}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - dubaomatrung-network
+    volumes:
+      - ./microservices/services/report-service/logs:/app/logs
+
+  # ========== Admin Service ==========
+  admin-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE_NAME: admin-service
+    container_name: dubaomatrung-admin
+    restart: always
+    ports:
+      - "3005:3005"
+    environment:
+      NODE_ENV: production
+      PORT: 3005
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-4}
+      DB_NAME: admin_db
+      JWT_SECRET: ${JWT_SECRET:-dubaomatrung_secret_key_change_this_in_production}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - dubaomatrung-network
+    volumes:
+      - ./microservices/services/admin-service/logs:/app/logs
+
+  # ========== Search Service ==========
+  search-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE_NAME: search-service
+    container_name: dubaomatrung-search
+    restart: always
+    ports:
+      - "3006:3006"
+    environment:
+      NODE_ENV: production
+      PORT: 3006
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-4}
+      DB_NAME: gis_db
+      JWT_SECRET: ${JWT_SECRET:-dubaomatrung_secret_key_change_this_in_production}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - dubaomatrung-network
+    volumes:
+      - ./microservices/services/search-service/logs:/app/logs
+
+  # ========== MapServer Service ==========
+  mapserver-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.mapserver
+    container_name: dubaomatrung-mapserver
+    restart: always
+    ports:
+      - "3007:3007"
+    environment:
+      NODE_ENV: production
+      PORT: 3007
+      MAPSERVER_PATH: /mapserver
+      JWT_SECRET: ${JWT_SECRET:-dubaomatrung_secret_key_change_this_in_production}
+    networks:
+      - dubaomatrung-network
+    volumes:
+      - ./mapserver:/mapserver
+      - gis_uploads:/app/uploads:ro
+
+  # ========== Frontend (React + Nginx) ==========
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        VITE_API_URL: http://103.56.160.66:3000
+    container_name: dubaomatrung-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - gateway
+    networks:
+      - dubaomatrung-network
+
+# ========== Networks ==========
+networks:
+  dubaomatrung-network:
+    driver: bridge
+
+# ========== Volumes ==========
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  gis_uploads:
+    driver: local

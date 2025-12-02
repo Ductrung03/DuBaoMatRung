@@ -1,0 +1,70 @@
+# =====================================
+# Docker Ignore - Root Level
+# =====================================
+
+# Node modules
+**/node_modules
+**/npm-debug.log
+**/.npm
+
+# Development files
+**/.env.local
+**/.env.development
+**/.env.test
+
+# Build outputs
+**/dist
+**/build
+**/.next
+**/out
+
+# Logs
+**/logs
+**/*.log
+
+# Testing
+**/coverage
+**/.nyc_output
+**/test-results
+
+# IDE
+**/.vscode
+**/.idea
+**/*.swp
+**/*.swo
+**/*~
+
+# OS files
+**/.DS_Store
+**/Thumbs.db
+
+# Git
+**/.git
+**/.gitignore
+**/.gitattributes
+
+# Docker
+**/.dockerignore
+**/Dockerfile*
+**/docker-compose*.yml
+
+# Documentation
+**/*.md
+**/docs
+
+# Backup files
+**/backups
+**/*.sql
+**/*.dump
+
+# Temporary files
+**/tmp
+**/temp
+**/.cache
+
+# Prisma
+**/prisma/migrations
+
+# MapServer data (keep only mapfiles)
+mapserver/data/*
+!mapserver/data/.gitkeep

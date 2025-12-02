@@ -1994,3 +1994,8 @@
 {"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-12-01 22:30:36"}
 {"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-12-01 22:30:36"}
 {"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-12-01 22:30:36"}
+{"database":"admin_db","level":"info","message":"Database connection test successful","service":"admin-service","timestamp":"2025-12-02T11:49:22.184Z"}
+{"level":"info","message":"Kysely Query Builder initialized for admin_db","service":"admin-service","timestamp":"2025-12-02 18:49:22"}
+{"level":"info","message":"Database pool initialized successfully","service":"admin-service","timestamp":"2025-12-02 18:49:22"}
+{"level":"info","message":"Admin Service running on port 3005","service":"admin-service","timestamp":"2025-12-02 18:49:22"}
+{"level":"info","message":"Kysely Query Builder ready","service":"admin-service","timestamp":"2025-12-02 18:49:22"}
