@@ -72,7 +72,7 @@ docker-init/admin-postgis/01-admin-db.sql
 docker-init/postgis/01-admin-db.sql
 *.sql.gz
 
-docker/init-data/admin_db.sql
-docker/init-data/auth_db.sql
-docker/init-data/gis_db.sql
+docker/initial-data/admin_db.sql
+docker/initial-data/auth_db.sql
+docker/initial-data/gis_db.sql
 
