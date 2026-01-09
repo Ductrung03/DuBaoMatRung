@@ -21,7 +21,7 @@ export const WMS_BASE_URL = '/api/mapserver';
 export const GeoDataProvider = ({ children }) => {
   const [geoData, setGeoData] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   // Enhanced map layers config - SƠN LA 3 LAYERS
   const [mapLayers, setMapLayers] = useState({
     // ✅ SƠN LA 3 WMS LAYERS - Render qua MapServer
@@ -62,7 +62,7 @@ export const GeoDataProvider = ({ children }) => {
     // ✅ GEOJSON LAYERS - Load data từ API (optional)
     deforestationAlerts: {
       data: null,
-      visible: false,
+      visible: true, // ✅ ENABLE: Hiển thị mặc định để có dữ liệu cho table
       loading: false,
       name: "Dự báo mất rừng mới nhất",
       endpoint: "deforestation-alerts",
@@ -80,6 +80,8 @@ export const GeoDataProvider = ({ children }) => {
         .filter(([key, layer]) => layer.layerType === 'geojson')
         .map(([key, layer]) => ({ key, name: layer.name }));
 
+      // ✅ TRACK: Kiểm tra xem deforestationAlerts có load thành công không
+      let deforestationAlertsLoaded = false;
 
       // Load từng GeoJSON layer
       for (const layer of geojsonLayers) {
@@ -99,7 +101,7 @@ export const GeoDataProvider = ({ children }) => {
               'Accept': 'application/json',
               'Cache-Control': 'max-age=0'
             },
-            timeout: 120000 // 2 phút timeout
+            timeout: 300000 // 5 phút timeout
           });
 
           // ✅ API returns { success, data: { type, features } }
@@ -117,7 +119,14 @@ export const GeoDataProvider = ({ children }) => {
 
             // ✅ CẬP NHẬT: Nếu là deforestationAlerts, cũng cập nhật vào geoData để hiển thị trong table
             if (layer.key === 'deforestationAlerts') {
-              setGeoData(layerData);
+              // ✅ CHỈ SET NẾU CÓ DỮ LIỆU
+              if (layerData.features && layerData.features.length > 0) {
+                setGeoData(layerData);
+                deforestationAlertsLoaded = true;
+                // Log đã tắt để tránh spam console
+              } else {
+                console.warn('⚠️ deforestationAlerts loaded but has no features');
+              }
             }
 
           }
@@ -135,12 +144,13 @@ export const GeoDataProvider = ({ children }) => {
 
       // ✅ WMS layers tự động visible - không cần load data
 
-      // ✅ LOAD DỮ LIỆU MẶC ĐỊNH CHO BẢNG: Chỉ load mat_rung nếu KHÔNG có deforestationAlerts
-      // (vì deforestationAlerts ưu tiên cao hơn và đã bao gồm dữ liệu cần thiết)
-      const hasDeforestationAlerts = geojsonLayers.some(l => l.key === 'deforestationAlerts');
-      if (!hasDeforestationAlerts) {
+      // ✅ FIX: LUÔN LOAD DỮ LIỆU MẶC ĐỊNH NẾU deforestationAlerts KHÔNG CÓ DỮ LIỆU
+      // Đảm bảo table luôn có dữ liệu để hiển thị
+      if (!deforestationAlertsLoaded) {
+        // Log đã tắt để tránh spam console
         await loadDefaultMatRungData();
       } else {
+        // Log đã tắt để tránh spam console
       }
 
 
@@ -165,7 +175,7 @@ export const GeoDataProvider = ({ children }) => {
       if (response.data && response.data.success && response.data.data) {
         const matRungData = response.data.data; // ✅ KEY LÀ 'data' KHÔNG PHẢI 'mat_rung'
 
-        console.log(`✅ Loaded ${matRungData.features?.length || 0} mat_rung records from API`);
+        // Log đã tắt để tránh spam console
 
         // ✅ API đã tự động filter 12 tháng, không cần filter lại
         // Set vào geoData để hiển thị trong Map và Table
@@ -184,18 +194,18 @@ export const GeoDataProvider = ({ children }) => {
 
   // ✅ AUTO LOAD KHI COMPONENT MOUNT
   useEffect(() => {
-    
+
     // Delay nhỏ để đảm bảo UI đã render
     const timer = setTimeout(() => {
       loadAllDefaultLayers();
     }, 1000);
-    
+
     return () => clearTimeout(timer);
   }, []); // Chỉ chạy 1 lần khi mount
 
   // Enhanced layer data update với viewport metadata
   const updateLayerData = (layerName, data) => {
-    
+
     setMapLayers(prev => ({
       ...prev,
       [layerName]: {
@@ -348,211 +358,213 @@ export const GeoDataProvider = ({ children }) => {
       setLayerLoading(layerKey, false);
     }
   };
-// Thêm vào client/src/dashboard/contexts/GeoDataContext.jsx - AUTO FORECAST FUNCTIONS
+  // Thêm vào client/src/dashboard/contexts/GeoDataContext.jsx - AUTO FORECAST FUNCTIONS
 
-// ✅ HÀM MỚI: Load dữ liệu dự báo tự động
-const loadAutoForecastData = async (year, month, period) => {
-  try {
-    setLoading(true);
+  // ✅ HÀM MỚI: Load dữ liệu dự báo tự động
+  const loadAutoForecastData = async (year, month, period) => {
+    try {
+      setLoading(true);
 
-    // Tính toán khoảng thời gian (logic tương tự component)
-    const calculateDateRange = (year, month, period) => {
-      const yearInt = parseInt(year);
-      const monthInt = parseInt(month);
-      
-      if (period === "Trước ngày 15") {
-        let fromMonth = monthInt - 1;
-        let fromYear = yearInt;
-        
-        if (fromMonth === 0) {
-          fromMonth = 12;
-          fromYear = yearInt - 1;
+      // Tính toán khoảng thời gian (logic tương tự component)
+      const calculateDateRange = (year, month, period) => {
+        const yearInt = parseInt(year);
+        const monthInt = parseInt(month);
+
+        if (period === "Trước ngày 15") {
+          let fromMonth = monthInt - 1;
+          let fromYear = yearInt;
+
+          if (fromMonth === 0) {
+            fromMonth = 12;
+            fromYear = yearInt - 1;
+          }
+
+          const fromDate = `${fromYear}-${fromMonth.toString().padStart(2, '0')}-15`;
+          const toDate = `${yearInt}-${month.padStart(2, '0')}-15`;
+
+          return { fromDate, toDate };
+        } else {
+          const fromDate = `${yearInt}-${month.padStart(2, '0')}-01`;
+          const lastDay = new Date(yearInt, monthInt, 0).getDate();
+          const toDate = `${yearInt}-${month.padStart(2, '0')}-${lastDay.toString().padStart(2, '0')}`;
+
+          return { fromDate, toDate };
         }
-        
-        const fromDate = `${fromYear}-${fromMonth.toString().padStart(2, '0')}-15`;
-        const toDate = `${yearInt}-${month.padStart(2, '0')}-15`;
-        
-        return { fromDate, toDate };
+      };
+
+      const { fromDate, toDate } = calculateDateRange(year, month, period);
+
+      const response = await axios.post(`/api/mat-rung/auto-forecast`, {
+        year,
+        month,
+        period,
+        fromDate,
+        toDate
+      }, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        timeout: 60000 // 1 phút timeout
+      });
+
+      if (response.data.success && response.data.data) {
+        const forecastData = {
+          ...response.data.data,
+          loadType: 'auto_forecast',
+          loadTimestamp: new Date().toISOString(),
+          forecastMetadata: response.data.metadata || {}
+        };
+
+        // Set dữ liệu vào context
+        setGeoData(forecastData);
+
+
+        return {
+          success: true,
+          data: forecastData,
+          summary: response.data.summary || {}
+        };
       } else {
-        const fromDate = `${yearInt}-${month.padStart(2, '0')}-01`;
-        const lastDay = new Date(yearInt, monthInt, 0).getDate();
-        const toDate = `${yearInt}-${month.padStart(2, '0')}-${lastDay.toString().padStart(2, '0')}`;
-        
-        return { fromDate, toDate };
+        return {
+          success: false,
+          message: response.data.message || 'Không có dữ liệu trong khoảng thời gian này'
+        };
       }
-    };
 
-    const { fromDate, toDate } = calculateDateRange(year, month, period);
-
-    const response = await axios.post(`/api/mat-rung/auto-forecast`, {
-      year,
-      month,
-      period,
-      fromDate,
-      toDate
-    }, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      timeout: 60000 // 1 phút timeout
-    });
-
-    if (response.data.success && response.data.data) {
-      const forecastData = {
-        ...response.data.data,
-        loadType: 'auto_forecast',
-        loadTimestamp: new Date().toISOString(),
-        forecastMetadata: response.data.metadata || {}
-      };
-
-      // Set dữ liệu vào context
-      setGeoData(forecastData);
-      
-      
-      return {
-        success: true,
-        data: forecastData,
-        summary: response.data.summary || {}
-      };
-    } else {
+    } catch (error) {
+      console.error(`❌ Error loading auto forecast:`, error);
       return {
         success: false,
-        message: response.data.message || 'Không có dữ liệu trong khoảng thời gian này'
+        message: error.message || 'Lỗi khi tải dữ liệu dự báo tự động'
       };
-    }
-
-  } catch (error) {
-    console.error(`❌ Error loading auto forecast:`, error);
-    return {
-      success: false,
-      message: error.message || 'Lỗi khi tải dữ liệu dự báo tự động'
-    };
-  } finally {
-    setLoading(false);
-  }
-};
-
-// ✅ HÀM MỚI: Lấy preview thống kê trước khi load
-const getAutoForecastPreview = async (year, month, period) => {
-  try {
-    const calculateDateRange = (year, month, period) => {
-      const yearInt = parseInt(year);
-      const monthInt = parseInt(month);
-      
-      if (period === "Trước ngày 15") {
-        let fromMonth = monthInt - 1;
-        let fromYear = yearInt;
-        
-        if (fromMonth === 0) {
-          fromMonth = 12;
-          fromYear = yearInt - 1;
-        }
-        
-        const fromDate = `${fromYear}-${fromMonth.toString().padStart(2, '0')}-15`;
-        const toDate = `${yearInt}-${month.padStart(2, '0')}-15`;
-        
-        return { fromDate, toDate };
-      } else {
-        const fromDate = `${yearInt}-${month.padStart(2, '0')}-01`;
-        const lastDay = new Date(yearInt, monthInt, 0).getDate();
-        const toDate = `${yearInt}-${month.padStart(2, '0')}-${lastDay.toString().padStart(2, '0')}`;
-        
-        return { fromDate, toDate };
-      }
-    };
-
-    const { fromDate, toDate } = calculateDateRange(year, month, period);
-
-    const response = await axios.post(`/api/mat-rung/forecast-preview`, {
-      year,
-      month,
-      period,
-      fromDate,
-      toDate
-    }, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      timeout: 30000 // 30 giây timeout cho preview
-    });
-
-    return response.data;
-
-  } catch (error) {
-    console.error(`❌ Error getting forecast preview:`, error);
-    return {
-      success: false,
-      message: error.message || 'Lỗi khi lấy thông tin preview'
-    };
-  }
-};
-
-// ✅ HÀM MỚI: Clear dữ liệu và reset về mặc định
-const resetToDefaultData = async () => {
-  try {
-    setLoading(true);
-    
-    // Load lại dữ liệu mặc định (3 tháng gần nhất)
-    await loadDefaultMatRungData();
-    
-    return { success: true };
-    
-  } catch (error) {
-    console.error("❌ Error resetting to default:", error);
-    return { success: false, message: error.message };
-  } finally {
-    setLoading(false);
-  }
-};
-
-// ✅ HÀM MỚI: Get current data info
-const getCurrentDataInfo = () => {
-  if (!geoData || !geoData.features) {
-    return null;
-  }
-
-  const features = geoData.features;
-  const metadata = geoData.metadata || geoData.forecastMetadata || {};
-  
-  return {
-    type: geoData.loadType || 'unknown',
-    totalFeatures: features.length,
-    totalArea: features.reduce((sum, f) => sum + (f.properties.area || 0), 0),
-    totalAreaHa: Math.round((features.reduce((sum, f) => sum + (f.properties.area || 0), 0) / 10000) * 100) / 100,
-    loadTimestamp: geoData.loadTimestamp,
-    isAutoForecast: geoData.loadType === 'auto_forecast',
-    forecastInfo: metadata.forecast_info || null,
-    dateRange: {
-      earliest: features.length > 0 ? Math.min(...features.map(f => new Date(f.properties.end_sau).getTime())) : null,
-      latest: features.length > 0 ? Math.max(...features.map(f => new Date(f.properties.end_sau).getTime())) : null
+    } finally {
+      setLoading(false);
     }
   };
-};
 
-// ✅ EXPORT CÁC HÀM MỚI trong GeoDataContext.Provider value
-return (
-  <GeoDataContext.Provider value={{ 
-    geoData, 
-    setGeoData, 
-    loading, 
-    setLoading,
-    mapLayers,
-    updateLayerData,
-    toggleLayerVisibility,
-    setLayerLoading,
-    clearAllLayers,
-    getLayersStats,
-    loadDefaultMatRungData,
-    refreshDefaultData,
-    loadSingleLayer,
-    loadAllDefaultLayers,
-    
-    // ✅ NEW AUTO FORECAST FUNCTIONS
-    loadAutoForecastData,
-    getAutoForecastPreview,  
-    resetToDefaultData,
-    getCurrentDataInfo
-  }}>
-    {children}
-  </GeoDataContext.Provider>
-);};
+  // ✅ HÀM MỚI: Lấy preview thống kê trước khi load
+  const getAutoForecastPreview = async (year, month, period) => {
+    try {
+      const calculateDateRange = (year, month, period) => {
+        const yearInt = parseInt(year);
+        const monthInt = parseInt(month);
+
+        if (period === "Trước ngày 15") {
+          let fromMonth = monthInt - 1;
+          let fromYear = yearInt;
+
+          if (fromMonth === 0) {
+            fromMonth = 12;
+            fromYear = yearInt - 1;
+          }
+
+          const fromDate = `${fromYear}-${fromMonth.toString().padStart(2, '0')}-15`;
+          const toDate = `${yearInt}-${month.padStart(2, '0')}-15`;
+
+          return { fromDate, toDate };
+        } else {
+          const fromDate = `${yearInt}-${month.padStart(2, '0')}-01`;
+          const lastDay = new Date(yearInt, monthInt, 0).getDate();
+          const toDate = `${yearInt}-${month.padStart(2, '0')}-${lastDay.toString().padStart(2, '0')}`;
+
+          return { fromDate, toDate };
+        }
+      };
+
+      const { fromDate, toDate } = calculateDateRange(year, month, period);
+
+      const response = await axios.post(`/api/mat-rung/forecast-preview`, {
+        year,
+        month,
+        period,
+        fromDate,
+        toDate
+      }, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        timeout: 180000 // 3 phút timeout cho preview
+      });
+
+      return response.data;
+
+    } catch (error) {
+      console.error(`❌ Error getting forecast preview:`, error);
+      return {
+        success: false,
+        message: error.message || 'Lỗi khi lấy thông tin preview'
+      };
+    }
+  };
+
+  // ✅ HÀM MỚI: Clear dữ liệu và reset về mặc định
+  const resetToDefaultData = async () => {
+    try {
+      setLoading(true);
+
+      // Load lại dữ liệu mặc định (3 tháng gần nhất)
+      await loadDefaultMatRungData();
+
+      return { success: true };
+
+    } catch (error) {
+      console.error("❌ Error resetting to default:", error);
+      return { success: false, message: error.message };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ HÀM MỚI: Get current data info
+  const getCurrentDataInfo = () => {
+    if (!geoData || !geoData.features) {
+      return null;
+    }
+
+    const features = geoData.features;
+    const metadata = geoData.metadata || geoData.forecastMetadata || {};
+
+    return {
+      type: geoData.loadType || 'unknown',
+      totalFeatures: features.length,
+      // ✅ FIX: Dùng dtich (tính từ geometry) thay vì area (có thể = 0)
+      totalArea: features.reduce((sum, f) => sum + (f.properties.dtich || f.properties.area || 0), 0),
+      totalAreaHa: Math.round((features.reduce((sum, f) => sum + (f.properties.dtich || f.properties.area || 0), 0) / 10000) * 100) / 100,
+      loadTimestamp: geoData.loadTimestamp,
+      isAutoForecast: geoData.loadType === 'auto_forecast',
+      forecastInfo: metadata.forecast_info || null,
+      dateRange: {
+        earliest: features.length > 0 ? Math.min(...features.map(f => new Date(f.properties.end_sau).getTime())) : null,
+        latest: features.length > 0 ? Math.max(...features.map(f => new Date(f.properties.end_sau).getTime())) : null
+      }
+    };
+  };
+
+  // ✅ EXPORT CÁC HÀM MỚI trong GeoDataContext.Provider value
+  return (
+    <GeoDataContext.Provider value={{
+      geoData,
+      setGeoData,
+      loading,
+      setLoading,
+      mapLayers,
+      updateLayerData,
+      toggleLayerVisibility,
+      setLayerLoading,
+      clearAllLayers,
+      getLayersStats,
+      loadDefaultMatRungData,
+      refreshDefaultData,
+      loadSingleLayer,
+      loadAllDefaultLayers,
+
+      // ✅ NEW AUTO FORECAST FUNCTIONS
+      loadAutoForecastData,
+      getAutoForecastPreview,
+      resetToDefaultData,
+      getCurrentDataInfo
+    }}>
+      {children}
+    </GeoDataContext.Provider>
+  );
+};

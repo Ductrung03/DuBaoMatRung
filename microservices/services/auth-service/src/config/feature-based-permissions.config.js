@@ -50,7 +50,7 @@ const FEATURE_PERMISSIONS = {
   // 2. TRANG QUẢN LÝ DỮ LIỆU
   // ============================================
   data_management: {
-    name: 'Quản lý dữ liệu',
+    name: 'Tra cứu dữ liệu',
     description: 'Quản lý và tra cứu các loại dữ liệu trong hệ thống',
     icon: 'FaDatabase',
     path: '/dashboard/quanlydulieu',
@@ -121,7 +121,7 @@ const FEATURE_PERMISSIONS = {
   // 4. TRANG PHÁT HIỆN MẤT RỪNG
   // ============================================
   detection: {
-    name: 'Phát hiện mất rừng',
+    name: 'Xử lý ảnh viễn thám',
     description: 'Trang phát hiện mất rừng',
     icon: 'FaExclamationTriangle',
     path: '/dashboard/phathienmatrung',

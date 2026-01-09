@@ -2,46 +2,12 @@
  * Hook mới để quản lý feature-based permissions theo cấu trúc trang và chức năng
  */
 
-import { useState, useEffect } from 'react';
 import { useAuth } from '../dashboard/contexts/AuthContext';
-import axios from 'axios';
+import { usePermissionContext } from '../dashboard/contexts/PermissionContext';
 
 export const useFeaturePermissionsNew = () => {
-  const { user, isAdmin } = useAuth();
-  const [accessiblePages, setAccessiblePages] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetchUserAccess();
-  }, [user]);
-
-  const fetchUserAccess = async () => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    // Admin có toàn quyền
-    if (isAdmin()) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await axios.get('/api/auth/page-permissions/my-access');
-
-      if (response.data.success) {
-        setAccessiblePages(response.data.data.pages);
-      }
-    } catch (err) {
-      console.error('Error fetching user access:', err);
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { isAdmin } = useAuth();
+  const { accessiblePages, permissions, loading, error, refresh } = usePermissionContext();
 
   /**
    * Kiểm tra xem user có quyền truy cập trang không
@@ -50,7 +16,12 @@ export const useFeaturePermissionsNew = () => {
    */
   const hasPageAccess = (pageKey) => {
     if (isAdmin()) return true;
-    return accessiblePages.some(page => page.key === pageKey);
+
+    // Priority 1: Check structured data
+    if (Array.isArray(accessiblePages) && accessiblePages.some(page => page.key === pageKey)) return true;
+
+    // Priority 2: Fallback to flat permissions list (fastest for initial load)
+    return Array.isArray(permissions) && permissions.some(code => code.startsWith(`${pageKey}.`));
   };
 
   /**
@@ -60,11 +31,9 @@ export const useFeaturePermissionsNew = () => {
    */
   const hasFeatureAccess = (featureCode) => {
     if (isAdmin()) return true;
-    
-    // Tìm trong tất cả các trang và features
-    return accessiblePages.some(page => 
-      page.features.some(feature => feature.code === featureCode)
-    );
+
+    // Check flat permissions list which is faster and populated from cache/token
+    return Array.isArray(permissions) && permissions.includes(featureCode);
   };
 
   /**
@@ -74,12 +43,23 @@ export const useFeaturePermissionsNew = () => {
    */
   const getPageFeatures = (pageKey) => {
     if (isAdmin()) {
-      // Admin có tất cả features, cần lấy từ API hoặc config
       return [];
     }
 
-    const page = accessiblePages.find(p => p.key === pageKey);
-    return page ? page.features : [];
+    // Priority 1: Check structured data
+    if (Array.isArray(accessiblePages)) {
+      const page = accessiblePages.find(p => p.key === pageKey);
+      if (page) return page.features;
+    }
+
+    // Priority 2: Fallback to flat permissions list
+    if (Array.isArray(permissions) && permissions.length > 0) {
+      return permissions
+        .filter(code => code.startsWith(`${pageKey}.`))
+        .map(code => ({ code })); // Minimal object for compatibility
+    }
+
+    return [];
   };
 
   /**
@@ -87,7 +67,7 @@ export const useFeaturePermissionsNew = () => {
    * @returns {Array} Array of page objects
    */
   const getAccessiblePages = () => {
-    return accessiblePages;
+    return Array.isArray(accessiblePages) ? accessiblePages : [];
   };
 
   /**
@@ -115,8 +95,8 @@ export const useFeaturePermissionsNew = () => {
    */
   const getPageInfo = (pageKey) => {
     if (isAdmin()) return null; // Admin cần xử lý riêng
-    
-    return accessiblePages.find(p => p.key === pageKey) || null;
+
+    return Array.isArray(accessiblePages) ? (accessiblePages.find(p => p.key === pageKey) || null) : null;
   };
 
   /**
@@ -126,8 +106,8 @@ export const useFeaturePermissionsNew = () => {
    */
   const hasAnyFeatureAccess = (featureCodes) => {
     if (isAdmin()) return true;
-    
-    return featureCodes.some(code => hasFeatureAccess(code));
+
+    return Array.isArray(featureCodes) && featureCodes.some(code => hasFeatureAccess(code));
   };
 
   /**
@@ -137,8 +117,8 @@ export const useFeaturePermissionsNew = () => {
    */
   const hasAllFeatureAccess = (featureCodes) => {
     if (isAdmin()) return true;
-    
-    return featureCodes.every(code => hasFeatureAccess(code));
+
+    return Array.isArray(featureCodes) && featureCodes.every(code => hasFeatureAccess(code));
   };
 
   /**
@@ -146,16 +126,10 @@ export const useFeaturePermissionsNew = () => {
    * @returns {Array} Array of feature codes
    */
   const getAllAccessibleFeatures = () => {
-    if (isAdmin()) return []; // Admin cần xử lý riêng
-    
-    const allFeatures = [];
-    accessiblePages.forEach(page => {
-      page.features.forEach(feature => {
-        allFeatures.push(feature.code);
-      });
-    });
-    return allFeatures;
+    if (isAdmin()) return [];
+    return Array.isArray(permissions) ? permissions : [];
   };
+
 
   return {
     accessiblePages,
@@ -172,8 +146,7 @@ export const useFeaturePermissionsNew = () => {
     hasAllFeatureAccess,
     getAllAccessibleFeatures,
     isAdmin: isAdmin(),
-    // Refresh function để reload permissions
-    refresh: fetchUserAccess
+    refresh
   };
 };
 

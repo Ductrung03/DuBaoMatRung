@@ -12,7 +12,7 @@ import { useReport } from "../contexts/ReportContext";
 import { ClipLoader } from 'react-spinners';
 import { useLocation } from "react-router-dom";
 import { convertTcvn3ToUnicode } from "../../utils/fontConverter";
-import { FaFileWord, FaFilePdf, FaEye } from "react-icons/fa";
+import { FaFileWord, FaFilePdf, FaEye, FaFileCode } from "react-icons/fa";
 import { toast } from "react-toastify";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -36,6 +36,7 @@ const ThongKeBaoCaoMatRung = () => {
   // State cho xuất file
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [isExportingGeoJSON, setIsExportingGeoJSON] = useState(false);
 
   useEffect(() => {
     // Lấy params từ URL
@@ -64,9 +65,10 @@ const ThongKeBaoCaoMatRung = () => {
     try {
       const params = new URLSearchParams({
         fromDate,
-        toDate
+        toDate,
+        limit: '0'  // Không giới hạn số lượng dữ liệu cho báo cáo
       });
-      
+
       if (huyen) params.append('huyen', huyen);
       if (xa) params.append('xa', xa);
 
@@ -115,13 +117,13 @@ const ThongKeBaoCaoMatRung = () => {
       // Tạo header rows cho bảng
       const headerCells = [
         new TableCell({ children: [new Paragraph({ text: "TT", alignment: AlignmentType.CENTER })], width: { size: 5, type: WidthType.PERCENTAGE } }),
-        new TableCell({ children: [new Paragraph({ text: "Xã", alignment: AlignmentType.CENTER })], width: { size: 15, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Xã", alignment: AlignmentType.CENTER })], width: { size: 20, type: WidthType.PERCENTAGE } }),
         new TableCell({ children: [new Paragraph({ text: "Lô cảnh báo", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
-        new TableCell({ children: [new Paragraph({ text: "Tiểu khu", alignment: AlignmentType.CENTER })], width: { size: 10, type: WidthType.PERCENTAGE } }),
-        new TableCell({ children: [new Paragraph({ text: "Khoảnh", alignment: AlignmentType.CENTER })], width: { size: 10, type: WidthType.PERCENTAGE } }),
-        new TableCell({ children: [new Paragraph({ text: "Tọa độ VN-2000 X", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
-        new TableCell({ children: [new Paragraph({ text: "Tọa độ VN-2000 Y", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
-        new TableCell({ children: [new Paragraph({ text: "Diện tích (ha)", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Tiểu khu", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Khoảnh", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Tọa độ VN-2000 X", alignment: AlignmentType.CENTER })], width: { size: 13, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Tọa độ VN-2000 Y", alignment: AlignmentType.CENTER })], width: { size: 13, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Diện tích (ha)", alignment: AlignmentType.CENTER })], width: { size: 13, type: WidthType.PERCENTAGE } }),
       ];
 
       if (isVerified) {
@@ -136,13 +138,13 @@ const ThongKeBaoCaoMatRung = () => {
           new TableCell({ children: [new Paragraph({ text: item.properties.lo_canbao || (item.properties.gid ? `CB-${item.properties.gid}` : ""), alignment: AlignmentType.CENTER })] }),
           new TableCell({ children: [new Paragraph({ text: item.properties.tk || item.properties.tieukhu || "", alignment: AlignmentType.CENTER })] }),
           new TableCell({ children: [new Paragraph({ text: item.properties.khoanh || "", alignment: AlignmentType.CENTER })] }),
-          new TableCell({ children: [new Paragraph({ text: item.properties.x ? Math.round(item.properties.x).toString() : "", alignment: AlignmentType.CENTER })] }),
-          new TableCell({ children: [new Paragraph({ text: item.properties.y ? Math.round(item.properties.y).toString() : "", alignment: AlignmentType.CENTER })] }),
+          new TableCell({ children: [new Paragraph({ text: item.properties.x ? parseFloat(item.properties.x).toFixed(3) : "", alignment: AlignmentType.CENTER })] }),
+          new TableCell({ children: [new Paragraph({ text: item.properties.y ? parseFloat(item.properties.y).toFixed(3) : "", alignment: AlignmentType.CENTER })] }),
           new TableCell({
             children: [new Paragraph({
               text: (() => {
                 const areaField = isVerified ? (item.properties.dtichXM || item.properties.dtich_xm) : item.properties.dtich;
-                return areaField ? (areaField / 10000).toFixed(2) : "";
+                return areaField ? (areaField / 10000).toFixed(1) : "";
               })(),
               alignment: AlignmentType.CENTER
             })]
@@ -159,7 +161,7 @@ const ThongKeBaoCaoMatRung = () => {
       // Tạo total row
       const totalCells = [
         new TableCell({ children: [new Paragraph({ text: `Tổng ${totalLots} lô`, alignment: AlignmentType.CENTER })], columnSpan: isVerified ? 8 : 7 }),
-        new TableCell({ children: [new Paragraph({ text: totalArea.toFixed(2), alignment: AlignmentType.CENTER })] }),
+        new TableCell({ children: [new Paragraph({ text: totalArea.toFixed(1), alignment: AlignmentType.CENTER })] }),
       ];
       if (isVerified) {
         totalCells.push(new TableCell({ children: [new Paragraph({ text: "", alignment: AlignmentType.CENTER })] }));
@@ -172,8 +174,7 @@ const ThongKeBaoCaoMatRung = () => {
           children: [
             new Paragraph({ text: reportTitle, heading: "Heading1", alignment: AlignmentType.CENTER }),
             new Paragraph({ text: `Tỉnh: Sơn La`, alignment: AlignmentType.LEFT }),
-            new Paragraph({ text: `Huyện: ${reportParams.huyen ? convertTcvn3ToUnicode(reportParams.huyen) : (reportData.length > 0 ? (reportData[0].properties.huyen_name || convertTcvn3ToUnicode(reportData[0].properties.huyen) || reportData[0].properties.mahuyen || '..........') : '..........')}`, alignment: AlignmentType.CENTER }),
-            new Paragraph({ text: `Xã: ${reportParams.xa ? convertTcvn3ToUnicode(reportParams.xa) : (reportData.length > 0 ? (reportData[0].properties.xa_name || convertTcvn3ToUnicode(reportData[0].properties.xa) || reportData[0].properties.maxa || '..........') : '..........')}`, alignment: AlignmentType.RIGHT }),
+            new Paragraph({ text: `Xã: ${reportData.length > 0 ? (reportData[0].properties.xa_name || convertTcvn3ToUnicode(reportData[0].properties.xa) || reportData[0].properties.maxa || '..........') : (reportParams.xa ? convertTcvn3ToUnicode(reportParams.xa) : '..........')}`, alignment: AlignmentType.CENTER }),
             new Paragraph({ text: `Từ ngày: ${formatDate(reportParams.fromDate) || '..........'} Đến ngày: ${formatDate(reportParams.toDate) || '..........'}`, alignment: AlignmentType.CENTER }),
             new Paragraph({ text: "" }), // Empty line
             new Table({
@@ -288,6 +289,65 @@ const ThongKeBaoCaoMatRung = () => {
     }
   };
 
+  // Xuất GeoJSON
+  const handleExportGeoJSON = async () => {
+    try {
+      setIsExportingGeoJSON(true);
+
+      if (!Array.isArray(reportData) || reportData.length === 0) {
+        throw new Error('Không có dữ liệu để xuất GeoJSON');
+      }
+
+      // Tạo URL với query params
+      const params = new URLSearchParams();
+      if (reportParams.fromDate) params.append('fromDate', reportParams.fromDate);
+      if (reportParams.toDate) params.append('toDate', reportParams.toDate);
+      if (reportParams.huyen) params.append('huyen', reportParams.huyen);
+      if (reportParams.xa) params.append('xa', reportParams.xa);
+      if (reportParams.xacMinh) params.append('xacMinh', reportParams.xacMinh);
+
+      const url = `/api/bao-cao/export-geojson?${params.toString()}`;
+
+      // ✅ FIX: Gửi token để authentication
+      const token = localStorage.getItem('token');
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      // Fetch file
+      const response = await fetch(url, { headers });
+
+      if (!response.ok) {
+        throw new Error('Không thể xuất file GeoJSON');
+      }
+
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+
+      const isVerified = reportParams.xacMinh === 'true';
+      const fileName = isVerified
+        ? `mat-rung-xac-minh-${reportParams.fromDate}-${reportParams.toDate}.geojson`
+        : `mat-rung-${reportParams.fromDate}-${reportParams.toDate}.geojson`;
+
+      // Download file
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+
+      toast.success("File GeoJSON đã được tải xuống thành công!");
+      setTimeout(() => setIsExportingGeoJSON(false), 1000);
+    } catch (error) {
+      console.error("Lỗi khi xuất GeoJSON:", error);
+      toast.error("Có lỗi xảy ra khi xuất GeoJSON: " + error.message);
+      setIsExportingGeoJSON(false);
+    }
+  };
+
   // Hàm lấy dữ liệu biểu đồ từ API
   const fetchChartData = async (fromDate, toDate, huyen, xa) => {
     try {
@@ -296,7 +356,8 @@ const ThongKeBaoCaoMatRung = () => {
         toDate,
         huyen,
         xa,
-        xacMinh: 'false' // Luôn lấy tất cả dữ liệu để thống kê
+        xacMinh: 'false', // Luôn lấy tất cả dữ liệu để thống kê
+        limit: '0'  // Không giới hạn số lượng dữ liệu cho báo cáo
       });
 
       const response = await fetch(`/api/search/mat-rung?${params.toString()}`);
@@ -453,6 +514,25 @@ const ThongKeBaoCaoMatRung = () => {
                 </>
               )}
             </button>
+
+            <button
+              onClick={handleExportGeoJSON}
+              disabled={isExportingGeoJSON}
+              className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded text-sm"
+              title="Xuất file GeoJSON"
+            >
+              {isExportingGeoJSON ? (
+                <>
+                  <ClipLoader color="#ffffff" size={14} />
+                  <span className="ml-1">Đang xuất...</span>
+                </>
+              ) : (
+                <>
+                  <FaFileCode className="text-lg" />
+                  <span>Xuất GeoJSON</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
 
@@ -460,11 +540,9 @@ const ThongKeBaoCaoMatRung = () => {
           <div className="text-sm mb-2">
             <div className="flex justify-between font-semibold">
               <span>Tỉnh: Sơn La</span>
-              <span>Huyện: {reportParams.huyen ? convertTcvn3ToUnicode(reportParams.huyen) : (reportData.length > 0 ? (reportData[0].properties.huyen_name || convertTcvn3ToUnicode(reportData[0].properties.huyen) || reportData[0].properties.mahuyen || '..........') : '..........')}</span>
-              <span>Xã: {reportParams.xa ? convertTcvn3ToUnicode(reportParams.xa) : (reportData.length > 0 ? (reportData[0].properties.xa_name || convertTcvn3ToUnicode(reportData[0].properties.xa) || reportData[0].properties.maxa || '..........') : '..........')}</span>
+              <span>Xã: {reportData.length > 0 ? (reportData[0].properties.xa_name || convertTcvn3ToUnicode(reportData[0].properties.xa) || reportData[0].properties.maxa || '..........') : (reportParams.xa ? convertTcvn3ToUnicode(reportParams.xa) : '..........')}</span>
             </div>
-            <div className="flex justify-between font-semibold mt-1">
-              <span></span>
+            <div className="text-center font-semibold mt-1">
               <span>
                 Từ ngày: {formatDate(reportParams.fromDate) || '..........'}
                 {' '}
@@ -506,15 +584,15 @@ const ThongKeBaoCaoMatRung = () => {
                     {item.properties.khoanh || ""}
                   </td>
                   <td className="border border-black px-2 py-1">
-                    {item.properties.x ? Math.round(item.properties.x) : ""}
+                    {item.properties.x ? parseFloat(item.properties.x).toFixed(3) : ""}
                   </td>
                   <td className="border border-black px-2 py-1">
-                    {item.properties.y ? Math.round(item.properties.y) : ""}
+                    {item.properties.y ? parseFloat(item.properties.y).toFixed(3) : ""}
                   </td>
                   <td className="border border-black px-2 py-1">
                     {(() => {
                       const areaField = isVerified ? (item.properties.dtichXM || item.properties.dtich_xm) : item.properties.dtich;
-                      return areaField ? (areaField / 10000).toFixed(2) : "";
+                      return areaField ? (areaField / 10000).toFixed(1) : "";
                     })()}
                   </td>
                   {isVerified && (
@@ -530,7 +608,7 @@ const ThongKeBaoCaoMatRung = () => {
                   Tổng {totalLots} lô
                 </td>
                 <td className="border border-black px-2 py-1">
-                  {totalArea.toFixed(2)}
+                  {totalArea.toFixed(1)}
                 </td>
                 {isVerified && <td className="border border-black px-2 py-1"></td>}
               </tr>
@@ -544,9 +622,9 @@ const ThongKeBaoCaoMatRung = () => {
               </div>
               <div className="text-xs text-gray-600">
                 Lưu ý:<br/>
-                + Diện tích này lấy theo cột {isVerified ? 'dtichXM' : 'dtich'}<br/>
+                + Diện tích tính từ geometry, lấy 1 chữ số thập phân<br/>
                 + Dòng tổng: tính toán tổng số lô và tổng diện tích<br/>
-                + Tọa độ X,Y làm tròn, không lấy sau dấu ","
+                + Tọa độ X,Y làm tròn 3 chữ số thập phân
               </div>
             </div>
             <div className="text-right">

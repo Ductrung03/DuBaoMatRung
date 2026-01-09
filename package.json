@@ -27,7 +27,8 @@
     "npm": ">=9.0.0"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "shadcn": "^3.6.2"
   },
   "author": "LuckyBoiz",
   "license": "MIT",

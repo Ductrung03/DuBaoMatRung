@@ -96,6 +96,9 @@ app.use('/api/verification', verificationRoutes);
 // Direct route for GEE URL import
 app.post('/api/import-gee-url', asyncHandler(shapefileController.importFromGeeUrl));
 
+// Direct route for GeoJSON URL import with spatial validation
+app.post('/api/import-geojson-url', asyncHandler(shapefileController.importFromGeoJsonUrl));
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({

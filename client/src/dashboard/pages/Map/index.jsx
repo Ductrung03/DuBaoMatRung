@@ -2,7 +2,7 @@
 import { getLayerStyle } from "./utils/mapStyles";
 import { toast } from "react-toastify";
 import React, { useEffect, useRef } from "react";
-import { MapContainer, TileLayer, WMSTileLayer } from "react-leaflet";
+import { MapContainer, TileLayer, WMSTileLayer, useMap } from "react-leaflet";
 import { useLocation } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -22,6 +22,29 @@ import { useFeatureMatching } from "./hooks/useFeatureMatching";
 // Context & Utils
 import { useGeoData } from "../../contexts/GeoDataContext";
 import { MAP_CONFIG } from "./constants/mapConstants";
+
+// Helper component to access map instance in React Leaflet v3/v4/v5
+const MapController = ({ setMapReady }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (map) {
+      window._leaflet_map = map;
+      // Fix render issues when container size changes or tab switches
+      setTimeout(() => { 
+        map.invalidateSize();
+        setMapReady(true);
+      }, 100);
+      
+      return () => {
+        window._leaflet_map = null;
+        setMapReady(false);
+      };
+    }
+  }, [map, setMapReady]);
+
+  return null;
+};
 
 // Helper function để lấy query param từ URL
 const getQueryParam = (search, key) => {
@@ -250,13 +273,8 @@ const Map = () => {
           center={MAP_CONFIG.center}
           zoom={MAP_CONFIG.defaultZoom}
           className={`w-full rounded-xl shadow-lg ${mapHeight}`}
-          whenCreated={(mapInstance) => {
-            window._leaflet_map = mapInstance;
-            setTimeout(() => {
-              setMapReady(true);
-            }, 500);
-          }}
         >
+          <MapController setMapReady={setMapReady} />
           {/* Base Tile Layers */}
           {mapType === "normal" ? (
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />

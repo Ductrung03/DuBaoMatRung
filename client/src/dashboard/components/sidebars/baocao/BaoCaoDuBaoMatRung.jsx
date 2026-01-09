@@ -101,7 +101,8 @@ const BaoCaoDuBaoMatRung = () => {
           fromDate,
           toDate,
           xa: selectedXa,
-          xacMinh: 'false'  // Luôn lấy tất cả dữ liệu để thống kê
+          xacMinh: 'false',  // Luôn lấy tất cả dữ liệu để thống kê
+          limit: '0'  // Không giới hạn số lượng dữ liệu
         });
 
         const res = await axios.get(`/api/search/mat-rung?${params.toString()}`);
@@ -162,7 +163,8 @@ const BaoCaoDuBaoMatRung = () => {
           fromDate,
           toDate,
           xa: selectedXa,
-          xacMinh: isXacMinh ? 'true' : 'false'
+          xacMinh: isXacMinh ? 'true' : 'false',
+          limit: '0'  // Không giới hạn số lượng dữ liệu
         });
 
         const res = await axios.get(`/api/search/mat-rung?${params.toString()}`);
@@ -226,32 +228,32 @@ const BaoCaoDuBaoMatRung = () => {
           <div className="flex flex-col gap-3">
             {/* Từ ngày */}
             <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Từ ngày</label>
+              <label className="text-sm font-medium w-28">Từ ngày</label>
               <input
                 type="date"
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
-                className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+                className="w-48 border border-green-400 rounded-md px-2 py-1 bg-white"
                 disabled={isLoading}
               />
             </div>
 
             {/* Đến ngày */}
             <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Đến ngày</label>
+              <label className="text-sm font-medium w-28">Đến ngày</label>
               <input
                 type="date"
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
-                className="w-36 border border-green-400 rounded-md px-2 py-1 bg-white"
+                className="w-48 border border-green-400 rounded-md px-2 py-1 bg-white"
                 disabled={isLoading}
               />
             </div>
 
             {/* Xã */}
             <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Xã</label>
-              <div className="w-36">
+              <label className="text-sm font-medium w-20 flex-shrink-0">Xã</label>
+              <div className="flex-1 min-w-0 overflow-hidden">
                 <Dropdown
                   selectedValue={selectedXa}
                   onValueChange={adminUnits.xa.onChange}
@@ -259,15 +261,16 @@ const BaoCaoDuBaoMatRung = () => {
                   placeholder="Chọn xã"
                   disabled={adminUnits.xa.loading || adminUnits.xa.disabled}
                   loading={adminUnits.xa.loading}
-                  className="w-full border border-green-400 rounded-md px-2 py-1 bg-white"
+                  className="border border-green-400 rounded-md bg-white"
+                  selectClassName="text-sm py-1"
                 />
               </div>
             </div>
 
             {/* Tiểu khu */}
             <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Tiểu khu</label>
-              <div className="w-36">
+              <label className="text-sm font-medium w-20 flex-shrink-0">Tiểu khu</label>
+              <div className="flex-1 min-w-0 overflow-hidden">
                 <Dropdown
                   selectedValue={selectedTieukhu}
                   onValueChange={adminUnits.tieukhu.onChange}
@@ -275,15 +278,16 @@ const BaoCaoDuBaoMatRung = () => {
                   placeholder="Chọn tiểu khu"
                   disabled={adminUnits.tieukhu.loading || adminUnits.tieukhu.disabled}
                   loading={adminUnits.tieukhu.loading}
-                  className="w-full border border-green-400 rounded-md px-2 py-1 bg-white"
+                  className="border border-green-400 rounded-md bg-white"
+                  selectClassName="text-sm py-1"
                 />
               </div>
             </div>
 
             {/* Khoảnh */}
             <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Khoảnh</label>
-              <div className="w-36">
+              <label className="text-sm font-medium w-20 flex-shrink-0">Khoảnh</label>
+              <div className="flex-1 min-w-0 overflow-hidden">
                 <Dropdown
                   selectedValue={selectedKhoanh}
                   onValueChange={adminUnits.khoanh.onChange}
@@ -291,15 +295,16 @@ const BaoCaoDuBaoMatRung = () => {
                   placeholder="Chọn khoảnh"
                   disabled={adminUnits.khoanh.loading || adminUnits.khoanh.disabled}
                   loading={adminUnits.khoanh.loading}
-                  className="w-full border border-green-400 rounded-md px-2 py-1 bg-white"
+                  className="border border-green-400 rounded-md bg-white"
+                  selectClassName="text-sm py-1"
                 />
               </div>
             </div>
 
             {/* ✅ THÊM: Checkbox Xác minh */}
             <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Xác minh</label>
-              <div className="w-36 flex items-center gap-2">
+              <label className="text-sm font-medium w-28">Xác minh</label>
+              <div className="w-48 flex items-center gap-2">
                 <input
                   type="checkbox"
                   id="xacMinh"
@@ -308,13 +313,13 @@ const BaoCaoDuBaoMatRung = () => {
                   className="w-4 h-4 accent-green-600"
                   disabled={isLoading}
                 />
-              
+
               </div>
             </div>
 
             {/* Loại báo cáo */}
             <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Loại báo cáo</label>
+              <label className="text-sm font-medium w-28">Loại báo cáo</label>
               <Dropdown
                 selectedValue={reportType}
                 onValueChange={handleReportTypeChange}
@@ -322,7 +327,7 @@ const BaoCaoDuBaoMatRung = () => {
                 placeholder="Chọn loại"
                 disabled={isLoading}
                 loading={isLoading}
-                className="w-36"
+                className="w-48"
                 selectClassName="w-full border border-green-400 rounded-md px-2 py-1 bg-white"
               />
             </div>
@@ -331,7 +336,7 @@ const BaoCaoDuBaoMatRung = () => {
           <button
             onClick={handleBaoCao}
             disabled={isLoading}
-            className={`w-36 ${isLoading ? 'bg-gray-400' : 'bg-green-300 hover:bg-green-400'} text-black font-medium py-1 px-3 rounded-full text-center mt-2 self-center flex justify-center items-center transition-all`}
+            className={`w-48 ${isLoading ? 'bg-gray-400' : 'bg-green-300 hover:bg-green-400'} text-black font-medium py-1 px-3 rounded-full text-center mt-2 self-center flex justify-center items-center transition-all`}
           >
             {isLoading ? (
               <>

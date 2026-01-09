@@ -405,17 +405,19 @@ const XacMinhDuBaoMatRung = () => {
 
             {/* Nguyên nhân */}
             <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Nguyên nhân *</label>
-              <Dropdown
-                selectedValue={formData.nguyenNhan}
-                onValueChange={handleNguyenNhanChange}
-                options={nguyenNhanList.map(nn => ({ value: nn, label: nn }))}
-                placeholder="Chọn nguyên nhân"
-                disabled={loading || searchLoading}
-                loading={loading || searchLoading}
-                className="w-36"
-                selectClassName="w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-              />
+              <label className="text-sm font-medium w-24 flex-shrink-0">Nguyên nhân *</label>
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <Dropdown
+                  selectedValue={formData.nguyenNhan}
+                  onValueChange={handleNguyenNhanChange}
+                  options={nguyenNhanList.map(nn => ({ value: nn, label: nn }))}
+                  placeholder="Chọn nguyên nhân"
+                  disabled={loading || searchLoading}
+                  loading={loading || searchLoading}
+                  className="border border-green-400 rounded-md bg-white"
+                  selectClassName="text-sm py-1"
+                />
+              </div>
             </div>
 
             {/* Diện tích thực tế */}

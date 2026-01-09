@@ -32,14 +32,21 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       frameSrc: ["'self'", "https://earthengine.googleapis.com", "https://ee-phathiensommatrung.projects.earthengine.app"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://earthengine.googleapis.com"],
+      scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers
       styleSrc: ["'self'", "'unsafe-inline'"],
       // Allow images from self and same host on port 3000 (gateway) to avoid NotSameOrigin blocks
       imgSrc: ["'self'", "data:", "https:", "http://103.56.160.66:3000"],
       // Allow connecting to gateway and earth engine
-      connectSrc: ["'self'", "http://103.56.160.66:3000", "https://earthengine.googleapis.com"]
+      connectSrc: ["'self'", "http://103.56.160.66:3000", "https://earthengine.googleapis.com"],
+      // IMPORTANT: Disable upgrade-insecure-requests for HTTP deployment
+      upgradeInsecureRequests: null
     }
   },
-  crossOriginResourcePolicy: { policy: "cross-origin" }
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  // Disable HSTS for HTTP deployment
+  hsts: false,
+  // Disable Cross-Origin-Opener-Policy for HTTP deployment
+  crossOriginOpenerPolicy: false
 }));
 
 // CORS configuration
@@ -107,6 +114,24 @@ const limiter = rateLimit({
   }
 });
 app.use(limiter);
+
+// ========== STATIC FILES (Frontend) ==========
+const path = require('path');
+const frontendDistPath = path.join(__dirname, '../../../client/dist');
+
+// Serve static files from frontend build
+app.use(express.static(frontendDistPath, {
+  maxAge: 0, // No cache - always serve fresh files
+  etag: false,
+  setHeaders: (res, path) => {
+    // Prevent caching for HTML files
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  }
+}));
 
 // ========== SWAGGER DOCUMENTATION ==========
 app.use('/api-docs', swaggerUi.serve);
@@ -250,6 +275,18 @@ app.use('/api/import-gee-url',
   })
 );
 
+// Import from GeoJSON URL with spatial validation
+app.use('/api/import-geojson-url',
+  authMiddleware.authenticate,
+  createProxy(logger, {
+    target: process.env.GIS_SERVICE_URL || 'http://localhost:3003',
+    pathRewrite: (path, req) => '/api/import-geojson-url' + path,
+    serviceName: 'Import GeoJSON URL',
+    timeout: 300000, // 5 minutes timeout for GeoJSON processing
+    forwardUserHeaders: true
+  })
+);
+
 app.use('/api/layer-data',
   createProxy(logger, {
     target: process.env.GIS_SERVICE_URL || 'http://localhost:3003',
@@ -280,7 +317,7 @@ app.use('/api/bao-cao',
   authMiddleware.authenticateFlexible, // Support token from header or query parameter
   createProxy(logger, {
     target: process.env.REPORT_SERVICE_URL || 'http://localhost:3004',
-    pathRewrite: (path, req) => '/api/bao-cao' + path,
+    pathRewrite: (path, req) => '/api/bao-cao' + path, // Path already includes /api/bao-cao from mount point
     serviceName: 'Report',
     timeout: 60000, // Longer timeout for report generation
     forwardUserHeaders: true
@@ -333,6 +370,8 @@ app.use('/api/mapserver',
       return newPath + queryString;
     },
     serviceName: 'MapServer',
+    timeout: 300000,
+    proxyTimeout: 300000,
     onProxyRes: (proxyRes, req, res) => {
       // Ensure correct headers for images to avoid CORB/NotSameOrigin
       if (req.method === 'GET') {
@@ -358,7 +397,17 @@ app.use('/api/mapserver',
 
 // ========== ERROR HANDLING ==========
 
-// 404 handler
+// SPA Fallback - Serve index.html for non-API routes (must be before 404 handler)
+app.get('*', (req, res, next) => {
+  // Only serve index.html for non-API routes
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  } else {
+    next();
+  }
+});
+
+// 404 handler for API routes
 app.use((req, res) => {
   res.status(404).json({
     success: false,

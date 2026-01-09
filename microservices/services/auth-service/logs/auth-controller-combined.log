@@ -379,3 +379,802 @@
 {"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-11-29 23:10:13","username":"admin"}
 {"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-01 21:13:35","username":"admin"}
 {"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-01 21:13:35","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 17:47:28","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 17:47:29","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 19:57:38","username":"Admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-12-11 19:57:38","username":"Admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 19:57:45","username":"Admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-12-11 19:57:45","username":"Admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 19:57:48","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 19:57:49","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 21:33:50","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 21:33:55","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 21:45:09","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 21:45:09","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 22:00:30","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 22:00:31","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 22:08:55","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 22:08:56","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 22:16:32","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 22:16:33","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 22:25:07","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 22:25:07","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 22:35:28","username":"admin"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-12-11 22:35:28","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 22:43:47","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 22:43:47","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 22:46:54","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 22:46:55","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 22:51:22","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 22:51:23","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 22:52:51","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 22:52:51","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 23:10:08","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 23:10:08","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 23:10:31","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 23:10:31","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 23:10:36","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 23:10:36","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 23:11:08","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 23:11:08","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 23:16:58","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 23:16:58","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 23:18:38","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 23:18:39","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 23:26:13","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 23:26:13","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 23:26:33","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 23:26:34","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-11 23:26:51","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-11 23:26:51","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 00:03:44","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 00:03:45","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 00:48:32","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 00:48:33","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 00:57:52","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 00:57:52","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 09:34:07","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 09:34:07","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 09:52:31","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 09:52:34","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 09:57:19","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 09:57:19","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 09:57:44","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 09:57:45","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 10:04:13","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 10:04:14","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 10:14:12","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 10:14:13","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 10:14:24","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 10:14:24","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 10:14:53","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 10:14:53","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 10:26:32","username":"admin"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-12-12 10:26:33","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 10:27:09","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 10:27:09","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 10:33:10","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 10:33:11","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 10:39:07","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 10:39:08","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 10:45:47","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 10:45:47","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 14:53:57","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 14:53:57","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 20:40:21","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 20:40:22","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 20:45:34","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 20:45:34","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 20:52:11","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 20:52:12","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 20:52:52","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 20:52:52","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 20:53:37","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 20:53:37","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 21:02:27","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 21:02:27","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 21:07:03","username":"admin"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-12-12 21:07:04","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 21:07:26","username":"admin"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-12-12 21:07:26","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 21:14:23","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 21:14:24","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 21:16:46","username":"admin"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-12-12 21:16:46","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 21:19:51","username":"admin"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-12-12 21:19:52","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 21:20:00","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 21:20:00","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 22:21:50","username":"Admin@123admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-12-12 22:21:51","username":"Admin@123admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 22:24:29","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 22:24:29","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 22:28:41","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 22:28:42","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 22:35:10","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 22:35:11","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 22:39:37","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 22:39:37","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 22:40:42","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 22:40:42","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-12 22:42:09","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-12 22:42:11","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-13 23:40:22","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-13 23:40:22","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-14 08:20:23","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-14 08:20:23","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-16 08:11:15","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-16 08:11:15","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-16 09:11:48","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-16 09:11:48","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-16 09:16:12","username":"SonLa"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-12-16 09:16:12","username":"SonLa"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-16 09:16:18","username":"SonLa"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-16 09:16:18","userId":14,"username":"SonLa"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-16 10:41:15","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-16 10:41:16","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-17 09:40:02","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-17 09:40:04","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-17 09:58:07","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-17 09:58:07","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-19 10:19:56","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-19 10:19:56","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-21 22:33:30","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-21 22:33:31","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-23 09:41:35","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-23 09:41:36","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-23 10:27:03","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-23 10:27:04","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-23 22:22:44","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-23 22:22:45","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-25 20:06:41","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-25 20:06:41","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-26 10:09:43","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-26 10:09:43","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2025-12-26 14:35:45","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-26 14:35:52","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-26 14:35:53","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-29 07:41:48","username":"admin"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-12-29 07:41:48","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-29 07:41:54","username":"admin"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-12-29 07:41:54","username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-29 07:43:17","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-29 07:43:17","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-29 07:44:17","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-29 07:44:18","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-30 10:09:49","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-30 10:09:49","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-30 14:57:57","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-30 14:57:58","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-30 15:02:02","username":"Admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-12-30 15:02:02","username":"Admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-30 15:02:08","username":"Admin"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2025-12-30 15:02:08","username":"Admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-30 15:03:40","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-30 15:03:40","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2025-12-30 15:20:21","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-30 15:31:12","username":"ChiHuyen"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-30 15:31:12","userId":19,"username":"ChiHuyen"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-30 15:31:51","username":"test"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-30 15:31:52","userId":15,"username":"test"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2025-12-30 15:39:32","userId":"15"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-30 15:39:36","username":"test"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-30 15:39:36","userId":15,"username":"test"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-30 15:44:37","username":"SonLa"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-30 15:44:38","userId":20,"username":"SonLa"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2025-12-30 15:45:39","userId":"15"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2025-12-30 15:45:42","userId":"15"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2025-12-30 15:45:42","userId":"15"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2025-12-30 15:45:42","userId":"15"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2025-12-30 15:45:42","userId":"15"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-31 08:00:54","username":"SonLa"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-31 08:00:55","userId":20,"username":"SonLa"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-31 09:40:17","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2025-12-31 09:40:20","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-31 09:48:58","username":"SonLa"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-12-31 09:49:00","username":"SonLa"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2025-12-31 09:50:03","username":"SonLa"}
+{"level":"warn","message":"Login failed: invalid password","service":"auth-controller","timestamp":"2025-12-31 09:50:03","username":"SonLa"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-03 22:46:16","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-03 22:46:16","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-06 10:13:08","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-06 10:13:09","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-06 14:51:38","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-06 14:51:38","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-06 15:39:31","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-06 15:39:32","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-06 17:00:41","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-06 17:00:41","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-06 17:09:36","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-06 17:09:43","username":"Nam"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-06 17:09:43","userId":22,"username":"Nam"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-06 22:43:23","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-06 22:43:23","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 08:15:11","userId":"22"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 08:15:11","userId":"22"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 08:15:11","userId":"22"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 08:15:11","userId":"22"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 08:15:11","userId":"22"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 08:15:11","userId":"22"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 08:15:11","userId":"22"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 08:15:12","userId":"22"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 08:15:12","userId":"22"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 08:15:12","userId":"22"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 08:15:12","userId":"22"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 08:15:12","userId":"22"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 08:15:19","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 08:15:20","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 12:26:35","userId":"1"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 12:26:36","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 12:27:08","username":"role2"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 12:27:08","userId":25,"username":"role2"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 12:27:46","username":"role2"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 12:27:47","userId":25,"username":"role2"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 12:30:07","username":"role2"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 12:30:09","userId":25,"username":"role2"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 12:30:58","username":"role2"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 12:30:58","userId":25,"username":"role2"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 12:33:02","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 12:33:02","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 12:34:44","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 12:34:53","username":"role2"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 12:34:54","userId":25,"username":"role2"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 12:37:31","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 12:37:31","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 13:36:18","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 13:36:23","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 13:36:23","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 13:57:27","username":"FIS"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 13:57:28","userId":28,"username":"FIS"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 14:10:42","userId":"28"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 14:10:43","userId":"28"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 14:11:05","username":"CCKLSonLa"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 14:11:05","userId":29,"username":"CCKLSonLa"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 14:13:03","username":"HatKiemLam"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 14:13:04","userId":30,"username":"HatKiemLam"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 14:17:27","username":"KiemLamVien"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 14:17:28","userId":31,"username":"KiemLamVien"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 15:07:30","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 15:07:39","username":"role1"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 15:07:39","userId":24,"username":"role1"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 15:08:13","userId":"24"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 15:08:18","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 15:08:19","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 15:11:44","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 15:11:47","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 15:11:47","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 15:18:44","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 15:18:47","username":"test"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 15:18:47","userId":32,"username":"test"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 15:29:39","username":"test"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 15:29:41","userId":32,"username":"test"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 15:49:16","username":"test"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 15:49:17","userId":32,"username":"test"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 20:58:30","username":"test"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 20:58:32","userId":32,"username":"test"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 22:35:25","username":"test"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 22:35:25","userId":32,"username":"test"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 22:45:43","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 22:45:43","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 22:45:44","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 22:45:44","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 23:02:36","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 23:02:37","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:02:38","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:02:38","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:02:45","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:02:48","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:02:49","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:02:50","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:02:51","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:02:51","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:02:52","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:02:52","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:02:52","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:02:52","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:03:02","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:03:02","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:03:18","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:03:18","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:03:19","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:03:19","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:03:20","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:03:21","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:03:22","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:03:22","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:03:26","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:03:27","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:03:30","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:03:30","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:03:32","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:03:32","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:03:33","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:03:33","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:03:33","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:03:33","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:03:42","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:03:42","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:04:10","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:04:10","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:04:33","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:04:33","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:04:35","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:04:35","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:04:57","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:04:57","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:06:36","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:06:36","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:06:38","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:06:38","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:06:43","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:06:43","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 23:07:27","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 23:07:29","username":"test"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 23:07:29","userId":32,"username":"test"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 23:16:11","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 23:16:12","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:16:13","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:16:13","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:16:15","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:16:15","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:17:21","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:17:21","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:24:33","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:24:33","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:25:00","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:25:00","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:25:03","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:25:03","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:25:27","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:25:27","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:26:43","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:26:43","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:32:21","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:32:21","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:32:25","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:32:25","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:32:34","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:32:34","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:33:23","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:33:23","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 23:33:27","userId":"1"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 23:33:29","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 23:35:26","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 23:35:27","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:35:28","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:35:28","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:35:31","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:35:32","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:36:01","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:36:02","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:38:30","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:38:30","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:38:41","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:38:41","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:39:22","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:39:22","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:43:20","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:43:20","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:43:22","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:43:22","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:43:27","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:43:27","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:43:58","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:43:58","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:46:33","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:46:33","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-07 23:46:45","userId":"1"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:46:46","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:46:46","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:46:47","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:46:47","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-07 23:46:56","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-07 23:46:56","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:46:57","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:46:57","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:46:59","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:47:00","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-07 23:47:53","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-07 23:47:53","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 00:12:05","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 00:12:06","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 00:12:49","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 00:12:50","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 00:15:36","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 00:15:36","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 00:16:23","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 00:16:23","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 00:16:28","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 00:16:28","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 00:22:37","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 00:22:38","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 00:22:39","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 00:22:39","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 00:22:40","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 00:22:40","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 00:27:16","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 00:27:16","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 06:38:22","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 06:38:22","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 06:40:28","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 06:40:29","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 06:40:29","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 06:40:29","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 07:31:15","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 07:31:16","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 07:35:54","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 07:35:54","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 07:36:04","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 07:36:04","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 07:36:58","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 07:36:58","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 07:37:02","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 07:37:02","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 07:37:06","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 07:37:06","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 07:57:58","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 07:57:58","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 07:58:00","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 07:58:00","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 07:58:01","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 07:58:01","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 07:58:04","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 07:58:05","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 07:58:29","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 07:58:29","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 07:58:36","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 07:58:36","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"Công ty Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:13:45","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:13:46","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:16:03","userId":"1"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:16:03","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:16:07","username":"test"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 08:16:08","userId":32,"username":"test"}
+{"hasUserId":true,"headers":{"x-user-id":"32","x-user-roles":"Ki%E1%BB%83m%20l%C3%A2m%20vi%C3%AAn","x-user-username":"test"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:24:11","userId":"32"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:24:12","userId":32,"username":"test"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:24:32","userId":"32"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:24:43","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 08:24:43","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:24:43","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:24:43","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:25:09","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:25:10","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:25:30","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:25:30","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:25:33","userId":"1"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:25:34","userId":"1"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:25:35","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:25:35","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:25:37","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:25:37","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:27:02","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 08:27:02","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:27:03","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:27:03","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:27:10","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:27:10","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:27:16","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:27:16","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:27:37","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:27:37","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:27:38","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:27:38","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:27:41","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:27:49","username":"role2"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 08:27:50","userId":25,"username":"role2"}
+{"hasUserId":true,"headers":{"x-user-id":"25","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role2"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:27:51","userId":"25"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:27:51","userId":25,"username":"role2"}
+{"hasUserId":true,"headers":{"x-user-id":"25","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role2"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:27:54","userId":"25"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:27:54","userId":25,"username":"role2"}
+{"hasUserId":true,"headers":{"x-user-id":"25","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role2"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:27:57","userId":"25"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:27:57","userId":25,"username":"role2"}
+{"hasUserId":true,"headers":{"x-user-id":"25","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role2"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:28:00","userId":"25"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:28:00","userId":25,"username":"role2"}
+{"hasUserId":true,"headers":{"x-user-id":"25","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role2"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:28:01","userId":"25"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:28:01","userId":25,"username":"role2"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:28:45","userId":"25"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:28:55","username":"role3"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 08:28:55","userId":26,"username":"role3"}
+{"hasUserId":true,"headers":{"x-user-id":"26","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role3"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:28:56","userId":"26"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:28:56","userId":26,"username":"role3"}
+{"hasUserId":true,"headers":{"x-user-id":"26","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role3"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:29:03","userId":"26"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:29:03","userId":26,"username":"role3"}
+{"hasUserId":true,"headers":{"x-user-id":"26","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role3"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:29:05","userId":"26"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:29:05","userId":26,"username":"role3"}
+{"hasUserId":true,"headers":{"x-user-id":"26","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role3"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:29:06","userId":"26"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:29:07","userId":26,"username":"role3"}
+{"hasUserId":true,"headers":{"x-user-id":"26","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role3"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:29:08","userId":"26"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:29:08","userId":26,"username":"role3"}
+{"hasUserId":true,"headers":{"x-user-id":"26","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role3"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:29:52","userId":"26"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:29:52","userId":26,"username":"role3"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:29:55","userId":"26"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:30:01","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 08:30:01","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:30:02","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:30:02","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:30:03","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:30:03","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:30:05","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:30:05","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:30:07","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:30:07","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:34:51","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:34:52","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:35:22","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:35:22","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:35:26","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:35:26","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:38:10","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:38:18","username":"role3"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 08:38:18","userId":26,"username":"role3"}
+{"hasUserId":true,"headers":{"x-user-id":"26","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role3"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:38:19","userId":"26"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:38:19","userId":26,"username":"role3"}
+{"hasUserId":true,"headers":{"x-user-id":"26","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role3"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:38:22","userId":"26"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:38:22","userId":26,"username":"role3"}
+{"hasUserId":true,"headers":{"x-user-id":"26","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"role3"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:38:24","userId":"26"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:38:24","userId":26,"username":"role3"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:39:16","userId":"26"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:41:33","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 08:41:33","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:41:34","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:41:34","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"super_admin","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:43:30","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:43:30","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"super_admin","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:43:30","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:43:30","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:44:11","userId":"1"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:44:11","userId":"1"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:44:12","userId":"1"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:44:14","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:44:14","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:44:30","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:44:30","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:44:35","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:44:35","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:44:46","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:44:46","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:45:02","userId":"1"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:45:03","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:45:03","userId":1,"username":"admin"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:45:41","username":"CongTyFis"}
+{"level":"warn","message":"Login failed: user not found","service":"auth-controller","timestamp":"2026-01-08 08:45:41","username":"CongTyFis"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:45:58","username":"role1"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 08:45:58","userId":24,"username":"role1"}
+{"hasUserId":true,"headers":{"x-user-id":"24","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"role1"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:46:19","userId":"24"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:46:20","userId":24,"username":"role1"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:46:30","userId":"24"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:46:30","userId":"24"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:46:31","userId":"24"}
+{"hasUserId":true,"headers":{"x-user-id":"24","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"role1"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:46:31","userId":"24"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:46:31","userId":24,"username":"role1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:46:49","username":"FIS"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 08:46:50","userId":28,"username":"FIS"}
+{"hasUserId":true,"headers":{"x-user-id":"28","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"FIS"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:46:58","userId":"28"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:46:58","userId":28,"username":"FIS"}
+{"hasUserId":true,"headers":{"x-user-id":"28","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"FIS"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:46:58","userId":"28"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:46:58","userId":28,"username":"FIS"}
+{"hasUserId":true,"headers":{"x-user-id":"28","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"FIS"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:47:00","userId":"28"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:47:00","userId":28,"username":"FIS"}
+{"hasUserId":true,"headers":{"x-user-id":"28","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"FIS"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:47:10","userId":"28"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:47:11","userId":28,"username":"FIS"}
+{"hasUserId":true,"headers":{"x-user-id":"28","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"FIS"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:52:33","userId":"28"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:52:34","userId":28,"username":"FIS"}
+{"hasUserId":true,"headers":{"x-user-id":"28","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"FIS"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:57:51","userId":"28"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:57:52","userId":28,"username":"FIS"}
+{"hasUserId":true,"headers":{"x-user-id":"28","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"FIS"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:57:53","userId":"28"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:57:53","userId":28,"username":"FIS"}
+{"hasUserId":true,"headers":{"x-user-id":"28","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"FIS"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:57:55","userId":"28"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:57:55","userId":28,"username":"FIS"}
+{"hasUserId":true,"headers":{"x-user-id":"28","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"FIS"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:57:56","userId":"28"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:57:56","userId":28,"username":"FIS"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:58:00","userId":"28"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:58:27","username":"CCKLSonLa"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 08:58:27","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:58:28","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:58:28","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:58:36","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:58:36","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:58:38","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:58:38","userId":29,"username":"CCKLSonLa"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:58:54","userId":"29"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:59:00","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 08:59:00","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:59:01","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:59:01","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:59:02","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:59:02","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:59:03","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:59:03","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 08:59:13","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 08:59:22","username":"CCKLSonLa"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 08:59:22","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:59:23","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:59:23","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:59:29","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:59:29","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:59:52","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:59:52","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:59:53","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:59:53","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:59:58","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:59:58","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 08:59:59","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 08:59:59","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:00:00","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:00:00","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:00:01","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:00:01","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:00:02","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:00:02","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:00:10","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:00:10","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:00:11","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:00:11","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:00:11","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:00:11","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:00:16","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:00:16","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:02:24","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:02:24","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:06:08","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:06:09","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:06:11","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:06:11","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:06:11","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:06:11","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:06:41","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:06:41","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:06:50","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:06:50","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:06:56","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:06:56","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:09:57","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:09:57","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:10:11","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:10:11","userId":29,"username":"CCKLSonLa"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:10:41","userId":"29"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:10:41","userId":"29"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:10:42","userId":"29"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:10:42","userId":"29"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:10:42","userId":"29"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:10:42","userId":"29"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:10:42","userId":"29"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:10:44","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:10:44","userId":29,"username":"CCKLSonLa"}
+{"hasUserId":true,"headers":{"x-user-id":"29","x-user-roles":"Chi%20c%E1%BB%A5c%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"CCKLSonLa"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:10:44","userId":"29"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:10:44","userId":29,"username":"CCKLSonLa"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 09:11:04","username":"HatKiemLam"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 09:11:04","userId":30,"username":"HatKiemLam"}
+{"hasUserId":true,"headers":{"x-user-id":"30","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"HatKiemLam"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:11:24","userId":"30"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:11:25","userId":30,"username":"HatKiemLam"}
+{"hasUserId":true,"headers":{"x-user-id":"30","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"HatKiemLam"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:11:38","userId":"30"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:11:38","userId":30,"username":"HatKiemLam"}
+{"hasUserId":true,"headers":{"x-user-id":"30","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"HatKiemLam"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:11:59","userId":"30"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:11:59","userId":30,"username":"HatKiemLam"}
+{"hasUserId":true,"headers":{"x-user-id":"30","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"HatKiemLam"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:12:44","userId":"30"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:12:44","userId":30,"username":"HatKiemLam"}
+{"hasUserId":true,"headers":{"x-user-id":"30","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"HatKiemLam"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:12:51","userId":"30"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:12:52","userId":30,"username":"HatKiemLam"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:12:57","userId":"30"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 09:13:07","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 09:13:07","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:13:14","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:13:14","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:13:20","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:13:20","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:13:40","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:13:40","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:13:51","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:13:51","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:14:00","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 09:14:08","username":"HatKiemLam"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 09:14:09","userId":30,"username":"HatKiemLam"}
+{"hasUserId":true,"headers":{"x-user-id":"30","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"HatKiemLam"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:14:15","userId":"30"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:14:15","userId":30,"username":"HatKiemLam"}
+{"hasUserId":true,"headers":{"x-user-id":"30","x-user-roles":"H%E1%BA%A1t%20ki%E1%BB%83m%20l%C3%A2m","x-user-username":"HatKiemLam"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:14:35","userId":"30"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:14:35","userId":30,"username":"HatKiemLam"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:15:19","userId":"30"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:15:19","userId":"30"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:15:19","userId":"30"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:15:19","userId":"30"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:15:19","userId":"30"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 09:15:27","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 09:15:27","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:15:35","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:15:35","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:15:42","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:15:42","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:15:42","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:15:42","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:15:57","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 09:16:08","username":"KiemLamVien"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 09:16:09","userId":31,"username":"KiemLamVien"}
+{"hasUserId":true,"headers":{"x-user-id":"31","x-user-roles":"Ki%E1%BB%83m%20l%C3%A2m%20vi%C3%AAn","x-user-username":"KiemLamVien"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:16:16","userId":"31"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:16:16","userId":31,"username":"KiemLamVien"}
+{"hasUserId":true,"headers":{"x-user-id":"31","x-user-roles":"Ki%E1%BB%83m%20l%C3%A2m%20vi%C3%AAn","x-user-username":"KiemLamVien"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:16:31","userId":"31"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:16:31","userId":31,"username":"KiemLamVien"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:21:05","userId":"31"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:21:05","userId":"31"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 09:21:10","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 09:21:11","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:21:11","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:21:12","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:21:15","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:21:15","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:21:26","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:21:26","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:21:37","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:21:37","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:21:37","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:21:37","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:21:38","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:21:38","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:21:40","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:21:40","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:21:40","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:21:40","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:21:41","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:21:41","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:21:41","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:21:42","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:21:43","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:21:43","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:21:46","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:21:46","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:21:48","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:21:48","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:22:08","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:22:08","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:22:58","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:22:59","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:25:01","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:25:01","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:25:20","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:25:20","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:28:02","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:28:03","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:28:04","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:28:04","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:28:05","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:28:05","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:41:22","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:41:23","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:41:24","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:41:24","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:41:38","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 09:41:53","username":"KiemLamVien"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 09:41:54","userId":31,"username":"KiemLamVien"}
+{"hasUserId":true,"headers":{"x-user-id":"31","x-user-roles":"Ki%E1%BB%83m%20l%C3%A2m%20vi%C3%AAn","x-user-username":"KiemLamVien"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:42:15","userId":"31"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:42:15","userId":31,"username":"KiemLamVien"}
+{"hasUserId":true,"headers":{"x-user-id":"31","x-user-roles":"Ki%E1%BB%83m%20l%C3%A2m%20vi%C3%AAn","x-user-username":"KiemLamVien"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:42:21","userId":"31"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:42:21","userId":31,"username":"KiemLamVien"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:43:50","userId":"31"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 09:43:56","username":"admin"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 09:43:56","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:43:57","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:43:58","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:43:59","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:43:59","userId":1,"username":"admin"}
+{"hasUserId":true,"headers":{"x-user-id":"1","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"admin"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:44:00","userId":"1"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:44:00","userId":1,"username":"admin"}
+{"level":"info","message":"User logout","service":"auth-controller","timestamp":"2026-01-08 09:44:14","userId":"1"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-08 09:44:29","username":"KiemLamVien"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-08 09:44:29","userId":31,"username":"KiemLamVien"}
+{"hasUserId":true,"headers":{"x-user-id":"31","x-user-roles":"Ki%E1%BB%83m%20l%C3%A2m%20vi%C3%AAn","x-user-username":"KiemLamVien"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:44:30","userId":"31"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:44:30","userId":31,"username":"KiemLamVien"}
+{"hasUserId":true,"headers":{"x-user-id":"31","x-user-roles":"Ki%E1%BB%83m%20l%C3%A2m%20vi%C3%AAn","x-user-username":"KiemLamVien"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:44:33","userId":"31"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:44:33","userId":31,"username":"KiemLamVien"}
+{"hasUserId":true,"headers":{"x-user-id":"31","x-user-roles":"Ki%E1%BB%83m%20l%C3%A2m%20vi%C3%AAn","x-user-username":"KiemLamVien"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 09:44:36","userId":"31"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 09:44:36","userId":31,"username":"KiemLamVien"}
+{"hasUserId":true,"headers":{"x-user-id":"31","x-user-roles":"Ki%E1%BB%83m%20l%C3%A2m%20vi%C3%AAn","x-user-username":"KiemLamVien"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-08 22:24:10","userId":"31"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-08 22:24:11","userId":31,"username":"KiemLamVien"}
+{"level":"info","message":"Login attempt","service":"auth-controller","timestamp":"2026-01-09 08:35:35","username":"FIS"}
+{"level":"info","message":"Login successful","service":"auth-controller","timestamp":"2026-01-09 08:35:35","userId":28,"username":"FIS"}
+{"hasUserId":true,"headers":{"x-user-id":"28","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"FIS"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-09 08:35:35","userId":"28"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-09 08:35:35","userId":28,"username":"FIS"}
+{"hasUserId":true,"headers":{"x-user-id":"28","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"FIS"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-09 09:02:48","userId":"28"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-09 09:02:48","userId":28,"username":"FIS"}
+{"hasUserId":true,"headers":{"x-user-id":"28","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"FIS"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-09 09:02:48","userId":"28"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-09 09:02:48","userId":28,"username":"FIS"}
+{"hasUserId":true,"headers":{"x-user-id":"28","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-username":"FIS"},"level":"info","message":"getCurrentUser called","service":"auth-controller","timestamp":"2026-01-09 09:03:22","userId":"28"}
+{"level":"info","message":"getCurrentUser successful","roleCount":1,"service":"auth-controller","timestamp":"2026-01-09 09:03:22","userId":28,"username":"FIS"}

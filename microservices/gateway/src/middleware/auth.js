@@ -8,16 +8,32 @@ const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.error('[Auth] No token provided:', { path: req.path, headers: req.headers });
     return res.status(401).json({
       success: false,
-      message: 'No token provided'
+      error: {
+        code: 'NO_TOKEN',
+        message: 'No authentication token provided'
+      }
     });
   }
 
   const token = authHeader.split(' ')[1];
 
+  if (!token || token.trim() === '') {
+    console.error('[Auth] Empty token:', { path: req.path });
+    return res.status(401).json({
+      success: false,
+      error: {
+        code: 'EMPTY_TOKEN',
+        message: 'Authentication token is empty'
+      }
+    });
+  }
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
+    console.log('[Auth] Token verified successfully:', { userId: decoded.id, username: decoded.username });
 
     req.user = {
       id: decoded.id,
@@ -28,26 +44,51 @@ const authenticate = (req, res, next) => {
       permissions: decoded.permissions || []
     };
 
-    // Forward user info to downstream services
-    req.headers['x-user-id'] = decoded.id;
-    req.headers['x-user-username'] = decoded.username;
-    req.headers['x-user-roles'] = decoded.roles ? decoded.roles.join(',') : '';
+    // Forward user info to downstream services (must be strings)
+    req.headers['x-user-id'] = String(decoded.id);
+    req.headers['x-user-username'] = String(decoded.username);
+    // Encode roles to avoid invalid characters in headers (Vietnamese text)
+    const rolesArray = decoded.roles ? decoded.roles.map(r => typeof r === 'object' ? r.name || r.id : r) : [];
+    req.headers['x-user-roles'] = encodeURIComponent(rolesArray.join(','));
     req.headers['x-user-permissions'] = decoded.permissions ? decoded.permissions.join(',') : '';
 
     next();
   } catch (error) {
-    console.error('JWT verification failed:', error.message);
+    console.log('❌❌❌ [Auth] JWT verification failed:', {
+      error: error.message,
+      name: error.name,
+      path: req.path,
+      tokenPreview: token.substring(0, 50) + '...',
+      tokenLength: token.length,
+      stack: error.stack
+    });
 
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
         success: false,
-        message: 'Token expired'
+        error: {
+          code: 'TOKEN_EXPIRED',
+          message: 'Authentication token has expired'
+        }
+      });
+    }
+
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'INVALID_TOKEN',
+          message: 'Authentication token is invalid'
+        }
       });
     }
 
     return res.status(401).json({
       success: false,
-      message: 'Invalid token'
+      error: {
+        code: 'AUTH_ERROR',
+        message: 'Authentication failed'
+      }
     });
   }
 };
@@ -123,7 +164,9 @@ const optionalAuth = (req, res, next) => {
 
     req.headers['x-user-id'] = decoded.id;
     req.headers['x-user-username'] = decoded.username;
-    req.headers['x-user-roles'] = decoded.roles ? decoded.roles.join(',') : '';
+    // Encode roles to avoid invalid characters in headers (Vietnamese text)
+    const rolesArray = decoded.roles ? decoded.roles.map(r => typeof r === 'object' ? r.name || r.id : r) : [];
+    req.headers['x-user-roles'] = encodeURIComponent(rolesArray.join(','));
     req.headers['x-user-permissions'] = decoded.permissions ? decoded.permissions.join(',') : '';
   } catch (error) {
     // Ignore errors for optional auth
@@ -149,9 +192,13 @@ const authenticateFlexible = (req, res, next) => {
   }
 
   if (!token) {
+    console.error('[Auth Flexible] No token provided:', { path: req.path });
     return res.status(401).json({
       success: false,
-      message: 'No token provided'
+      error: {
+        code: 'NO_TOKEN',
+        message: 'No authentication token provided'
+      }
     });
   }
 
@@ -167,26 +214,38 @@ const authenticateFlexible = (req, res, next) => {
       permissions: decoded.permissions || []
     };
 
-    // Forward user info to downstream services
-    req.headers['x-user-id'] = decoded.id;
-    req.headers['x-user-username'] = decoded.username;
-    req.headers['x-user-roles'] = decoded.roles ? decoded.roles.join(',') : '';
+    // Forward user info to downstream services (must be strings)
+    req.headers['x-user-id'] = String(decoded.id);
+    req.headers['x-user-username'] = String(decoded.username);
+    // Encode roles to avoid invalid characters in headers (Vietnamese text)
+    const rolesArray = decoded.roles ? decoded.roles.map(r => typeof r === 'object' ? r.name || r.id : r) : [];
+    req.headers['x-user-roles'] = encodeURIComponent(rolesArray.join(','));
     req.headers['x-user-permissions'] = decoded.permissions ? decoded.permissions.join(',') : '';
 
     next();
   } catch (error) {
-    console.error('JWT verification failed:', error.message);
+    console.error('[Auth Flexible] JWT verification failed:', {
+      error: error.message,
+      name: error.name,
+      path: req.path
+    });
 
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
         success: false,
-        message: 'Token expired'
+        error: {
+          code: 'TOKEN_EXPIRED',
+          message: 'Authentication token has expired'
+        }
       });
     }
 
     return res.status(401).json({
       success: false,
-      message: 'Invalid token'
+      error: {
+        code: 'INVALID_TOKEN',
+        message: 'Authentication token is invalid'
+      }
     });
   }
 };

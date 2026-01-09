@@ -1,7 +1,7 @@
 // gis-service/src/controllers/shapefile.controller.js
 const multer = require('multer');
 const AdmZip = require('adm-zip');
-const { ogr2ogr } = require('ogr2ogr'); // ✅ Destructure để lấy named export
+const shapefile = require('shapefile'); // ✅ Pure JavaScript shapefile reader (no GDAL required)
 const fs = require('fs').promises;
 const path = require('path');
 const axios = require('axios');
@@ -10,6 +10,91 @@ const { ValidationError } = require('../../../../shared/errors');
 const { formatResponse } = require('../../../../shared/utils');
 
 const logger = createLogger('shapefile-controller');
+
+// ✅ Hàm đọc file .prj và phát hiện SRID
+async function detectSRIDFromPrj(prjPath) {
+  try {
+    const prjContent = await fs.readFile(prjPath, 'utf-8');
+    logger.info('PRJ content detected', { prjContent: prjContent.substring(0, 300) });
+
+    // Common SRID patterns from GEE exports
+    if (prjContent.includes('WGS_1984') || prjContent.includes('WGS 84') || prjContent.includes('GCS_WGS_1984')) {
+      return 4326; // WGS84
+    }
+    if (prjContent.includes('UTM_Zone_48N') || prjContent.includes('UTM zone 48N') || prjContent.includes('WGS_1984_UTM_Zone_48N')) {
+      return 32648; // UTM Zone 48N (Việt Nam)
+    }
+    if (prjContent.includes('UTM_Zone_49N') || prjContent.includes('UTM zone 49N') || prjContent.includes('WGS_1984_UTM_Zone_49N')) {
+      return 32649; // UTM Zone 49N (Việt Nam)
+    }
+    if (prjContent.includes('VN-2000') || prjContent.includes('Vietnam_2000')) {
+      return 4756; // VN-2000
+    }
+    if (prjContent.includes('Pseudo_Mercator') || prjContent.includes('Web_Mercator') || prjContent.includes('Auxiliary_Sphere')) {
+      return 3857; // Web Mercator (Google)
+    }
+    if (prjContent.includes('EPSG')) {
+      const match = prjContent.match(/EPSG[:\s"]*(\d+)/i);
+      if (match) {
+        return parseInt(match[1]);
+      }
+    }
+
+    // Default to WGS84 if cannot determine
+    return 4326;
+  } catch (error) {
+    logger.warn('Could not read .prj file, assuming WGS84', { error: error.message });
+    return 4326;
+  }
+}
+
+// ✅ Hàm kiểm tra xem coordinates có phải là WGS84 không (auto-detect từ giá trị)
+function detectSRIDFromCoordinates(geometry) {
+  try {
+    let coords;
+    if (geometry.type === 'Polygon') {
+      coords = geometry.coordinates[0][0];
+    } else if (geometry.type === 'MultiPolygon') {
+      coords = geometry.coordinates[0][0][0];
+    } else if (geometry.type === 'Point') {
+      coords = geometry.coordinates;
+    } else {
+      return 4326;
+    }
+
+    if (!coords || coords.length < 2) return 4326;
+
+    const [x, y] = coords;
+
+    // WGS84 (lat/lon): x trong [-180, 180], y trong [-90, 90]
+    // Việt Nam WGS84: x [102-110], y [8-24]
+    const isVietnamWGS84 = x >= 100 && x <= 115 && y >= 5 && y <= 25;
+
+    // UTM Zone 48N (Sơn La): x ~400000-600000, y ~2000000-2500000
+    const isUTM48N = x >= 300000 && x <= 700000 && y >= 1800000 && y <= 2600000;
+
+    if (isVietnamWGS84) {
+      logger.info('Coordinates detected as WGS84', { x, y });
+      return 4326;
+    }
+
+    if (isUTM48N) {
+      logger.info('Coordinates detected as UTM Zone 48N', { x, y });
+      return 32648;
+    }
+
+    // Nếu x,y quá lớn (> 1000) -> có thể là projected
+    if (Math.abs(x) > 1000 || Math.abs(y) > 1000) {
+      logger.warn('Unknown projected coordinates, will try UTM 48N', { x, y });
+      return 32648;
+    }
+
+    return 4326;
+  } catch (error) {
+    logger.warn('Error detecting SRID from coordinates', { error: error.message });
+    return 4326;
+  }
+}
 
 // Configure multer for file upload
 const storage = multer.diskStorage({
@@ -78,14 +163,29 @@ exports.importShapefile = async (req, res, next) => {
 
     const shpPath = path.join(extractPath, shpFile);
 
-    logger.info('Converting shapefile to GeoJSON', { shpFile });
+    // ✅ Detect SRID from .prj file
+    const prjFile = files.find(f => f.endsWith('.prj'));
+    let detectedSRID = 4326;
+    if (prjFile) {
+      const prjPath = path.join(extractPath, prjFile);
+      detectedSRID = await detectSRIDFromPrj(prjPath);
+    }
 
-    // Convert to GeoJSON using ogr2ogr (v6.x API)
-    const result = await ogr2ogr(shpPath, {
-      options: ['-t_srs', 'EPSG:4326'] // ✅ Sử dụng options array thay vì targetSrs
-    });
+    logger.info('Converting shapefile to GeoJSON', { shpFile, detectedSRID });
 
-    const geoJSON = result.data; // ✅ Lấy data từ result object
+    // Convert to GeoJSON using shapefile package (pure JavaScript, no GDAL needed)
+    const featureList = [];
+    const source = await shapefile.open(shpPath);
+
+    let result;
+    while ((result = await source.read()) && !result.done) {
+      featureList.push(result.value);
+    }
+
+    const geoJSON = {
+      type: 'FeatureCollection',
+      features: featureList
+    };
 
     logger.info('Shapefile converted', {
       features: geoJSON.features?.length || 0
@@ -93,7 +193,17 @@ exports.importShapefile = async (req, res, next) => {
 
     // Validate GeoJSON
     if (!geoJSON.features || geoJSON.features.length === 0) {
-      throw new ValidationError('Shapefile contains no features');
+      throw new ValidationError('❌ File shapefile không chứa dữ liệu. Vui lòng kiểm tra file shapefile có dữ liệu không');
+    }
+
+    // ✅ Auto-detect SRID từ coordinates nếu .prj không rõ ràng
+    if (detectedSRID === 4326 && geoJSON.features.length > 0) {
+      const sampleGeometry = geoJSON.features[0].geometry;
+      const coordSRID = detectSRIDFromCoordinates(sampleGeometry);
+      if (coordSRID !== 4326) {
+        detectedSRID = coordSRID;
+        logger.info('SRID updated from coordinate analysis', { newSRID: detectedSRID });
+      }
     }
 
     // Insert into database
@@ -105,24 +215,68 @@ exports.importShapefile = async (req, res, next) => {
         const props = feature.properties || {};
         const geometry = feature.geometry;
 
-        // Build insert query
-        const insertQuery = `
-          INSERT INTO son_la_mat_rung (
-            geom,
-            area,
-            start_dau,
-            end_sau,
-            mahuyen,
-            detection_status
-          ) VALUES (
-            ST_GeomFromGeoJSON($1),
-            $2,
-            $3,
-            $4,
-            $5,
-            'Chưa xác minh'
-          )
-        `;
+        // ✅ Build insert query với ST_Transform nếu cần chuyển đổi hệ tọa độ
+        let insertQuery;
+        if (detectedSRID !== 4326) {
+          // Cần transform từ SRID gốc về WGS84 (4326)
+          insertQuery = `
+            INSERT INTO son_la_mat_rung (
+              geom,
+              area,
+              start_dau,
+              end_sau,
+              mahuyen,
+              detection_status
+            ) VALUES (
+              ST_Multi(
+                ST_CollectionExtract(
+                  ST_Buffer(
+                    ST_MakeValid(
+                      ST_Transform(
+                        ST_SetSRID(ST_GeomFromGeoJSON($1), ${detectedSRID}),
+                        4326
+                      )
+                    ),
+                    0
+                  ),
+                  3
+                )
+              ),
+              $2,
+              $3,
+              $4,
+              $5,
+              'Chưa xác minh'
+            )
+          `;
+        } else {
+          // Dữ liệu đã là WGS84
+          insertQuery = `
+            INSERT INTO son_la_mat_rung (
+              geom,
+              area,
+              start_dau,
+              end_sau,
+              mahuyen,
+              detection_status
+            ) VALUES (
+              ST_Multi(
+                ST_CollectionExtract(
+                  ST_Buffer(
+                    ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)),
+                    0
+                  ),
+                  3
+                )
+              ),
+              $2,
+              $3,
+              $4,
+              $5,
+              'Chưa xác minh'
+            )
+          `;
+        }
 
         await db.query(insertQuery, [
           JSON.stringify(geometry),
@@ -143,20 +297,23 @@ exports.importShapefile = async (req, res, next) => {
 
     // Clear cache
     await redis.clearPattern('matrung:*');
+    await redis.clearPattern('layer:*');
 
     logger.info('Shapefile import completed', {
       total: geoJSON.features.length,
       inserted: insertedCount,
-      errors: errorCount
+      errors: errorCount,
+      srid: detectedSRID
     });
 
     res.json(formatResponse(
       true,
-      'Shapefile imported successfully',
+      `Shapefile imported successfully (SRID: ${detectedSRID})`,
       {
         total_features: geoJSON.features.length,
         inserted: insertedCount,
-        errors: errorCount
+        errors: errorCount,
+        detected_srid: detectedSRID
       }
     ));
 
@@ -262,14 +419,29 @@ exports.importFromGeeUrl = async (req, res, next) => {
 
     const shpPath = path.join(extractPath, shpFile);
 
-    logger.info('Converting shapefile to GeoJSON', { shpFile });
+    // ✅ Detect SRID from .prj file
+    const prjFile = files.find(f => f.endsWith('.prj'));
+    let detectedSRID = 4326;
+    if (prjFile) {
+      const prjPath = path.join(extractPath, prjFile);
+      detectedSRID = await detectSRIDFromPrj(prjPath);
+    }
 
-    // Convert to GeoJSON using ogr2ogr (v6.x API)
-    const result = await ogr2ogr(shpPath, {
-      options: ['-t_srs', 'EPSG:4326'] // ✅ Sử dụng options array thay vì targetSrs
-    });
+    logger.info('Converting shapefile to GeoJSON', { shpFile, detectedSRID });
 
-    const geoJSON = result.data; // ✅ Lấy data từ result object
+    // Convert to GeoJSON using shapefile package (pure JavaScript, no GDAL needed)
+    const featureList = [];
+    const source = await shapefile.open(shpPath);
+
+    let result;
+    while ((result = await source.read()) && !result.done) {
+      featureList.push(result.value);
+    }
+
+    const geoJSON = {
+      type: 'FeatureCollection',
+      features: featureList
+    };
 
     logger.info('Shapefile converted to GeoJSON', {
       features: geoJSON.features?.length || 0
@@ -277,8 +449,20 @@ exports.importFromGeeUrl = async (req, res, next) => {
 
     // Validate GeoJSON
     if (!geoJSON.features || geoJSON.features.length === 0) {
-      throw new ValidationError('Shapefile contains no features');
+      throw new ValidationError('❌ File ZIP không chứa dữ liệu. Vui lòng kiểm tra:\n• File shapefile có dữ liệu không\n• Quá trình export từ Google Earth Engine có thành công không\n• Task trên GEE đã hoàn thành chưa');
     }
+
+    // ✅ Auto-detect SRID từ coordinates nếu .prj không rõ ràng
+    if (detectedSRID === 4326 && geoJSON.features.length > 0) {
+      const sampleGeometry = geoJSON.features[0].geometry;
+      const coordSRID = detectSRIDFromCoordinates(sampleGeometry);
+      if (coordSRID !== 4326) {
+        detectedSRID = coordSRID;
+        logger.info('SRID updated from coordinate analysis', { newSRID: detectedSRID });
+      }
+    }
+
+    logger.info('Final SRID determined', { detectedSRID });
 
     // Check for duplicates before importing
     let existingCount = 0;
@@ -289,7 +473,7 @@ exports.importFromGeeUrl = async (req, res, next) => {
     const BATCH_SIZE = 50;
     const features = geoJSON.features;
 
-    logger.info('Starting batch processing', { totalFeatures: features.length, batchSize: BATCH_SIZE });
+    logger.info('Starting batch processing', { totalFeatures: features.length, batchSize: BATCH_SIZE, srid: detectedSRID });
 
     for (let i = 0; i < features.length; i += BATCH_SIZE) {
       const batch = features.slice(i, Math.min(i + BATCH_SIZE, features.length));
@@ -311,42 +495,72 @@ exports.importFromGeeUrl = async (req, res, next) => {
             throw new Error('Feature has no valid geometry');
           }
 
-          // Check for duplicate based on geometry and date
-          const checkQuery = `
-            SELECT COUNT(*) as count FROM son_la_mat_rung
-            WHERE ST_Equals(geom, ST_GeomFromGeoJSON($1))
-            AND start_dau = $2
-          `;
-
-          const checkResult = await db.query(checkQuery, [
-            JSON.stringify(geometry),
-            props.start_dau || new Date().toISOString()
-          ]);
-
-          if (parseInt(checkResult.rows[0].count) > 0) {
-            return { status: 'existing' };
+          // ✅ Build insert query với ST_Transform nếu cần chuyển đổi hệ tọa độ
+          let insertQuery;
+          if (detectedSRID !== 4326) {
+            // Cần transform từ SRID gốc về WGS84 (4326)
+            insertQuery = `
+              INSERT INTO son_la_mat_rung (
+                geom,
+                area,
+                start_dau,
+                end_sau,
+                mahuyen,
+                detection_status
+              ) VALUES (
+                ST_Multi(
+                  ST_CollectionExtract(
+                    ST_Buffer(
+                      ST_MakeValid(
+                        ST_Transform(
+                          ST_SetSRID(ST_GeomFromGeoJSON($1), ${detectedSRID}),
+                          4326
+                        )
+                      ),
+                      0
+                    ),
+                    3
+                  )
+                ),
+                $2,
+                $3,
+                $4,
+                $5,
+                'Chưa xác minh'
+              )
+              RETURNING gid
+            `;
+          } else {
+            // Dữ liệu đã là WGS84
+            insertQuery = `
+              INSERT INTO son_la_mat_rung (
+                geom,
+                area,
+                start_dau,
+                end_sau,
+                mahuyen,
+                detection_status
+              ) VALUES (
+                ST_Multi(
+                  ST_CollectionExtract(
+                    ST_Buffer(
+                      ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)),
+                      0
+                    ),
+                    3
+                  )
+                ),
+                $2,
+                $3,
+                $4,
+                $5,
+                'Chưa xác minh'
+              )
+              RETURNING gid
+            `;
           }
 
-          // Insert new record
-          const insertQuery = `
-            INSERT INTO son_la_mat_rung (
-              geom,
-              area,
-              start_dau,
-              end_sau,
-              mahuyen,
-              detection_status
-            ) VALUES (
-              ST_GeomFromGeoJSON($1),
-              $2,
-              $3,
-              $4,
-              $5,
-              'Chưa xác minh'
-            )
-          `;
-
-          await db.query(insertQuery, [
+          const result = await db.query(insertQuery, [
             JSON.stringify(geometry),
             props.area || props.areaHa || 0,
             props.start_dau || props.startDate || new Date().toISOString(),
@@ -354,7 +568,7 @@ exports.importFromGeeUrl = async (req, res, next) => {
             props.mahuyen || props.districtCode || '01'
           ]);
 
-          return { status: 'inserted' };
+          return { status: 'inserted', gid: result.rows[0]?.gid };
         })
       );
 
@@ -377,16 +591,17 @@ exports.importFromGeeUrl = async (req, res, next) => {
 
     // Clear cache
     await redis.clearPattern('matrung:*');
+    await redis.clearPattern('layer:*');
 
     logger.info('Google Earth Engine import completed', {
       total: geoJSON.features.length,
       inserted: insertedCount,
       existing: existingCount,
-      errors: errorCount
+      errors: errorCount,
+      srid: detectedSRID
     });
 
     // Prepare response
-    const totalProcessed = insertedCount + existingCount + errorCount;
     let message = '';
     let alreadyExists = false;
 
@@ -394,15 +609,14 @@ exports.importFromGeeUrl = async (req, res, next) => {
       message = `Dữ liệu đã tồn tại trong hệ thống. Không có bản ghi mới nào được thêm.`;
       alreadyExists = true;
     } else if (insertedCount > 0 && existingCount > 0) {
-      message = `Import thành công! Đã thêm ${insertedCount} bản ghi mới, ${existingCount} bản ghi đã tồn tại.`;
+      message = `Import thành công! Đã thêm ${insertedCount} bản ghi mới, ${existingCount} bản ghi đã tồn tại. (SRID: ${detectedSRID})`;
     } else if (insertedCount > 0) {
-      message = `Import thành công! Đã thêm ${insertedCount} bản ghi mới.`;
+      message = `Import thành công! Đã thêm ${insertedCount} bản ghi mới. (SRID: ${detectedSRID})`;
     } else {
       message = `Import thất bại. Không có bản ghi nào được thêm vào hệ thống.`;
     }
 
     // Get recently added data for display (only new records from this import)
-    // Chỉ lấy dữ liệu được thêm trong vòng 1 phút qua để tránh timeout
     const getAllQuery = `
       SELECT
         gid,
@@ -448,6 +662,7 @@ exports.importFromGeeUrl = async (req, res, next) => {
       recordsExisting: existingCount,
       recordsError: errorCount,
       totalFeatures: geoJSON.features.length,
+      detectedSRID: detectedSRID,
       geojson: geojsonData
     });
 
@@ -516,6 +731,376 @@ exports.importFromGeeUrl = async (req, res, next) => {
     } catch (cleanupError) {
       logger.warn('Cleanup failed', { error: cleanupError.message });
     }
+  }
+};
+
+// Import from GeoJSON URL with spatial intersection validation
+exports.importFromGeoJsonUrl = async (req, res, next) => {
+  try {
+    const { jsonUrl } = req.body;
+
+    if (!jsonUrl) {
+      throw new ValidationError('jsonUrl is required');
+    }
+
+    const db = req.app.locals.db;
+    const redis = req.app.locals.redis;
+    const adminDb = req.app.locals.adminDb; // Connection to admin_db
+
+    logger.info('Downloading GeoJSON from URL', { url: jsonUrl });
+
+    // Download GeoJSON file
+    let response;
+    try {
+      response = await axios.get(jsonUrl, {
+        timeout: 280000, // 4 phút 40 giây
+        responseType: 'json',
+        headers: {
+          'Accept': 'application/json, application/geo+json, */*',
+          'User-Agent': 'DuBaoMatRung/1.0'
+        },
+        maxContentLength: 100 * 1024 * 1024, // 100MB
+        maxBodyLength: 100 * 1024 * 1024,
+        validateStatus: (status) => status < 500
+      });
+    } catch (fetchError) {
+      logger.error('Failed to download GeoJSON', {
+        error: fetchError.message,
+        code: fetchError.code
+      });
+      throw fetchError;
+    }
+
+    logger.info('GeoJSON response received', {
+      status: response.status,
+      contentType: response.headers['content-type']
+    });
+
+    // Check response status
+    if (response.status !== 200) {
+      logger.error('URL returned non-200 status', {
+        status: response.status,
+        statusText: response.statusText
+      });
+      throw new ValidationError(`URL trả về lỗi ${response.status}: ${response.statusText || 'Unknown error'}`);
+    }
+
+    const geoJSON = response.data;
+
+    // Validate GeoJSON structure
+    if (!geoJSON || typeof geoJSON !== 'object') {
+      throw new ValidationError('Dữ liệu tải về không phải là JSON hợp lệ');
+    }
+
+    if (!geoJSON.features || !Array.isArray(geoJSON.features)) {
+      throw new ValidationError('GeoJSON không có trường "features" hoặc không phải là array');
+    }
+
+    if (geoJSON.features.length === 0) {
+      throw new ValidationError('GeoJSON không chứa dữ liệu (features rỗng)');
+    }
+
+    logger.info('GeoJSON validated', {
+      totalFeatures: geoJSON.features.length
+    });
+
+    // ✅ STEP: Filter features by spatial intersection with sonla_hientrangrung
+    logger.info('Starting spatial intersection validation with sonla_hientrangrung table');
+
+    const validFeatures = [];
+    const invalidFeatures = [];
+    let validationErrors = 0;
+
+    // Create PostgreSQL connection pool for admin_db
+    const { Pool } = require('pg');
+    const adminDbPool = new Pool({
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 5433,
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD,
+      database: 'admin_db',
+      max: 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000
+    });
+
+    try {
+      // Process features in batches for performance
+      const VALIDATION_BATCH_SIZE = 20;
+
+      for (let i = 0; i < geoJSON.features.length; i += VALIDATION_BATCH_SIZE) {
+        const batch = geoJSON.features.slice(i, Math.min(i + VALIDATION_BATCH_SIZE, geoJSON.features.length));
+
+        logger.info('Validating batch', {
+          batchNumber: Math.floor(i / VALIDATION_BATCH_SIZE) + 1,
+          batchStart: i,
+          batchEnd: Math.min(i + VALIDATION_BATCH_SIZE, geoJSON.features.length),
+          total: geoJSON.features.length
+        });
+
+        // Check each feature in parallel
+        const batchResults = await Promise.allSettled(
+          batch.map(async (feature, idx) => {
+            try {
+              if (!feature.geometry || !feature.geometry.type) {
+                throw new Error('Feature has no valid geometry');
+              }
+
+              // ✅ Query to check spatial intersection with sonla_hientrangrung
+              const intersectQuery = `
+                SELECT EXISTS (
+                  SELECT 1
+                  FROM sonla_hientrangrung
+                  WHERE ST_Intersects(
+                    geom,
+                    ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)
+                  )
+                ) as intersects
+              `;
+
+              const result = await adminDbPool.query(intersectQuery, [
+                JSON.stringify(feature.geometry)
+              ]);
+
+              return {
+                feature,
+                intersects: result.rows[0].intersects,
+                originalIndex: i + idx
+              };
+            } catch (error) {
+              logger.warn('Error validating feature', {
+                featureIndex: i + idx,
+                error: error.message
+              });
+              return {
+                feature,
+                intersects: false,
+                error: error.message,
+                originalIndex: i + idx
+              };
+            }
+          })
+        );
+
+        // Categorize results
+        batchResults.forEach((result) => {
+          if (result.status === 'fulfilled') {
+            if (result.value.intersects) {
+              validFeatures.push(result.value.feature);
+            } else {
+              invalidFeatures.push({
+                index: result.value.originalIndex,
+                reason: result.value.error || 'Không giao với khu vực hiện trạng rừng'
+              });
+            }
+          } else {
+            validationErrors++;
+            logger.error('Feature validation failed', {
+              error: result.reason?.message
+            });
+          }
+        });
+      }
+
+      logger.info('Spatial intersection validation completed', {
+        totalFeatures: geoJSON.features.length,
+        validFeatures: validFeatures.length,
+        invalidFeatures: invalidFeatures.length,
+        validationErrors
+      });
+
+      // Check if no valid features
+      if (validFeatures.length === 0) {
+        return res.json({
+          success: false,
+          message: 'Không có dữ liệu nào hợp lệ để import. Tất cả các vùng trong GeoJSON không giao với khu vực hiện trạng rừng.',
+          totalFeatures: geoJSON.features.length,
+          validFeatures: 0,
+          filteredFeatures: geoJSON.features.length,
+          recordsAdded: 0
+        });
+      }
+
+      // ✅ Insert valid features into son_la_mat_rung (gis_db)
+      logger.info('Starting insertion of valid features into son_la_mat_rung');
+
+      let insertedCount = 0;
+      let errorCount = 0;
+
+      const INSERT_BATCH_SIZE = 50;
+
+      for (let i = 0; i < validFeatures.length; i += INSERT_BATCH_SIZE) {
+        const batch = validFeatures.slice(i, Math.min(i + INSERT_BATCH_SIZE, validFeatures.length));
+
+        logger.info('Inserting batch', {
+          batchNumber: Math.floor(i / INSERT_BATCH_SIZE) + 1,
+          batchStart: i,
+          batchEnd: Math.min(i + INSERT_BATCH_SIZE, validFeatures.length),
+          total: validFeatures.length
+        });
+
+        const batchResults = await Promise.allSettled(
+          batch.map(async (feature) => {
+            const props = feature.properties || {};
+            const geometry = feature.geometry;
+
+            // Insert into son_la_mat_rung (assuming WGS84 / EPSG:4326)
+            const insertQuery = `
+              INSERT INTO son_la_mat_rung (
+                geom,
+                area,
+                start_dau,
+                end_sau,
+                mahuyen,
+                detection_status
+              ) VALUES (
+                ST_Multi(
+                  ST_CollectionExtract(
+                    ST_Buffer(
+                      ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)),
+                      0
+                    ),
+                    3
+                  )
+                ),
+                $2,
+                $3,
+                $4,
+                $5,
+                'Chưa xác minh'
+              )
+              RETURNING gid
+            `;
+
+            const result = await db.query(insertQuery, [
+              JSON.stringify(geometry),
+              props.area || props.areaHa || 0,
+              props.start_dau || props.startDate || new Date().toISOString(),
+              props.end_sau || props.endDate || new Date().toISOString(),
+              props.mahuyen || props.districtCode || '01'
+            ]);
+
+            return { status: 'inserted', gid: result.rows[0]?.gid };
+          })
+        );
+
+        // Count results
+        batchResults.forEach((result) => {
+          if (result.status === 'fulfilled') {
+            insertedCount++;
+          } else {
+            logger.warn('Failed to insert feature', {
+              error: result.reason?.message || 'Unknown error'
+            });
+            errorCount++;
+          }
+        });
+      }
+
+      // Clear cache
+      await redis.clearPattern('matrung:*');
+      await redis.clearPattern('layer:*');
+
+      logger.info('GeoJSON import completed', {
+        totalFeatures: geoJSON.features.length,
+        validFeatures: validFeatures.length,
+        filteredFeatures: invalidFeatures.length,
+        inserted: insertedCount,
+        errors: errorCount
+      });
+
+      // Get recently added data for display
+      const getAllQuery = `
+        SELECT
+          gid,
+          ST_AsGeoJSON(geom)::json as geometry,
+          area,
+          start_dau,
+          end_sau,
+          mahuyen,
+          detection_status,
+          verification_notes,
+          created_at
+        FROM son_la_mat_rung
+        WHERE created_at >= NOW() - INTERVAL '1 minute'
+        ORDER BY created_at DESC
+        LIMIT 500
+      `;
+
+      const allDataResult = await db.query(getAllQuery);
+
+      const geojsonData = {
+        type: 'FeatureCollection',
+        features: allDataResult.rows.map(row => ({
+          type: 'Feature',
+          geometry: row.geometry,
+          properties: {
+            gid: row.gid,
+            area: row.area,
+            start_dau: row.start_dau,
+            end_sau: row.end_sau,
+            mahuyen: row.mahuyen,
+            detection_status: row.detection_status,
+            verification_notes: row.verification_notes,
+            created_at: row.created_at
+          }
+        }))
+      };
+
+      res.json({
+        success: insertedCount > 0,
+        message: `Import thành công! Đã thêm ${insertedCount} bản ghi hợp lệ. Đã lọc bỏ ${invalidFeatures.length} vùng không giao với hiện trạng rừng.`,
+        totalFeatures: geoJSON.features.length,
+        validFeatures: validFeatures.length,
+        filteredFeatures: invalidFeatures.length,
+        recordsAdded: insertedCount,
+        recordsError: errorCount,
+        geojson: geojsonData
+      });
+
+    } finally {
+      // Close admin_db connection pool
+      await adminDbPool.end();
+    }
+
+  } catch (error) {
+    logger.error('GeoJSON import failed', {
+      error: error.message,
+      stack: error.stack
+    });
+
+    // Handle specific error types
+    if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+      return res.status(408).json({
+        success: false,
+        message: 'Hết thời gian chờ khi tải dữ liệu. Vui lòng thử lại.'
+      });
+    }
+
+    if (error.response) {
+      const status = error.response.status;
+      let message = 'Không thể tải dữ liệu từ URL';
+
+      if (status === 401 || status === 403) {
+        message = 'Không có quyền truy cập URL. Vui lòng kiểm tra quyền truy cập.';
+      } else if (status === 404) {
+        message = 'Không tìm thấy dữ liệu tại URL này. Vui lòng kiểm tra URL.';
+      }
+
+      return res.status(status).json({
+        success: false,
+        message
+      });
+    }
+
+    if (error instanceof ValidationError) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+
+    next(error);
   }
 };
 

@@ -4,9 +4,20 @@ const crypto = require('crypto');
 
 const { toUnicode } = require('vietnamese-conversion');
 
-// Convert TCVN3 to Unicode
+// Check if text is already Unicode (contains Vietnamese Unicode characters)
+const isUnicode = (text) => {
+  if (!text) return true;
+  // Vietnamese Unicode ranges
+  const unicodePattern = /[\u00C0-\u024F\u1E00-\u1EFF]/;
+  return unicodePattern.test(text);
+};
+
+// Convert TCVN3 to Unicode (only if not already Unicode)
 const convertTcvn3ToUnicode = (text) => {
   if (!text) return '';
+  // If already Unicode, return as-is
+  if (isUnicode(text)) return text;
+  // Otherwise convert from TCVN3
   return toUnicode(text, 'tcvn3');
 };
 
@@ -101,14 +112,14 @@ const buildWhereClause = (filters, startIndex = 1) => {
 
   Object.entries(filters).forEach(([key, value]) => {
     if (value !== null && value !== undefined && value !== '') {
-      conditions.push(`${key} = $${index}`);
+      conditions.push("${key} = $${index}");
       params.push(value);
       index++;
     }
   });
 
   const whereClause = conditions.length > 0
-    ? `WHERE ${conditions.join(' AND ')}`
+    ? "WHERE " + conditions.join(' AND ')
     : '';
 
   return { whereClause, params, nextIndex: index };
@@ -129,6 +140,7 @@ const formatResponse = (success, message, data = null, meta = null) => {
 };
 
 module.exports = {
+  isUnicode,
   convertTcvn3ToUnicode,
   generateRandomString,
   hashData,

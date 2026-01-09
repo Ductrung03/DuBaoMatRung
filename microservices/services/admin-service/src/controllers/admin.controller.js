@@ -194,7 +194,7 @@ exports.getHanhChinh = async (req, res, next) => {
         huyen,
         xa,
         ST_AsGeoJSON(ST_Transform(geom, 4326)) as geometry
-      FROM laocai_ranhgioihc
+      FROM sonla_rgx
       WHERE geom IS NOT NULL
       LIMIT 1000
     `;

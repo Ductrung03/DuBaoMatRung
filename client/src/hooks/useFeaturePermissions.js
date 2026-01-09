@@ -1,55 +1,20 @@
 /**
  * Hook để quản lý feature-based permissions
  * Sử dụng để kiểm tra quyền truy cập trang và chức năng
+ * Refactored to use PermissionContext for performance optimization (single source of truth)
  */
 
-import { useState, useEffect } from 'react';
 import { useAuth } from '../dashboard/contexts/AuthContext';
-import axios from 'axios';
+import { usePermissionContext } from '../dashboard/contexts/PermissionContext';
 
 export const useFeaturePermissions = () => {
-  const { user, isAdmin } = useAuth();
-  const [permissions, setPermissions] = useState([]);
-  const [accessiblePages, setAccessiblePages] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetchUserAccess();
-  }, [user]);
-
-  const fetchUserAccess = async () => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    // Admin có toàn quyền
-    if (isAdmin()) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await axios.get('/api/auth/permissions/my-access');
-
-      if (response.data.success) {
-        setAccessiblePages(response.data.data.pages);
-
-        // Flatten all permissions from all pages
-        const allPermissions = response.data.data.pages.flatMap(page =>
-          page.features.map(feature => feature.code)
-        );
-        setPermissions(allPermissions);
-      }
-    } catch (err) {
-      console.error('Error fetching user access:', err);
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { isAdmin } = useAuth();
+  const {
+    permissions,
+    accessiblePages,
+    loading,
+    error
+  } = usePermissionContext();
 
   /**
    * Kiểm tra xem user có quyền truy cập trang không

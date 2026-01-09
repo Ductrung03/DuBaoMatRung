@@ -192,7 +192,12 @@ exports.updateUser = async (req, res, next) => {
     if (position !== undefined) updateData.position = position;
     if (organization !== undefined) updateData.organization = organization;
     if (district_id !== undefined) updateData.district_id = district_id;
+    if (district_id !== undefined) updateData.district_id = district_id;
     if (is_active !== undefined) updateData.is_active = is_active;
+    // Update administrative units
+    if (req.body.xa !== undefined) updateData.xa = req.body.xa;
+    if (req.body.khoanh !== undefined) updateData.khoanh = req.body.khoanh;
+    if (req.body.tieukhu !== undefined) updateData.tieukhu = req.body.tieukhu;
 
     // Hash new password if provided
     if (password) {
@@ -267,6 +272,40 @@ exports.deleteUser = async (req, res, next) => {
     res.json({
       success: true,
       message: 'User deleted successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get roles of a user
+ * @route GET /api/auth/users/:userId/roles
+ */
+exports.getUserRoles = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(userId) },
+      include: {
+        userRoles: {
+          include: {
+            role: true
+          }
+        }
+      }
+    });
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    const roles = user.userRoles.map(ur => ur.role);
+
+    res.json({
+      success: true,
+      data: roles
     });
   } catch (error) {
     next(error);

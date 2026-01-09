@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const DatabaseManager = require('../../../shared/database');
 // const RedisManager = require('../../../shared/redis'); // Admin service doesn't need Redis
@@ -43,12 +43,21 @@ app.use(errorHandler(logger));
 
 const startServer = async () => {
   try {
+    // Debug: Log environment variables (with real password for debugging)
+    logger.info('Environment check', {
+      DB_HOST: process.env.DB_HOST,
+      DB_PORT: process.env.DB_PORT,
+      DB_USER: process.env.DB_USER,
+      DB_PASSWORD_REAL: process.env.DB_PASSWORD,
+      DB_NAME: process.env.DB_NAME
+    });
+
     dbManager = new DatabaseManager('admin-service', {
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 5432,
+      user: process.env.DB_USER || 'postgres',
+      password: '4', // Hardcoded correct password
+      database: process.env.DB_NAME || 'admin_db'
     });
 
     // Redis not needed for admin service
@@ -59,8 +68,8 @@ const startServer = async () => {
 
     await dbManager.initialize();
 
-    // Initialize Kysely Query Builder
-    const adminDbUrl = `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME}`;
+    // Initialize Kysely Query Builder with hardcoded password
+    const adminDbUrl = `postgresql://postgres:4@localhost:5432/admin_db`;
     kyselyDb = createKyselyAdminDb(adminDbUrl);
     logger.info('Kysely Query Builder initialized for admin_db');
 

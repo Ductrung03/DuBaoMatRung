@@ -19,85 +19,89 @@ import Map from "./dashboard/pages/Map";
 import DuBaoMatRung from "./dashboard/pages/DuBaoMatRung";
 import Dashboard from "./dashboard/pages/Dashboard";
 
+import { PermissionProvider } from "./dashboard/contexts/PermissionContext";
+
 function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
         <AuthProvider>
-          <GeoDataProvider>
-            <ReportProvider>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/" element={<Navigate to="/dashboard" />} />
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <MainLayout />
-                    </ProtectedRoute>
-                  }
-                >
-                  <Route path="" element={<Dashboard />} />
-                  <Route 
-                    path="dubaomatrung" 
-                    element={
-                      <PermissionProtectedRoute requiredPermission="forecast">
-                        <DuBaoMatRung />
-                      </PermissionProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="quanlydulieu" 
-                    element={
-                      <PermissionProtectedRoute requiredPermission="data_management">
-                        <QuanLyDuLieu />
-                      </PermissionProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="phathienmatrung" 
-                    element={
-                      <PermissionProtectedRoute requiredPermission="detection">
-                        <ErrorBoundary>
-                          <PhatHienMatRung />
-                        </ErrorBoundary>
-                      </PermissionProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="baocao" 
-                    element={
-                      <PermissionProtectedRoute requiredPermission="reports">
-                        <ThongKeBaoCaoMatRung />
-                      </PermissionProtectedRoute>
-                    } 
-                  />
+          <PermissionProvider>
+            <GeoDataProvider>
+              <ReportProvider>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/" element={<Navigate to="/dashboard" />} />
                   <Route
-                    path="quanlynguoidung"
+                    path="/dashboard"
                     element={
-                      <PermissionProtectedRoute requiredPermission="user_management">
-                        <QuanLyNguoiDung />
-                      </PermissionProtectedRoute>
+                      <ProtectedRoute>
+                        <MainLayout />
+                      </ProtectedRoute>
                     }
-                  />
-                  <Route
-                    path="quanlyrole"
-                    element={
-                      <PermissionProtectedRoute requiredPermission="role_management">
-                        <QuanLyRole />
-                      </PermissionProtectedRoute>
-                    }
-                  />
-                </Route>
-                <Route path="*" element={<Navigate to="/dashboard" />} />
-              </Routes>
-            </ReportProvider>
-          </GeoDataProvider>
+                  >
+                    <Route path="" element={<Dashboard />} />
+                    <Route
+                      path="dubaomatrung/*"
+                      element={
+                        <PermissionProtectedRoute requiredPermission="forecast">
+                          <DuBaoMatRung />
+                        </PermissionProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="quanlydulieu/*"
+                      element={
+                        <PermissionProtectedRoute requiredPermission="data_management">
+                          <QuanLyDuLieu />
+                        </PermissionProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="phathienmatrung/*"
+                      element={
+                        <PermissionProtectedRoute requiredPermission="detection">
+                          <ErrorBoundary>
+                            <PhatHienMatRung />
+                          </ErrorBoundary>
+                        </PermissionProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="baocao"
+                      element={
+                        <PermissionProtectedRoute requiredPermission="reports">
+                          <ThongKeBaoCaoMatRung />
+                        </PermissionProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="quanlynguoidung"
+                      element={
+                        <PermissionProtectedRoute requiredPermission="user_management">
+                          <QuanLyNguoiDung />
+                        </PermissionProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="quanlyrole"
+                      element={
+                        <PermissionProtectedRoute requiredPermission="role_management">
+                          <QuanLyRole />
+                        </PermissionProtectedRoute>
+                      }
+                    />
+                  </Route>
+                  <Route path="*" element={<Navigate to="/dashboard" />} />
+                </Routes>
+              </ReportProvider>
+            </GeoDataProvider>
+          </PermissionProvider>
         </AuthProvider>
-        
+
         {/* ToastContainer với z-index cao nhất và cấu hình tối ưu */}
-        <ToastContainer 
-          position="top-center" 
+        <ToastContainer
+          position="top-center"
           autoClose={3000}
           hideProgressBar={false}
           newestOnTop={true}
@@ -106,7 +110,7 @@ function App() {
           pauseOnFocusLoss={true}
           draggable={true}
           pauseOnHover={true}
-          style={{ 
+          style={{
             zIndex: 99999,
             position: 'fixed',
             top: '20px',

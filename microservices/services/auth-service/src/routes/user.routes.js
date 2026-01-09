@@ -159,6 +159,24 @@ router.delete('/:id', userController.deleteUser);
 /**
  * @swagger
  * /api/auth/users/{userId}/roles:
+ *   get:
+ *     summary: Get roles of user
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: List of user roles
+ */
+router.get('/:userId/roles', userController.getUserRoles);
+
+/**
+ * @swagger
+ * /api/auth/users/{userId}/roles:
  *   post:
  *     summary: Assign role to user
  *     tags: [Users]

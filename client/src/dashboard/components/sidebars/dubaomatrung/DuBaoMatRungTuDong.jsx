@@ -155,7 +155,7 @@ const DuBaoMatRungTuDong = () => {
         onClick={() => setIsForecastOpen(!isForecastOpen)}
       >
         <div className="flex items-center justify-between">
-          <span>Dự báo mất rừng tự động</span>
+          <span>Phân tích mất rừng tự động</span>
           <span className={`transform transition-transform ${isForecastOpen ? 'rotate-180' : ''}`}>
             ▼
           </span>
@@ -171,50 +171,56 @@ const DuBaoMatRungTuDong = () => {
 
           {/* Container để căn chỉnh */}
           <div className="flex flex-col gap-3">
-            
+
             {/* Năm */}
-            <div className="flex items-center gap-0.5">
-              <label className="text-sm font-medium w-20">Năm</label>
-              <Dropdown
-                selectedValue={selectedYear}
-                onValueChange={setSelectedYear}
-                options={years.map(year => ({ value: year.toString(), label: year.toString() }))}
-                placeholder="Chọn năm"
-                disabled={isProcessing || loading}
-                loading={isProcessing || loading}
-                className="w-36"
-                selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-              />
+            <div className="flex items-center gap-1">
+              <label className="text-sm font-medium w-16 flex-shrink-0">Năm</label>
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <Dropdown
+                  selectedValue={selectedYear}
+                  onValueChange={setSelectedYear}
+                  options={years.map(year => ({ value: year.toString(), label: year.toString() }))}
+                  placeholder="Chọn năm"
+                  disabled={isProcessing || loading}
+                  loading={isProcessing || loading}
+                  className="border border-green-400 rounded-md bg-white"
+                  selectClassName="text-sm py-1"
+                />
+              </div>
             </div>
 
             {/* Tháng */}
-            <div className="flex items-center gap-0.5">
-              <label className="text-sm font-medium w-20">Tháng</label>
-              <Dropdown
-                selectedValue={selectedMonth}
-                onValueChange={setSelectedMonth}
-                options={months}
-                placeholder="Chọn tháng"
-                disabled={isProcessing || loading}
-                loading={isProcessing || loading}
-                className="w-36"
-                selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-              />
+            <div className="flex items-center gap-1">
+              <label className="text-sm font-medium w-16 flex-shrink-0">Tháng</label>
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <Dropdown
+                  selectedValue={selectedMonth}
+                  onValueChange={setSelectedMonth}
+                  options={months}
+                  placeholder="Chọn tháng"
+                  disabled={isProcessing || loading}
+                  loading={isProcessing || loading}
+                  className="border border-green-400 rounded-md bg-white"
+                  selectClassName="text-sm py-1"
+                />
+              </div>
             </div>
 
             {/* Kỳ */}
-            <div className="flex items-center gap-0.5">
-              <label className="text-sm font-medium w-20">Kỳ</label>
-              <Dropdown
-                selectedValue={selectedPeriod}
-                onValueChange={setSelectedPeriod}
-                options={[{ value: "Trước ngày 15", label: "Trước ngày 15" }, { value: "Sau ngày 15", label: "Sau ngày 15" }]}
-                placeholder="Chọn kỳ"
-                disabled={isProcessing || loading}
-                loading={isProcessing || loading}
-                className="w-36"
-                selectClassName="w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-              />
+            <div className="flex items-center gap-1">
+              <label className="text-sm font-medium w-16 flex-shrink-0">Kỳ</label>
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <Dropdown
+                  selectedValue={selectedPeriod}
+                  onValueChange={setSelectedPeriod}
+                  options={[{ value: "Trước ngày 15", label: "Trước ngày 15" }, { value: "Sau ngày 15", label: "Sau ngày 15" }]}
+                  placeholder="Chọn kỳ"
+                  disabled={isProcessing || loading}
+                  loading={isProcessing || loading}
+                  className="border border-green-400 rounded-md bg-white"
+                  selectClassName="text-sm py-1"
+                />
+              </div>
             </div>
           </div>
 
@@ -235,7 +241,7 @@ const DuBaoMatRungTuDong = () => {
                   Đang xử lý...
                 </span>
               ) : (
-                'Dự báo'
+                'Phân tích'
               )}
             </button>
 

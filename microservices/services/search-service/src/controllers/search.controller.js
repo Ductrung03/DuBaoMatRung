@@ -43,13 +43,14 @@ exports.searchMatRung = async (req, res, next) => {
       params.push('Đã xác minh');
     }
 
+    // ✅ FIX: Dùng end_sau thay vì detection_date vì detection_date đều NULL
     if (fromDate) {
-      whereClause += ` AND m.detection_date >= $${paramIndex++}`;
+      whereClause += ` AND m.end_sau >= $${paramIndex++}`;
       params.push(fromDate);
     }
 
     if (toDate) {
-      whereClause += ` AND m.detection_date <= $${paramIndex++}`;
+      whereClause += ` AND m.end_sau <= $${paramIndex++}`;
       params.push(toDate);
     }
 
@@ -89,7 +90,7 @@ exports.searchMatRung = async (req, res, next) => {
       // Get matching geometries from admin_db
       const spatialQuery = `
         SELECT ST_AsText(ST_Union(r.geom)) as union_geom_wkt
-        FROM laocai_ranhgioihc r
+        FROM sonla_rgx r
         ${spatialWhereClause}
       `;
 
@@ -109,6 +110,12 @@ exports.searchMatRung = async (req, res, next) => {
     }
 
     // ✅ OPTIMIZED: Query với tất cả thông tin cần thiết
+    // ✅ Tính diện tích từ geometry thay vì dùng field area (vì area = 0)
+    // ✅ FIX: Dùng lowercase cho aliases hoặc quote chúng để tránh PostgreSQL auto-lowercase
+    // ✅ FIX: Nếu limit=0 thì không giới hạn (dùng cho báo cáo)
+    const parsedLimit = parseInt(limit);
+    const limitClause = parsedLimit > 0 ? `LIMIT $${paramIndex}` : '';
+
     query = `
       SELECT
         m.gid,
@@ -117,10 +124,10 @@ exports.searchMatRung = async (req, res, next) => {
         m.end_sau,
         m.mahuyen,
         CONCAT('CB-', m.gid) as lo_canbao,
-        ROUND(ST_X(ST_Centroid(m.geom))::numeric, 0) as x,
-        ROUND(ST_Y(ST_Centroid(m.geom))::numeric, 0) as y,
-        m.area as dtich,
-        m.verified_area as dtichXM,
+        ROUND(ST_X(ST_Centroid(m.geom))::numeric, 6) as x,
+        ROUND(ST_Y(ST_Centroid(m.geom))::numeric, 6) as y,
+        ST_Area(m.geom::geography) as dtich,
+        COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
         m.verification_reason,
         m.detection_status,
         m.verification_notes,
@@ -129,10 +136,12 @@ exports.searchMatRung = async (req, res, next) => {
       FROM son_la_mat_rung m
       ${whereClause}
       ORDER BY m.gid DESC
-      LIMIT $${paramIndex}
+      ${limitClause}
     `;
 
-    params.push(parseInt(limit));
+    if (parsedLimit > 0) {
+      params.push(parsedLimit);
+    }
 
     const result = await db.query(query, params);
 
@@ -171,30 +180,31 @@ exports.searchMatRung = async (req, res, next) => {
     if (centroids.length > 0) {
       try {
         // Tạo temporary table với centroids
+        // ✅ FIX: JOIN với sonla_tkkl để lấy xa, tieukhu, khoanh
         const tempTableQuery = `
           WITH centroids AS (
             SELECT
               unnest(ARRAY[${centroids.map((_, idx) => `$${idx + 1}::text`).join(',')}]) as point_wkt
           )
           SELECT
-            r.huyen,
-            r.xa,
-            r.tieukhu,
-            r.khoanh,
+            tk.xa,
+            tk.tieukhu,
+            tk.khoanh,
             c.point_wkt as centroid_key
           FROM centroids c
-          LEFT JOIN laocai_ranhgioihc r
-            ON ST_Intersects(r.geom, ST_GeomFromText(c.point_wkt, 4326))
+          LEFT JOIN sonla_tkkl tk
+            ON ST_Intersects(tk.geom, ST_GeomFromText(c.point_wkt, 4326))
         `;
 
         const adminResult = await adminDb.query(tempTableQuery, centroids);
 
         // Map kết quả theo centroid
+        // ✅ FIX: Data trong sonla_tkkl đã là Unicode, KHÔNG cần convert
         adminResult.rows.forEach(row => {
           if (row.centroid_key) {
             adminInfoMap[row.centroid_key] = {
-              huyen_name: convertTcvn3ToUnicode(row.huyen),
-              xa_name: convertTcvn3ToUnicode(row.xa),
+              huyen_name: null, // Không có thông tin huyện trong sonla_tkkl
+              xa_name: row.xa, // Đã là Unicode, không cần convert
               tk: row.tieukhu,
               khoanh: row.khoanh
             };
@@ -307,6 +317,7 @@ exports.searchMatRungById = async (req, res, next) => {
     logger.info(`Searching for CB-${gid} with radius ${radius}m`);
 
     // Step 1: Get target feature
+    // ✅ FIX: Thêm dtich và dtichXM để tương thích với searchMatRung
     const targetQuery = `
       SELECT
         m.gid,
@@ -320,6 +331,10 @@ exports.searchMatRungById = async (req, res, next) => {
         m.verified_by,
         m.verification_reason,
         m.verification_notes,
+        ST_Area(m.geom::geography) as dtich,
+        COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
+        ROUND(ST_X(ST_Centroid(m.geom))::numeric, 6) as x,
+        ROUND(ST_Y(ST_Centroid(m.geom))::numeric, 6) as y,
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry,
         ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as center_lng,
         ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as center_lat,
@@ -343,6 +358,7 @@ exports.searchMatRungById = async (req, res, next) => {
     const targetRow = targetResult.rows[0];
 
     // Build target feature
+    // ✅ FIX: Thêm dtich, dtichXM, x, y để tương thích với searchMatRung
     const targetFeature = {
       type: 'Feature',
       geometry: JSON.parse(targetRow.geometry),
@@ -358,6 +374,10 @@ exports.searchMatRungById = async (req, res, next) => {
         verified_by: targetRow.verified_by,
         verification_reason: targetRow.verification_reason,
         verification_notes: targetRow.verification_notes,
+        dtich: targetRow.dtich, // ✅ Diện tích từ geometry
+        dtichXM: targetRow.dtichXM, // ✅ Diện tích xác minh
+        x: targetRow.x, // ✅ Tọa độ X
+        y: targetRow.y, // ✅ Tọa độ Y
         isTarget: true // Mark as target for highlighting
       }
     };
@@ -375,6 +395,7 @@ exports.searchMatRungById = async (req, res, next) => {
     logger.info(`Found CB-${gid} at [${center.lat}, ${center.lng}]`);
 
     // Step 2: Get surrounding features within radius
+    // ✅ FIX: Thêm dtich, dtichXM, x, y để tương thích với searchMatRung
     const surroundingQuery = `
       SELECT
         m.gid,
@@ -388,6 +409,10 @@ exports.searchMatRungById = async (req, res, next) => {
         m.verified_by,
         m.verification_reason,
         m.verification_notes,
+        ST_Area(m.geom::geography) as dtich,
+        COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
+        ROUND(ST_X(ST_Centroid(m.geom))::numeric, 6) as x,
+        ROUND(ST_Y(ST_Centroid(m.geom))::numeric, 6) as y,
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry,
         ST_Distance(
           ST_Transform(m.geom, 3857),
@@ -407,6 +432,7 @@ exports.searchMatRungById = async (req, res, next) => {
 
     const surroundingResult = await db.query(surroundingQuery, [gid, parseFloat(radius)]);
 
+    // ✅ FIX: Thêm dtich, dtichXM, x, y vào surroundingFeatures
     const surroundingFeatures = surroundingResult.rows.map(row => ({
       type: 'Feature',
       geometry: JSON.parse(row.geometry),
@@ -422,6 +448,10 @@ exports.searchMatRungById = async (req, res, next) => {
         verified_by: row.verified_by,
         verification_reason: row.verification_reason,
         verification_notes: row.verification_notes,
+        dtich: row.dtich, // ✅ Diện tích từ geometry
+        dtichXM: row.dtichXM, // ✅ Diện tích xác minh
+        x: row.x, // ✅ Tọa độ X
+        y: row.y, // ✅ Tọa độ Y
         distance: parseFloat(row.distance).toFixed(2),
         isTarget: false
       }
@@ -447,26 +477,28 @@ exports.searchMatRungById = async (req, res, next) => {
       const geometries = allRows.map(row => row.geometry);
       const placeholders = geometries.map((_, idx) => `$${idx + 1}`).join(',');
 
+      // ✅ FIX: JOIN với sonla_tkkl để lấy xa, tieukhu, khoanh
       const adminQuery = `
         WITH geoms AS (
           SELECT
             unnest(ARRAY[${placeholders}])::text as geom_json,
             generate_series(1, ${geometries.length}) as idx
         )
-        SELECT idx, r.huyen, r.xa, r.tieukhu, r.khoanh
+        SELECT idx, tk.xa, tk.tieukhu, tk.khoanh
         FROM geoms g
-        LEFT JOIN laocai_ranhgioihc r
-          ON ST_Intersects(r.geom, ST_SetSRID(ST_GeomFromGeoJSON(g.geom_json), 4326))
+        LEFT JOIN sonla_tkkl tk
+          ON ST_Intersects(tk.geom, ST_SetSRID(ST_GeomFromGeoJSON(g.geom_json), 4326))
       `;
 
       const adminResult = await adminDb.query(adminQuery, geometries);
       const adminInfoMap = {};
 
+      // ✅ FIX: Data trong sonla_tkkl đã là Unicode, KHÔNG cần convert
       adminResult.rows.forEach(row => {
         if (row.idx) {
           adminInfoMap[row.idx - 1] = {
-            huyen_name: convertTcvn3ToUnicode(row.huyen),
-            xa_name: convertTcvn3ToUnicode(row.xa),
+            huyen_name: null, // Không có thông tin huyện trong sonla_tkkl
+            xa_name: row.xa, // Đã là Unicode, không cần convert
             tk: row.tieukhu,
             khoanh: row.khoanh
           };

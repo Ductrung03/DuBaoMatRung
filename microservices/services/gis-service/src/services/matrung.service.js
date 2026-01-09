@@ -2,13 +2,154 @@
 // Service layer for mat_rung operations using Kysely Query Builder
 
 const { sql } = require('kysely');
+const { Pool } = require('pg');
 const createLogger = require('../../../../shared/logger');
 
 const logger = createLogger('matrung-service');
 
+// Admin DB pool for spatial lookups
+let adminDbPool = null;
+
+function getAdminDbPool() {
+  if (!adminDbPool) {
+    adminDbPool = new Pool({
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT) || 5432,
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD,
+      database: 'admin_db',
+      max: 10,
+      min: 2,
+      idleTimeoutMillis: 60000,
+      connectionTimeoutMillis: 30000,
+      keepAlive: true,
+      keepAliveInitialDelayMillis: 10000
+    });
+
+    adminDbPool.on('error', (err) => {
+      logger.error('Admin DB pool error:', err.message);
+      // Reset pool on error
+      adminDbPool = null;
+    });
+
+    logger.info('Admin DB pool created for spatial lookups');
+  }
+  return adminDbPool;
+}
+
 class MatRungService {
   constructor(kyselyDb) {
     this.db = kyselyDb;
+    this.adminDb = getAdminDbPool();
+  }
+
+  /**
+   * Enrich rows with admin info (xa, tk, khoanh) from admin_db
+   * Uses point-based lookup with centroid for faster performance
+   */
+  async enrichWithAdminInfo(rows) {
+    if (!rows || rows.length === 0) return rows;
+
+    const BATCH_SIZE = 100;
+    const adminInfoMap = {};
+    const MAX_RETRIES = 2;
+
+    const executeWithRetry = async (query, params, retries = 0) => {
+      try {
+        // Refresh pool reference in case it was reset
+        this.adminDb = getAdminDbPool();
+        return await this.adminDb.query(query, params);
+      } catch (error) {
+        if (retries < MAX_RETRIES && (error.message.includes('terminated') || error.message.includes('Connection'))) {
+          logger.warn(`Admin DB query failed, retrying (${retries + 1}/${MAX_RETRIES})...`);
+          // Force pool reset
+          adminDbPool = null;
+          this.adminDb = getAdminDbPool();
+          await new Promise(resolve => setTimeout(resolve, 500));
+          return executeWithRetry(query, params, retries + 1);
+        }
+        throw error;
+      }
+    };
+
+    try {
+      const startTime = Date.now();
+
+      // Process in batches for better performance
+      for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+        const batch = rows.slice(i, i + BATCH_SIZE);
+        const validPoints = [];
+        const pointIndexMap = [];
+
+        batch.forEach((row, batchIdx) => {
+          // Skip invalid coordinates
+          if (row.x_coordinate && row.y_coordinate &&
+              !isNaN(row.x_coordinate) && !isNaN(row.y_coordinate)) {
+            validPoints.push(`${row.x_coordinate},${row.y_coordinate}`);
+            pointIndexMap.push(i + batchIdx);
+          }
+        });
+
+        if (validPoints.length === 0) continue;
+
+        // Optimized query - sonla_tkkl geometry is already in 4326
+        const adminQuery = `
+          WITH input_points AS (
+            SELECT
+              ordinality as idx,
+              ST_SetSRID(ST_MakePoint(
+                NULLIF(split_part(coords, ',', 1), '')::float,
+                NULLIF(split_part(coords, ',', 2), '')::float
+              ), 4326) as pt
+            FROM unnest($1::text[]) WITH ORDINALITY AS t(coords, ordinality)
+            WHERE coords IS NOT NULL AND coords != 'null,null' AND coords != ','
+          )
+          SELECT DISTINCT ON (g.idx)
+            g.idx,
+            COALESCE(t.xa, r.xa) as xa,
+            t.tieukhu as tk,
+            t.khoanh
+          FROM input_points g
+          LEFT JOIN sonla_tkkl t ON t.geom IS NOT NULL AND ST_Intersects(t.geom, g.pt)
+          LEFT JOIN sonla_rgx r ON t.xa IS NULL AND r.geom IS NOT NULL AND ST_Intersects(r.geom, g.pt)
+          WHERE g.pt IS NOT NULL
+          ORDER BY g.idx
+        `;
+
+        const result = await executeWithRetry(adminQuery, [validPoints]);
+
+        // Add to map with correct offset using pointIndexMap
+        result.rows.forEach(row => {
+          if (row.idx && row.idx > 0 && row.idx <= pointIndexMap.length) {
+            const originalIdx = pointIndexMap[row.idx - 1];
+            adminInfoMap[originalIdx] = {
+              xa: row.xa,
+              tk: row.tk,
+              khoanh: row.khoanh
+            };
+          }
+        });
+      }
+
+      const duration = Date.now() - startTime;
+      const enrichedCount = Object.keys(adminInfoMap).length;
+      logger.info(`Admin info enriched: ${enrichedCount}/${rows.length} records in ${duration}ms`);
+
+      // Merge admin info into rows
+      return rows.map((row, idx) => {
+        const adminInfo = adminInfoMap[idx] || {};
+        return {
+          ...row,
+          xa: adminInfo.xa || row.xa || null,
+          tk: adminInfo.tk || row.tk || null,
+          khoanh: adminInfo.khoanh || row.khoanh || null
+        };
+      });
+    } catch (error) {
+      logger.error('Failed to enrich with admin info:', error.message);
+      // Return original rows if enrichment fails
+      return rows;
+    }
   }
 
   /**
@@ -63,7 +204,6 @@ class MatRungService {
    */
   async getMatRung({ fromDate, toDate, huyen, xa, tk, khoanh, churung, limit = 1000 }) {
     const hasUsers = await this.tableExists('users');
-    const hasSonLaTkkl = await this.tableExists('sonla_tkkl');
 
     // No filters - return 12 months data
     if (!fromDate && !toDate && !huyen && !xa && !tk && !khoanh && !churung) {
@@ -85,11 +225,18 @@ class MatRungService {
           'm.verified_area',
           'm.verification_reason',
           'm.verification_notes',
-          sql`ST_X(ST_Centroid(ST_Transform(m.geom, 4326)))`.as('x_coordinate'),
-          sql`ST_Y(ST_Centroid(ST_Transform(m.geom, 4326)))`.as('y_coordinate'),
-          sql`ST_AsGeoJSON(ST_Transform(m.geom, 4326))`.as('geometry')
+          sql`ST_X(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('x_coordinate'),
+          sql`ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('y_coordinate'),
+          sql`ST_Area(m.geom::geography)`.as('dtich'),
+          sql`COALESCE(m.verified_area, ST_Area(m.geom::geography))`.as('dtichXM'),
+          sql`ST_AsGeoJSON(ST_Transform(ST_MakeValid(m.geom), 4326), 6)`.as('geometry'),
+          sql`NULL`.as('huyen'),
+          sql`NULL`.as('xa'),
+          sql`NULL`.as('tk'),
+          sql`NULL`.as('khoanh')
         ])
         .where('m.geom', 'is not', null)
+        .where(sql`NOT ST_IsEmpty(m.geom)`)
         .where(sql`m.end_sau::date`, '>=', sql`CURRENT_DATE - INTERVAL '12 months'`)
         .orderBy('m.end_sau', 'desc')
         .orderBy('m.gid', 'desc')
@@ -110,32 +257,9 @@ class MatRungService {
         ]);
       }
 
-      // ✅ Join với sonla_tkkl để lấy thông tin địa lý
-      if (hasSonLaTkkl) {
-        query = query
-          .leftJoin('sonla_tkkl as t', (join) =>
-            join.on(sql`ST_Intersects(
-              ST_Transform(m.geom, 4326),
-              ST_Transform(t.geom, 4326)
-            )`)
-          )
-          .select([
-            sql`NULL`.as('huyen'),
-            't.xa',
-            sql`t.tieukhu`.as('tk'),
-            't.khoanh'
-          ]);
-      } else {
-        query = query.select([
-          sql`NULL`.as('huyen'),
-          sql`NULL`.as('xa'),
-          sql`NULL`.as('tk'),
-          sql`NULL`.as('khoanh')
-        ]);
-      }
-
       const result = await query.execute();
-      return result;
+      // ✅ Enrich với xa, tk, khoanh từ admin_db
+      return await this.enrichWithAdminInfo(result);
     }
 
     // With filters
@@ -157,11 +281,18 @@ class MatRungService {
         'm.verified_area',
         'm.verification_reason',
         'm.verification_notes',
-        sql`ST_X(ST_Centroid(ST_Transform(m.geom, 4326)))`.as('x_coordinate'),
-        sql`ST_Y(ST_Centroid(ST_Transform(m.geom, 4326)))`.as('y_coordinate'),
-        sql`ST_AsGeoJSON(ST_Transform(m.geom, 4326))`.as('geometry')
+        sql`ST_X(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('x_coordinate'),
+        sql`ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('y_coordinate'),
+        sql`ST_Area(m.geom::geography)`.as('dtich'),
+        sql`COALESCE(m.verified_area, ST_Area(m.geom::geography))`.as('dtichXM'),
+        sql`ST_AsGeoJSON(ST_Transform(ST_MakeValid(m.geom), 4326), 6)`.as('geometry'),
+        sql`NULL`.as('huyen'),
+        sql`NULL`.as('xa'),
+        sql`NULL`.as('tk'),
+        sql`NULL`.as('khoanh')
       ])
       .where('m.geom', 'is not', null)
+      .where(sql`NOT ST_IsEmpty(m.geom)`)
       .where('m.start_dau', '>=', fromDate)
       .where('m.end_sau', '<=', toDate);
 
@@ -180,54 +311,21 @@ class MatRungService {
       ]);
     }
 
-    // Add spatial filters using sonla_tkkl from admin_db
-    if (hasSonLaTkkl && (xa || tk || khoanh)) {
-      query = query.leftJoin(sql`sonla_tkkl`.as('t'), (join) =>
-        join.on(sql`ST_Intersects(
-          ST_Transform(m.geom, 4326),
-          ST_Transform(t.geom, 4326)
-        )`)
-      );
-
-      query = query.select([
-        sql`NULL`.as('huyen'),
-        't.xa',
-        sql`t.tieukhu`.as('tk'),
-        't.khoanh'
-      ]);
-
-      if (xa) query = query.where('t.xa', '=', xa);
-      if (tk) query = query.where('t.tieukhu', '=', tk);
-      if (khoanh) query = query.where('t.khoanh', '=', khoanh);
-    } else if (hasSonLaTkkl) {
-      query = query
-        .leftJoin(sql`sonla_tkkl`.as('t'), (join) =>
-          join.on(sql`ST_Intersects(
-            ST_Transform(m.geom, 4326),
-            ST_Transform(t.geom, 4326)
-          )`)
-        )
-        .select([
-          sql`NULL`.as('huyen'),
-          't.xa',
-          sql`t.tieukhu`.as('tk'),
-          't.khoanh'
-        ]);
-    } else {
-      query = query.select([
-        sql`NULL`.as('huyen'),
-        sql`NULL`.as('xa'),
-        sql`NULL`.as('tk'),
-        sql`NULL`.as('khoanh')
-      ]);
-    }
-
     query = query
       .orderBy('m.end_sau', 'desc')
       .orderBy('m.gid', 'desc')
       .limit(parseInt(limit));
 
-    const result = await query.execute();
+    let result = await query.execute();
+
+    // ✅ Enrich với xa, tk, khoanh từ admin_db
+    result = await this.enrichWithAdminInfo(result);
+
+    // Filter by xa, tk, khoanh after enrichment
+    if (xa) result = result.filter(r => r.xa === xa);
+    if (tk) result = result.filter(r => r.tk === tk);
+    if (khoanh) result = result.filter(r => r.khoanh === khoanh);
+
     return result;
   }
 
@@ -238,7 +336,6 @@ class MatRungService {
     logger.info(`Loading all mat rung data: ${months} months, limit: ${limit}`);
 
     const hasUsers = await this.tableExists('users');
-    const hasSonLaTkkl = await this.tableExists('sonla_tkkl');
 
     let query = this.db
       .selectFrom('son_la_mat_rung as m')
@@ -258,7 +355,11 @@ class MatRungService {
         'm.verification_notes',
         sql`ST_X(ST_Centroid(ST_Transform(m.geom, 4326)))`.as('x_coordinate'),
         sql`ST_Y(ST_Centroid(ST_Transform(m.geom, 4326)))`.as('y_coordinate'),
-        sql`ST_AsGeoJSON(ST_Transform(m.geom, 4326))`.as('geometry')
+        sql`ST_AsGeoJSON(ST_Transform(m.geom, 4326))`.as('geometry'),
+        sql`NULL`.as('huyen'),
+        sql`NULL`.as('xa'),
+        sql`NULL`.as('tk'),
+        sql`NULL`.as('khoanh')
       ])
       .where('m.geom', 'is not', null)
       .where(sql`m.end_sau::date`, '>=', sql`CURRENT_DATE - INTERVAL '${sql.raw(months.toString())} months'`)
@@ -280,31 +381,9 @@ class MatRungService {
       ]);
     }
 
-    if (hasSonLaTkkl) {
-      query = query
-        .leftJoin(sql`sonla_tkkl`.as('t'), (join) =>
-          join.on(sql`ST_Intersects(
-            ST_Transform(m.geom, 4326),
-            ST_Transform(t.geom, 4326)
-          )`)
-        )
-        .select([
-          sql`NULL`.as('huyen'),
-          't.xa',
-          sql`t.tieukhu`.as('tk'),
-          't.khoanh'
-        ]);
-    } else {
-      query = query.select([
-        sql`NULL`.as('huyen'),
-        sql`NULL`.as('xa'),
-        sql`NULL`.as('tk'),
-        sql`NULL`.as('khoanh')
-      ]);
-    }
-
     const result = await query.execute();
-    return result;
+    // ✅ Enrich với xa, tk, khoanh từ admin_db
+    return await this.enrichWithAdminInfo(result);
   }
 
   /**
@@ -313,9 +392,7 @@ class MatRungService {
   async getStats() {
     logger.info('Calculating mat rung statistics');
 
-    const hasSonLaTkkl = await this.tableExists('sonla_tkkl');
-
-    let query = this.db
+    const query = this.db
       .selectFrom('son_la_mat_rung as m')
       .select([
         sql`COUNT(*)`.as('total_records'),
@@ -327,21 +404,9 @@ class MatRungService {
         sql`SUM(m.area)`.as('total_area'),
         sql`COUNT(DISTINCT m.mahuyen)`.as('unique_districts'),
         sql`COUNT(CASE WHEN m.detection_status = 'Đã xác minh' THEN 1 END)`.as('verified_records'),
-        sql`COUNT(CASE WHEN m.verified_by IS NOT NULL THEN 1 END)`.as('records_with_verifier')
+        sql`COUNT(CASE WHEN m.verified_by IS NOT NULL THEN 1 END)`.as('records_with_verifier'),
+        sql`0`.as('records_with_spatial_data')
       ]);
-
-    if (hasSonLaTkkl) {
-      query = query
-        .leftJoin(sql`sonla_tkkl`.as('t'), (join) =>
-          join.on(sql`ST_Intersects(
-            ST_Transform(m.geom, 4326),
-            ST_Transform(t.geom, 4326)
-          )`)
-        )
-        .select(sql`COUNT(CASE WHEN t.gid IS NOT NULL THEN 1 END)`.as('records_with_spatial_data'));
-    } else {
-      query = query.select(sql`0`.as('records_with_spatial_data'));
-    }
 
     const result = await query.executeTakeFirst();
     return result;
@@ -383,7 +448,6 @@ class MatRungService {
     logger.info('Auto forecast request', { fromDate, toDate });
 
     const hasUsers = await this.tableExists('users');
-    const hasSonLaTkkl = await this.tableExists('sonla_tkkl');
 
     const startTime = Date.now();
 
@@ -405,7 +469,11 @@ class MatRungService {
         'm.verification_notes',
         sql`ST_X(ST_Centroid(ST_Transform(m.geom, 4326)))`.as('x_coordinate'),
         sql`ST_Y(ST_Centroid(ST_Transform(m.geom, 4326)))`.as('y_coordinate'),
-        sql`ST_AsGeoJSON(ST_Transform(m.geom, 4326))`.as('geometry')
+        sql`ST_AsGeoJSON(ST_Transform(m.geom, 4326))`.as('geometry'),
+        sql`NULL`.as('huyen'),
+        sql`NULL`.as('xa'),
+        sql`NULL`.as('tk'),
+        sql`NULL`.as('khoanh')
       ])
       .where('m.geom', 'is not', null)
       .where(sql`m.end_sau::date`, '>=', sql`${fromDate}::date`)
@@ -428,30 +496,11 @@ class MatRungService {
       ]);
     }
 
-    if (hasSonLaTkkl) {
-      query = query
-        .leftJoin(sql`sonla_tkkl`.as('t'), (join) =>
-          join.on(sql`ST_Intersects(
-            ST_Transform(m.geom, 4326),
-            ST_Transform(t.geom, 4326)
-          )`)
-        )
-        .select([
-          sql`NULL`.as('huyen'),
-          't.xa',
-          sql`t.tieukhu`.as('tk'),
-          't.khoanh'
-        ]);
-    } else {
-      query = query.select([
-        sql`NULL`.as('huyen'),
-        sql`NULL`.as('xa'),
-        sql`NULL`.as('tk'),
-        sql`NULL`.as('khoanh')
-      ]);
-    }
+    let result = await query.execute();
 
-    const result = await query.execute();
+    // ✅ Enrich với xa, tk, khoanh từ admin_db
+    result = await this.enrichWithAdminInfo(result);
+
     const queryTime = Date.now() - startTime;
 
     logger.info(`Auto forecast query completed in ${queryTime}ms, found ${result.length} records`);

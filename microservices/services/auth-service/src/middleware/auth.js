@@ -6,11 +6,13 @@ const authenticateToken = async (req, res, next) => {
     // Kiểm tra user info từ gateway headers trước
     const userId = req.headers['x-user-id'];
     const username = req.headers['x-user-username'];
-    
+
     if (userId && username) {
       // User đã được authenticate bởi gateway
+      const parsedUserId = parseInt(userId);
+
       req.user = {
-        id: parseInt(userId),
+        id: !isNaN(parsedUserId) ? parsedUserId : null,
         username: username,
         roles: req.headers['x-user-roles'] ? req.headers['x-user-roles'].split(',') : [],
         permissions: req.headers['x-user-permissions'] ? req.headers['x-user-permissions'].split(',') : []
@@ -30,7 +32,7 @@ const authenticateToken = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
+
     // Lấy thông tin user từ database
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },

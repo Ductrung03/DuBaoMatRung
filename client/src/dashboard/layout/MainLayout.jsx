@@ -10,7 +10,7 @@ const MainLayout = () => {
       
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar cố định */}
-        <div className="w-80 bg-white border-r border-gray-200 overflow-y-auto">
+        <div className="w-96 bg-white border-r border-gray-200 overflow-y-auto">
           <Sidebar />
         </div>
         

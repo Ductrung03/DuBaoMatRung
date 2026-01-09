@@ -14,10 +14,10 @@ export default function PhatHienMatRung() {
   const iframeRef = useRef(null);
   const containerRef = useRef(null);
   const location = useLocation();
-  
+
   // ✅ BỎ TIMEOUT - Để iframe tự load
   const [loadTimeout, setLoadTimeout] = useState(null);
-  
+
   useEffect(() => {
     // Kiểm tra tab từ URL
     const searchParams = new URLSearchParams(location.search);
@@ -25,7 +25,7 @@ export default function PhatHienMatRung() {
     if (tab && ["phantich", "locmay", "xulyanh"].includes(tab)) {
       setActiveTab(tab);
     }
-    
+
     // Reset states when component mounts
     setError(null);
     setRetryCount(0);
@@ -35,26 +35,26 @@ export default function PhatHienMatRung() {
   useEffect(() => {
     loadIframe();
   }, [activeTab]);
-  
+
   const loadIframe = () => {
     setLoading(true);
     setError(null);
-    
+
     // Clear previous timeout
     if (loadTimeout) {
       clearTimeout(loadTimeout);
     }
-    
+
     // ✅ TĂNG TIMEOUT LÊN 60 GIÂY thay vì bỏ hoàn toàn
     const timeout = setTimeout(() => {
       if (loading) {
         // ✅ KHÔNG SET ERROR - chỉ log warning
       }
     }, 60000); // 60 seconds timeout
-    
+
     setLoadTimeout(timeout);
   };
-  
+
   // URLs cho các tab
   const getTabConfig = () => {
     const configs = {
@@ -62,7 +62,7 @@ export default function PhatHienMatRung() {
         title: "Phân tích mất rừng",
         url: "https://ee-phathiensommatrung.projects.earthengine.app/view/phantichmatrung",
         icon: <FaListAlt />,
-        description: "Phân tích và phát hiện mất rừng sử dụng AI"
+        description: "Phân tích và xử lý ảnh viễn thám sử dụng AI"
       },
       locmay: {
         title: "Công cụ lọc mây",
@@ -77,54 +77,54 @@ export default function PhatHienMatRung() {
         description: "Công cụ xử lý và phân tích ảnh vệ tinh"
       }
     };
-    
+
     return configs[activeTab] || configs.phantich;
   };
-  
+
   // Xử lý khi iframe load thành công
   const handleIframeLoad = () => {
     setLoading(false);
     setError(null);
-    
+
     if (loadTimeout) {
       clearTimeout(loadTimeout);
     }
-    
+
     // Toast success message
     toast.success(`🎉 Đã tải thành công ${getTabConfig().title}`, {
       autoClose: 2000
     });
   };
-  
+
   // Xử lý khi iframe load error
   const handleIframeError = () => {
     console.error(`❌ Iframe failed to load for ${activeTab}`);
     setLoading(false);
     setError("LOAD_ERROR");
-    
+
     if (loadTimeout) {
       clearTimeout(loadTimeout);
     }
-    
+
     // Toast error message
     toast.error(`❌ Không thể tải ${getTabConfig().title}. Vui lòng thử lại.`, {
       autoClose: 5000
     });
   };
-  
+
   // Xử lý chuyển tab
   const handleChangeTab = (tab) => {
     if (tab === activeTab) return;
-    
+
     setActiveTab(tab);
   };
-  
+
   // Retry loading
   const handleRetry = () => {
     const newRetryCount = retryCount + 1;
     setRetryCount(newRetryCount);
-    
-    
+
+
     if (newRetryCount <= 5) { // Tăng số lần retry
       loadIframe();
       toast.info(`🔄 Đang thử lại... (${newRetryCount}/5)`, {
@@ -136,7 +136,7 @@ export default function PhatHienMatRung() {
       });
     }
   };
-  
+
   // Mở trong tab mới
   const handleOpenInNewTab = () => {
     const config = getTabConfig();
@@ -173,50 +173,47 @@ export default function PhatHienMatRung() {
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
-  
+
   const currentConfig = getTabConfig();
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={`w-full h-screen flex flex-col bg-gray-50 ${isFullscreen ? 'fullscreen-container' : ''}`}
     >
-      
+
       {/* Header với tab navigation */}
       <div className="bg-white shadow-sm border-b border-gray-200 px-4 py-3 flex-shrink-0">
         {/* Tab buttons */}
         <div className="flex gap-2 mb-2">
           <button
             onClick={() => handleChangeTab("phantich")}
-            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${
-              activeTab === "phantich"
+            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${activeTab === "phantich"
                 ? "bg-green-600 text-white shadow-md"
                 : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-            }`}
+              }`}
           >
             <FaListAlt className="mr-2" />
             Phân tích mất rừng
           </button>
-          
+
           <button
             onClick={() => handleChangeTab("locmay")}
-            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${
-              activeTab === "locmay"
+            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${activeTab === "locmay"
                 ? "bg-blue-600 text-white shadow-md"
                 : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-            }`}
+              }`}
           >
             <FaCloudSun className="mr-2" />
             Lọc mây
           </button>
-          
+
           <button
             onClick={() => handleChangeTab("xulyanh")}
-            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${
-              activeTab === "xulyanh"
+            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${activeTab === "xulyanh"
                 ? "bg-purple-600 text-white shadow-md"
                 : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-            }`}
+              }`}
           >
             <FaImage className="mr-2" />
             Xử lý ảnh
@@ -232,7 +229,7 @@ export default function PhatHienMatRung() {
             {isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
           </button>
         </div>
-        
+
         {/* Current tab info */}
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -251,7 +248,7 @@ export default function PhatHienMatRung() {
               <FaRedo className="mr-1" />
               Tải lại
             </button>
-            
+
             <button
               onClick={handleOpenInNewTab}
               className="flex items-center px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
@@ -265,7 +262,7 @@ export default function PhatHienMatRung() {
 
       {/* Main content area */}
       <div className="relative flex-1 overflow-hidden">
-        
+
         {/* Loading overlay - CHỈ HIỂN THỊ TRONG 10 GIÂY ĐẦU */}
         {loading && !error && (
           <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
@@ -288,7 +285,7 @@ export default function PhatHienMatRung() {
             </div>
           </div>
         )}
-        
+
         {/* Error overlay */}
         {error && (
           <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
@@ -296,11 +293,11 @@ export default function PhatHienMatRung() {
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
                 <FaExclamationTriangle className="text-2xl text-red-500" />
               </div>
-              
+
               <h3 className="text-xl font-semibold text-gray-800 mb-2">
                 Không thể tải {currentConfig.title}
               </h3>
-              
+
               <div className="text-sm text-gray-600 mb-4">
                 {error === "TIMEOUT" && (
                   <div>
@@ -308,7 +305,7 @@ export default function PhatHienMatRung() {
                     <p>Có thể do kết nối mạng chậm hoặc server Google Earth Engine đang bận.</p>
                   </div>
                 )}
-                
+
                 {error === "LOAD_ERROR" && (
                   <div>
                     <p className="mb-2">🔗 Lỗi kết nối</p>
@@ -316,7 +313,7 @@ export default function PhatHienMatRung() {
                   </div>
                 )}
               </div>
-              
+
               <div className="flex flex-col sm:flex-row gap-2 w-full">
                 <button
                   onClick={handleRetry}
@@ -326,7 +323,7 @@ export default function PhatHienMatRung() {
                   <FaRedo className="mr-2" />
                   {retryCount > 5 ? "Đã hết lượt thử" : `Thử lại (${retryCount}/5)`}
                 </button>
-                
+
                 <button
                   onClick={handleOpenInNewTab}
                   className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
@@ -338,7 +335,7 @@ export default function PhatHienMatRung() {
             </div>
           </div>
         )}
-        
+
         {/* ✅ MAIN IFRAME với CSS tối ưu cho scroll */}
         {!error && (
           <iframe
@@ -350,7 +347,7 @@ export default function PhatHienMatRung() {
             onError={handleIframeError}
             // ✅ BỎ SANDBOX hoặc cấu hình nhẹ hơn để cho phép scroll
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
-            style={{ 
+            style={{
               border: "none",
               display: "block", // Luôn hiển thị, không ẩn khi loading
               opacity: loading ? 0.3 : 1, // Làm mờ khi loading thay vì ẩn
@@ -367,7 +364,7 @@ export default function PhatHienMatRung() {
           />
         )}
       </div>
-      
+
       {/* Footer info */}
       <div className="bg-gray-800 text-white px-4 py-2 text-xs flex-shrink-0">
         <div className="flex items-center justify-between">

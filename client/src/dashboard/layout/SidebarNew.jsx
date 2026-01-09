@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  FaChartLine, FaDatabase, FaFileAlt, FaSearch, 
+import {
+  FaChartLine, FaDatabase, FaFileAlt, FaSearch,
   FaUsers, FaUserShield, FaChevronDown, FaChevronRight,
   FaHome, FaCog, FaSignOutAlt
 } from 'react-icons/fa';
@@ -11,59 +11,59 @@ import { useAuth } from '../contexts/AuthContext';
 const SidebarNew = () => {
   const location = useLocation();
   const { logout, user } = useAuth();
-  const { 
-    hasPageAccess, 
-    hasFeatureAccess, 
-    getPageFeatures, 
-    isAdmin, 
-    loading 
+  const {
+    hasPageAccess,
+    hasFeatureAccess,
+    getPageFeatures,
+    isAdmin,
+    loading
   } = useFeaturePermissionsNew();
-  
+
   const [expandedPages, setExpandedPages] = useState(new Set(['forecast', 'data_management']));
 
   // Cấu hình menu với icons và paths
   const menuConfig = {
     forecast: {
-      name: 'Dự báo mất rừng',
+      name: 'Giám sát mất rừng',
       icon: FaChartLine,
-      path: '/dashboard/dubao-matrung',
+      path: '/dashboard/dubaomatrung',
       features: [
         {
           code: 'forecast.auto',
-          name: 'Dự báo tự động',
-          path: '/dashboard/dubao-matrung/auto'
+          name: 'Phân tích tự động',
+          path: '/dashboard/dubaomatrung/auto'
         },
         {
           code: 'forecast.custom',
-          name: 'Dự báo tùy biến',
-          path: '/dashboard/dubao-matrung/custom'
+          name: 'Phân tích tùy biến',
+          path: '/dashboard/dubaomatrung/custom'
         }
       ]
     },
     data_management: {
-      name: 'Quản lý dữ liệu',
+      name: 'Tra cứu dữ liệu',
       icon: FaDatabase,
-      path: '/dashboard/quanly-dulieu',
+      path: '/dashboard/quanlydulieu',
       features: [
         {
           code: 'data_management.forecast_lookup',
           name: 'Tra cứu dự báo',
-          path: '/dashboard/quanly-dulieu/forecast-lookup'
+          path: '/dashboard/quanlydulieu/forecast-lookup'
         },
         {
           code: 'data_management.satellite_lookup',
           name: 'Tra cứu ảnh vệ tinh',
-          path: '/dashboard/quanly-dulieu/satellite-lookup'
+          path: '/dashboard/quanlydulieu/satellite-lookup'
         },
         {
           code: 'data_management.verification',
           name: 'Xác minh dự báo',
-          path: '/dashboard/quanly-dulieu/verification'
+          path: '/dashboard/quanlydulieu/verification'
         },
         {
           code: 'data_management.update',
           name: 'Cập nhật dữ liệu',
-          path: '/dashboard/quanly-dulieu/update'
+          path: '/dashboard/quanlydulieu/update'
         }
       ]
     },
@@ -90,53 +90,53 @@ const SidebarNew = () => {
       ]
     },
     detection: {
-      name: 'Phát hiện mất rừng',
+      name: 'Xử lý ảnh viễn thám',
       icon: FaSearch,
-      path: '/dashboard/phathien-matrung',
+      path: '/dashboard/phathienmatrung',
       features: [
         {
           code: 'detection.view',
           name: 'Xem phát hiện',
-          path: '/dashboard/phathien-matrung/view'
+          path: '/dashboard/phathienmatrung/view'
         },
         {
           code: 'detection.analyze',
           name: 'Phân tích',
-          path: '/dashboard/phathien-matrung/analyze'
+          path: '/dashboard/phathienmatrung/analyze'
         }
       ]
     },
     user_management: {
       name: 'Quản lý người dùng',
       icon: FaUsers,
-      path: '/dashboard/quanly-nguoidung',
+      path: '/dashboard/quanlynguoidung',
       features: [
         {
           code: 'user_management.view',
           name: 'Danh sách người dùng',
-          path: '/dashboard/quanly-nguoidung'
+          path: '/dashboard/quanlynguoidung'
         },
         {
           code: 'user_management.create',
           name: 'Thêm người dùng',
-          path: '/dashboard/quanly-nguoidung/create'
+          path: '/dashboard/quanlynguoidung/create'
         }
       ]
     },
     role_management: {
       name: 'Quản lý vai trò',
       icon: FaUserShield,
-      path: '/dashboard/quanly-role',
+      path: '/dashboard/quanlyrole',
       features: [
         {
           code: 'role_management.view',
           name: 'Danh sách vai trò',
-          path: '/dashboard/quanly-role'
+          path: '/dashboard/quanlyrole'
         },
         {
           code: 'role_management.assign_permissions',
           name: 'Phân quyền',
-          path: '/dashboard/quanly-role/permissions'
+          path: '/dashboard/quanlyrole/permissions'
         }
       ]
     }
@@ -152,6 +152,13 @@ const SidebarNew = () => {
     setExpandedPages(newExpanded);
   };
 
+  /* 
+   * Tối ưu hiển thị Sidebar:
+   * Không block UI bằng loading state nữa vì hook useFeaturePermissionsNew đã có fallback.
+   * Sidebar sẽ hiển thị ngay những gì có trong cache/token.
+   */
+  // if (loading) { ... } // REMOVED LOADING BLOCK
+
   const isActivePath = (path) => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
@@ -160,23 +167,22 @@ const SidebarNew = () => {
     if (isAdmin) {
       return menuConfig[pageKey]?.features || [];
     }
-    
-    const pageFeatures = getPageFeatures(pageKey);
+
     const configFeatures = menuConfig[pageKey]?.features || [];
-    
-    // Lọc features theo permissions
-    return configFeatures.filter(configFeature => 
-      pageFeatures.some(permFeature => permFeature.code === configFeature.code)
+
+    // Priority 1: Check structured data from API (if available)
+    const pageFeatures = getPageFeatures(pageKey);
+    if (Array.isArray(pageFeatures) && pageFeatures.length > 0) {
+      return configFeatures.filter(configFeature =>
+        pageFeatures.some(permFeature => permFeature && permFeature.code === configFeature.code)
+      );
+    }
+
+    // Priority 2: Fallback to flat permissions list (fastest for initial load)
+    return configFeatures.filter(configFeature =>
+      hasFeatureAccess(configFeature.code)
     );
   };
-
-  if (loading) {
-    return (
-      <div className="w-64 bg-white shadow-lg h-full flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="w-64 bg-white shadow-lg h-full flex flex-col">
@@ -187,7 +193,7 @@ const SidebarNew = () => {
             <FaChartLine className="text-green-600 text-xl" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-gray-900">Dự báo mất rừng</h1>
+            <h1 className="text-lg font-bold text-gray-900">Giám sát mất rừng</h1>
             <p className="text-xs text-gray-500">Hệ thống quản lý</p>
           </div>
         </div>
@@ -199,11 +205,10 @@ const SidebarNew = () => {
           {/* Dashboard */}
           <Link
             to="/dashboard"
-            className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-              location.pathname === '/dashboard'
-                ? 'bg-green-100 text-green-700'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
+            className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${location.pathname === '/dashboard'
+              ? 'bg-green-100 text-green-700'
+              : 'text-gray-600 hover:bg-gray-100'
+              }`}
           >
             <FaHome className="mr-3" />
             Trang chủ
@@ -226,11 +231,10 @@ const SidebarNew = () => {
               <div key={pageKey} className="space-y-1">
                 {/* Page Header */}
                 <div
-                  className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg cursor-pointer transition-colors ${
-                    isPageActive
-                      ? 'bg-green-100 text-green-700'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
+                  className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg cursor-pointer transition-colors ${isPageActive
+                    ? 'bg-green-100 text-green-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                    }`}
                   onClick={() => hasVisibleFeatures && togglePageExpansion(pageKey)}
                 >
                   <div className="flex items-center">
@@ -251,11 +255,10 @@ const SidebarNew = () => {
                       <Link
                         key={feature.code}
                         to={feature.path}
-                        className={`flex items-center px-4 py-2 text-sm rounded-lg transition-colors ${
-                          isActivePath(feature.path)
-                            ? 'bg-green-50 text-green-600 border-l-2 border-green-600'
-                            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                        }`}
+                        className={`flex items-center px-4 py-2 text-sm rounded-lg transition-colors ${isActivePath(feature.path)
+                          ? 'bg-green-50 text-green-600 border-l-2 border-green-600'
+                          : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                          }`}
                       >
                         <div className="w-2 h-2 bg-current rounded-full mr-3 opacity-50"></div>
                         {feature.name}
@@ -282,7 +285,7 @@ const SidebarNew = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="flex space-x-2">
           <Link
             to="/dashboard/settings"

@@ -816,3 +816,479 @@
 {"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-02 18:49:31"}
 {"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-02 18:49:42"}
 {"level":"info","message":"Added admin info for 78/78 features","service":"layer-controller","timestamp":"2025-12-02 18:49:42"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-11 19:57:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-11 21:33:42"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-11 21:45:06"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-11 22:00:25"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-11 22:08:47"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-11 22:16:27"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-11 22:25:01"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-11 22:51:32"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-11 23:09:56"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-11 23:10:34"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-11 23:10:45"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-11 23:11:14"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-11 23:26:11"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-11 23:26:40"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-12 00:03:42"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 00:27:34"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 00:48:29"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 00:52:19"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-12 09:33:37"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 09:34:43"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 09:52:43"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 09:56:24"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 09:57:06"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 09:57:25"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 09:57:49"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 10:14:08"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 10:14:19"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 10:33:07"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-12 10:39:02"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 10:39:56"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 10:45:20"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 10:45:41"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 11:34:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 11:35:04"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-12 15:02:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 15:14:31"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 15:29:15"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 15:53:10"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-12 16:16:33"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-12 19:54:11"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 20:40:18"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 20:40:20"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 20:40:26"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 20:45:39"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 20:52:49"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 20:52:57"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 20:53:36"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 20:53:43"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-12 21:02:31"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 21:14:27"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 21:15:44"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 21:16:34"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 21:22:56"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 21:25:21"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-12 22:21:27"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 22:22:17"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-12 23:34:36"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 23:38:56"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-12 23:50:36"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-13 20:37:31"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-13 23:11:29"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-13 23:40:07"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-13 23:44:57"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-13 23:52:48"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-13 23:54:06"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-14 08:20:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-14 10:33:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-14 11:20:53"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-14 13:40:03"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-14 19:07:34"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-15 19:27:50"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-15 19:28:02"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-15 19:37:10"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-15 19:48:35"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-15 19:49:34"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-15 19:51:08"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-15 20:38:25"}
+{"level":"info","message":"Added admin info for 418/418 features","service":"layer-controller","timestamp":"2025-12-15 20:38:27"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-15 20:38:37"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-15 20:39:52"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-15 20:39:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-15 21:11:47"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-15 21:30:33"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-15 21:51:21"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-15 21:51:24"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-15 22:11:24"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-16 08:11:10"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-16 08:11:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-16 09:07:19"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-16 09:11:35"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-16 09:11:37"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-16 09:11:38"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-16 09:15:52"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-16 10:12:45"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-16 10:12:47"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-16 10:41:14"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-16 10:46:56"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-17 08:08:19"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-17 08:08:25"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 08:17:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 08:18:37"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 08:43:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 08:55:14"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 09:02:50"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 09:03:48"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-17 09:23:12"}
+{"level":"info","message":"Added admin info for 427/427 features","service":"layer-controller","timestamp":"2025-12-17 09:23:19"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 09:27:03"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 09:39:53"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 09:39:54"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 09:40:25"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 09:43:05"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 09:58:03"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-17 10:05:03"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 10:06:13"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 10:10:24"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 10:11:25"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 10:13:21"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-17 13:49:22"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 13:50:23"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 13:50:50"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-17 13:51:56"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-17 16:42:12"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-17 16:42:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-17 18:32:47"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-17 18:32:48"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-17 21:38:10"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-17 21:38:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-18 08:12:26"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-18 08:12:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-18 09:25:34"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-18 09:25:41"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-18 09:27:51"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-18 10:04:06"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-18 11:54:21"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-18 11:54:24"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-19 07:57:23"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-19 07:57:24"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-19 07:57:27"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-19 07:57:28"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-19 08:05:43"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-19 09:22:53"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-19 09:22:56"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-19 10:33:48"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-19 10:33:53"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-19 10:53:33"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-19 11:03:11"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-20 21:18:03"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-20 21:18:05"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-21 22:32:26"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-21 22:32:28"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-22 22:49:46"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-22 22:49:54"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-23 09:41:34"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-23 09:41:38"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-23 10:25:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-23 10:26:37"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-23 22:22:43"}
+{"level":"info","message":"Added admin info for 336/336 features","service":"layer-controller","timestamp":"2025-12-23 22:22:47"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-25 20:06:39"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-25 20:07:57"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-25 20:14:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-26 08:15:02"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-28 23:42:28"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-28 23:42:29"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-28 23:57:07"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-28 23:58:49"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-28 23:58:50"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 00:10:39"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-29 00:13:05"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-29 00:13:06"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 00:29:29"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 00:36:51"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-29 07:41:34"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-29 07:41:35"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 07:41:43"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 07:53:47"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 07:57:58"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 08:37:45"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-29 08:51:40"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-29 08:51:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 09:04:54"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-29 10:07:14"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-29 10:07:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 10:23:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-29 10:33:52"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-29 10:33:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 10:37:23"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-29 13:48:15"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-29 13:48:17"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 14:13:38"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 14:23:49"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 14:33:03"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 14:48:03"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-29 15:45:56"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-29 15:45:57"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 15:51:42"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-29 19:03:49"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-29 19:03:50"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 19:19:15"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 19:27:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 19:31:00"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 19:58:52"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 20:03:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-29 20:30:18"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-29 20:30:20"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 20:31:08"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 20:35:45"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-29 20:44:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-30 08:49:39"}
+{"level":"info","message":"Added admin info for 646/646 features","service":"layer-controller","timestamp":"2025-12-30 08:49:43"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-30 09:36:43"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-30 09:36:44"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 10:09:47"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-30 13:21:10"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-30 13:21:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-30 14:44:42"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-30 14:44:43"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 14:45:38"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 14:57:21"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:01:33"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:02:47"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:03:15"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:13:22"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:13:56"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:14:22"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:14:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:20:26"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:30:17"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-30 15:33:56"}
+{"level":"info","message":"Added admin info for 672/672 features","service":"layer-controller","timestamp":"2025-12-30 15:34:01"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:36:48"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:39:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:43:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:43:45"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-30 15:45:40"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-30 15:45:42"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-30 15:48:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-30 19:47:35"}
+{"level":"info","message":"Added admin info for 188/188 features","service":"layer-controller","timestamp":"2025-12-30 19:47:39"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-31 07:59:25"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-31 08:00:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-31 08:22:13"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-31 08:28:23"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-31 08:31:58"}
+{"level":"info","message":"Added admin info for 749/749 features","service":"layer-controller","timestamp":"2025-12-31 08:32:04"}
+{"layerName":"tieukukhoanh","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"sonla_tkkl","timestamp":"2025-12-31 08:51:07"}
+{"layerName":"ranhgioixa","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"sonla_rgx","timestamp":"2025-12-31 08:55:49"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"sonla_rgx","timestamp":"2025-12-31 08:55:49"}
+{"layerName":"administrative","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"sonla_rgx","timestamp":"2025-12-31 08:56:24"}
+{"level":"warn","message":"Table does not exist","service":"layer-controller","tableName":"sonla_rgx","timestamp":"2025-12-31 08:56:24"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-31 09:05:44"}
+{"level":"info","message":"Added admin info for 1270/1270 features","service":"layer-controller","timestamp":"2025-12-31 09:05:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-31 09:11:40"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-31 09:12:28"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-31 09:29:15"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-31 09:29:52"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-31 09:39:58"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-31 09:45:35"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-31 09:47:57"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-31 09:48:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-31 13:32:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-31 15:23:06"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2025-12-31 15:48:15"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-31 20:38:10"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2025-12-31 23:55:36"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 00:28:14"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 00:31:14"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 00:34:00"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 00:36:10"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 00:52:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 00:52:44"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-01 01:00:14"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 01:02:41"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 01:02:52"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-01 06:31:13"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-01 20:29:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 20:29:32"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 21:22:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 21:29:21"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-01 21:35:45"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 21:37:14"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 21:44:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 21:49:13"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 22:18:23"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-01 22:18:31"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-01 22:50:02"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-03 02:25:42"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-03 22:46:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 08:19:00"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 08:57:20"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 10:13:06"}
+{"level":"info","message":"Added admin info for 2722/2722 features","service":"layer-controller","timestamp":"2026-01-06 10:13:33"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 10:18:48"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 10:22:20"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 10:49:43"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 11:07:36"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 14:33:16"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-06 14:33:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 14:51:45"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 15:39:20"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 15:39:47"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 15:39:50"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-06 15:39:56"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 15:40:25"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-06 15:40:26"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-06 15:40:28"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 15:40:33"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 15:46:11"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 15:47:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 15:58:50"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 16:01:44"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 17:00:36"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 17:01:06"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-06 17:01:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 17:01:42"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-06 17:01:43"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 18:30:09"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-06 18:30:44"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 20:01:02"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 20:01:32"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-06 20:01:44"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-06 20:02:15"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 20:09:18"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 21:39:24"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 21:39:54"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-06 21:40:07"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-06 21:40:38"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-06 22:28:45"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 22:41:42"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-06 22:42:12"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-06 22:43:01"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-06 22:43:14"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 08:11:07"}
+{"level":"info","message":"Added admin info for 3802/3802 features","service":"layer-controller","timestamp":"2026-01-07 08:11:51"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 08:15:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 08:25:44"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 08:37:17"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 08:39:02"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 08:45:38"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:01:37"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:04:11"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:07:02"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:07:39"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:07:41"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 09:12:51"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 09:13:21"}
+{"level":"info","message":"Added admin info for 6505/6505 features","service":"layer-controller","timestamp":"2026-01-07 09:14:11"}
+{"level":"info","message":"Added admin info for 6505/6505 features","service":"layer-controller","timestamp":"2026-01-07 09:15:22"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:18:34"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:20:14"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:21:08"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:30:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:39:56"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:44:06"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:44:10"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:45:20"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:49:23"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:52:27"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:56:41"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:57:05"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 09:57:54"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 10:02:45"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 10:11:17"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 10:11:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 10:15:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 10:16:26"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 10:18:10"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-07 10:18:18"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 10:19:08"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 10:21:26"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 10:27:52"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 10:27:59"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 10:49:51"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 10:56:56"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 10:58:30"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 10:59:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 12:01:02"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 12:01:32"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-07 12:02:56"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-07 12:03:43"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 12:26:53"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 12:27:34"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 12:30:37"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 12:30:44"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 13:24:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 13:24:58"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-07 13:26:49"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-07 13:27:29"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 13:35:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 13:36:35"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 13:57:21"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 14:01:24"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 14:13:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 14:15:06"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 14:15:20"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 14:20:18"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 14:26:11"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 14:28:18"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 14:29:27"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-07 14:31:47"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 14:35:40"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 14:38:58"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 14:39:05"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 14:46:08"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 14:46:20"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 14:52:06"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 15:00:07"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 15:00:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 15:12:03"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 15:17:53"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 15:29:45"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 15:32:38"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 15:36:10"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-07 15:40:16"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 15:49:55"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 15:50:07"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 20:44:45"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-07 20:47:32"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 20:58:52"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 20:59:20"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 20:59:32"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 21:09:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 22:15:25"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-07 22:18:02"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 22:36:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 22:36:20"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 22:36:26"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 23:03:38"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 23:03:53"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 23:04:24"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 23:16:13"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 23:16:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 23:18:25"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-07 23:24:59"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-07 23:27:38"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 23:33:57"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 23:39:51"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 23:44:26"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 23:47:21"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 23:47:31"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-07 23:48:25"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-08 00:16:49"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-08 07:36:01"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-08 07:37:01"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-08 07:37:53"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-08 07:39:01"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-08 07:58:58"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-08 08:14:35"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-08 08:24:42"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-08 08:25:39"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-08 08:26:10"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-08 08:26:14"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-08 08:44:11"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-08 08:45:12"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-08 08:45:42"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-08 08:45:46"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-08 08:46:31"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-08 08:46:38"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-08 08:47:04"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-08 08:47:38"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-08 08:49:20"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-08 08:50:16"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-08 08:50:32"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-08 08:51:01"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-08 08:51:19"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-08 09:11:01"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-08 09:11:08"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-08 09:12:19"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-08 09:25:53"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-08 09:28:17"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-09 08:35:31"}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-09 08:36:19"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-09 08:37:51"}
+{"level":"info","message":"Added admin info for 10000/10000 features","service":"layer-controller","timestamp":"2026-01-09 08:38:17"}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-09 09:03:41"}

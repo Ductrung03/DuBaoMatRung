@@ -21,9 +21,12 @@ class DatabaseManager {
       ssl: this.config.ssl || false,
 
       // Pool configuration
-      max: this.config.max || 20,
-      idleTimeoutMillis: this.config.idleTimeoutMillis || 30000,
-      connectionTimeoutMillis: this.config.connectionTimeoutMillis || 10000,
+      max: this.config.max || 10, // Giảm từ 20 xuống 10 để tránh quá tải
+      min: 2, // Giữ ít nhất 2 connections
+      idleTimeoutMillis: this.config.idleTimeoutMillis || 10000, // Giảm từ 30s xuống 10s
+      connectionTimeoutMillis: this.config.connectionTimeoutMillis || 30000, // Tăng từ 10s lên 30s
+      statement_timeout: 60000, // 60s timeout cho query
+      query_timeout: 60000,
 
       // Application name for debugging
       application_name: `${this.serviceName}_service`

@@ -120,7 +120,7 @@ const DuBaoMatRungTuyBien = () => {
         className="bg-forest-green-primary text-white py-0.2 px-4 rounded-full text-sm font-medium uppercase tracking-wide text-left shadow-md w-full cursor-pointer"
         onClick={() => setIsForecastOpen(!isForecastOpen)}
       >
-        Dự báo mất rừng tùy biến
+        Phân tích mất rừng tùy biến
       </div>
 
       {isForecastOpen && (

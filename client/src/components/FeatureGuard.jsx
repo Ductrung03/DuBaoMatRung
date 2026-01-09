@@ -28,16 +28,30 @@ import { useFeaturePermissions } from '../hooks/useFeaturePermissions';
  * </FeatureGuard>
  */
 const FeatureGuard = ({ featureCode, children, fallback = null }) => {
-  const { hasFeatureAccess, isAdmin, loading } = useFeaturePermissions();
+  const { hasFeatureAccess, isAdmin, loading, permissions } = useFeaturePermissions();
 
-  // Trong lúc loading, không hiển thị gì
-  if (loading) {
-    return null;
+  // Tối ưu: Nếu có permissions (từ cache/token) thì check luôn, không cần đợi loading
+  // Nếu đang loading mà chưa có data thì mới return null
+  /* 
+  if (loading && permissions.length === 0) { 
+     // Chỉ return null khi thực sự chưa load được gì và không có cache
+     return null; 
   }
+  */
+  // Thực tế: PermissionContext đã handle việc init từ cache, nên khi loading=true có thể permissions đã có data.
+  // Tuy nhiên để UX tốt nhất (instant show), ta check quyền luôn.
+  // Nếu loading=true nhưng permissions=[], thì hasFeatureAccess sẽ false -> fallback -> ok.
+  // Nhưng nếu đang thực sự fetching lần đầu, có thể user sẽ thấy fallback xong mới thấy content?
+  // Tốt nhất là: Nếu admin -> show luôn. Nếu không -> check quyền.
 
-  // Admin có tất cả quyền
   if (isAdmin) {
     return <>{children}</>;
+  }
+
+  // Nếu đang loading MÀ chưa có permission nào hết -> chờ (tránh flash "Không có quyền")
+  // NHƯNG với fix ở Context, ta đã load từ token/cache nên permissions thường sẽ có ngay.
+  if (loading && !hasFeatureAccess(featureCode) && permissions.length === 0) {
+    return null;
   }
 
   // Kiểm tra quyền

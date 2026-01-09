@@ -161,6 +161,10 @@ exports.getMatRung = async (req, res, next) => {
           m.verification_reason,
           m.verification_notes,
 
+          -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
+          ST_Area(m.geom::geography) as dtich,
+          COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
+
           ${hasUsers ? `
           u.full_name as verified_by_name,
           u.username as verified_by_username,
@@ -185,6 +189,9 @@ exports.getMatRung = async (req, res, next) => {
 
           ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x_coordinate,
           ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y_coordinate,
+          -- ✅ FIX: Thêm x, y shorthand cho Table.jsx
+          ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x,
+          ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y,
 
           ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
 
@@ -197,8 +204,8 @@ exports.getMatRung = async (req, res, next) => {
         ` : ''}
         ${hasUsers ? 'LEFT JOIN users u ON m.verified_by = u.id' : ''}
         WHERE m.geom IS NOT NULL
-          AND m.end_sau::date >= CURRENT_DATE - INTERVAL '12 months'
-        ORDER BY m.end_sau DESC, m.gid DESC
+          AND m.start_dau::date >= CURRENT_DATE - INTERVAL '12 months'
+        ORDER BY m.start_dau DESC, m.gid DESC
         LIMIT $1
       `;
 
@@ -229,7 +236,7 @@ exports.getMatRung = async (req, res, next) => {
     logger.info('Loading mat rung data with filters', { fromDate, toDate, huyen, xa });
 
     // Build WHERE clause
-    const conditions = ['m.start_dau >= $1', 'm.end_sau <= $2'];
+    const conditions = ['m.start_dau >= $1', 'm.start_dau <= $2'];
     const params = [fromDate, toDate];
     let index = 3;
 
@@ -283,6 +290,10 @@ exports.getMatRung = async (req, res, next) => {
         m.verification_reason,
         m.verification_notes,
 
+        -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
+        ST_Area(m.geom::geography) as dtich,
+        COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
+
         ${hasUsers ? `
         u.full_name as verified_by_name,
         u.username as verified_by_username,
@@ -307,6 +318,9 @@ exports.getMatRung = async (req, res, next) => {
 
         ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x_coordinate,
         ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y_coordinate,
+        -- ✅ FIX: Thêm x, y shorthand cho Table.jsx
+        ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x,
+        ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y,
 
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
 
@@ -314,7 +328,7 @@ exports.getMatRung = async (req, res, next) => {
       ${spatialJoin}
       ${hasUsers ? 'LEFT JOIN users u ON m.verified_by = u.id' : ''}
       ${whereClause}
-      ORDER BY m.end_sau DESC, m.gid DESC
+      ORDER BY m.start_dau DESC, m.gid DESC
       LIMIT $${index}
     `;
 
@@ -380,6 +394,10 @@ exports.getAllMatRung = async (req, res, next) => {
         m.verification_reason,
         m.verification_notes,
 
+        -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
+        ST_Area(m.geom::geography) as dtich,
+        COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
+
         ${hasUsers ? `
         u.full_name as verified_by_name,
         u.username as verified_by_username,
@@ -404,6 +422,9 @@ exports.getAllMatRung = async (req, res, next) => {
 
         ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x_coordinate,
         ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y_coordinate,
+        -- ✅ FIX: Thêm x, y shorthand cho Table.jsx
+        ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x,
+        ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y,
 
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
 
@@ -416,8 +437,8 @@ exports.getAllMatRung = async (req, res, next) => {
       ` : ''}
       ${hasUsers ? 'LEFT JOIN users u ON m.verified_by = u.id' : ''}
       WHERE m.geom IS NOT NULL
-        AND m.end_sau::date >= CURRENT_DATE - INTERVAL '${parseInt(months)} months'
-      ORDER BY m.end_sau DESC, m.gid DESC
+        AND m.start_dau::date >= CURRENT_DATE - INTERVAL '${parseInt(months)} months'
+      ORDER BY m.start_dau DESC, m.gid DESC
       LIMIT $1
     `;
 
@@ -467,10 +488,10 @@ exports.getStats = async (req, res, next) => {
         COUNT(*) as total_records,
         COUNT(CASE WHEN m.geom IS NOT NULL THEN 1 END) as records_with_geometry,
         ${hasRg3lr ? `COUNT(CASE WHEN r.gid IS NOT NULL THEN 1 END) as records_with_spatial_data,` : `0 as records_with_spatial_data,`}
-        COUNT(CASE WHEN m.end_sau::date >= CURRENT_DATE - INTERVAL '3 months' THEN 1 END) as recent_3_months,
-        COUNT(CASE WHEN m.end_sau::date >= CURRENT_DATE - INTERVAL '12 months' THEN 1 END) as recent_12_months,
+        COUNT(CASE WHEN m.start_dau::date >= CURRENT_DATE - INTERVAL '3 months' THEN 1 END) as recent_3_months,
+        COUNT(CASE WHEN m.start_dau::date >= CURRENT_DATE - INTERVAL '12 months' THEN 1 END) as recent_12_months,
         MIN(m.start_dau) as earliest_date,
-        MAX(m.end_sau) as latest_date,
+        MAX(m.start_dau) as latest_date,
         SUM(m.area) as total_area,
         COUNT(DISTINCT m.mahuyen) as unique_districts,
         COUNT(CASE WHEN m.detection_status = 'Đã xác minh' THEN 1 END) as verified_records,
@@ -538,12 +559,12 @@ exports.forecastPreview = async (req, res, next) => {
       SELECT
         COUNT(*) as total_features,
         SUM(m.area) as total_area,
-        MIN(m.end_sau) as earliest_date,
-        MAX(m.end_sau) as latest_date
+        MIN(m.start_dau) as earliest_date,
+        MAX(m.start_dau) as latest_date
       FROM mat_rung m
       WHERE m.geom IS NOT NULL
-        AND m.end_sau::date >= $1::date
-        AND m.end_sau::date <= $2::date
+        AND m.start_dau::date >= $1::date
+        AND m.start_dau::date <= $2::date
     `;
 
     const startTime = Date.now();
@@ -613,6 +634,10 @@ exports.autoForecast = async (req, res, next) => {
         m.verification_reason,
         m.verification_notes,
 
+        -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
+        ST_Area(m.geom::geography) as dtich,
+        COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
+
         ${hasUsers ? `
         u.full_name as verified_by_name,
         u.username as verified_by_username,
@@ -637,6 +662,9 @@ exports.autoForecast = async (req, res, next) => {
 
         ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x_coordinate,
         ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y_coordinate,
+        -- ✅ FIX: Thêm x, y shorthand cho Table.jsx
+        ST_X(ST_Centroid(ST_Transform(m.geom, 4326))) as x,
+        ST_Y(ST_Centroid(ST_Transform(m.geom, 4326))) as y,
 
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
 
@@ -649,9 +677,9 @@ exports.autoForecast = async (req, res, next) => {
       ` : ''}
       ${hasUsers ? 'LEFT JOIN users u ON m.verified_by = u.id' : ''}
       WHERE m.geom IS NOT NULL
-        AND m.end_sau::date >= $1::date
-        AND m.end_sau::date <= $2::date
-      ORDER BY m.end_sau DESC, m.gid DESC
+        AND m.start_dau::date >= $1::date
+        AND m.start_dau::date <= $2::date
+      ORDER BY m.start_dau DESC, m.gid DESC
       LIMIT 5000
     `;
 
@@ -680,8 +708,8 @@ exports.autoForecast = async (req, res, next) => {
       forecast_month: parseInt(month)
     });
 
-    // Calculate statistics
-    const totalArea = geoJSON.features.reduce((sum, f) => sum + (f.properties.area || 0), 0);
+    // Calculate statistics - ✅ FIX: Dùng dtich (tính từ geometry) thay vì area
+    const totalArea = geoJSON.features.reduce((sum, f) => sum + (f.properties.dtich || f.properties.area || 0), 0);
 
     res.json({
       success: true,
@@ -726,6 +754,10 @@ function buildGeoJSON(rows, extraProps = {}) {
         verification_reason: row.verification_reason,
         verification_notes: row.verification_notes,
 
+        // ✅ FIX: Thêm dtich và dtichXM (tính từ geometry)
+        dtich: row.dtich,
+        dtichXM: row.dtichXM,
+
         verified_by_name: row.verified_by_name,
         verified_by_username: row.verified_by_username,
 
@@ -737,6 +769,9 @@ function buildGeoJSON(rows, extraProps = {}) {
 
         x_coordinate: row.x_coordinate,
         y_coordinate: row.y_coordinate,
+        // ✅ FIX: Thêm x, y shorthand cho Table.jsx
+        x: row.x,
+        y: row.y,
 
         ...extraProps
       }

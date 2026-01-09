@@ -24,14 +24,14 @@ const QuanLyRoleUltraModern = () => {
 
   // Debug selectedPermissions changes
   useEffect(() => {
-    console.log('Selected permissions changed:', Array.from(selectedPermissions));
+    // Debug log đã tắt
   }, [selectedPermissions]);
 
   const fetchRoles = async () => {
     try {
       const response = await api.get('/auth/roles?include_permissions=true');
       if (response.data.success) {
-        console.log('Roles data:', response.data.data); // Debug log
+        // Debug log đã tắt
         setRoles(response.data.data);
       }
     } catch (error) {
@@ -58,11 +58,10 @@ const QuanLyRoleUltraModern = () => {
       const response = await api.get(`/auth/roles/${roleId}`);
       if (response.data.success) {
         const role = response.data.data;
-        console.log('Full role data:', role); // Debug log
-        console.log('Role permissions:', role.permissions); // Debug log
+        // Debug logs đã tắt
         const permissionCodes = role.permissions ?
           role.permissions.map(p => p.code) : [];
-        console.log('Permission codes:', permissionCodes); // Debug log
+        // Debug log đã tắt
         setSelectedPermissions(new Set(permissionCodes));
         return role;
       }
@@ -84,14 +83,13 @@ const QuanLyRoleUltraModern = () => {
 
       const existingPermissionCodes = new Set(
         roleDetail.data.data.permissions ?
-        roleDetail.data.data.permissions.map(p => p.code) : []
+          roleDetail.data.data.permissions.map(p => p.code) : []
       );
 
       const permissionsToAdd = [...selectedPermissions].filter(code => !existingPermissionCodes.has(code));
       const permissionsToRemove = [...existingPermissionCodes].filter(code => !selectedPermissions.has(code));
 
-      console.log('Permissions to add:', permissionsToAdd);
-      console.log('Permissions to remove:', permissionsToRemove);
+      // Debug logs đã tắt
 
       // Build permission code to ID map from tree structure
       const permissionCodeToId = {};
@@ -101,13 +99,13 @@ const QuanLyRoleUltraModern = () => {
         });
       });
 
-      console.log('Permission code to ID map:', permissionCodeToId);
+      // Debug log đã tắt
 
       // Remove permissions first
       for (const code of permissionsToRemove) {
         const permissionId = permissionCodeToId[code];
         if (permissionId) {
-          console.log(`Removing permission: ${code} (ID: ${permissionId})`);
+          // Debug log đã tắt
           await api.delete(`/auth/roles/${selectedRole.id}/permissions/${permissionId}`);
         }
       }
@@ -116,7 +114,7 @@ const QuanLyRoleUltraModern = () => {
       for (const code of permissionsToAdd) {
         const permissionId = permissionCodeToId[code];
         if (permissionId) {
-          console.log(`Adding permission: ${code} (ID: ${permissionId})`);
+          // Debug log đã tắt
           await api.post('/auth/roles/permissions', {
             roleId: selectedRole.id,
             permissionId: permissionId
@@ -135,6 +133,67 @@ const QuanLyRoleUltraModern = () => {
     } catch (error) {
       console.error('Error saving permissions:', error);
       toast.error(error.response?.data?.message || 'Lỗi khi lưu phân quyền');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateRole = async () => {
+    try {
+      if (!formData.name.trim()) {
+        toast.error('Vui lòng nhập tên vai trò');
+        return;
+      }
+
+      setLoading(true);
+
+      // Map selected permission codes to IDs
+      const permissionCodeToId = {};
+      permissions.forEach(page => {
+        page.children.forEach(feature => {
+          permissionCodeToId[feature.code] = feature.permission_id;
+        });
+      });
+
+      const permissionIds = [...selectedPermissions].map(code => permissionCodeToId[code]).filter(id => id);
+
+      const payload = {
+        name: formData.name,
+        description: formData.description,
+        permissions: permissionIds
+      };
+
+      const response = await api.post('/auth/roles', payload);
+
+      if (response.data.success) {
+        toast.success('Tạo vai trò thành công');
+        setShowModal(false);
+        fetchRoles();
+      }
+    } catch (error) {
+      console.error('Error creating role:', error);
+      toast.error(error.response?.data?.message || 'Lỗi khi tạo vai trò');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteRole = async (role) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa vai trò "${role.name}"? Hành động này không thể hoàn tác.`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await api.delete(`/auth/roles/${role.id}`);
+
+      if (response.data.success) {
+        toast.success(`Đã xóa vai trò "${role.name}" thành công`);
+        fetchRoles();
+      }
+    } catch (error) {
+      console.error('Error deleting role:', error);
+      toast.error(error.response?.data?.message || 'Không thể xóa vai trò. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -174,13 +233,31 @@ const QuanLyRoleUltraModern = () => {
   const openPermissionsModal = async (role) => {
     setModalMode('permissions');
     setSelectedRole(role);
-    setSelectedPermissions(new Set()); // Clear first
+
+    // Initialize permissions directly from the role object passed from the list
+    // This ensures immediate display of checked items without waiting for API
+    if (role.permissions && Array.isArray(role.permissions)) {
+      const codes = role.permissions.map(p => p.code);
+      // Debug log đã tắt
+      setSelectedPermissions(new Set(codes));
+    } else {
+      setSelectedPermissions(new Set());
+    }
+
     setLoading(true);
     setShowModal(true);
-    
-    // Fetch and set permissions after modal is open
+
+    // Fetch fresh permissions to ensure data is up to date
     await fetchRolePermissions(role.id);
     setLoading(false);
+  };
+
+  const openCreateModal = () => {
+    setModalMode('create');
+    setSelectedRole(null);
+    setFormData({ name: '', description: '' });
+    setSelectedPermissions(new Set());
+    setShowModal(true);
   };
 
   const closeModal = () => {
@@ -212,7 +289,7 @@ const QuanLyRoleUltraModern = () => {
                 </div>
               </div>
               <button
-                onClick={() => setShowModal(true)}
+                onClick={openCreateModal}
                 className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center transition-colors shadow-sm"
               >
                 <FaPlus className="mr-2" />
@@ -291,6 +368,7 @@ const QuanLyRoleUltraModern = () => {
                       </button>
                       {!role.is_system && (
                         <button
+                          onClick={() => handleDeleteRole(role)}
                           className="text-red-600 hover:text-red-800 p-2 hover:bg-red-100 rounded-lg transition-colors"
                           title="Xóa"
                         >
@@ -301,7 +379,7 @@ const QuanLyRoleUltraModern = () => {
                   </div>
                   <p className="text-gray-600 text-sm mb-4">{role.description}</p>
                   <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span>Quyền: {role._count?.rolePermissions || role.rolePermissions?.length || 0}</span>
+                    <span>Quyền: {role.permissions?.length || role._count?.rolePermissions || 0}</span>
                     <span>ID: {role.id}</span>
                   </div>
                 </div>
@@ -330,8 +408,8 @@ const QuanLyRoleUltraModern = () => {
                     </p>
                   </div>
                 </div>
-                <button 
-                  onClick={closeModal} 
+                <button
+                  onClick={closeModal}
                   className="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-lg transition-colors"
                 >
                   <FaTimes className="text-xl" />
@@ -340,8 +418,40 @@ const QuanLyRoleUltraModern = () => {
             </div>
 
             <div className="p-6 overflow-y-auto max-h-[70vh]">
-              {modalMode === 'permissions' ? (
+              {/* Form fields for Create mode */}
+              {modalMode === 'create' && (
+                <div className="space-y-6 mb-8 border-b border-gray-200 pb-8">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Tên vai trò *</label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="Nhập tên vai trò..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả</label>
+                    <textarea
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      rows="3"
+                      placeholder="Mô tả vai trò này..."
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Permission Tree - Always show for create, or if permissions mode */}
+              {(modalMode === 'permissions' || modalMode === 'create') && (
                 <div className="space-y-6">
+                  {modalMode === 'create' && (
+                    <h3 className="text-lg font-medium text-gray-900 border-l-4 border-green-500 pl-3">
+                      Phân quyền chức năng
+                    </h3>
+                  )}
                   {permissions.map((page) => {
                     const pageFeatureCodes = page.children.map(f => f.code);
                     const selectedCount = pageFeatureCodes.filter(code => selectedPermissions.has(code)).length;
@@ -395,11 +505,10 @@ const QuanLyRoleUltraModern = () => {
                               return (
                                 <div
                                   key={feature.code}
-                                  className={`relative p-3 rounded-lg border-2 transition-all cursor-pointer ${
-                                    isChecked
-                                      ? 'bg-green-50 border-green-300 shadow-sm'
-                                      : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
-                                  }`}
+                                  className={`relative p-3 rounded-lg border-2 transition-all cursor-pointer ${isChecked
+                                    ? 'bg-green-50 border-green-300 shadow-sm'
+                                    : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                                    }`}
                                   onClick={() => togglePermission(feature.code)}
                                 >
                                   <div className="flex items-start">
@@ -443,29 +552,6 @@ const QuanLyRoleUltraModern = () => {
                     );
                   })}
                 </div>
-              ) : (
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Tên vai trò</label>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      placeholder="Nhập tên vai trò..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả</label>
-                    <textarea
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      rows="4"
-                      placeholder="Mô tả vai trò này..."
-                    />
-                  </div>
-                </div>
               )}
             </div>
 
@@ -485,7 +571,7 @@ const QuanLyRoleUltraModern = () => {
                     Hủy
                   </button>
                   <button
-                    onClick={modalMode === 'permissions' ? handleSavePermissions : () => {}}
+                    onClick={modalMode === 'permissions' ? handleSavePermissions : handleCreateRole}
                     className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center transition-colors shadow-md"
                     disabled={loading}
                   >

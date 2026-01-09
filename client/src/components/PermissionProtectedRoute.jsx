@@ -29,9 +29,27 @@ const PermissionProtectedRoute = ({ children, requiredPermission, fallback = nul
     // JWT token có field "permissions" chứa array các permission codes
     const userPermissions = user.permissions || [];
 
-    // Kiểm tra xem user có bất kỳ permission nào bắt đầu với prefix này không
-    // Ví dụ: requiredPermission = "forecast" sẽ match với "forecast.auto", "forecast.custom", etc.
-    const hasAccess = userPermissions.some(perm => perm.startsWith(requiredPermission + '.'));
+    // Kiểm tra nhiều pattern:
+    // 1. Exact match: "user_management" === "user_management"
+    // 2. Prefix match: permission starts with "user_management."
+    // 3. Wildcard: permission = "user.*" hoặc "*"
+    const hasAccess = userPermissions.some(perm => {
+      // Exact match
+      if (perm === requiredPermission) return true;
+
+      // Prefix match: user_management.view, user_management.create, etc.
+      if (perm.startsWith(requiredPermission + '.')) return true;
+
+      // Wildcard match
+      if (perm === '*' || perm === 'admin.*') return true;
+
+      // Module wildcard: user.* matches user_management
+      const permModule = perm.split('.')[0];
+      const reqModule = requiredPermission.split('_')[0]; // user_management -> user
+      if (perm === permModule + '.*' && permModule === reqModule) return true;
+
+      return false;
+    });
 
     console.log(`🔍 Checking permission "${requiredPermission}":`, {
       userPermissions,

@@ -15,6 +15,9 @@ model User {
   position       String?
   organization   String?
   district_id    String?
+  xa             String?    // Xã
+  khoanh         String?    // Khoảnh
+  tieukhu        String?    // Tiểu khu
   is_active      Boolean    @default(true)
   created_at     DateTime   @default(now())
   updated_at     DateTime   @updatedAt

@@ -73,13 +73,20 @@ const handleMapServerRequest = async (req, res) => {
     });
 
     // Set up environment for MapServer
+    // MapServer 8.x requires MAPSERVER_CONFIG_FILE
+    const configFile = process.env.MS_CONFIG_FILE || MS_CONFIG_FILE;
     const env = {
       ...process.env,
       QUERY_STRING: queryString,
       REQUEST_METHOD: 'GET',
       MS_MAPFILE: MAPFILE_PATH,  // ✅ Sử dụng MS_MAPFILE để MapServer tự động load
-      MS_MAP_PATTERN: '.*',
-      MS_MAP_NO_PATH: '1'
+      MAPSERVER_CONFIG_FILE: configFile, // ✅ Required for MapServer 8.x
+      // MS4W environment variables
+      PROJ_DATA: process.env.PROJ_LIB || 'C:\\ms4w\\share\\proj',
+      PROJ_LIB: process.env.PROJ_LIB || 'C:\\ms4w\\share\\proj',
+      GDAL_DATA: 'C:\\ms4w\\gdaldata',
+      GDAL_DRIVER_PATH: 'C:\\ms4w\\gdalplugins',
+      PATH: `C:\\ms4w\\Apache\\cgi-bin;C:\\ms4w\\tools;${process.env.PATH || ''}`
     };
 
     // Spawn MapServer process

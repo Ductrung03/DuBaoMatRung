@@ -191,6 +191,62 @@ router.get('/export-pdf', asyncHandler(reportController.exportPDF));
 
 /**
  * @swagger
+ * /api/bao-cao/export-geojson:
+ *   get:
+ *     summary: Export GeoJSON file
+ *     description: Generate and download a GeoJSON file for forest loss data
+ *     tags: [Reports]
+ *     parameters:
+ *       - in: query
+ *         name: fromDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for report
+ *       - in: query
+ *         name: toDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for report
+ *       - in: query
+ *         name: huyen
+ *         schema:
+ *           type: string
+ *         description: District name
+ *       - in: query
+ *         name: xa
+ *         schema:
+ *           type: string
+ *         description: Commune name
+ *       - in: query
+ *         name: xacMinh
+ *         schema:
+ *           type: string
+ *           enum: [true, false]
+ *         description: Whether to include verified data only
+ *     responses:
+ *       200:
+ *         description: GeoJSON file generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 type:
+ *                   type: string
+ *                   example: FeatureCollection
+ *                 features:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       400:
+ *         description: Invalid request parameters
+ */
+router.get('/export-geojson', asyncHandler(reportController.exportGeoJSON));
+
+/**
+ * @swagger
  * /api/reports/stats:
  *   get:
  *     summary: Get report statistics

@@ -158,6 +158,8 @@ exports.exportDOCX = async (req, res, next) => {
     if (huyen) searchParams.append('huyen', huyen);
     if (xa) searchParams.append('xa', xa);
     if (xacMinh === 'true') searchParams.append('xacMinh', 'true');
+    // Không giới hạn số lượng dữ liệu cho báo cáo
+    searchParams.append('limit', '0');
 
     // Get user info from headers forwarded by gateway
     const userHeaders = {};
@@ -328,6 +330,8 @@ exports.exportPDF = async (req, res, next) => {
     if (huyen) searchParams.append('huyen', huyen);
     if (xa) searchParams.append('xa', xa);
     if (xacMinh === 'true') searchParams.append('xacMinh', 'true');
+    // Không giới hạn số lượng dữ liệu cho báo cáo
+    searchParams.append('limit', '0');
 
     // Get user info from headers forwarded by gateway
     const userHeaders = {};
@@ -442,6 +446,63 @@ exports.exportPDF = async (req, res, next) => {
 
   } catch (error) {
     logger.error('Error exporting PDF:', error);
+    next(error);
+  }
+};
+
+// Export GeoJSON file
+exports.exportGeoJSON = async (req, res, next) => {
+  try {
+    const { fromDate, toDate, huyen, xa, xacMinh } = req.query;
+
+    logger.info('Exporting GeoJSON file', { fromDate, toDate, huyen, xa, xacMinh });
+
+    // Get data from search service
+    const axios = require('axios');
+    const searchUrl = `${process.env.SEARCH_SERVICE_URL || 'http://localhost:3006'}/api/search/mat-rung`;
+    const searchParams = new URLSearchParams();
+
+    if (fromDate) searchParams.append('fromDate', fromDate);
+    if (toDate) searchParams.append('toDate', toDate);
+    if (huyen) searchParams.append('huyen', huyen);
+    if (xa) searchParams.append('xa', xa);
+    if (xacMinh === 'true') searchParams.append('xacMinh', 'true');
+    // Không giới hạn số lượng dữ liệu cho báo cáo
+    searchParams.append('limit', '0');
+
+    // Get user info from headers forwarded by gateway
+    const userHeaders = {};
+    if (req.headers['x-user-id']) userHeaders['x-user-id'] = req.headers['x-user-id'];
+    if (req.headers['x-user-username']) userHeaders['x-user-username'] = req.headers['x-user-username'];
+    if (req.headers['x-user-roles']) userHeaders['x-user-roles'] = req.headers['x-user-roles'];
+    if (req.headers['x-user-permissions']) userHeaders['x-user-permissions'] = req.headers['x-user-permissions'];
+
+    const searchResponse = await axios.get(`${searchUrl}?${searchParams.toString()}`, { headers: userHeaders });
+    const data = searchResponse.data.data;
+
+    if (!data || !data.features || data.features.length === 0) {
+      return res.status(404).json({ success: false, message: 'Không có dữ liệu để xuất GeoJSON' });
+    }
+
+    // Create GeoJSON FeatureCollection
+    const geojson = {
+      type: 'FeatureCollection',
+      features: data.features
+    };
+
+    const isVerified = xacMinh === 'true';
+    const fileName = isVerified
+      ? `mat-rung-xac-minh-${fromDate}-${toDate}.geojson`
+      : `mat-rung-${fromDate}-${toDate}.geojson`;
+
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    res.json(geojson);
+
+    logger.info('GeoJSON exported successfully', { fileName, featureCount: data.features.length });
+
+  } catch (error) {
+    logger.error('Error exporting GeoJSON:', error);
     next(error);
   }
 };

@@ -1,0 +1,9 @@
+{
+  "name": "@dubao/utils",
+  "version": "1.0.0",
+  "description": "Shared utility functions",
+  "main": "index.js",
+  "dependencies": {
+    "vietnamese-conversion": "^1.0.1"
+  }
+}

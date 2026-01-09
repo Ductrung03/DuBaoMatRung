@@ -15,12 +15,14 @@ const Sidebar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const [, setGeoData] = useState(null);
-  
+
   const pathAfterDashboard = currentPath.replace("/dashboard", "").replace(/^\//, "");
+  // Lấy phần đầu tiên của path để xác định module (ví dụ: quanlydulieu/abc -> quanlydulieu)
+  const rootPath = pathAfterDashboard.split('/')[0];
 
   // Logic để ánh xạ đường dẫn với component - ĐÃ ĐƯỢC BẢO VỆ BỞI FEATURE PERMISSIONS
   const getComponentByPath = () => {
-    switch (pathAfterDashboard) {
+    switch (rootPath) {
       case "dubaomatrung":
         return [
           <FeatureGuard key="tuDong" featureCode="forecast.auto">

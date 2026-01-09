@@ -96,7 +96,7 @@ class AdminService {
     logger.info('Getting hanh chinh data');
 
     const result = await this.db
-      .selectFrom('laocai_ranhgioihc')
+      .selectFrom('sonla_rgx')
       .select([
         'huyen',
         'xa',

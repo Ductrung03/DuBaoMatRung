@@ -354,8 +354,137 @@ Closes #234
 4. **Prisma**: Run `npx prisma generate` after schema changes
 5. **MapServer**: Requires GDAL/MapServer installation
 
+## Production Deployment (Windows Server)
+
+### Quick Deploy
+
+```powershell
+# 1. Trên máy hiện tại - Chuẩn bị package
+.\prepare-deploy.ps1
+
+# 2. Transfer thư mục deploy-package lên server (USB/Network/Cloud)
+
+# 3. Trên server - Setup tự động
+.\setup-server.ps1
+```
+
+### Yêu Cầu Trên Server
+
+Cài đặt trước khi deploy:
+
+1. **Node.js 18+** - https://nodejs.org/
+2. **PostgreSQL 15+** - https://www.postgresql.org/download/windows/
+3. **Redis** (optional) - https://github.com/tporadowski/redis/releases
+4. **PM2** - Sẽ tự động install khi chạy setup script
+
+### Deployment Scripts
+
+```powershell
+# Chuẩn bị package để deploy
+.\prepare-deploy.ps1
+
+# Setup trên server (tự động)
+.\setup-server.ps1
+```
+
+### Quản Lý Services với PM2
+
+```powershell
+# Xem status
+pm2 status
+
+# Xem logs
+pm2 logs
+pm2 logs gateway
+
+# Restart services
+pm2 restart all
+pm2 restart gateway
+
+# Stop services
+pm2 stop all
+```
+
+### Environment Variables
+
+File `.env`:
+
+```env
+NODE_ENV=production
+
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_NAME_AUTH=auth_db
+DB_NAME_GIS=gis_db
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# JWT
+JWT_SECRET=your_production_secret
+REFRESH_TOKEN_SECRET=your_refresh_secret
+
+# Services (localhost cho server deployment)
+AUTH_SERVICE_URL=http://localhost:3001
+USER_SERVICE_URL=http://localhost:3002
+GIS_SERVICE_URL=http://localhost:3003
+REPORT_SERVICE_URL=http://localhost:3004
+ADMIN_SERVICE_URL=http://localhost:3005
+SEARCH_SERVICE_URL=http://localhost:3006
+MAPSERVER_SERVICE_URL=http://localhost:3007
+```
+
+### Backup & Restore
+
+```powershell
+# Backup databases
+pg_dump -U postgres auth_db > "backups\auth_db_$(Get-Date -Format 'yyyyMMdd').sql"
+pg_dump -U postgres gis_db > "backups\gis_db_$(Get-Date -Format 'yyyyMMdd').sql"
+
+# Restore
+psql -U postgres -d auth_db -f "backups\auth_db_20250610.sql"
+```
+
+### Nginx Configuration (Optional)
+
+Download: https://nginx.org/en/download.html
+
+Config file `C:\nginx\conf\nginx.conf`:
+
+```nginx
+http {
+    upstream api {
+        server localhost:3000;
+    }
+
+    server {
+        listen 80;
+
+        # Frontend
+        location / {
+            root C:/DuBaoMatRung/client/dist;
+            try_files $uri $uri/ /index.html;
+        }
+
+        # API Proxy
+        location /api/ {
+            proxy_pass http://api/api/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+    }
+}
+```
+
 ## Tài Liệu Tham Khảo
 
-- Windows Deployment: `scripts/windows/README.md`
-- Permission Config: `microservices/services/auth-service/src/config/`
-- Database Schema: `microservices/services/auth-service/prisma/schema.prisma`
+- **Quick Start Deploy**: [QUICK_START_DEPLOY.md](QUICK_START_DEPLOY.md)
+- **Deployment Guide**: [DEPLOY_WINDOWS_SERVER.md](DEPLOY_WINDOWS_SERVER.md)
+- **Initial Data**: `docker/initial-data/` (SQL dumps cho database seed)
+- **Permission Config**: `microservices/services/auth-service/src/config/`
+- **Database Schema**: `microservices/services/auth-service/prisma/schema.prisma`
+ 

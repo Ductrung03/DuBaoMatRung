@@ -7,7 +7,7 @@ const Dashboard = () => {
       <div className="mb-4">
         <Link to="/dashboard/dubaomatrung">
           <div className="bg-forest-green-primary text-white py-2 px-4 rounded-full text-lg font-medium uppercase tracking-wide text-left shadow-md w-full cursor-pointer hover:bg-green-800 transition">
-            Dự báo mất rừng
+            Giám sát mất rừng
           </div>
         </Link>
       </div>
@@ -15,7 +15,7 @@ const Dashboard = () => {
       <div className="mb-4">
         <Link to="/dashboard/quanlydulieu">
           <div className="bg-forest-green-primary text-white py-2 px-4 rounded-full text-lg font-medium uppercase tracking-wide text-left shadow-md w-full cursor-pointer hover:bg-green-800 transition">
-            Quản lý dữ liệu
+            Tra cứu dữ liệu
           </div>
         </Link>
       </div>
@@ -31,7 +31,7 @@ const Dashboard = () => {
       <div className="mb-4">
         <Link to="/dashboard/phathienmatrung">
           <div className="bg-forest-green-primary text-white py-2 px-4 rounded-full text-lg font-medium uppercase tracking-wide text-left shadow-md w-full cursor-pointer hover:bg-green-800 transition">
-            Phát hiện mất rừng
+            Xử lý ảnh viễn thám
           </div>
         </Link>
       </div>

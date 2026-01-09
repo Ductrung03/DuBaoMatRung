@@ -4,7 +4,42 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dubaomatrung</title>
+    <title>Hệ thống giám sát mất rừng tỉnh Sơn La</title>
+    <!-- Clear invalid tokens before app loads -->
+    <script>
+      (function() {
+        try {
+          const token = localStorage.getItem('token');
+          if (token && token !== 'null' && token !== 'undefined') {
+            // Try to decode JWT
+            const parts = token.split('.');
+            if (parts.length !== 3) {
+              console.log('⚠️ Invalid token format detected, clearing...');
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              return;
+            }
+
+            // Check expiration
+            try {
+              const payload = JSON.parse(atob(parts[1]));
+              const now = Date.now() / 1000;
+              if (payload.exp && payload.exp < now) {
+                console.log('⚠️ Expired token detected, clearing...');
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+              }
+            } catch (e) {
+              console.log('⚠️ Token decode error, clearing...');
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+            }
+          }
+        } catch (e) {
+          console.error('Token validation error:', e);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

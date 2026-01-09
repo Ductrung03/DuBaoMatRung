@@ -14,7 +14,7 @@ const getPermissionsTree = async (req, res, next) => {
     });
 
     const tree = buildPermissionTree(permissions);
-    
+
     res.json({
       success: true,
       data: tree,
@@ -29,15 +29,15 @@ const getPermissionsTree = async (req, res, next) => {
 const getPermissionsByCategory = async (req, res, next) => {
   try {
     const { category } = req.params;
-    
+
     const permissions = await prisma.permission.findMany({
-      where: { 
+      where: {
         ui_category: category,
-        is_active: true 
+        is_active: true
       },
       orderBy: [{ order: 'asc' }, { name: 'asc' }]
     });
-    
+
     res.json({
       success: true,
       data: permissions
@@ -50,8 +50,11 @@ const getPermissionsByCategory = async (req, res, next) => {
 
 const getUserMenuItems = async (req, res, next) => {
   try {
-    const userId = req.user.id;
-    
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.json({ success: true, data: [] });
+    }
+
     const userPermissions = await prisma.permission.findMany({
       where: {
         is_active: true,
@@ -69,7 +72,7 @@ const getUserMenuItems = async (req, res, next) => {
       },
       orderBy: { order: 'asc' }
     });
-    
+
     const menuItems = userPermissions.map(p => ({
       code: p.code,
       name: p.name,
@@ -77,7 +80,7 @@ const getUserMenuItems = async (req, res, next) => {
       icon: p.icon,
       order: p.order
     }));
-    
+
     res.json({
       success: true,
       data: menuItems
@@ -90,9 +93,12 @@ const getUserMenuItems = async (req, res, next) => {
 
 const checkPageAccess = async (req, res, next) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.json({ success: true, hasAccess: false });
+    }
     const { pageCode } = req.params;
-    
+
     const hasAccess = await prisma.permission.findFirst({
       where: {
         code: pageCode,
@@ -108,7 +114,7 @@ const checkPageAccess = async (req, res, next) => {
         }
       }
     });
-    
+
     res.json({
       success: true,
       hasAccess: !!hasAccess
@@ -121,20 +127,23 @@ const checkPageAccess = async (req, res, next) => {
 
 const getPageActions = async (req, res, next) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.json({ success: true, data: [] });
+    }
     const { pageCode } = req.params;
-    
+
     const pagePermission = await prisma.permission.findFirst({
       where: { code: pageCode, is_active: true }
     });
-    
+
     if (!pagePermission) {
       return res.status(404).json({
         success: false,
         message: 'Không tìm thấy trang'
       });
     }
-    
+
     const actions = await prisma.permission.findMany({
       where: {
         parent_id: pagePermission.id,
@@ -152,7 +161,7 @@ const getPageActions = async (req, res, next) => {
       },
       orderBy: { order: 'asc' }
     });
-    
+
     res.json({
       success: true,
       data: actions
@@ -167,7 +176,7 @@ const validatePermissions = async (req, res, next) => {
   try {
     const permissions = await prisma.permission.findMany();
     const errors = validatePermissionStructure(permissions);
-    
+
     res.json({
       success: true,
       isValid: errors.length === 0,
@@ -228,7 +237,7 @@ const getAllPermissions = async (req, res, next) => {
 const getPermissionById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
+
     const permission = await prisma.permission.findUnique({
       where: { id: parseInt(id) },
       include: {
@@ -364,9 +373,9 @@ const getModernPermissionsTree = async (req, res, next) => {
 const buildPermissionTree = (permissions) => {
   const permissionMap = new Map();
   const tree = [];
-  
+
   permissions.forEach(p => permissionMap.set(p.id, { ...p, children: [] }));
-  
+
   permissions.forEach(p => {
     const permission = permissionMap.get(p.id);
     if (p.parent_id) {
@@ -378,23 +387,23 @@ const buildPermissionTree = (permissions) => {
       tree.push(permission);
     }
   });
-  
+
   return tree.sort((a, b) => a.order - b.order);
 };
 
 const validatePermissionStructure = (permissions) => {
   const errors = [];
-  
+
   permissions.forEach(p => {
     if (p.parent_id && !permissions.find(parent => parent.id === p.parent_id)) {
       errors.push(`Permission ${p.code} has invalid parent_id: ${p.parent_id}`);
     }
-    
+
     if (p.ui_element === 'page' && !p.ui_path) {
       errors.push(`Page permission ${p.code} missing ui_path`);
     }
   });
-  
+
   return errors;
 };
 
@@ -911,27 +920,74 @@ exports.getFeaturePermissionsTree = async (req, res, next) => {
  */
 exports.getMyAccessibleFeatures = async (req, res, next) => {
   try {
+    // IMPORTANT: Validate that user info is present from authentication middleware
+    logger.info('getMyAccessibleFeatures called', {
+      hasUser: !!req.user,
+      userId: req.user?.id,
+      username: req.user?.username,
+      headers: {
+        'x-user-id': req.headers['x-user-id'],
+        'x-user-username': req.headers['x-user-username']
+      }
+    });
+
+    if (!req.user || !req.user.id || isNaN(req.user.id)) {
+      logger.error('User not authenticated properly - req.user is missing or incomplete', {
+        user: req.user,
+        headers: req.headers
+      });
+      return res.status(401).json({
+        success: false,
+        message: 'User not authenticated properly',
+        error: 'Missing user information in request'
+      });
+    }
+
     const userId = req.user.id;
     const { getUserAccessiblePages, getUserAccessibleFeatures } = require('../config/feature-based-permissions.config');
 
     // Get user's permission codes
-    const userPermissions = await prisma.permission.findMany({
-      where: {
-        is_active: true,
-        rolePermissions: {
-          some: {
-            role: {
-              userRoles: {
-                some: { user_id: userId }
+    let permissionCodes = [];
+    try {
+      // OPTIMIZED QUERY: Split into 2 steps to avoid deep join performance issues
+      // 1. Get user roles first (fast index lookup)
+      const userRoles = await prisma.userRole.findMany({
+        where: { user_id: userId },
+        select: { role_id: true }
+      });
+
+      const roleIds = userRoles.map(ur => ur.role_id);
+
+      if (roleIds.length === 0) {
+        permissionCodes = [];
+      } else {
+        // 2. Get permissions for these roles
+        const userPermissions = await prisma.permission.findMany({
+          where: {
+            is_active: true,
+            rolePermissions: {
+              some: {
+                role_id: { in: roleIds }
               }
             }
-          }
-        }
-      },
-      select: { code: true }
-    });
+          },
+          select: { code: true }
+        });
 
-    const permissionCodes = userPermissions.map(p => p.code);
+        permissionCodes = userPermissions.map(p => p.code);
+      }
+    } catch (dbError) {
+      logger.error('Database error fetching permissions', { userId, error: dbError.message });
+      // In case of DB error, return empty permissions instead of crashing, or rethrow handled error?
+      // For now, let's returning empty set is safer than 500 loop if data is corrupted
+      permissionCodes = [];
+    }
+
+    logger.info('User permissions fetched', {
+      userId,
+      permissionCount: permissionCodes.length,
+      permissions: permissionCodes
+    });
 
     // Get accessible pages
     const accessiblePages = getUserAccessiblePages(permissionCodes);
@@ -944,7 +1000,8 @@ exports.getMyAccessibleFeatures = async (req, res, next) => {
 
     logger.info('Retrieved user accessible features', {
       userId,
-      pageCount: pagesWithFeatures.length
+      pageCount: pagesWithFeatures.length,
+      pages: pagesWithFeatures.map(p => p.name)
     });
 
     res.json({
@@ -955,8 +1012,20 @@ exports.getMyAccessibleFeatures = async (req, res, next) => {
       }
     });
   } catch (error) {
-    logger.error('Error retrieving user accessible features', { error: error.message });
-    next(error);
+    logger.error('Error retrieving user accessible features', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    // Return a valid empty response on error to avoid breaking frontend completely
+    res.json({
+      success: false,
+      message: 'Failed to retrieve permissions',
+      data: {
+        pages: [],
+        total_permissions: 0
+      }
+    });
   }
 };
 

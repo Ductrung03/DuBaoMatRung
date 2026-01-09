@@ -8,7 +8,7 @@ const prisma = require('../lib/prisma');
 
 const logger = createLogger('auth-controller');
 const JWT_SECRET = process.env.JWT_SECRET || 'dubaomatrung_secret_key_change_this_in_production';
-const JWT_EXPIRES_IN = '24h';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 // Login
 exports.login = async (req, res, next) => {
@@ -118,10 +118,29 @@ exports.getCurrentUser = async (req, res, next) => {
   try {
     const userId = req.headers['x-user-id'];
 
+    logger.info('getCurrentUser called', {
+      userId,
+      hasUserId: !!userId,
+      headers: {
+        'x-user-id': req.headers['x-user-id'],
+        'x-user-username': req.headers['x-user-username'],
+        'x-user-roles': req.headers['x-user-roles']
+      }
+    });
+
     if (!userId || isNaN(parseInt(userId))) {
-      throw new ValidationError('Invalid User ID in request');
+      logger.error('Invalid or missing user ID in request', {
+        userId,
+        headers: Object.keys(req.headers)
+      });
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid or missing User ID in request',
+        error: 'User ID header is required and must be a valid number'
+      });
     }
 
+    // OPTIMIZED QUERY: Fetch user and roles first, then permissions separately
     const user = await prisma.user.findFirst({
       where: {
         id: parseInt(userId),
@@ -130,26 +149,55 @@ exports.getCurrentUser = async (req, res, next) => {
       include: {
         userRoles: {
           include: {
-            role: {
-              include: {
-                rolePermissions: {
-                  include: {
-                    permission: true
-                  }
-                }
-              }
-            }
+            role: true
           }
         }
       }
     });
 
     if (!user) {
-      throw new AuthenticationError('User not found');
+      logger.warn('User not found or inactive', { userId: parseInt(userId) });
+      return res.status(404).json({
+        success: false,
+        message: 'User not found or inactive'
+      });
+    }
+
+    // Fetch permissions for the roles
+    if (user.userRoles && user.userRoles.length > 0) {
+      const roleIds = user.userRoles.map(ur => ur.role_id);
+
+      const rolePermissions = await prisma.rolePermission.findMany({
+        where: {
+          role_id: { in: roleIds }
+        },
+        include: {
+          permission: true
+        }
+      });
+
+      // Stitch permissions back to roles
+      user.userRoles.forEach(ur => {
+        ur.role.rolePermissions = rolePermissions.filter(rp => rp.role_id === ur.role_id);
+      });
+    }
+
+    if (!user) {
+      logger.warn('User not found or inactive', { userId: parseInt(userId) });
+      return res.status(404).json({
+        success: false,
+        message: 'User not found or inactive'
+      });
     }
 
     // Remove sensitive data
     const { password_hash, ...userWithoutPassword } = user;
+
+    logger.info('getCurrentUser successful', {
+      userId: user.id,
+      username: user.username,
+      roleCount: user.userRoles?.length || 0
+    });
 
     res.json({
       success: true,
@@ -157,6 +205,11 @@ exports.getCurrentUser = async (req, res, next) => {
     });
 
   } catch (error) {
+    logger.error('Error in getCurrentUser', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.headers['x-user-id']
+    });
     next(error);
   }
 };

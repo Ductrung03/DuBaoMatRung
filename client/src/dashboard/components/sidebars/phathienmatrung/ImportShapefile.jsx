@@ -1,7 +1,7 @@
 // Sửa file: client/src/dashboard/components/sidebars/phathienmatrung/ImportShapefile.jsx
 
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../../../../services/api";
 import { toast } from "react-toastify";
 import config from "../../../../config";
 import { FaFileUpload, FaCloudSun, FaImage, FaExclamationTriangle, FaInfoCircle } from "react-icons/fa";
@@ -17,7 +17,7 @@ const LoadingOverlay = ({ message, progress }) => (
       {progress > 0 && (
         <div className="w-full mt-3">
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
+            <div
               className="bg-green-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             ></div>
@@ -39,14 +39,10 @@ const ImportShapefile = () => {
   const navigate = useNavigate();
   const { setGeoData } = useGeoData();
 
-  // Hàm kiểm tra URL hợp lệ
+  // Hàm kiểm tra URL hợp lệ cho GeoJSON
   const validateGeeUrl = (url) => {
     if (!url || url.trim() === "") {
-      return { valid: false, message: "Vui lòng nhập URL từ Google Earth Engine" };
-    }
-
-    if (!url.includes("earthengine.googleapis.com")) {
-      return { valid: false, message: "URL phải từ domain earthengine.googleapis.com" };
+      return { valid: false, message: "Vui lòng nhập URL file GeoJSON" };
     }
 
     // Kiểm tra định dạng URL cơ bản
@@ -79,7 +75,7 @@ const ImportShapefile = () => {
       progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
           const newProgress = prev + 5;
-          
+
           // Update message based on progress
           if (newProgress <= 20) {
             setLoadingMessage("Đang kết nối đến Google Earth Engine...");
@@ -92,15 +88,15 @@ const ImportShapefile = () => {
           } else if (newProgress <= 90) {
             setLoadingMessage("Đang hoàn thiện quá trình import...");
           }
-          
+
           return newProgress > 90 ? 90 : newProgress;
         });
       }, 800);
 
 
-      const response = await axios.post(
-        `/api/import-gee-url`,
-        { zipUrl },
+      const response = await api.post(
+        `/import-geojson-url`,
+        { jsonUrl: zipUrl },
         {
           timeout: 300000, // 5 phút timeout
           onUploadProgress: (progressEvent) => {
@@ -137,10 +133,19 @@ const ImportShapefile = () => {
       // Import thành công
       let successMessage = `✅ ${data.message}`;
       if (data.recordsAdded > 0) {
-        successMessage += ` Đã thêm ${data.recordsAdded} bản ghi mới.`;
+        successMessage += `\n📊 Tổng số: ${data.totalFeatures} features`;
+        successMessage += `\n✓ Hợp lệ: ${data.validFeatures} features (giao với hiện trạng rừng)`;
+        if (data.filteredFeatures > 0) {
+          successMessage += `\n✗ Đã lọc: ${data.filteredFeatures} features (không giao với hiện trạng rừng)`;
+        }
       }
-      
-      toast.success(successMessage);
+
+      toast.success(successMessage, {
+        autoClose: 8000,
+        style: {
+          whiteSpace: 'pre-line'
+        }
+      });
 
       if (data.geojson) {
         setGeoData(data.geojson);
@@ -159,13 +164,13 @@ const ImportShapefile = () => {
 
       if (err.code === 'ECONNABORTED' || err.message.includes('timeout')) {
         errorMessage = "⏱️ Hết thời gian chờ khi tải dữ liệu từ Google Earth Engine. Đây có thể do:\n" +
-                      "• Dữ liệu quá lớn (hơn 100MB)\n" +
-                      "• Kết nối mạng chậm\n" +
-                      "• Google Earth Engine phản hồi chậm\n\n" +
-                      "💡 Gợi ý:\n" +
-                      "• Giảm kích thước dữ liệu trên Google Earth Engine\n" +
-                      "• Thử lại sau vài phút\n" +
-                      "• Kiểm tra kết nối mạng";
+          "• Dữ liệu quá lớn (hơn 100MB)\n" +
+          "• Kết nối mạng chậm\n" +
+          "• Google Earth Engine phản hồi chậm\n\n" +
+          "💡 Gợi ý:\n" +
+          "• Giảm kích thước dữ liệu trên Google Earth Engine\n" +
+          "• Thử lại sau vài phút\n" +
+          "• Kiểm tra kết nối mạng";
       } else if (err.response) {
         const status = err.response.status;
         const responseData = err.response.data;
@@ -188,10 +193,10 @@ const ImportShapefile = () => {
               break;
             case 408:
               errorMessage = "⏱️ Server timeout. Dữ liệu quá lớn hoặc mất quá nhiều thời gian xử lý.\n\n" +
-                            "💡 Gợi ý:\n" +
-                            "• Giảm số lượng features trên Google Earth Engine\n" +
-                            "• Chia nhỏ dữ liệu thành nhiều phần\n" +
-                            "• Thử lại sau vài phút";
+                "💡 Gợi ý:\n" +
+                "• Giảm số lượng features trên Google Earth Engine\n" +
+                "• Chia nhỏ dữ liệu thành nhiều phần\n" +
+                "• Thử lại sau vài phút";
               break;
             case 500:
               errorMessage = "🔧 Lỗi server. Vui lòng thử lại sau hoặc liên hệ quản trị viên.";
@@ -242,7 +247,7 @@ const ImportShapefile = () => {
   const handleUrlChange = (e) => {
     const newUrl = e.target.value;
     setZipUrl(newUrl);
-    
+
     // Real-time validation với feedback visual
     if (newUrl && !newUrl.includes("earthengine.googleapis.com")) {
       // Có thể thêm visual feedback ở đây
@@ -253,13 +258,12 @@ const ImportShapefile = () => {
     <div className="p-4 bg-white rounded-md shadow-md relative">
       <button
         onClick={handlePhatHienMatRungClick}
-        className={`w-full bg-gradient-to-r ${
-          activeButton === "phantich"
-            ? "from-teal-500 to-teal-700 border-2 border-white scale-105"
-            : "from-forest-green-primary to-green-700"
-        } text-white py-2 px-4 rounded-md hover:shadow-lg transition-all duration-300 flex items-center justify-center mb-4`}
+        className={`w-full bg-gradient-to-r ${activeButton === "phantich"
+          ? "from-teal-500 to-teal-700 border-2 border-white scale-105"
+          : "from-forest-green-primary to-green-700"
+          } text-white py-2 px-4 rounded-md hover:shadow-lg transition-all duration-300 flex items-center justify-center mb-4`}
       >
-        <span className="font-medium">Phát hiện mất rừng</span>
+        <span className="font-medium">Xử lý ảnh viễn thám</span>
       </button>
 
       {isForecastOpen && (
@@ -268,43 +272,45 @@ const ImportShapefile = () => {
 
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              URL tải file ZIP Shapefile
+              URL file GeoJSON
             </label>
             <input
               type="text"
               value={zipUrl}
               onChange={handleUrlChange}
-              placeholder="Dán URL download ZIP shapefile từ Google Drive hoặc GEE"
+              placeholder="Dán URL file GeoJSON từ Google Drive, GEE hoặc server"
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-forest-green-primary focus:border-forest-green-primary"
               disabled={loading}
             />
-            
+
             {/* Thông tin hướng dẫn */}
             <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
               <div className="flex items-start">
                 <FaInfoCircle className="text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
                 <div className="text-xs text-blue-700">
-                  <p className="font-medium mb-1">📦 Hướng dẫn xuất và import dữ liệu từ Google Earth Engine:</p>
+                  <p className="font-medium mb-1">📦 Hướng dẫn xuất và import dữ liệu GeoJSON:</p>
                   <ol className="list-decimal list-inside space-y-1 ml-1">
-                    <li><strong>Xuất Shapefile ZIP từ GEE:</strong>
+                    <li><strong>Xuất GeoJSON từ GEE:</strong>
                       <ul className="list-disc list-inside ml-4 mt-1">
-                        <li>Chạy script phát hiện mất rừng trên GEE</li>
-                        <li>Sử dụng Export.table.toDrive() hoặc Export.table.toCloudStorage()</li>
-                        <li>Format: 'SHP' (Shapefile)</li>
-                        <li>Chờ task hoàn thành và tải file ZIP về</li>
+                        <li>Chạy script xử lý ảnh viễn thám trên GEE</li>
+                        <li>Kết quả phát hiện mất rừng export ra file GeoJSON</li>
+                        <li>Upload file GeoJSON lên Google Drive hoặc server</li>
                       </ul>
                     </li>
-                    <li className="mt-2"><strong>Lấy URL download ZIP:</strong>
+                    <li className="mt-2"><strong>Lấy URL download GeoJSON:</strong>
                       <ul className="list-disc list-inside ml-4 mt-1">
-                        <li>Mở Google Drive (nếu dùng toDrive)</li>
-                        <li>Click phải vào file ZIP → "Get link"</li>
+                        <li>Mở Google Drive (nếu upload lên Drive)</li>
+                        <li>Click phải vào file GeoJSON → "Get link"</li>
                         <li>Đảm bảo link có quyền "Anyone with the link"</li>
                         <li>Copy URL và dán vào ô trên</li>
                       </ul>
                     </li>
                   </ol>
                   <p className="mt-2 text-green-700 font-medium">
-                    ✅ Hệ thống sẽ tự động: Download ZIP → Giải nén → Parse shapefile → Import vào database
+                    ✅ Hệ thống sẽ tự động: Download GeoJSON → <strong>Lọc dữ liệu giao với hiện trạng rừng</strong> → Import vào database
+                  </p>
+                  <p className="mt-1 text-orange-700 font-medium">
+                    ⚠️ Chỉ import các vùng mất rừng nằm trong khu vực hiện trạng rừng
                   </p>
                 </div>
               </div>
@@ -313,7 +319,7 @@ const ImportShapefile = () => {
             {/* Validation feedback */}
             {zipUrl && (
               <div className="mt-2">
-                {zipUrl.includes("earthengine.googleapis.com") || zipUrl.includes("drive.google.com") || zipUrl.includes("storage.googleapis.com") ? (
+                {zipUrl.includes(".geojson") || zipUrl.includes(".json") || zipUrl.includes("drive.google.com") || zipUrl.includes("storage.googleapis.com") ? (
                   <div className="flex items-center text-green-600 text-xs">
                     <FaInfoCircle className="mr-1" />
                     URL hợp lệ - Sẵn sàng tải xuống
@@ -321,7 +327,7 @@ const ImportShapefile = () => {
                 ) : (
                   <div className="flex items-center text-orange-600 text-xs">
                     <FaExclamationTriangle className="mr-1" />
-                    URL nên từ Google Earth Engine, Google Drive hoặc Cloud Storage
+                    URL nên trỏ đến file GeoJSON (.geojson hoặc .json)
                   </div>
                 )}
               </div>
@@ -331,11 +337,10 @@ const ImportShapefile = () => {
           <button
             onClick={handleImport}
             disabled={loading || !zipUrl.trim()}
-            className={`w-full py-2 px-4 rounded-md flex items-center justify-center mb-4 font-medium transition-all ${
-              loading || !zipUrl.trim()
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-forest-green-primary hover:bg-green-700 text-white"
-            }`}
+            className={`w-full py-2 px-4 rounded-md flex items-center justify-center mb-4 font-medium transition-all ${loading || !zipUrl.trim()
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-forest-green-primary hover:bg-green-700 text-white"
+              }`}
           >
             {loading ? (
               <>
@@ -369,11 +374,10 @@ const ImportShapefile = () => {
 
       <button
         onClick={handleLocMayClick}
-        className={`w-full bg-gradient-to-r ${
-          activeButton === "locMay"
-            ? "from-green-500 to-green-700 border-2 border-white scale-105"
-            : "from-blue-500 to-blue-700"
-        } text-white py-2 px-4 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center mb-4`}
+        className={`w-full bg-gradient-to-r ${activeButton === "locMay"
+          ? "from-green-500 to-green-700 border-2 border-white scale-105"
+          : "from-blue-500 to-blue-700"
+          } text-white py-2 px-4 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center mb-4`}
       >
         <FaCloudSun className="text-xl mr-3" />
         <span className="font-medium">Công cụ lọc mây</span>
@@ -381,19 +385,18 @@ const ImportShapefile = () => {
 
       <button
         onClick={handleXuLyAnhClick}
-        className={`w-full bg-gradient-to-r ${
-          activeButton === "xuLyAnh"
-            ? "from-orange-500 to-orange-700 border-2 border-white scale-105"
-            : "from-purple-500 to-purple-700"
-        } text-white py-3 px-6 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center`}
+        className={`w-full bg-gradient-to-r ${activeButton === "xuLyAnh"
+          ? "from-orange-500 to-orange-700 border-2 border-white scale-105"
+          : "from-purple-500 to-purple-700"
+          } text-white py-3 px-6 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center`}
       >
         <FaImage className="text-xl mr-3" />
         <span className="font-medium">Xử lý ảnh vệ tinh</span>
       </button>
 
       {loading && (
-        <LoadingOverlay 
-          message={loadingMessage} 
+        <LoadingOverlay
+          message={loadingMessage}
           progress={uploadProgress}
         />
       )}

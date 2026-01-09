@@ -20,14 +20,14 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   // ✅ MAPPING CHÍNH XÁC với spatial intersection và user info
   const columnMapping = {
     loCB: "gid",
-    dtich: "area",
+    dtich: "dtich", // ✅ FIX: Dùng dtich (tính từ geometry) thay vì area (có thể = 0)
     xa: "xa",
     tk: "tk",
     khoanh: "khoanh",
-    X: "x_coordinate",
-    Y: "y_coordinate",
+    X: "x", // ✅ FIX: Backend trả về 'x' không phải 'x_coordinate'
+    Y: "y", // ✅ FIX: Backend trả về 'y' không phải 'y_coordinate'
     xacminh: "detection_status",
-    DtichXM: "verified_area",
+    DtichXM: "dtichXM", // ✅ FIX: Dùng dtichXM thay vì verified_area
     ngnhan: "verification_reason",
     NguoiXM: "verified_by_name", // ✅ FIX: Đổi thành verified_by_name thay vì verified_by
     NgayXM: "detection_date",
@@ -60,17 +60,17 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
       return row[actualColumnName];
     }
 
-    // Fallback names với user info
+    // Fallback names với user info - ✅ FIX: Ưu tiên dtich trước area
     const fallbackNames = {
       loCB: ["gid", "GID", "id"],
-      dtich: ["area", "AREA", "dtich"],
+      dtich: ["dtich", "DTICH", "area", "AREA"], // ✅ FIX: Ưu tiên dtich (từ geometry) trước area
       xa: ["xa", "XA", "xa_name"],
       tk: ["tk", "TK", "tieukhu", "TIEUKHU"],
       khoanh: ["khoanh", "KHOANH"],
       X: ["x_coordinate", "X", "x", "longitude"],
       Y: ["y_coordinate", "Y", "y", "latitude"],
       xacminh: ["detection_status", "DETECTION_STATUS"],
-      DtichXM: ["verified_area", "VERIFIED_AREA"],
+      DtichXM: ["dtichXM", "dtich_xm", "verified_area", "VERIFIED_AREA"], // ✅ FIX: Ưu tiên dtichXM
       ngnhan: ["verification_reason", "VERIFICATION_REASON"],
       NguoiXM: ["verified_by_name", "verified_by_username", "verified_by", "VERIFIED_BY"], // ✅ FIX: Ưu tiên tên thật
       NgayXM: ["detection_date", "DETECTION_DATE"],
@@ -104,10 +104,9 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
       case "dtich":
       case "DtichXM":
         if (typeof value === "number") {
-          if (value > 1000) {
-            return `${(value / 10000).toFixed(2)} ha`;
-          }
-          return `${parseFloat(value).toFixed(2)} ha`;
+          // ✅ FIX: Luôn chia cho 10000 vì dtich/dtichXM luôn là m²
+          // ✅ FIX: Dùng toFixed(1) thay vì toFixed(2) để hiển thị 1 chữ số thập phân
+          return `${(value / 10000).toFixed(1)} ha`;
         }
         return value;
 
@@ -123,21 +122,23 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
       case "X":
       case "Y":
         if (value && value !== null) {
-          return parseFloat(value).toFixed(4);
+          return parseFloat(value).toFixed(3);
         }
         return "NULL";
 
       case "xacminh":
-        { const statusMap = {
-          pending: "Chưa xác minh",
-          verifying: "Đang xác minh", 
-          verified: "Đã xác minh",
-          rejected: "Không xác minh được",
-          "Chưa xác minh": "Chưa xác minh",
-          "Đang xác minh": "Đang xác minh",
-          "Đã xác minh": "Đã xác minh",
-        };
-        return statusMap[value] || value || "Chưa xác minh"; }
+        {
+          const statusMap = {
+            pending: "Chưa xác minh",
+            verifying: "Đang xác minh",
+            verified: "Đã xác minh",
+            rejected: "Không xác minh được",
+            "Chưa xác minh": "Chưa xác minh",
+            "Đang xác minh": "Đang xác minh",
+            "Đã xác minh": "Đã xác minh",
+          };
+          return statusMap[value] || value || "Chưa xác minh";
+        }
 
       case "loCB":
         return `CB-${value}`;
@@ -169,12 +170,11 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   // Debug data changes
   // eslint-disable-next-line react-hooks/rules-of-hooks
   React.useEffect(() => {
-    // eslint-disable-next-line no-undef
-    if (process.env.NODE_ENV === "development" && data && data.length > 0) {
-      
-      // ✅ FIX: Debug user info trong data
+    if (data && data.length > 0) {
       const sampleRow = data[0];
-      
+      // ✅ DEBUG: Log field names để kiểm tra
+      // Debug logs đã tắt để tránh spam console
+
       // ✅ FIX: Check for target feature (is_target property or first feature)
       const possibleTarget = data.find(row => row.is_target === true) || data[0];
       if (possibleTarget) {
@@ -347,7 +347,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
         });
 
         if (rowIndex !== -1) {
-          
+
           setHighlightedRow(rowIndex);
           setSelectedRow(rowIndex);
           setTargetGid(targetGid);
@@ -396,7 +396,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   const getRowStyle = (rowIndex) => {
     const currentRowGid = getActualValue(data[rowIndex], "loCB");
     const isTargetRow = targetGid && currentRowGid && currentRowGid.toString() === targetGid.toString();
-    
+
     let backgroundColor;
     let borderLeft = "none";
     let fontWeight = "normal";
@@ -574,7 +574,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
       <div style={headerStyle}>
         <h2 className="text-lg sm:text-xl font-bold text-gray-800">
           🔍 Bảng dữ liệu xác minh ({data.length} bản ghi)
-          
+
         </h2>
         {isAdmin() && (
           <div className="text-xs sm:text-sm text-gray-600 italic bg-blue-50 p-2 rounded-md border-l-4 border-blue-400">
@@ -598,7 +598,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
                 {requiredColumns.map((columnKey, index) => {
                   const fullName = {
                     xacminh: "Trạng thái xác minh",
-                    DtichXM: "Diện tích xác minh", 
+                    DtichXM: "Diện tích xác minh",
                     NguoiXM: "Người xác minh",
                     NgayXM: "Ngày xác minh",
                   }[columnKey] || getColumnDisplayName(columnKey);
@@ -679,13 +679,10 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
                         ) : (
                           <div className="flex items-center">
                             <span
-                              className={`truncate ${isTargetCell ? "text-red-700 font-bold text-lg" : ""} ${
-                                columnKey === "dtich" || columnKey === "DtichXM" ? "text-green-700 font-medium" : ""
-                              } ${columnKey === "NgayXM" ? "text-blue-700" : ""} ${
-                                columnKey === "xacminh" ? "text-orange-700 font-medium" : ""
-                              } ${columnKey === "NguoiXM" ? "text-purple-700 font-medium" : ""} ${
-                                isNull ? "text-gray-400 italic" : ""
-                              }`}
+                              className={`truncate ${isTargetCell ? "text-red-700 font-bold text-lg" : ""} ${columnKey === "dtich" || columnKey === "DtichXM" ? "text-green-700 font-medium" : ""
+                                } ${columnKey === "NgayXM" ? "text-blue-700" : ""} ${columnKey === "xacminh" ? "text-orange-700 font-medium" : ""
+                                } ${columnKey === "NguoiXM" ? "text-purple-700 font-medium" : ""} ${isNull ? "text-gray-400 italic" : ""
+                                }`}
                               title={displayValue}
                             >
                               {isTargetCell ? `🎯 ${displayValue}` : displayValue}
@@ -753,8 +750,8 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
             <span className="font-medium">
               📊 Tổng số bản ghi: <span className="text-forest-green-primary font-bold ml-1">{data.length}</span>
             </span>
-           
-            
+
+
           </div>
 
           {editRowIndex !== -1 && (

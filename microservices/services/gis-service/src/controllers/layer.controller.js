@@ -69,7 +69,7 @@ exports.getLayerDataByPath = async (req, res, next) => {
     // Build query with optional date filter
     let query;
 
-    // ✅ Đặc biệt cho mat_rung (deforestation-alerts): Lấy đầy đủ properties
+    // ✅ Đặc biệt cho mat_rung (deforestation-alerts): Lấy đầy đủ properties + X,Y coordinates
     if (layerName === 'deforestation-alerts') {
       query = `
         SELECT
@@ -88,17 +88,25 @@ exports.getLayerDataByPath = async (req, res, next) => {
           verification_notes,
           created_at,
           updated_at,
+          -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
+          ST_Area(geom::geography) as dtich,
+          COALESCE(verified_area, ST_Area(geom::geography)) as "dtichXM",
+          ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x_coordinate,
+          ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y_coordinate,
+          -- ✅ FIX: Thêm x, y shorthand cho Table.jsx
+          ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x,
+          ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y,
           ST_AsGeoJSON(ST_Transform(geom, 4326)) as geometry
         FROM ${tableName}
         WHERE geom IS NOT NULL
       `;
 
-      // Add date filter
+      // Add date filter - ✅ FIXED: Sử dụng start_dau thay vì end_sau vì end_sau rỗng
       if (days) {
-        query += ` AND end_sau::date >= CURRENT_DATE - INTERVAL '${parseInt(days)} days'`;
+        query += ` AND start_dau::date >= CURRENT_DATE - INTERVAL '${parseInt(days)} days'`;
       }
 
-      query += ' ORDER BY end_sau DESC LIMIT 10000';
+      query += ' ORDER BY start_dau DESC LIMIT 10000';
 
     } else {
       // Query mặc định cho các layer khác
@@ -132,23 +140,30 @@ exports.getLayerDataByPath = async (req, res, next) => {
         const geometries = result.rows.map(row => row.geometry);
         const placeholders = geometries.map((_, idx) => `$${idx + 1}`).join(',');
 
-        // Query admin info từ sonla_rgx và sonla_tkkl
+        // Query admin info từ sonla_rgx và sonla_tkkl với centroid cho faster query
         const adminQuery = `
           WITH geoms AS (
             SELECT
               unnest(ARRAY[${placeholders}])::text as geom_json,
               generate_series(1, ${geometries.length}) as idx
+          ),
+          centroids AS (
+            SELECT
+              idx,
+              ST_Centroid(ST_GeomFromGeoJSON(geom_json)) as centroid
+            FROM geoms
           )
-          SELECT
-            g.idx,
+          SELECT DISTINCT ON (c.idx)
+            c.idx,
             rgx.xa,
             tkkl.tieukhu as tk,
             tkkl.khoanh
-          FROM geoms g
+          FROM centroids c
           LEFT JOIN sonla_rgx rgx
-            ON ST_Intersects(rgx.geom, ST_GeomFromGeoJSON(g.geom_json))
+            ON ST_Intersects(rgx.geom, c.centroid)
           LEFT JOIN sonla_tkkl tkkl
-            ON ST_Intersects(tkkl.geom, ST_GeomFromGeoJSON(g.geom_json))
+            ON ST_Intersects(tkkl.geom, c.centroid)
+          ORDER BY c.idx
         `;
 
         const adminResult = await adminDb.query(adminQuery, geometries);
@@ -164,14 +179,45 @@ exports.getLayerDataByPath = async (req, res, next) => {
           }
         });
 
-        // Merge admin info vào result
+        // Get usernames from auth_db
+        const userIds = [...new Set(result.rows.map(r => r.verified_by).filter(id => id))];
+        const userMap = {};
+
+        if (userIds.length > 0) {
+          try {
+            const authDb = new Pool({
+              host: process.env.DB_HOST || 'localhost',
+              port: process.env.DB_PORT || 5433,
+              user: process.env.DB_USER || 'postgres',
+              password: process.env.DB_PASSWORD,
+              database: 'auth_db',
+              max: 3,
+              idleTimeoutMillis: 3000
+            });
+
+            const userQuery = `SELECT id, username, email FROM "User" WHERE id = ANY($1::int[])`;
+            const userResult = await authDb.query(userQuery, [userIds]);
+
+            userResult.rows.forEach(user => {
+              userMap[user.id] = user.username || user.email || `User ${user.id}`;
+            });
+
+            await authDb.end();
+            logger.info(`Fetched ${userResult.rows.length} usernames from auth_db`);
+          } catch (err) {
+            logger.warn('Failed to fetch usernames:', err.message);
+          }
+        }
+
+        // Merge admin info và username vào result
         result.rows = result.rows.map((row, idx) => {
           const adminInfo = adminInfoMap[idx] || {};
           return {
             ...row,
             xa: adminInfo.xa || null,
             tk: adminInfo.tk || null,
-            khoanh: adminInfo.khoanh || null
+            khoanh: adminInfo.khoanh || null,
+            verified_by_name: row.verified_by ? (userMap[row.verified_by] || null) : null
           };
         });
 

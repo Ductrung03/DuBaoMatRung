@@ -50,30 +50,20 @@ const Header = () => {
     return user.permissions.some(p => p.startsWith(prefix));
   };
 
-  // ✅ FIXED: Get permission level display - Hiển thị theo role thực tế
+  // ✅ FIXED: Get permission level display - Hiển thị tất cả roles (không dịch header)
   const getPermissionLevelDisplay = () => {
-    // Ưu tiên hiển thị role từ userRoles
-    if (user?.userRoles && user.userRoles.length > 0) {
-      const roleName = user.userRoles[0].role.name;
-      const roleDescriptions = {
-        'super_admin': 'Quản trị viên tối cao',
-        'admin': 'Quản trị viên hệ thống',
-        'gis_manager': 'Quản lý GIS',
-        'gis_specialist': 'Chuyên viên GIS',
-        'verifier': 'Người xác minh',
-        'reporter': 'Người báo cáo',
-        'viewer': 'Người xem'
-      };
-      return roleDescriptions[roleName] || roleName;
+    // Check new 'roles' format first (from JWT/API)
+    if (user?.roles && user.roles.length > 0) {
+      return user.roles.map(r => r.name).join(', ');
     }
 
-    // Fallback: nếu không có userRoles, check permission_level
-    const levels = {
-      'national': 'Người dùng cấp quốc gia',
-      'province': 'Người dùng cấp tỉnh',
-      'district': 'Người dùng cấp huyện'
-    };
-    return levels[user?.permission_level] || 'Người dùng';
+    // Check old 'userRoles' format (legacy)
+    if (user?.userRoles && user.userRoles.length > 0) {
+      return user.userRoles.map(ur => ur.role ? ur.role.name : '').filter(n => n).join(', ');
+    }
+
+    // Fallback: Check permission_level or role
+    return user?.permission_level || user?.role || 'Người dùng';
   };
 
   return (
@@ -92,38 +82,36 @@ const Header = () => {
             </div>
           </div>
         </Link>
-        
+
         {/* ✅ FIXED: Tiêu đề với navigation links đúng syntax */}
         <div>
           <h1 className="text-xl font-bold uppercase">
-            Hệ thống phát hiện sớm mất rừng tỉnh Sơn La
+            Hệ thống giám sát mất rừng tỉnh Sơn La
           </h1>
           <div className="flex gap-8 mt-1">
-            {/* Dự báo mất rừng - Hiển thị nếu có quyền forecast */}
+            {/* Giám sát mất rừng - Hiển thị nếu có quyền forecast */}
             {hasPagePermission('forecast') && (
               <Link
                 to="/dashboard/dubaomatrung"
-                className={`text-base font-semibold hover:underline transition-colors ${
-                  isActive("/dashboard/dubaomatrung")
-                    ? "text-red-600"
-                    : "text-white"
-                }`}
+                className={`text-base font-semibold hover:underline transition-colors ${isActive("/dashboard/dubaomatrung")
+                  ? "text-red-600"
+                  : "text-white"
+                  }`}
               >
-                Dự báo mất rừng
+                Giám sát mất rừng
               </Link>
             )}
 
-            {/* Quản lý dữ liệu - Hiển thị nếu có quyền data_management */}
+            {/* Tra cứu dữ liệu - Hiển thị nếu có quyền data_management */}
             {hasPagePermission('data_management') && (
               <Link
                 to="/dashboard/quanlydulieu"
-                className={`text-base font-semibold hover:underline transition-colors ${
-                  isActive("/dashboard/quanlydulieu")
-                    ? "text-red-600"
-                    : "text-white"
-                }`}
+                className={`text-base font-semibold hover:underline transition-colors ${isActive("/dashboard/quanlydulieu")
+                  ? "text-red-600"
+                  : "text-white"
+                  }`}
               >
-                Quản lý dữ liệu
+                Tra cứu dữ liệu
               </Link>
             )}
 
@@ -131,25 +119,23 @@ const Header = () => {
             {hasPagePermission('reports') && (
               <Link
                 to="/dashboard/baocao"
-                className={`text-base font-semibold hover:underline transition-colors ${
-                  isActive("/dashboard/baocao") ? "text-red-600" : "text-white"
-                }`}
+                className={`text-base font-semibold hover:underline transition-colors ${isActive("/dashboard/baocao") ? "text-red-600" : "text-white"
+                  }`}
               >
                 Báo cáo
               </Link>
             )}
 
-            {/* Phát hiện mất rừng - Hiển thị nếu có quyền detection */}
+            {/* Xử lý ảnh viễn thám - Hiển thị nếu có quyền detection */}
             {hasPagePermission('detection') && (
               <Link
                 to="/dashboard/phathienmatrung"
-                className={`text-base font-semibold hover:underline transition-colors ${
-                  isActive("/dashboard/phathienmatrung")
-                    ? "text-red-600"
-                    : "text-white"
-                }`}
+                className={`text-base font-semibold hover:underline transition-colors ${isActive("/dashboard/phathienmatrung")
+                  ? "text-red-600"
+                  : "text-white"
+                  }`}
               >
-                Phát hiện mất rừng
+                Xử lý ảnh viễn thám
               </Link>
             )}
 
@@ -157,11 +143,10 @@ const Header = () => {
             {hasPagePermission('user_management') && (
               <Link
                 to="/dashboard/quanlynguoidung"
-                className={`text-base font-semibold hover:underline transition-colors ${
-                  isActive("/dashboard/quanlynguoidung")
-                    ? "text-red-600"
-                    : "text-white"
-                }`}
+                className={`text-base font-semibold hover:underline transition-colors ${isActive("/dashboard/quanlynguoidung")
+                  ? "text-red-600"
+                  : "text-white"
+                  }`}
               >
                 Quản lý người dùng
               </Link>
@@ -171,11 +156,10 @@ const Header = () => {
             {hasPagePermission('role_management') && (
               <Link
                 to="/dashboard/quanlyrole"
-                className={`text-base font-semibold hover:underline transition-colors ${
-                  isActive("/dashboard/quanlyrole")
-                    ? "text-red-600"
-                    : "text-white"
-                }`}
+                className={`text-base font-semibold hover:underline transition-colors ${isActive("/dashboard/quanlyrole")
+                  ? "text-red-600"
+                  : "text-white"
+                  }`}
               >
                 Quản lý Roles
               </Link>
@@ -195,7 +179,7 @@ const Header = () => {
           </div>
           {user && (
             <div className="ml-2 text-sm">
-              <div className="font-semibold">{user.full_name}</div>
+              <div className="font-semibold">{user.username}</div>
               <div className="text-xs opacity-80">
                 {getPermissionLevelDisplay()}
               </div>
@@ -205,9 +189,9 @@ const Header = () => {
 
         {/* ✅ SIMPLIFIED USER MENU - Chỉ còn Đổi mật khẩu và Đăng xuất */}
         {showUserMenu && (
-          <div 
+          <div
             className="user-menu-dropdown absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1"
-            style={{ 
+            style={{
               zIndex: 99998,
               position: 'absolute',
               top: '100%',

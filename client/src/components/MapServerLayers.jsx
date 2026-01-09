@@ -6,11 +6,9 @@ const WMS_URL = `${config.API_URL}/api/mapserver`;
 
 // Cấu hình cho các layer
 const layerConfigs = [
-  { name: 'ranhgioihc', opacity: 0.8 },
-  { name: 'rg3lr', opacity: 0.7 },
-  { name: 'nendiahinh', opacity: 0.5 },
-  { name: 'chuquanly', opacity: 0.6 },
-  { name: 'huyen', opacity: 0.9 },
+  { name: 'ranhgioixa', opacity: 0.8 },
+  { name: 'tieukukhoanh', opacity: 0.7 },
+  { name: 'hientrangrung', opacity: 0.9 },
 ];
 
 export function MapServerLayers({ visibleLayers }) {

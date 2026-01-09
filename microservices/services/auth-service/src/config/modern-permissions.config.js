@@ -1137,7 +1137,7 @@ function flattenPermissions() {
             description: perm.description,
             module: module,
             resource: `${page}.${feature}`,
-            action: perm.action, // Use the action from the perm object
+            action: action || 'view', // Use parsed action from code or default to 'view'
             ui_path: pageData.path,
             ui_category: moduleData.name,
             ui_element: perm.ui_element,

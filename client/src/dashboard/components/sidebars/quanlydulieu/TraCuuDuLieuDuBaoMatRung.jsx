@@ -176,105 +176,126 @@ const TraCuuDuLieuDuBaoMatRung = () => {
               <div className="font-medium text-sm mb-1 mt-3">Khu vực</div>
 
               {/* Xã */}
-              <div className="flex items-center justify-between mb-1 pl-4">
-                <label className="text-sm">Xã</label>
-                <Dropdown
-                  selectedValue={selectedXa}
-                  onValueChange={adminUnits.xa.onChange}
-                  options={adminUnits.xa.list}
-                  placeholder="Chọn xã"
-                  disabled={adminUnits.xa.loading || adminUnits.xa.disabled}
-                  loading={adminUnits.xa.loading}
-                  className="w-36"
-                />
+              <div className="flex items-center gap-2 mb-1 pl-4">
+                <label className="text-sm w-20 flex-shrink-0">Xã</label>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <Dropdown
+                    selectedValue={selectedXa}
+                    onValueChange={adminUnits.xa.onChange}
+                    options={adminUnits.xa.list}
+                    placeholder="Chọn xã"
+                    disabled={adminUnits.xa.loading || adminUnits.xa.disabled}
+                    loading={adminUnits.xa.loading}
+                    className="border border-green-400 rounded-md bg-white"
+                    selectClassName="text-sm py-1"
+                  />
+                </div>
               </div>
 
               {/* Tiểu khu */}
-              <div className="flex items-center justify-between mb-1 pl-4">
-                <label className="text-sm">Tiểu khu</label>
-                <Dropdown
-                  selectedValue={selectedTieukhu}
-                  onValueChange={adminUnits.tieukhu.onChange}
-                  options={adminUnits.tieukhu.list}
-                  placeholder="Chọn tiểu khu"
-                  disabled={adminUnits.tieukhu.loading || adminUnits.tieukhu.disabled}
-                  loading={adminUnits.tieukhu.loading}
-                  className="w-36"
-                />
+              <div className="flex items-center gap-2 mb-1 pl-4">
+                <label className="text-sm w-20 flex-shrink-0">Tiểu khu</label>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <Dropdown
+                    selectedValue={selectedTieukhu}
+                    onValueChange={adminUnits.tieukhu.onChange}
+                    options={adminUnits.tieukhu.list}
+                    placeholder="Chọn tiểu khu"
+                    disabled={adminUnits.tieukhu.loading || adminUnits.tieukhu.disabled}
+                    loading={adminUnits.tieukhu.loading}
+                    className="border border-green-400 rounded-md bg-white"
+                    selectClassName="text-sm py-1"
+                  />
+                </div>
               </div>
 
               {/* Khoảnh */}
-              <div className="flex items-center justify-between mb-1 pl-4">
-                <label className="text-sm">Khoảnh</label>
-                <Dropdown
-                  selectedValue={selectedKhoanh}
-                  onValueChange={adminUnits.khoanh.onChange}
-                  options={adminUnits.khoanh.list}
-                  placeholder="Chọn khoảnh"
-                  disabled={adminUnits.khoanh.loading || adminUnits.khoanh.disabled}
-                  loading={adminUnits.khoanh.loading}
-                  className="w-36"
-                />
+              <div className="flex items-center gap-2 mb-1 pl-4">
+                <label className="text-sm w-20 flex-shrink-0">Khoảnh</label>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <Dropdown
+                    selectedValue={selectedKhoanh}
+                    onValueChange={adminUnits.khoanh.onChange}
+                    options={adminUnits.khoanh.list}
+                    placeholder="Chọn khoảnh"
+                    disabled={adminUnits.khoanh.loading || adminUnits.khoanh.disabled}
+                    loading={adminUnits.khoanh.loading}
+                    className="border border-green-400 rounded-md bg-white"
+                    selectClassName="text-sm py-1"
+                  />
+                </div>
               </div>
 
               <div className="font-medium text-sm mb-1 mt-3">Thuộc tính rừng</div>
-              
+
               {/* Chức năng rừng */}
-              <div className="flex items-center justify-between mb-1 pl-4">
-                <label className="text-sm">Chức năng rừng</label>
-                <Dropdown
-                  selectedValue={selectedChucNangRung}
-                  onValueChange={handleChucNangRungChange}
-                  options={chucNangRungList}
-                  placeholder="Chọn chức năng"
-                  disabled={loading}
-                  loading={loading}
-                  className="w-36"
-                />
+              <div className="flex items-center gap-2 mb-1 pl-4">
+                <label className="text-sm w-20 flex-shrink-0">Chức năng</label>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <Dropdown
+                    selectedValue={selectedChucNangRung}
+                    onValueChange={handleChucNangRungChange}
+                    options={chucNangRungList}
+                    placeholder="Chọn chức năng"
+                    disabled={loading}
+                    loading={loading}
+                    className="border border-green-400 rounded-md bg-white"
+                    selectClassName="text-sm py-1"
+                  />
+                </div>
               </div>
 
               {/* Chủ rừng */}
-              <div className="flex items-center justify-between mb-1 pl-4">
-                <label className="text-sm">Chủ rừng</label>
-                <Dropdown
-                  selectedValue={adminUnits.selectedChuRung}
-                  onValueChange={adminUnits.handleChuRungChange}
-                  options={chuRungList}
-                  placeholder="Chọn chủ rừng"
-                  disabled={loading}
-                  loading={loading}
-                  className="w-36"
-                />
+              <div className="flex items-center gap-2 mb-1 pl-4">
+                <label className="text-sm w-20 flex-shrink-0">Chủ rừng</label>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <Dropdown
+                    selectedValue={adminUnits.selectedChuRung}
+                    onValueChange={adminUnits.handleChuRungChange}
+                    options={chuRungList}
+                    placeholder="Chọn chủ rừng"
+                    disabled={loading}
+                    loading={loading}
+                    className="border border-green-400 rounded-md bg-white"
+                    selectClassName="text-sm py-1"
+                  />
+                </div>
               </div>
 
               <div className="font-medium text-sm mb-1 mt-3">Trạng thái xác minh</div>
-              
+
               {/* Trạng thái xác minh */}
-              <div className="flex items-center justify-between mb-1 pl-4">
-                <label className="text-sm">Trạng thái</label>
-                <Dropdown
-                  selectedValue={selectedTrangThaiXacMinh}
-                  onValueChange={handleTrangThaiXacMinhChange}
-                  options={trangThaiXacMinhList}
-                  placeholder="Chọn trạng thái"
-                  disabled={loading}
-                  loading={loading}
-                  className="w-36"
-                />
+              <div className="flex items-center gap-2 mb-1 pl-4">
+                <label className="text-sm w-20 flex-shrink-0">Trạng thái</label>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <Dropdown
+                    selectedValue={selectedTrangThaiXacMinh}
+                    onValueChange={handleTrangThaiXacMinhChange}
+                    options={trangThaiXacMinhList}
+                    placeholder="Chọn trạng thái"
+                    disabled={loading}
+                    loading={loading}
+                    className="border border-green-400 rounded-md bg-white"
+                    selectClassName="text-sm py-1"
+                  />
+                </div>
               </div>
 
               {/* Nguyên nhân */}
-              <div className="flex items-center justify-between mb-1 pl-4">
-                <label className="text-sm">Nguyên nhân</label>
-                <Dropdown
-                  selectedValue={selectedNguyenNhan}
-                  onValueChange={handleNguyenNhanChange}
-                  options={nguyenNhanList}
-                  placeholder="Chọn nguyên nhân"
-                  disabled={loading}
-                  loading={loading}
-                  className="w-36"
-                />
+              <div className="flex items-center gap-2 mb-1 pl-4">
+                <label className="text-sm w-20 flex-shrink-0">Nguyên nhân</label>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <Dropdown
+                    selectedValue={selectedNguyenNhan}
+                    onValueChange={handleNguyenNhanChange}
+                    options={nguyenNhanList}
+                    placeholder="Chọn nguyên nhân"
+                    disabled={loading}
+                    loading={loading}
+                    className="border border-green-400 rounded-md bg-white"
+                    selectClassName="text-sm py-1"
+                  />
+                </div>
               </div>
 
               {/* Nút tra cứu */}

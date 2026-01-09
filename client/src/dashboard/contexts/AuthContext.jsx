@@ -1,6 +1,6 @@
 // client/src/dashboard/contexts/AuthContext.jsx - FIXED TOKEN HANDLING
 import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../services/api"; // ✅ FIX: Use api instance instead of axios
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
@@ -14,126 +14,136 @@ export const useAuth = () => useContext(AuthContext);
 
 // Provider để bọc quanh app
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    // Lazy initialization from localStorage to prevent flash of null state
+    const savedUser = localStorage.getItem("user");
+    const savedToken = localStorage.getItem("token");
+    if (savedUser && savedToken) {
+      try {
+        return JSON.parse(savedUser);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  });
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
 
-  // ✅ FIXED: Setup axios interceptor để handle token và 401 tự động
+  // ✅ REMOVED: axios interceptor không cần thiết vì api instance đã có sẵn trong api.js
+
+  // ✅ SIMPLIFIED: Restore auth từ localStorage
   useEffect(() => {
-    // Request interceptor để thêm token vào mọi request
-    const requestInterceptor = axios.interceptors.request.use(
-      (config) => {
-        const currentToken = localStorage.getItem("token");
-        if (currentToken) {
-          config.headers.Authorization = `Bearer ${currentToken}`;
-        }
-        return config;
-      },
-      (error) => {
-        console.error("❌ Request interceptor error:", error);
-        return Promise.reject(error);
-      }
-    );
-
-    // Response interceptor để handle 401 và các lỗi khác
-    const responseInterceptor = axios.interceptors.response.use(
-      (response) => {
-        return response;
-      },
-      (error) => {
-        console.error(`❌ Response error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
-          status: error.response?.status,
-          message: error.response?.data?.message,
-          hasToken: !!error.config?.headers?.Authorization
-        });
-
-        if (error.response?.status === 401) {
-          
-          // Clear all auth data
-          setToken(null);
-          setUser(null);
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          
-          // Navigate to login
-          navigate("/login");
-          
-          // Show toast
-          toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
-        }
-        return Promise.reject(error);
-      }
-    );
-
-    // Cleanup interceptors khi component unmount
-    return () => {
-      axios.interceptors.request.eject(requestInterceptor);
-      axios.interceptors.response.eject(responseInterceptor);
-    };
-  }, [navigate]);
-
-  // ✅ FIXED: Kiểm tra token khi component mount
-  useEffect(() => {
-    const checkLoggedIn = async () => {
+    const initAuth = async () => {
       const currentToken = localStorage.getItem("token");
+      const savedUserData = localStorage.getItem("user");
+      const currentPath = window.location.pathname;
+      const publicPaths = ['/login', '/register', '/'];
 
-      if (currentToken && typeof currentToken === 'string' && currentToken !== 'null' && currentToken !== 'undefined') {
-        try {
+      // Nếu không có token
+      if (!currentToken || currentToken === 'null' || currentToken === 'undefined') {
+        setLoading(false);
+        // Redirect về login nếu đang ở protected route
+        if (!publicPaths.includes(currentPath)) {
+          navigate("/login", { replace: true });
+        }
+        return;
+      }
 
-          // Set token vào state trước khi verify
-          setToken(currentToken);
+      // Decode JWT để kiểm tra expiration
+      try {
+        const decodedToken = jwtDecode(currentToken);
 
-          // Decode JWT to get permissions - với validation và error handling
-          let decodedToken;
-          try {
-            decodedToken = jwtDecode(currentToken);
-            console.log("🔓 Decoded JWT token:", decodedToken);
-          } catch (decodeError) {
-            console.error("❌ JWT decode error:", decodeError);
-            throw new Error("Invalid token format");
-          }
-
-          const res = await axios.get(`/api/auth/me`, {
-            headers: {
-              Authorization: `Bearer ${currentToken}`
-            }
-          });
-
-          // Merge user data with permissions from JWT
-          const userData = {
-            ...res.data.user,
-            permissions: decodedToken.permissions || []
-          };
-
-          setUser(userData);
-
-          // Lưu user data vào localStorage
-          localStorage.setItem("user", JSON.stringify(userData));
-
-        } catch (err) {
-          console.error("❌ Token verification failed:", err);
-
-          // Clear invalid token
-          setToken(null);
-          setUser(null);
+        // Kiểm tra token đã hết hạn chưa
+        const currentTime = Date.now() / 1000;
+        if (decodedToken.exp && decodedToken.exp < currentTime) {
+          // Token expired, clearing...
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-
-          // Only show error if it's not a network issue
-          if (err.response?.status === 401) {
-          } else {
-            console.error("🌐 Network or server error during token verification");
+          setLoading(false);
+          if (!publicPaths.includes(currentPath)) {
+            navigate("/login", { replace: true });
           }
+          return;
         }
-      } else {
+
+        // Set token vào state
+        setToken(currentToken);
+
+        // Lấy user data từ localStorage (đã lưu khi login)
+        let userData;
+        if (savedUserData) {
+          try {
+            userData = JSON.parse(savedUserData);
+            // Auth restored from localStorage
+          } catch (parseError) {
+            console.error("❌ User data parse failed:", parseError);
+            userData = {
+              id: decodedToken.id,
+              username: decodedToken.username,
+              full_name: decodedToken.full_name,
+              email: decodedToken.email,
+              permissions: decodedToken.permissions || [],
+              roles: decodedToken.roles || []
+            };
+          }
+        } else {
+          userData = {
+            id: decodedToken.id,
+            username: decodedToken.username,
+            full_name: decodedToken.full_name,
+            email: decodedToken.email,
+            permissions: decodedToken.permissions || [],
+            roles: decodedToken.roles || []
+          };
+        }
+
+        setUser(userData);
+
+        // Fetch fresh user data from API to ensure roles are up-to-date
+        try {
+          // Use a short timeout to not block UI if offline/slow
+          const response = await api.get('/auth/me'); // Ensure this endpoint exists and works
+          if (response.data && response.data.user) {
+            const freshUser = response.data.user;
+
+            // Merge permissions from token if not present in API response
+            if (!freshUser.permissions) {
+              freshUser.permissions = decodedToken.permissions || [];
+            }
+
+            // If backend returns userRoles but not roles (simple array), we might want to standardize
+            // But Header.jsx handles both, so it's fine.
+
+            // User profile updated from server
+            setUser(freshUser);
+            localStorage.setItem("user", JSON.stringify(freshUser));
+          }
+        } catch (fetchError) {
+          console.warn("⚠️ Could not fetch fresh user profile:", fetchError.message);
+          // Continue with data from localStorage/token
+        }
+
+      } catch (err) {
+        console.error("❌ Auth init failed:", err.message);
+        // Clear invalid token
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setToken(null);
+        setUser(null);
+
+        if (!publicPaths.includes(currentPath)) {
+          navigate("/login", { replace: true });
+        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
-    checkLoggedIn();
-  }, []);
+    initAuth();
+  }, [navigate]);
 
   // ✅ FIXED: Đăng nhập with better error handling
   const login = async (username, password) => {
@@ -141,7 +151,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
 
 
-      const res = await axios.post(`/api/auth/login`, {
+      const res = await api.post(`/auth/login`, {
         username,
         password,
       });
@@ -159,7 +169,7 @@ export const AuthProvider = ({ children }) => {
       let decodedToken;
       try {
         decodedToken = jwtDecode(newToken);
-        console.log("🔓 Login - Decoded JWT token:", decodedToken);
+        // Login - Decoded JWT token
       } catch (decodeError) {
         console.error("❌ Login JWT decode error:", decodeError);
         throw new Error('Invalid token format received from server');
@@ -181,12 +191,12 @@ export const AuthProvider = ({ children }) => {
       toast.success("Đăng nhập thành công!");
       navigate("/dashboard");
       return true;
-      
+
     } catch (err) {
       console.error("❌ Login error:", err);
-      
+
       let errorMessage = "Lỗi khi đăng nhập";
-      
+
       if (err.response?.status === 401) {
         errorMessage = "Tên đăng nhập hoặc mật khẩu không đúng";
       } else if (err.response?.data?.message) {
@@ -194,10 +204,10 @@ export const AuthProvider = ({ children }) => {
       } else if (err.code === 'NETWORK_ERROR' || err.message === 'Network Error') {
         errorMessage = "Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.";
       }
-      
+
       toast.error(errorMessage);
       return false;
-      
+
     } finally {
       setLoading(false);
     }
@@ -206,15 +216,15 @@ export const AuthProvider = ({ children }) => {
   // ✅ FIXED: Đăng xuất with cleanup
   const logout = async () => {
     try {
-      
+
       // Call logout API if token exists
       if (token) {
         try {
-          await axios.post(`/api/auth/logout`);
+          await api.post(`/auth/logout`);
         } catch (err) {
         }
       }
-      
+
     } catch (err) {
       console.error("❌ Logout API error:", err);
     } finally {
@@ -223,46 +233,67 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      
+
       navigate("/login");
       toast.info("Đã đăng xuất khỏi hệ thống");
     }
   };
 
-  // Kiểm tra vai trò - với Prisma RBAC
+  // Kiểm tra vai trò - hỗ trợ cả format mới (roles) và format cũ (userRoles)
   const isAdmin = () => {
     if (!user) return false;
 
-    // Kiểm tra role admin từ userRoles - FIXED: check cho cả super_admin và admin
-    if (user.userRoles && user.userRoles.some(userRole =>
-      userRole.role.name === "super_admin" || userRole.role.name === "admin"
+    // Format mới: API trả về 'roles' array với các role objects có 'name' trực tiếp
+    if (user.roles && user.roles.some(role =>
+      role.name === "super_admin" || role.name === "admin"
     )) {
       return true;
     }
 
-    // Fallback: kiểm tra permission_level
+    // Format cũ: 'userRoles' với nested 'role' object
+    if (user.userRoles && user.userRoles.some(userRole =>
+      userRole.role && (userRole.role.name === "super_admin" || userRole.role.name === "admin")
+    )) {
+      return true;
+    }
+
+    // Fallback: kiểm tra permission_level hoặc role field trực tiếp
     return user.permission_level === 'admin' || user.role === 'admin';
   };
 
   // Kiểm tra permission cụ thể
   const hasPermission = (action, subject) => {
-    if (!user || !user.userRoles) return false;
+    if (!user) return false;
 
     // Admin có tất cả quyền
     if (isAdmin()) return true;
 
-    // Kiểm tra permission trong các roles
-    return user.userRoles.some(userRole =>
-      userRole.role.rolePermissions && userRole.role.rolePermissions.some(rp =>
-        (rp.permission.action === action && rp.permission.subject === subject) ||
-        (rp.permission.action === 'manage' && rp.permission.subject === 'all')
-      )
-    );
+    // Format mới: 'roles' array với mỗi role có 'permissions' array
+    if (user.roles) {
+      return user.roles.some(role =>
+        role.permissions && role.permissions.some(perm =>
+          (perm.action === action && perm.subject === subject) ||
+          (perm.action === 'manage' && perm.subject === 'all')
+        )
+      );
+    }
+
+    // Format cũ: 'userRoles' với nested role và rolePermissions
+    if (user.userRoles) {
+      return user.userRoles.some(userRole =>
+        userRole.role && userRole.role.rolePermissions && userRole.role.rolePermissions.some(rp =>
+          (rp.permission.action === action && rp.permission.subject === subject) ||
+          (rp.permission.action === 'manage' && rp.permission.subject === 'all')
+        )
+      );
+    }
+
+    return false;
   };
-  
+
   // Lấy mã huyện của người dùng (TCVN3)
   const getUserDistrictId = () => user?.district_id || null;
-  
+
   // Kiểm tra quyền truy cập huyện
   const canAccessDistrict = (districtId) => {
     if (isAdmin()) return true;
