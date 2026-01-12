@@ -84,7 +84,7 @@ class MatRungService {
         batch.forEach((row, batchIdx) => {
           // Skip invalid coordinates
           if (row.x_coordinate && row.y_coordinate &&
-              !isNaN(row.x_coordinate) && !isNaN(row.y_coordinate)) {
+            !isNaN(row.x_coordinate) && !isNaN(row.y_coordinate)) {
             validPoints.push(`${row.x_coordinate},${row.y_coordinate}`);
             pointIndexMap.push(i + batchIdx);
           }
@@ -228,7 +228,7 @@ class MatRungService {
           sql`ST_X(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('x_coordinate'),
           sql`ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('y_coordinate'),
           sql`ST_Area(m.geom::geography)`.as('dtich'),
-          sql`COALESCE(m.verified_area, ST_Area(m.geom::geography))`.as('dtichXM'),
+          sql`COALESCE(m.verified_area, 0)`.as('dtichXM'),
           sql`ST_AsGeoJSON(ST_Transform(ST_MakeValid(m.geom), 4326), 6)`.as('geometry'),
           sql`NULL`.as('huyen'),
           sql`NULL`.as('xa'),
@@ -284,7 +284,7 @@ class MatRungService {
         sql`ST_X(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('x_coordinate'),
         sql`ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('y_coordinate'),
         sql`ST_Area(m.geom::geography)`.as('dtich'),
-        sql`COALESCE(m.verified_area, ST_Area(m.geom::geography))`.as('dtichXM'),
+        sql`COALESCE(m.verified_area, 0)`.as('dtichXM'),
         sql`ST_AsGeoJSON(ST_Transform(ST_MakeValid(m.geom), 4326), 6)`.as('geometry'),
         sql`NULL`.as('huyen'),
         sql`NULL`.as('xa'),

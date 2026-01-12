@@ -12,12 +12,28 @@ exports.searchMatRung = async (req, res, next) => {
   try {
     const { q, status, fromDate, toDate, limit = 100, huyen, xa, xacMinh } = req.query;
 
+    // ✅ SCOPE ENFORCEMENT
+    const userRolesStr = req.headers['x-user-roles'] ? decodeURIComponent(req.headers['x-user-roles']) : '';
+    // Check if user is Admin or LanhDao (skip enforcement)
+    // Note: Roles might be "Admin,User" string
+    const userRoles = userRolesStr.split(',');
+    const isRestricted = !userRoles.includes('Admin') && !userRoles.includes('LanhDao');
+
+    let forcedXa = null;
+
+    if (isRestricted) {
+      if (req.headers['x-user-xa']) forcedXa = decodeURIComponent(req.headers['x-user-xa']);
+    }
+
+    // Effective filters
+    const effectiveXa = forcedXa || xa;
+
     const db = req.app.locals.db;
     const redis = req.app.locals.redis; // Có thể undefined nếu Redis bị disable
 
     // ✅ Kiểm tra Redis có available không
     if (redis) {
-      const cacheKey = `search:${q || ''}:${status || ''}:${fromDate || ''}:${toDate || ''}:${huyen || ''}:${xa || ''}:${xacMinh || ''}`;
+      const cacheKey = `search:${q || ''}:${status || ''}:${fromDate || ''}:${toDate || ''}:${huyen || ''}:${effectiveXa || ''}:${xacMinh || ''}:role:${isRestricted ? 'restricted' : 'admin'}`;
       const cached = await redis.get(cacheKey);
 
       if (cached) {
@@ -26,7 +42,7 @@ exports.searchMatRung = async (req, res, next) => {
       }
     }
 
-    logger.info('Searching mat rung', { q, status, fromDate, toDate, huyen, xa, xacMinh });
+    logger.info('Searching mat rung', { q, status, fromDate, toDate, huyen, xa: effectiveXa, xacMinh });
 
     let whereClause = 'WHERE m.geom IS NOT NULL AND ST_IsValid(m.geom)';
     const params = [];
@@ -56,7 +72,7 @@ exports.searchMatRung = async (req, res, next) => {
 
     // ✅ Build query with proper admin_db spatial filtering
     let query;
-    let needsAdminJoin = huyen || xa;
+    let needsAdminJoin = huyen || effectiveXa;
 
     if (needsAdminJoin) {
       // Connect to admin_db for spatial filtering
@@ -81,10 +97,10 @@ exports.searchMatRung = async (req, res, next) => {
         spatialParams.push(huyen);
       }
 
-      if (xa) {
+      if (effectiveXa) {
         spatialWhereClause += huyen ? ' AND' : ' WHERE';
         spatialWhereClause += ` r.xa = $${spatialParamIndex++}`;
-        spatialParams.push(xa);
+        spatialParams.push(effectiveXa);
       }
 
       // Get matching geometries from admin_db
@@ -97,7 +113,7 @@ exports.searchMatRung = async (req, res, next) => {
       const spatialResult = await adminDb.query(spatialQuery, spatialParams);
 
       if (!spatialResult.rows[0] || !spatialResult.rows[0].union_geom_wkt) {
-        logger.warn('No matching admin boundaries found', { huyen, xa });
+        logger.warn('No matching admin boundaries found', { huyen, xa: effectiveXa });
         return res.json(formatResponse(true, 'No data found', {
           type: 'FeatureCollection',
           features: []
@@ -127,7 +143,7 @@ exports.searchMatRung = async (req, res, next) => {
         ROUND(ST_X(ST_Centroid(m.geom))::numeric, 6) as x,
         ROUND(ST_Y(ST_Centroid(m.geom))::numeric, 6) as y,
         ST_Area(m.geom::geography) as dtich,
-        COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
+        COALESCE(m.verified_area, 0) as "dtichXM",
         m.verification_reason,
         m.detection_status,
         m.verification_notes,
@@ -332,7 +348,7 @@ exports.searchMatRungById = async (req, res, next) => {
         m.verification_reason,
         m.verification_notes,
         ST_Area(m.geom::geography) as dtich,
-        COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
+        COALESCE(m.verified_area, 0) as "dtichXM",
         ROUND(ST_X(ST_Centroid(m.geom))::numeric, 6) as x,
         ROUND(ST_Y(ST_Centroid(m.geom))::numeric, 6) as y,
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry,
@@ -410,7 +426,7 @@ exports.searchMatRungById = async (req, res, next) => {
         m.verification_reason,
         m.verification_notes,
         ST_Area(m.geom::geography) as dtich,
-        COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
+        COALESCE(m.verified_area, 0) as "dtichXM",
         ROUND(ST_X(ST_Centroid(m.geom))::numeric, 6) as x,
         ROUND(ST_Y(ST_Centroid(m.geom))::numeric, 6) as y,
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry,

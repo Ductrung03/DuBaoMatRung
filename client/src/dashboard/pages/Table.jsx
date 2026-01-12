@@ -103,12 +103,11 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     switch (columnKey) {
       case "dtich":
       case "DtichXM":
-        if (typeof value === "number") {
-          // ✅ FIX: Luôn chia cho 10000 vì dtich/dtichXM luôn là m²
-          // ✅ FIX: Dùng toFixed(1) thay vì toFixed(2) để hiển thị 1 chữ số thập phân
-          return `${(value / 10000).toFixed(1)} ha`;
-        }
-        return value;
+        // ✅ FIX: Luôn hiển thị giá trị, nếu null/undefined thì là 0
+        const areaValue = typeof value === "number" ? value : 0;
+        // ✅ FIX: Luôn chia cho 10000 vì dtich/dtichXM luôn là m²
+        // ✅ FIX: Dùng toFixed(1) thay vì toFixed(2) để hiển thị 1 chữ số thập phân
+        return `${(areaValue / 10000).toFixed(1)} ha`;
 
       case "NgayXM":
         if (value) {
@@ -335,7 +334,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const handleHighlightTableRow = (event) => {
-      const { feature } = event.detail;
+      const { feature, moveToTop } = event.detail;
 
       if (feature && feature.properties && feature.properties.gid) {
         const targetGid = feature.properties.gid;
@@ -352,20 +351,29 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
           setSelectedRow(rowIndex);
           setTargetGid(targetGid);
 
-          // Scroll to highlighted row
+          // ✅ FIX: Scroll to highlighted row - đưa row lên đầu table nếu moveToTop = true
           setTimeout(() => {
             const tableContainer = document.querySelector(".custom-table-scroll");
             const highlightedRowElement = document.querySelector(`[data-row-index="${rowIndex}"]`);
 
             if (tableContainer && highlightedRowElement) {
-              const containerRect = tableContainer.getBoundingClientRect();
-              const rowRect = highlightedRowElement.getBoundingClientRect();
-
-              if (rowRect.top < containerRect.top || rowRect.bottom > containerRect.bottom) {
+              if (moveToTop) {
+                // ✅ Scroll row lên đầu table container
                 highlightedRowElement.scrollIntoView({
                   behavior: 'smooth',
-                  block: 'nearest'
+                  block: 'start'
                 });
+              } else {
+                // Scroll vào vùng nhìn thấy nếu row đang ở ngoài
+                const containerRect = tableContainer.getBoundingClientRect();
+                const rowRect = highlightedRowElement.getBoundingClientRect();
+
+                if (rowRect.top < containerRect.top || rowRect.bottom > containerRect.bottom) {
+                  highlightedRowElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest'
+                  });
+                }
               }
             }
           }, 100);

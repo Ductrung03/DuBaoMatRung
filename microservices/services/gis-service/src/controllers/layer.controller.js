@@ -26,17 +26,35 @@ exports.getLayerDataByPath = async (req, res, next) => {
     const { layerName } = req.params;
     const { format = 'geojson', days } = req.query;
 
+    // ✅ DEBUG: Log all x-user headers
+    logger.info('🔍 DEBUG - Headers received:', {
+      layerName,
+      'x-user-id': req.headers['x-user-id'],
+      'x-user-username': req.headers['x-user-username'],
+      'x-user-roles': req.headers['x-user-roles'],
+      'x-user-xa': req.headers['x-user-xa'],
+      'x-user-tieukhu': req.headers['x-user-tieukhu'],
+      'x-user-khoanh': req.headers['x-user-khoanh'],
+      'authorization': req.headers['authorization'] ? 'Bearer ***' : 'MISSING'
+    });
+
     const db = req.app.locals.db;
     const redis = req.app.locals.redis;
 
     // Map layer name to table
     const tableName = layerMapping[layerName] || layerName;
-    const cacheKey = `layer:${layerName}:${format}:${days || 'all'}`;
+
+    // ✅ FIX: Include user scope in cache key for restricted users
+    const userXa = req.headers['x-user-xa'] || '';
+    const userTk = req.headers['x-user-tieukhu'] || '';
+    const userKhoanh = req.headers['x-user-khoanh'] || '';
+    const userScope = userXa || userTk || userKhoanh ? `${userXa}:${userTk}:${userKhoanh}` : 'all';
+    const cacheKey = `layer:${layerName}:${format}:${days || 'all'}:${userScope}`;
 
     // Try cache
     const cached = await redis.get(cacheKey);
     if (cached) {
-      logger.info('Cache hit for layer data', { layerName });
+      logger.info('Cache hit for layer data', { layerName, userScope });
       return res.json({
         ...cached,
         cached: true
@@ -90,7 +108,7 @@ exports.getLayerDataByPath = async (req, res, next) => {
           updated_at,
           -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
           ST_Area(geom::geography) as dtich,
-          COALESCE(verified_area, ST_Area(geom::geography)) as "dtichXM",
+          COALESCE(verified_area, 0) as "dtichXM",
           ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x_coordinate,
           ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y_coordinate,
           -- ✅ FIX: Thêm x, y shorthand cho Table.jsx
@@ -225,6 +243,30 @@ exports.getLayerDataByPath = async (req, res, next) => {
       } catch (err) {
         logger.error('Failed to get admin info for layer:', err.message);
       }
+    }
+
+    // ✅ FIX: Apply scope filtering based on user headers
+    const userRolesStr = req.headers['x-user-roles'] ? decodeURIComponent(req.headers['x-user-roles']) : '';
+    const userRoles = userRolesStr.split(',');
+    const isRestricted = !userRoles.includes('Admin') && !userRoles.includes('LanhDao');
+
+    if (isRestricted && layerName === 'deforestation-alerts') {
+      const effectiveXa = req.headers['x-user-xa'] ? decodeURIComponent(req.headers['x-user-xa']) : null;
+      const effectiveTk = req.headers['x-user-tieukhu'] ? decodeURIComponent(req.headers['x-user-tieukhu']) : null;
+      const effectiveKhoanh = req.headers['x-user-khoanh'] ? decodeURIComponent(req.headers['x-user-khoanh']) : null;
+
+      logger.info('Applying scope filter', { effectiveXa, effectiveTk, effectiveKhoanh, isRestricted });
+
+      // Filter rows by user scope
+      const originalCount = result.rows.length;
+      result.rows = result.rows.filter(row => {
+        if (effectiveXa && row.xa !== effectiveXa) return false;
+        if (effectiveTk && row.tk !== effectiveTk) return false;
+        if (effectiveKhoanh && row.khoanh !== effectiveKhoanh) return false;
+        return true;
+      });
+
+      logger.info(`Scope filter applied: ${result.rows.length}/${originalCount} features after filtering`);
     }
 
     const features = result.rows.map(row => {

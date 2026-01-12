@@ -244,11 +244,13 @@ app.use('/api/users',
 
 // GIS Service - Mat Rung endpoints
 app.use('/api/mat-rung',
+  authMiddleware.optionalAuth, // ✅ FIX: Use optionalAuth to allow public access but support user scope
   createProxy(logger, {
     target: process.env.GIS_SERVICE_URL || 'http://localhost:3003',
     pathRewrite: (path, req) => '/api/mat-rung' + path,
     serviceName: 'Mat Rung',
-    timeout: 120000 // 2 minutes timeout for mat-rung queries
+    timeout: 120000, // 2 minutes timeout for mat-rung queries
+    forwardUserHeaders: true // ✅ FIX: Forward user headers
   })
 );
 
@@ -288,10 +290,12 @@ app.use('/api/import-geojson-url',
 );
 
 app.use('/api/layer-data',
+  authMiddleware.optionalAuth, // ✅ FIX: Use optionalAuth to decode JWT and extract user scope
   createProxy(logger, {
     target: process.env.GIS_SERVICE_URL || 'http://localhost:3003',
     pathRewrite: (path, req) => '/api/layer-data' + path,
-    serviceName: 'Layer Data'
+    serviceName: 'Layer Data',
+    forwardUserHeaders: true // ✅ FIX: Forward x-user-* headers to backend
   })
 );
 
@@ -343,10 +347,12 @@ app.use('/api/hanhchinh',
 
 // Search Service
 app.use('/api/search',
+  authMiddleware.optionalAuth, // ✅ FIX: Use optionalAuth to allow public access but support user scope
   createProxy(logger, {
     target: process.env.SEARCH_SERVICE_URL || 'http://localhost:3006',
     pathRewrite: (path, req) => '/api/search' + path,
-    serviceName: 'Search'
+    serviceName: 'Search',
+    forwardUserHeaders: true // ✅ FIX: Forward user headers
   })
 );
 

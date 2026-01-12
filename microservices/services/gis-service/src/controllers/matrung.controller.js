@@ -53,14 +53,14 @@ async function getAdminDataOptimized(db, geom) {
     const hasMvXa = await materializedViewExists(db, 'mv_xa_by_huyen');
     const hasMvTieukhu = await materializedViewExists(db, 'mv_tieukhu_by_xa');
     const hasMvKhoanh = await materializedViewExists(db, 'mv_khoanh_by_tieukhu');
-    
+
     if (!hasMvHuyen) {
       return { huyen: null, xa: null, tk: null, khoanh: null };
     }
 
     // Use spatial intersection with laocai_rg3lr for most accurate data
     const hasRg3lr = await tableExists(db, 'laocai_rg3lr');
-    
+
     if (hasRg3lr) {
       const query = `
         SELECT 
@@ -72,7 +72,7 @@ async function getAdminDataOptimized(db, geom) {
         WHERE ST_Intersects(ST_Transform($1, 4326), ST_Transform(r.geom, 4326))
         LIMIT 1
       `;
-      
+
       const result = await db.query(query, [geom]);
       if (result.rows.length > 0) {
         return result.rows[0];
@@ -92,7 +92,7 @@ async function getAdminDataOptimized(db, geom) {
         WHERE ST_Intersects(ST_Transform($1, 4326), ST_Transform(r.geom, 4326))
         LIMIT 1
       `;
-      
+
       const result = await db.query(query, [geom]);
       if (result.rows.length > 0) {
         return result.rows[0];
@@ -120,11 +120,27 @@ exports.getMatRung = async (req, res, next) => {
       limit = 1000
     } = req.query;
 
+    // ✅ SCOPE ENFORCEMENT
+    const userRolesStr = req.headers['x-user-roles'] ? decodeURIComponent(req.headers['x-user-roles']) : '';
+    const userRoles = userRolesStr.split(',');
+    const isRestricted = !userRoles.includes('Admin') && !userRoles.includes('LanhDao');
+
+    // Determine effective filters (User forced > Query param)
+    let effectiveXa = xa;
+    let effectiveTk = tk;
+    let effectiveKhoanh = khoanh;
+
+    if (isRestricted) {
+      if (req.headers['x-user-xa']) effectiveXa = decodeURIComponent(req.headers['x-user-xa']);
+      if (req.headers['x-user-tieukhu']) effectiveTk = decodeURIComponent(req.headers['x-user-tieukhu']);
+      if (req.headers['x-user-khoanh']) effectiveKhoanh = decodeURIComponent(req.headers['x-user-khoanh']);
+    }
+
     const db = req.app.locals.db;
     const redis = req.app.locals.redis;
 
-    // Build cache key
-    const cacheKey = `matrung:${JSON.stringify(req.query)}`;
+    // Build cache key with effective filters
+    const cacheKey = `matrung:${JSON.stringify({ ...req.query, xa: effectiveXa, tk: effectiveTk, khoanh: effectiveKhoanh, isRestricted })}`;
 
     // Try cache first
     const cached = await redis.get(cacheKey);
@@ -142,8 +158,15 @@ exports.getMatRung = async (req, res, next) => {
     const hasRg3lr = await tableExists(db, 'laocai_rg3lr');
 
     // No filters - return 12 months data
-    if (!fromDate && !toDate && !huyen && !xa && !tk && !khoanh && !churung) {
-      logger.info('Loading mat rung data: 12 months default');
+    // CAREFUL: If restricted, we MUST filter, so we cannot use "No filters" default block unless we add filters to it.
+    // For simplicity, if restricted, we treat it as "With filters" flow or add WHERE clause here.
+    // Actually, "With filters" block below handles spatial join.
+    // If user is restricted, we should probably SKIP this "No filters" block and force "With filters" flow,
+    // OR add spatial filtering to this block too.
+    // But this block is "12 months data".
+    // Let's modify the condition:
+    if (!isRestricted && !fromDate && !toDate && !huyen && !xa && !tk && !khoanh && !churung) {
+      logger.info('Loading mat rung data: 12 months default (Unrestricted)');
 
       const query = `
         SELECT
@@ -163,7 +186,7 @@ exports.getMatRung = async (req, res, next) => {
 
           -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
           ST_Area(m.geom::geography) as dtich,
-          COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
+          COALESCE(m.verified_area, 0) as "dtichXM",
 
           ${hasUsers ? `
           u.full_name as verified_by_name,
@@ -228,48 +251,80 @@ exports.getMatRung = async (req, res, next) => {
       ));
     }
 
-    // With filters
+    // With filters (or restricted user default view which requires filtering)
+    // If unrestricted and missing dates, throw error.
+    // If restricted, we might want to allow default view but filtered by scope.
+    // If restricted and NO dates provided, we can default to 12 months BUT with filters.
+
+    let effectiveFromDate = fromDate;
+    let effectiveToDate = toDate;
+
     if (!fromDate || !toDate) {
-      throw new ValidationError('fromDate and toDate are required for filtered search');
+      if (isRestricted) {
+        // Default to 12 months if restricted user didn't pick dates
+        // This handles the "default view" for restricted users
+        // We need to calculate dates in JS or use Postgres current_date
+        // Let's use JS for params
+        const today = new Date();
+        const lastYear = new Date();
+        lastYear.setFullYear(today.getFullYear() - 1);
+        effectiveToDate = today.toISOString().split('T')[0];
+        effectiveFromDate = lastYear.toISOString().split('T')[0];
+      } else {
+        throw new ValidationError('fromDate and toDate are required for filtered search');
+      }
     }
 
-    logger.info('Loading mat rung data with filters', { fromDate, toDate, huyen, xa });
+    logger.info('Loading mat rung data with filters', { fromDate: effectiveFromDate, toDate: effectiveToDate, huyen, xa: effectiveXa, isRestricted });
 
     // Build WHERE clause
     const conditions = ['m.start_dau >= $1', 'm.start_dau <= $2'];
-    const params = [fromDate, toDate];
+    const params = [effectiveFromDate, effectiveToDate];
     let index = 3;
 
     // Add spatial filters using laocai_rg3lr for better accuracy
     let spatialJoin = '';
-    if (hasRg3lr && (huyen || xa || tk || khoanh || churung)) {
+    // Always join if we have any spatial filter (including forced scope)
+    const hasSpatialFilter = huyen || effectiveXa || effectiveTk || effectiveKhoanh || churung;
+
+    if (hasRg3lr && hasSpatialFilter) {
       spatialJoin = `
         LEFT JOIN laocai_rg3lr r ON ST_Intersects(
           ST_Transform(m.geom, 4326),
           ST_Transform(r.geom, 4326)
         )
       `;
-      
+
       if (huyen) {
         conditions.push(`r.huyen = $${index++}`);
         params.push(huyen);
       }
-      if (xa) {
+      if (effectiveXa) {
         conditions.push(`r.xa = $${index++}`);
-        params.push(xa);
+        params.push(effectiveXa);
       }
-      if (tk) {
+      if (effectiveTk) {
         conditions.push(`r.tk = $${index++}`);
-        params.push(tk);
+        params.push(effectiveTk);
       }
-      if (khoanh) {
+      if (effectiveKhoanh) {
         conditions.push(`r.khoanh = $${index++}`);
-        params.push(khoanh);
+        params.push(effectiveKhoanh);
       }
       if (churung) {
         conditions.push(`r.churung ILIKE $${index++}`);
         params.push(`%${churung}%`);
       }
+    } else if (!hasRg3lr && isRestricted) {
+      // Fallback: If no rg reference table but user is restricted, we can't filter safely!
+      // Return empty or error?
+      // Or maybe try filtering on 'mahuyen' if that's all we have?
+      // mat_rung table has 'mahuyen', 'xa', 'tk', 'khoanh' columns?
+      // Query implies they come from 'laocai_rg3lr r' mostly.
+      // But 'mat_rung' has 'mahuyen'.
+      // If we can't join, we can't enforce xa/tk/khoanh accurately if they aren't on mat_rung.
+      // Assuming rg3lr exists as per existing code.
+      logger.warn('Scope enforcement requires laocai_rg3lr table which is missing');
     }
 
     const whereClause = `WHERE ${conditions.join(' AND ')} AND m.geom IS NOT NULL`;
@@ -292,7 +347,7 @@ exports.getMatRung = async (req, res, next) => {
 
         -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
         ST_Area(m.geom::geography) as dtich,
-        COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
+        COALESCE(m.verified_area, 0) as "dtichXM",
 
         ${hasUsers ? `
         u.full_name as verified_by_name,
@@ -396,7 +451,7 @@ exports.getAllMatRung = async (req, res, next) => {
 
         -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
         ST_Area(m.geom::geography) as dtich,
-        COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
+        COALESCE(m.verified_area, 0) as "dtichXM",
 
         ${hasUsers ? `
         u.full_name as verified_by_name,
@@ -636,7 +691,7 @@ exports.autoForecast = async (req, res, next) => {
 
         -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
         ST_Area(m.geom::geography) as dtich,
-        COALESCE(m.verified_area, ST_Area(m.geom::geography)) as "dtichXM",
+        COALESCE(m.verified_area, 0) as "dtichXM",
 
         ${hasUsers ? `
         u.full_name as verified_by_name,

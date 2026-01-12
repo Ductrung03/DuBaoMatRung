@@ -8474,3 +8474,205 @@
 {"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-09 16:38:55"}
 {"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-09 16:38:55"}
 {"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-09 16:38:56"}
+{"ip":"147.185.132.184","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-09 21:13:53"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-09 21:23:09"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-09 21:23:09"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-09 21:23:10"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-09 21:23:10"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-09 21:23:11"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-09 21:23:12"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-09 21:29:32"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2026-01-09 21:31:20"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2026-01-09T14:57:34.881Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2026-01-09 21:57:34"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2026-01-09 21:57:34"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2026-01-09 21:57:34"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2026-01-09 21:57:35"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2026-01-09 21:57:35"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2026-01-09 21:57:35"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2026-01-09 21:57:35"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2026-01-09 21:57:35"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2026-01-09 21:57:35"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-09 22:02:44"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-09 22:12:28"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-10 02:08:13"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-10 02:08:14"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-10 02:08:14"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-10 02:08:15"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-10 02:08:15"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-10 02:08:15"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-10 02:08:15"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-10 02:08:16"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-10 02:08:16"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-10 02:08:16"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-10 02:08:16"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-10 02:08:16"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-10 02:08:17"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-10 02:08:17"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-10 02:08:17"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-10 02:08:17"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-10 02:08:19"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-10 02:08:19"}
+{"ip":"165.154.163.10","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-10 04:36:47"}
+{"ip":"37.19.216.146","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-10 05:26:17"}
+{"ip":"87.236.176.114","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-10 06:26:41"}
+{"ip":"87.236.176.119","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-10 06:33:21"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-10 06:52:09"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-10 06:52:10"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-10 06:52:10"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-10 06:52:11"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-10 06:52:12"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-10 06:52:12"}
+{"ip":"87.121.84.24","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-10 10:04:21"}
+{"ip":"87.121.84.24","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-10 10:04:22"}
+{"ip":"87.121.84.24","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-10 10:04:23"}
+{"ip":"87.121.84.24","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-10 10:04:23"}
+{"ip":"87.121.84.24","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-10 10:04:23"}
+{"ip":"87.121.84.24","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-10 10:04:24"}
+{"ip":"162.216.150.36","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-10 11:30:25"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-10 11:37:11"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-10 11:37:11"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-10 11:37:14"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-10 11:37:15"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-10 11:37:15"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-10 11:37:16"}
+{"ip":"167.94.138.176","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-10 13:19:20"}
+{"ip":"167.94.138.176","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-10 13:19:26"}
+{"ip":"167.94.138.176","level":"info","message":"GET /robots.txt","service":"gis-service","timestamp":"2026-01-10 13:19:36"}
+{"ip":"35.203.210.101","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-10 14:58:06"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-10 16:20:26"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-10 16:20:26"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-10 16:20:27"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-10 16:20:28"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-10 16:20:28"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-10 16:20:29"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-10 21:04:42"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-10 21:04:43"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-10 21:04:44"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-10 21:04:45"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-10 21:04:45"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-10 21:04:46"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-11 01:48:28"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-11 01:48:28"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-11 01:48:29"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-11 01:48:29"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-11 01:48:31"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-11 01:48:32"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-11 06:32:55"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-11 06:32:55"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-11 06:32:56"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-11 06:32:56"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-11 06:32:57"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-11 06:32:57"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-11 07:38:08"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-11 07:38:08"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-11 07:38:10"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-11 07:38:10"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-11 07:38:11"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-11 07:38:12"}
+{"ip":"147.185.132.251","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-11 11:02:14"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-11 12:22:43"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-11 12:22:44"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-11 12:22:45"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-11 12:22:45"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-11 12:22:46"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-11 12:22:47"}
+{"ip":"66.132.153.141","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-11 13:56:19"}
+{"ip":"66.132.153.141","level":"info","message":"GET /login","service":"gis-service","timestamp":"2026-01-11 13:59:19"}
+{"ip":"195.3.222.78","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-11 14:47:46"}
+{"ip":"195.3.222.78","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-11 14:47:50"}
+{"ip":"195.3.222.78","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-11 14:47:50"}
+{"ip":"195.3.222.78","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-11 14:47:54"}
+{"ip":"195.3.222.78","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-11 14:47:55"}
+{"ip":"195.3.222.78","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-11 14:47:58"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-11 17:06:12"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-11 17:06:13"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-11 17:06:13"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-11 17:06:15"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-11 17:06:15"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-11 17:06:16"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-11 21:49:34"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-11 21:49:34"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-11 21:49:36"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-11 21:49:36"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-11 21:49:37"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-11 21:49:38"}
+{"ip":"66.132.153.143","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-12 02:23:34"}
+{"ip":"66.132.153.143","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-12 02:23:41"}
+{"ip":"66.132.153.143","level":"info","message":"GET /.well-known/security.txt","service":"gis-service","timestamp":"2026-01-12 02:28:51"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-12 02:34:19"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-12 02:34:20"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-12 02:34:21"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-12 02:34:21"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-12 02:34:23"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-12 02:34:23"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-12 07:18:10"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-12 07:18:11"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-12 07:18:12"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-12 07:18:12"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-12 07:18:13"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-12 07:18:13"}
+{"ip":"162.216.149.161","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-12 09:32:24"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-12 12:02:44"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-12 12:02:45"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-12 12:02:46"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-12 12:02:46"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-12 12:02:47"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-12 12:02:48"}
+{"ip":"95.214.55.246","level":"info","message":"POST /","service":"gis-service","timestamp":"2026-01-12 13:38:20"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next","service":"gis-service","timestamp":"2026-01-12 13:38:21"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api","service":"gis-service","timestamp":"2026-01-12 13:38:22"}
+{"ip":"95.214.55.246","level":"info","message":"POST /_next/server","service":"gis-service","timestamp":"2026-01-12 13:38:23"}
+{"ip":"95.214.55.246","level":"info","message":"POST /app","service":"gis-service","timestamp":"2026-01-12 13:38:25"}
+{"ip":"95.214.55.246","level":"info","message":"POST /api/route","service":"gis-service","timestamp":"2026-01-12 13:38:25"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 13:51:48"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2026-01-12 13:52:19"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 17:02:57"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 17:08:37"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 17:12:18"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 17:14:27"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 17:16:24"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 17:22:27"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 17:27:49"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 17:30:45"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/import-geojson-url/","service":"gis-service","timestamp":"2026-01-12 17:32:04","userId":"28"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 20:25:15"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2026-01-12 20:25:15","userId":"1"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 21:05:49"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 21:06:28"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 21:06:50"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2026-01-12T14:37:39.757Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2026-01-12 21:37:39"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2026-01-12 21:37:39"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2026-01-12 21:37:39"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2026-01-12 21:37:40"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2026-01-12 21:37:40"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2026-01-12 21:37:40"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2026-01-12 21:37:40"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2026-01-12 21:37:40"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2026-01-12 21:37:40"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-12 21:40:22"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2026-01-12 21:40:22","userId":"1"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2026-01-12 21:40:55"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2026-01-12T14:57:20.027Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2026-01-12 21:57:20"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2026-01-12 21:57:20"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2026-01-12 21:57:20"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2026-01-12 21:57:20"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2026-01-12 21:57:20"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2026-01-12 21:57:20"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2026-01-12 21:57:20"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2026-01-12 21:57:20"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2026-01-12 21:57:20"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2026-01-12 22:33:30","userId":"20"}
+{"level":"error","message":"Connection terminated due to connection timeout","method":"POST","name":"Error","path":"/api/mat-rung/forecast-preview","service":"gis-service","stack":"Error: Connection terminated due to connection timeout\n    at C:\\DuBaoMatRung\\microservices\\node_modules\\pg-pool\\index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async PostgresDriver.acquireConnection (C:\\DuBaoMatRung\\microservices\\node_modules\\kysely\\dist\\cjs\\dialect\\postgres\\postgres-driver.js:23:24)\n    at async RuntimeDriver.acquireConnection (C:\\DuBaoMatRung\\microservices\\node_modules\\kysely\\dist\\cjs\\driver\\runtime-driver.js:46:28)\n    at async DefaultConnectionProvider.provideConnection (C:\\DuBaoMatRung\\microservices\\node_modules\\kysely\\dist\\cjs\\driver\\default-connection-provider.js:10:28)\n    at async DefaultQueryExecutor.executeQuery (C:\\DuBaoMatRung\\microservices\\node_modules\\kysely\\dist\\cjs\\query-executor\\query-executor-base.js:36:16)\n    at async SelectQueryBuilderImpl.execute (C:\\DuBaoMatRung\\microservices\\node_modules\\kysely\\dist\\cjs\\query-builder\\select-query-builder.js:319:24)\n    at async SelectQueryBuilderImpl.executeTakeFirst (C:\\DuBaoMatRung\\microservices\\node_modules\\kysely\\dist\\cjs\\query-builder\\select-query-builder.js:323:26)\n    at async MatRungService.forecastPreview (C:\\DuBaoMatRung\\microservices\\services\\gis-service\\src\\services\\matrung.service.js:423:20)\n    at async exports.forecastPreview (C:\\DuBaoMatRung\\microservices\\services\\gis-service\\src\\controllers\\matrung.controller.kysely.js:270:19)","statusCode":500,"timestamp":"2026-01-12 22:33:36"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"gis-service","timestamp":"2026-01-12T15:36:10.453Z"}
+{"level":"info","message":"Kysely Query Builder initialized for gis_db","service":"gis-service","timestamp":"2026-01-12 22:36:10"}
+{"level":"info","message":"Database pool initialized successfully","service":"gis-service","timestamp":"2026-01-12 22:36:10"}
+{"level":"info","message":"Redis client connected","service":"gis-service","timestamp":"2026-01-12 22:36:10"}
+{"level":"info","message":"Redis client ready","service":"gis-service","timestamp":"2026-01-12 22:36:10"}
+{"level":"info","message":"Redis manager initialized successfully","service":"gis-service","timestamp":"2026-01-12 22:36:10"}
+{"level":"info","message":"GIS Service running on port 3003","service":"gis-service","timestamp":"2026-01-12 22:36:10"}
+{"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2026-01-12 22:36:10"}
+{"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2026-01-12 22:36:10"}
+{"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2026-01-12 22:36:10"}

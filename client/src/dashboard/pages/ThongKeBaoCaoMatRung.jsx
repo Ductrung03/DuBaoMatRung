@@ -77,14 +77,14 @@ const ThongKeBaoCaoMatRung = () => {
 
       if (data.success && data.data.features) {
         let filteredData = data.data.features;
-        
+
         // Lọc theo trạng thái xác minh
         if (xacMinh === 'true') {
-          filteredData = filteredData.filter(feature => 
+          filteredData = filteredData.filter(feature =>
             feature.properties.xacminh === 1 || feature.properties.xacminh === '1'
           );
         }
-        
+
         setReportData(filteredData);
       }
     } catch (error) {
@@ -144,7 +144,9 @@ const ThongKeBaoCaoMatRung = () => {
             children: [new Paragraph({
               text: (() => {
                 const areaField = isVerified ? (item.properties.dtichXM || item.properties.dtich_xm) : item.properties.dtich;
-                return areaField ? (areaField / 10000).toFixed(1) : "";
+                // ✅ FIX: Return "0.0" if areaField is null/0/undefined
+                const val = areaField || 0;
+                return (val / 10000).toFixed(1);
               })(),
               alignment: AlignmentType.CENTER
             })]
@@ -559,8 +561,8 @@ const ThongKeBaoCaoMatRung = () => {
                 <th className="border border-black px-2 py-1">Lô cảnh báo</th>
                 <th className="border border-black px-2 py-1">Tiểu khu</th>
                 <th className="border border-black px-2 py-1">Khoảnh</th>
-                <th className="border border-black px-2 py-1">Tọa độ VN-2000<br/>X</th>
-                <th className="border border-black px-2 py-1">Tọa độ VN-2000<br/>Y</th>
+                <th className="border border-black px-2 py-1">Tọa độ VN-2000<br />X</th>
+                <th className="border border-black px-2 py-1">Tọa độ VN-2000<br />Y</th>
                 <th className="border border-black px-2 py-1">Diện tích (ha)</th>
                 {isVerified && (
                   <th className="border border-black px-2 py-1">Nguyên nhân</th>
@@ -592,7 +594,9 @@ const ThongKeBaoCaoMatRung = () => {
                   <td className="border border-black px-2 py-1">
                     {(() => {
                       const areaField = isVerified ? (item.properties.dtichXM || item.properties.dtich_xm) : item.properties.dtich;
-                      return areaField ? (areaField / 10000).toFixed(1) : "";
+                      // ✅ FIX: Return "0.0" if null/undefined
+                      const val = areaField || 0;
+                      return (val / 10000).toFixed(1);
                     })()}
                   </td>
                   {isVerified && (
@@ -602,7 +606,7 @@ const ThongKeBaoCaoMatRung = () => {
                   )}
                 </tr>
               ))}
-              
+
               <tr className="font-bold">
                 <td className="border border-black px-2 py-1" colSpan={isVerified ? "8" : "7"}>
                   Tổng {totalLots} lô
@@ -621,9 +625,9 @@ const ThongKeBaoCaoMatRung = () => {
                 <strong>Người tổng hợp</strong>
               </div>
               <div className="text-xs text-gray-600">
-                Lưu ý:<br/>
-                + Diện tích tính từ geometry, lấy 1 chữ số thập phân<br/>
-                + Dòng tổng: tính toán tổng số lô và tổng diện tích<br/>
+                Lưu ý:<br />
+                + Diện tích tính từ geometry, lấy 1 chữ số thập phân<br />
+                + Dòng tổng: tính toán tổng số lô và tổng diện tích<br />
                 + Tọa độ X,Y làm tròn 3 chữ số thập phân
               </div>
             </div>

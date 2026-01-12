@@ -1,6 +1,6 @@
 // client/src/dashboard/contexts/GeoDataContext.jsx - AUTO LOAD ALL LAYERS
 import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../services/api"; // ✅ FIX: Use authenticated api instead of raw axios
 import config from "../../config";
 import { toast } from "react-toastify";
 
@@ -96,7 +96,7 @@ export const GeoDataProvider = ({ children }) => {
             endpoint += '?days=90'; // 3 tháng = 90 ngày
           }
 
-          const response = await axios.get(endpoint, {
+          const response = await api.get(endpoint, {
             headers: {
               'Accept': 'application/json',
               'Cache-Control': 'max-age=0'
@@ -165,7 +165,7 @@ export const GeoDataProvider = ({ children }) => {
       setLoading(true);
 
       // ✅ Gọi API /api/mat-rung - mặc định trả về 12 tháng, limit 1000
-      const response = await axios.get(`/api/mat-rung`, {
+      const response = await api.get(`/mat-rung`, {
         params: {
           limit: 1000
         }
@@ -316,7 +316,7 @@ export const GeoDataProvider = ({ children }) => {
           endpoint += '?days=365'; // 1 năm cho load riêng lẻ
         }
 
-        const response = await axios.get(endpoint, {
+        const response = await api.get(endpoint, {
           headers: {
             'Accept': 'application/json',
             'Cache-Control': 'max-age=0'
@@ -394,16 +394,13 @@ export const GeoDataProvider = ({ children }) => {
 
       const { fromDate, toDate } = calculateDateRange(year, month, period);
 
-      const response = await axios.post(`/api/mat-rung/auto-forecast`, {
+      const response = await api.post(`/mat-rung/auto-forecast`, {
         year,
         month,
         period,
         fromDate,
         toDate
       }, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
         timeout: 60000 // 1 phút timeout
       });
 
@@ -473,16 +470,13 @@ export const GeoDataProvider = ({ children }) => {
 
       const { fromDate, toDate } = calculateDateRange(year, month, period);
 
-      const response = await axios.post(`/api/mat-rung/forecast-preview`, {
+      const response = await api.post(`/mat-rung/forecast-preview`, {
         year,
         month,
         period,
         fromDate,
         toDate
       }, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
         timeout: 180000 // 3 phút timeout cho preview
       });
 

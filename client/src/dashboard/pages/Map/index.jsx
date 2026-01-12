@@ -31,11 +31,11 @@ const MapController = ({ setMapReady }) => {
     if (map) {
       window._leaflet_map = map;
       // Fix render issues when container size changes or tab switches
-      setTimeout(() => { 
+      setTimeout(() => {
         map.invalidateSize();
         setMapReady(true);
       }, 100);
-      
+
       return () => {
         window._leaflet_map = null;
         setMapReady(false);
@@ -111,7 +111,7 @@ const Map = () => {
 
   // ✅ FIX: Luôn hiển thị table khi có dữ liệu, không phụ thuộc vào trang
   const shouldShowTable = geoData?.features?.length > 0;
-  const mapHeight = shouldShowTable 
+  const mapHeight = shouldShowTable
     ? "h-[40vh] md:h-[50vh]"  // Shorter when table is shown
     : "h-[60vh] md:h-[calc(100vh-150px)]"; // Taller when no table
 
@@ -121,14 +121,14 @@ const Map = () => {
   useEffect(() => {
     const handleZoomToFeature = (event) => {
       const { feature, center, bbox, zoom } = event.detail;
-      
+
       if (!feature || !window._leaflet_map) {
         return;
       }
 
       try {
         const targetGid = feature.properties.gid;
-        
+
         // ✅ FIX: Zoom using bbox if available, fallback to center
         if (bbox && bbox.length === 4) {
           const [west, south, east, north] = bbox;
@@ -149,16 +149,16 @@ const Map = () => {
           });
 
         }
-        
+
         // ✅ FIX: Highlight target feature with delay
         setTimeout(() => {
           if (geoJsonLayerRef.current) {
             let targetLayer = null;
-            
+
             geoJsonLayerRef.current.eachLayer((layer) => {
               if (layer.feature && layer.feature.properties.gid === targetGid) {
                 targetLayer = layer;
-                
+
                 // Reset all other layers first
                 geoJsonLayerRef.current.eachLayer((l) => {
                   if (l !== layer) {
@@ -166,27 +166,27 @@ const Map = () => {
                     l.setStyle(originalStyle);
                   }
                 });
-                
+
                 // Apply highlight style to target
                 const highlightStyle = {
                   fillColor: "#ff7800",
-                  color: "#ff0000", 
+                  color: "#ff0000",
                   weight: 4,
                   fillOpacity: 0.8,
                   dashArray: "5, 5"
                 };
-                
+
                 layer.setStyle(highlightStyle);
                 layer.bringToFront();
-                
+
                 // Open popup if available
                 if (layer.getPopup) {
                   layer.openPopup();
                 }
-                
+
               }
             });
-            
+
             if (targetLayer) {
               setSelectedFeature(feature);
               setHighlightedLayerRef(targetLayer);
@@ -194,7 +194,7 @@ const Map = () => {
             }
           }
         }, 1000); // Delay để đảm bảo map đã zoom xong
-        
+
         toast.success(`🗺️ Đã zoom đến CB-${targetGid} trên bản đồ`, { autoClose: 3000 });
 
       } catch (error) {
@@ -205,12 +205,56 @@ const Map = () => {
 
     // Add event listener
     window.addEventListener('zoomToFeature', handleZoomToFeature);
-    
+
     // Cleanup
     return () => {
       window.removeEventListener('zoomToFeature', handleZoomToFeature);
     };
   }, [geoJsonLayerRef, setSelectedFeature, setHighlightedLayerRef]);
+
+  // ===================================
+  // ZOOM WHEN CLICKING ON MAP (FROM MAP INTERACTION)
+  // ===================================
+  useEffect(() => {
+    const handleZoomFromMapClick = (event) => {
+      const { feature, center, bounds } = event.detail;
+
+      if (!window._leaflet_map || !bounds) {
+        return;
+      }
+
+      try {
+        const targetGid = feature?.properties?.gid;
+
+        // ✅ FIX: Zoom trực tiếp đến feature mới, không thu nhỏ trước
+        const leafletBounds = L.latLngBounds(
+          [bounds[1], bounds[0]], // SW: [south, west]
+          [bounds[3], bounds[2]]  // NE: [north, east]
+        );
+
+        // Sử dụng flyToBounds với duration ngắn hơn để zoom nhanh
+        window._leaflet_map.flyToBounds(leafletBounds, {
+          padding: [30, 30],
+          duration: 0.8,  // Nhanh hơn vì user đã thấy feature
+          animate: true,
+          maxZoom: 18
+        });
+
+        if (targetGid) {
+          toast.info(`🎯 Đang zoom vào CB-${targetGid}`, { autoClose: 2000 });
+        }
+
+      } catch (error) {
+        console.error("❌ Error in zoomToFeatureFromMap:", error);
+      }
+    };
+
+    window.addEventListener('zoomToFeatureFromMap', handleZoomFromMapClick);
+
+    return () => {
+      window.removeEventListener('zoomToFeatureFromMap', handleZoomFromMapClick);
+    };
+  }, []);
 
   // ===================================
   // EFFECTS
@@ -239,8 +283,8 @@ const Map = () => {
         const bounds = geoJsonLayer.getBounds();
 
         if (bounds.isValid()) {
-          window._leaflet_map.fitBounds(bounds, { 
-            padding: MAP_CONFIG.flyToBoundsPadding 
+          window._leaflet_map.fitBounds(bounds, {
+            padding: MAP_CONFIG.flyToBoundsPadding
           });
         } else {
         }
@@ -262,7 +306,7 @@ const Map = () => {
 
       {/* Map Container */}
       <div className={`flex justify-center items-center ${shouldShowTable ? "mb-2 md:mb-5" : ""} relative`}>
-        
+
         {/* Loading Overlay */}
         {loading && (
           <LoadingOverlay message="Đang tải dữ liệu bản đồ..." />

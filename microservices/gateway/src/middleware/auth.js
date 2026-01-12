@@ -51,6 +51,10 @@ const authenticate = (req, res, next) => {
     const rolesArray = decoded.roles ? decoded.roles.map(r => typeof r === 'object' ? r.name || r.id : r) : [];
     req.headers['x-user-roles'] = encodeURIComponent(rolesArray.join(','));
     req.headers['x-user-permissions'] = decoded.permissions ? decoded.permissions.join(',') : '';
+    // ✅ FIX: Forward location scope headers
+    req.headers['x-user-xa'] = decoded.xa ? encodeURIComponent(decoded.xa) : '';
+    req.headers['x-user-tieukhu'] = decoded.tieukhu ? encodeURIComponent(decoded.tieukhu) : '';
+    req.headers['x-user-khoanh'] = decoded.khoanh ? encodeURIComponent(decoded.khoanh) : '';
 
     next();
   } catch (error) {
@@ -168,6 +172,10 @@ const optionalAuth = (req, res, next) => {
     const rolesArray = decoded.roles ? decoded.roles.map(r => typeof r === 'object' ? r.name || r.id : r) : [];
     req.headers['x-user-roles'] = encodeURIComponent(rolesArray.join(','));
     req.headers['x-user-permissions'] = decoded.permissions ? decoded.permissions.join(',') : '';
+    // ✅ FIX: Forward location scope headers
+    req.headers['x-user-xa'] = decoded.xa ? encodeURIComponent(decoded.xa) : '';
+    req.headers['x-user-tieukhu'] = decoded.tieukhu ? encodeURIComponent(decoded.tieukhu) : '';
+    req.headers['x-user-khoanh'] = decoded.khoanh ? encodeURIComponent(decoded.khoanh) : '';
   } catch (error) {
     // Ignore errors for optional auth
     console.warn('Optional auth failed:', error.message);
@@ -221,6 +229,10 @@ const authenticateFlexible = (req, res, next) => {
     const rolesArray = decoded.roles ? decoded.roles.map(r => typeof r === 'object' ? r.name || r.id : r) : [];
     req.headers['x-user-roles'] = encodeURIComponent(rolesArray.join(','));
     req.headers['x-user-permissions'] = decoded.permissions ? decoded.permissions.join(',') : '';
+    // ✅ FIX: Forward location scope headers
+    req.headers['x-user-xa'] = decoded.xa ? encodeURIComponent(decoded.xa) : '';
+    req.headers['x-user-tieukhu'] = decoded.tieukhu ? encodeURIComponent(decoded.tieukhu) : '';
+    req.headers['x-user-khoanh'] = decoded.khoanh ? encodeURIComponent(decoded.khoanh) : '';
 
     next();
   } catch (error) {

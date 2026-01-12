@@ -8,7 +8,7 @@ const MapUpdater = ({ selectedFeature }) => {
   useEffect(() => {
     if (selectedFeature && selectedFeature.geometry) {
       try {
-        
+
         // Tạo layer mới từ geometry của feature đã chọn
         const geojsonFeature = {
           type: "Feature",
@@ -24,9 +24,14 @@ const MapUpdater = ({ selectedFeature }) => {
 
           // Sử dụng setTimeout để đảm bảo map đã render xong
           setTimeout(() => {
+            // ✅ FIX: Nếu đang zoom sâu thì giữ nguyên mức zoom (nếu bounds nhỏ), chỉ pan
+            // Tuy nhiên flyToBounds tự động handle việc này khá tốt. 
+            // Vấn đề reset có thể do padding quá lớn với bounds nhỏ?
+            // Hoặc do duration. Giữ nguyên default behavior nhưng giảm padding nếu cần.
             map.flyToBounds(bounds, {
               padding: [50, 50],
-              duration: 1.5
+              duration: 1.5,
+              maxZoom: 18 // ✅ FIX: Giới hạn zoom tối đa để tránh bị quá gần
             });
           }, 200);
         } else {

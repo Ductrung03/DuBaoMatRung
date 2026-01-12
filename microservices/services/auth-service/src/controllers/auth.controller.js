@@ -73,7 +73,11 @@ exports.login = async (req, res, next) => {
       full_name: user.full_name,
       email: user.email,
       roles: roles.map(role => role.name),
-      permissions: Array.from(permissionsSet)
+      permissions: Array.from(permissionsSet),
+      // ✅ FIX: Include location scope in token
+      xa: user.xa,
+      tieukhu: user.tieukhu,
+      khoanh: user.khoanh
     };
 
     const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
@@ -304,7 +308,11 @@ exports.refreshToken = async (req, res, next) => {
       full_name: user.full_name,
       email: user.email,
       roles: roles.map(role => role.name),
-      permissions: Array.from(permissionsSet)
+      permissions: Array.from(permissionsSet),
+      // ✅ FIX: Include location scope in token
+      xa: user.xa,
+      tieukhu: user.tieukhu,
+      khoanh: user.khoanh
     };
 
     const newToken = jwt.sign(newTokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });

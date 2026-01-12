@@ -42,7 +42,7 @@ function createProxy(logger, options) {
 
         // Forward user authentication headers if enabled
         if (forwardUserHeaders) {
-          const userHeaders = ['x-user-id', 'x-user-roles', 'x-user-permissions', 'x-user-username', 'x-user-name', 'x-user-full-name'];
+          const userHeaders = ['x-user-id', 'x-user-roles', 'x-user-permissions', 'x-user-username', 'x-user-name', 'x-user-full-name', 'x-user-xa', 'x-user-tieukhu', 'x-user-khoanh'];
           userHeaders.forEach(header => {
             if (req.headers[header]) {
               proxyReq.setHeader(header, req.headers[header]);
