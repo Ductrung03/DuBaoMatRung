@@ -1,6 +1,7 @@
-import axios from 'axios';
+// client/src/utils/dropdownService.js - ✅ FIX: Use api instance for authenticated requests
+import api from '../services/api';
 
-const API_URL = '/api/dropdown';
+const API_URL = '/dropdown'; // ✅ FIX: Remove /api prefix - api instance already has baseURL=/api
 
 /**
  * Fetches a list of districts (huyện).
@@ -8,7 +9,7 @@ const API_URL = '/api/dropdown';
  */
 export const getDistricts = async () => {
   try {
-    const response = await axios.get(`${API_URL}/huyen`);
+    const response = await api.get(`${API_URL}/huyen`);
     return response.data.data || [];
   } catch (error) {
     console.error('Error fetching districts:', error);
@@ -24,7 +25,7 @@ export const getDistricts = async () => {
 export const getCommunes = async (districtName) => {
   if (!districtName) return [];
   try {
-    const response = await axios.get(`${API_URL}/xa`, { params: { huyen: districtName } });
+    const response = await api.get(`${API_URL}/xa`, { params: { huyen: districtName } });
     return response.data.data || [];
   } catch (error) {
     console.error(`Error fetching communes for district ${districtName}:`, error);
@@ -41,7 +42,7 @@ export const getCommunes = async (districtName) => {
 export const getPlots = async (districtName, communeName) => {
   if (!districtName || !communeName) return [];
   try {
-    const response = await axios.get(`${API_URL}/khoanh`, { params: { huyen: districtName, xa: communeName } });
+    const response = await api.get(`${API_URL}/khoanh`, { params: { huyen: districtName, xa: communeName } });
     return response.data.data || [];
   } catch (error) {
     console.error(`Error fetching plots for commune ${communeName}:`, error);
@@ -59,7 +60,7 @@ export const getPlots = async (districtName, communeName) => {
 export const getSubZones = async (districtName, communeName, plotName) => {
   if (!districtName || !communeName || !plotName) return [];
   try {
-    const response = await axios.get(`${API_URL}/tieukhu`, { params: { huyen: districtName, xa: communeName, khoanh: plotName } });
+    const response = await api.get(`${API_URL}/tieukhu`, { params: { huyen: districtName, xa: communeName, khoanh: plotName } });
     return response.data.data || [];
   } catch (error) {
     console.error(`Error fetching sub-zones for plot ${plotName}:`, error);
@@ -73,7 +74,7 @@ export const getSubZones = async (districtName, communeName, plotName) => {
  */
 export const getChucNangRung = async () => {
   try {
-    const response = await axios.get(`${API_URL}/chucnangrung`);
+    const response = await api.get(`${API_URL}/chucnangrung`);
     return response.data || [];
   } catch (error) {
     console.error('Error fetching forest functions:', error);
@@ -87,7 +88,7 @@ export const getChucNangRung = async () => {
  */
 export const getChuRung = async () => {
   try {
-    const response = await axios.get(`${API_URL}/churung`);
+    const response = await api.get(`${API_URL}/churung`);
     return response.data || [];
   } catch (error) {
     console.error('Error fetching forest owners:', error);
@@ -101,7 +102,7 @@ export const getChuRung = async () => {
  */
 export const getTrangThaiXacMinh = async () => {
   try {
-    const response = await axios.get(`${API_URL}/trangthaixacminh`);
+    const response = await api.get(`${API_URL}/trangthaixacminh`);
     return response.data || [];
   } catch (error) {
     console.error('Error fetching verification statuses:', error);
@@ -115,7 +116,7 @@ export const getTrangThaiXacMinh = async () => {
  */
 export const getNguyenNhan = async () => {
   try {
-    const response = await axios.get(`${API_URL}/nguyennhan`);
+    const response = await api.get(`${API_URL}/nguyennhan`);
     return response.data || [];
   } catch (error) {
     console.error('Error fetching causes:', error);
@@ -129,7 +130,7 @@ export const getNguyenNhan = async () => {
  */
 export const getSonLaXa = async () => {
   try {
-    const response = await axios.get(`${API_URL}/sonla/xa`);
+    const response = await api.get(`${API_URL}/sonla/xa`);
     return response.data.data || [];
   } catch (error) {
     console.error('Error fetching Sơn La communes:', error);
@@ -145,7 +146,7 @@ export const getSonLaXa = async () => {
 export const getSonLaTieuKhu = async (communeName) => {
   if (!communeName) return [];
   try {
-    const response = await axios.get(`${API_URL}/sonla/tieukhu`, { params: { xa: communeName } });
+    const response = await api.get(`${API_URL}/sonla/tieukhu`, { params: { xa: communeName } });
     return response.data.data || [];
   } catch (error) {
     console.error(`Error fetching Sơn La sub-zones for commune ${communeName}:`, error);
@@ -166,7 +167,7 @@ export const getSonLaKhoanh = async (communeName, subZoneName) => {
     if (subZoneName) {
       params.tieukhu = subZoneName;
     }
-    const response = await axios.get(`${API_URL}/sonla/khoanh`, { params });
+    const response = await api.get(`${API_URL}/sonla/khoanh`, { params });
     return response.data.data || [];
   } catch (error) {
     console.error(`Error fetching Sơn La plots:`, error);

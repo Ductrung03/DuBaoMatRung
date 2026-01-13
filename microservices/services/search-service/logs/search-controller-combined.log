@@ -1127,3 +1127,46 @@
 {"level":"info","message":"Found CB-14870 at [21.30029908849654, 103.9358388429813]","service":"search-controller","timestamp":"2026-01-08 09:18:12"}
 {"level":"info","message":"Found 50 features within 10000m of CB-14870","service":"search-controller","timestamp":"2026-01-08 09:18:13"}
 {"level":"info","message":"Added admin info for 51 features","service":"search-controller","timestamp":"2026-01-08 09:18:15"}
+{"fromDate":"2025-12-01","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2026-01-13 08:37:24","toDate":"2025-12-30","xa":"Xã Ngọc Chiến","xacMinh":"false"}
+{"level":"info","message":"Found 721 son_la_mat_rung records","service":"search-controller","timestamp":"2026-01-13 08:37:29"}
+{"level":"info","message":"Retrieved admin info for 721 locations","service":"search-controller","timestamp":"2026-01-13 08:37:29"}
+{"fromDate":"2025-12-01","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2026-01-13 08:37:32","toDate":"2025-12-30","xa":"Xã Ngọc Chiến"}
+{"level":"info","message":"Found 721 son_la_mat_rung records","service":"search-controller","timestamp":"2026-01-13 08:37:35"}
+{"level":"info","message":"Retrieved admin info for 721 locations","service":"search-controller","timestamp":"2026-01-13 08:37:35"}
+{"fromDate":"2025-12-01","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2026-01-13 08:42:43","toDate":"2025-12-30","xa":"Xã Mường La","xacMinh":"false"}
+{"level":"info","message":"Found 1707 son_la_mat_rung records","service":"search-controller","timestamp":"2026-01-13 08:42:47"}
+{"level":"info","message":"Retrieved admin info for 922 locations","service":"search-controller","timestamp":"2026-01-13 08:42:48"}
+{"fromDate":"2025-12-01","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2026-01-13 08:43:04","toDate":"2025-12-30","xa":"Xã Mường La"}
+{"level":"info","message":"Found 1707 son_la_mat_rung records","service":"search-controller","timestamp":"2026-01-13 08:43:08"}
+{"level":"info","message":"Retrieved admin info for 922 locations","service":"search-controller","timestamp":"2026-01-13 08:43:08"}
+{"fromDate":"2025-12-01","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2026-01-13 08:51:31","toDate":"2025-12-30","xa":"Xã Chiềng Hoa","xacMinh":"false"}
+{"level":"info","message":"Found 877 son_la_mat_rung records","service":"search-controller","timestamp":"2026-01-13 08:51:35"}
+{"level":"info","message":"Retrieved admin info for 859 locations","service":"search-controller","timestamp":"2026-01-13 08:51:35"}
+{"fromDate":"2025-12-01","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2026-01-13 08:51:46","toDate":"2025-12-30","xa":"Xã Chiềng Hoa"}
+{"level":"info","message":"Found 877 son_la_mat_rung records","service":"search-controller","timestamp":"2026-01-13 08:51:49"}
+{"level":"info","message":"Retrieved admin info for 859 locations","service":"search-controller","timestamp":"2026-01-13 08:51:49"}
+{"level":"info","message":"Searching for CB-6884 with radius 10000m","service":"search-controller","timestamp":"2026-01-13 09:09:21"}
+{"level":"info","message":"Found CB-6884 at [21.492079239889353, 103.66882648646715]","service":"search-controller","timestamp":"2026-01-13 09:09:21"}
+{"level":"info","message":"Found 50 features within 10000m of CB-6884","service":"search-controller","timestamp":"2026-01-13 09:09:23"}
+{"level":"info","message":"Added admin info for 51 features","service":"search-controller","timestamp":"2026-01-13 09:09:24"}
+{"level":"info","message":"Searching for CB-6817 with radius 10000m","service":"search-controller","timestamp":"2026-01-13 09:11:35"}
+{"level":"info","message":"Found CB-6817 at [21.594980238058426, 103.6441806807004]","service":"search-controller","timestamp":"2026-01-13 09:11:35"}
+{"level":"info","message":"Found 50 features within 10000m of CB-6817","service":"search-controller","timestamp":"2026-01-13 09:11:37"}
+{"level":"info","message":"Added admin info for 51 features","service":"search-controller","timestamp":"2026-01-13 09:11:38"}
+{"level":"info","message":"Searching for CB-6386 with radius 10000m","service":"search-controller","timestamp":"2026-01-13 09:12:13"}
+{"level":"info","message":"Found CB-6386 at [21.556829921988818, 103.80766969328715]","service":"search-controller","timestamp":"2026-01-13 09:12:13"}
+{"level":"info","message":"Found 50 features within 10000m of CB-6386","service":"search-controller","timestamp":"2026-01-13 09:12:16"}
+{"level":"info","message":"Added admin info for 51 features","service":"search-controller","timestamp":"2026-01-13 09:12:17"}
+{"fromDate":"2025-12-01","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2026-01-13 09:35:07","toDate":"2025-12-30","xa":"Phường Tô Hiệu","xacMinh":"false"}
+{"level":"info","message":"Found 58 son_la_mat_rung records","service":"search-controller","timestamp":"2026-01-13 09:35:12"}
+{"level":"info","message":"Retrieved admin info for 58 locations","service":"search-controller","timestamp":"2026-01-13 09:35:12"}
+{"level":"info","message":"Searching for CB-1811 with radius 10000m","service":"search-controller","timestamp":"2026-01-13 10:56:56"}
+{"level":"info","message":"Found CB-1811 at [21.416101221536255, 103.96090029058871]","service":"search-controller","timestamp":"2026-01-13 10:56:56"}
+{"level":"info","message":"Found 50 features within 10000m of CB-1811","service":"search-controller","timestamp":"2026-01-13 10:56:57"}
+{"level":"info","message":"Added admin info for 51 features","service":"search-controller","timestamp":"2026-01-13 10:56:58"}
+{"fromDate":"2025-12-01","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2026-01-13 10:58:48","toDate":"2025-12-30","xa":"Phường Tô Hiệu","xacMinh":"false"}
+{"level":"info","message":"Found 58 son_la_mat_rung records","service":"search-controller","timestamp":"2026-01-13 10:58:50"}
+{"level":"info","message":"Retrieved admin info for 58 locations","service":"search-controller","timestamp":"2026-01-13 10:58:50"}
+{"fromDate":"2025-12-01","level":"info","message":"Searching mat rung","service":"search-controller","timestamp":"2026-01-13 10:58:51","toDate":"2025-12-30","xa":"Phường Tô Hiệu"}
+{"level":"info","message":"Found 58 son_la_mat_rung records","service":"search-controller","timestamp":"2026-01-13 10:58:54"}
+{"level":"info","message":"Retrieved admin info for 58 locations","service":"search-controller","timestamp":"2026-01-13 10:58:54"}

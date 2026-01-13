@@ -204,6 +204,19 @@ exports.getSonLaXa = async (req, res, next) => {
   try {
     const kyselyDb = req.app.locals.kyselyDb;
 
+    // ✅ FIX: Read user scope from headers (forwarded by gateway)
+    const userXa = req.headers['x-user-xa']
+      ? decodeURIComponent(req.headers['x-user-xa'])
+      : null;
+
+    // If user has xa scope assigned, only return that xa
+    if (userXa) {
+      const data = [{ value: userXa, label: userXa }];
+      logger.info('getSonLaXa: User scoped to xa', { userXa });
+      return res.json(formatResponse(true, 'Sơn La Xa list (scoped)', data));
+    }
+
+    // If no scope (admin/leader) -> return all
     const adminService = new AdminService(kyselyDb);
     const results = await adminService.getSonLaXa();
 
@@ -225,8 +238,26 @@ exports.getSonLaTieuKhu = async (req, res, next) => {
     const { xa } = req.query;
     const kyselyDb = req.app.locals.kyselyDb;
 
+    // ✅ FIX: Read user scope from headers
+    const userXa = req.headers['x-user-xa'] 
+      ? decodeURIComponent(req.headers['x-user-xa']) 
+      : null;
+    const userTieukhu = req.headers['x-user-tieukhu']
+      ? decodeURIComponent(req.headers['x-user-tieukhu'])
+      : null;
+    
+    // If user has tieukhu scope, only return that tieukhu
+    if (userTieukhu) {
+      const data = [{ value: userTieukhu, label: userTieukhu }];
+      logger.info('getSonLaTieuKhu: User scoped to tieukhu', { userTieukhu });
+      return res.json(formatResponse(true, 'Sơn La Tieu khu list (scoped)', data));
+    }
+
+    // If user has xa scope but not tieukhu, filter by xa
+    const effectiveXa = userXa || xa;
+
     const adminService = new AdminService(kyselyDb);
-    const results = await adminService.getSonLaTieuKhu(xa);
+    const results = await adminService.getSonLaTieuKhu(effectiveXa);
 
     const data = results.map(r => ({
       value: r.tieukhu,
@@ -246,8 +277,30 @@ exports.getSonLaKhoanh = async (req, res, next) => {
     const { xa, tieukhu } = req.query;
     const kyselyDb = req.app.locals.kyselyDb;
 
+    // ✅ FIX: Read user scope from headers
+    const userXa = req.headers['x-user-xa'] 
+      ? decodeURIComponent(req.headers['x-user-xa']) 
+      : null;
+    const userTieukhu = req.headers['x-user-tieukhu']
+      ? decodeURIComponent(req.headers['x-user-tieukhu'])
+      : null;
+    const userKhoanh = req.headers['x-user-khoanh']
+      ? decodeURIComponent(req.headers['x-user-khoanh'])
+      : null;
+    
+    // If user has khoanh scope, only return that khoanh
+    if (userKhoanh) {
+      const data = [{ value: userKhoanh, label: userKhoanh }];
+      logger.info('getSonLaKhoanh: User scoped to khoanh', { userKhoanh });
+      return res.json(formatResponse(true, 'Sơn La Khoanh list (scoped)', data));
+    }
+
+    // Use user scope if query params not provided
+    const effectiveXa = userXa || xa;
+    const effectiveTieukhu = userTieukhu || tieukhu;
+
     const adminService = new AdminService(kyselyDb);
-    const results = await adminService.getSonLaKhoanh(xa, tieukhu);
+    const results = await adminService.getSonLaKhoanh(effectiveXa, effectiveTieukhu);
 
     const data = results.map(r => ({
       value: r.khoanh,

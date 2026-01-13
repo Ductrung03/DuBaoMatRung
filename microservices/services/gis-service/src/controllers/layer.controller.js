@@ -18,6 +18,9 @@ const layerMapping = {
   'matrung': 'son_la_mat_rung'
 };
 
+// ✅ FIX: Danh sách roles có toàn quyền xem dữ liệu (không cần filter theo khu vực)
+const ADMIN_ROLES = ['Công ty Fis', 'Chi cục kiểm lâm', 'Admin', 'LanhDao'];
+
 // Get layer data by path parameter (new endpoint for frontend)
 exports.getLayerDataByPath = async (req, res, next) => {
   let adminDb = null;
@@ -44,12 +47,42 @@ exports.getLayerDataByPath = async (req, res, next) => {
     // Map layer name to table
     const tableName = layerMapping[layerName] || layerName;
 
-    // ✅ FIX: Include user scope in cache key for restricted users
-    const userXa = req.headers['x-user-xa'] || '';
-    const userTk = req.headers['x-user-tieukhu'] || '';
-    const userKhoanh = req.headers['x-user-khoanh'] || '';
-    const userScope = userXa || userTk || userKhoanh ? `${userXa}:${userTk}:${userKhoanh}` : 'all';
+    // ✅ FIX: Include user scope in cache key - phân biệt Admin/LanhDao vs restricted users
+    const userXa = req.headers['x-user-xa'] ? decodeURIComponent(req.headers['x-user-xa']) : '';
+    const userTk = req.headers['x-user-tieukhu'] ? decodeURIComponent(req.headers['x-user-tieukhu']) : '';
+    const userKhoanh = req.headers['x-user-khoanh'] ? decodeURIComponent(req.headers['x-user-khoanh']) : '';
+
+    // Xác định role để tạo cache key chính xác
+    const userRolesForCache = req.headers['x-user-roles'] ? decodeURIComponent(req.headers['x-user-roles']).split(',').filter(r => r) : [];
+    const isAdminOrLeaderForCache = userRolesForCache.some(role => ADMIN_ROLES.includes(role));
+
+    let userScope;
+    if (isAdminOrLeaderForCache) {
+      userScope = 'admin';  // Admin/LanhDao share cache của toàn bộ data
+    } else if (userXa || userTk || userKhoanh) {
+      userScope = `scoped:${userXa}:${userTk}:${userKhoanh}`;  // User có scope cụ thể
+    } else {
+      userScope = 'noscope';  // Restricted user không có scope - cache riêng (sẽ trả về empty)
+    }
+
     const cacheKey = `layer:${layerName}:${format}:${days || 'all'}:${userScope}`;
+
+    // ✅ FIX: Nếu restricted user không có scope, trả về empty ngay (không cần query DB)
+    if (userScope === 'noscope') {
+      logger.warn('Restricted user without scope, returning empty immediately', {
+        layerName,
+        userId: req.headers['x-user-id']
+      });
+      const emptyResponse = formatResponse(
+        true,
+        `No data available - please contact admin to assign management area`,
+        { type: 'FeatureCollection', features: [] },
+        { layer: layerName, cached: false, noScope: true }
+      );
+      // Cache empty response for 5 minutes to avoid repeated queries
+      await redis.set(cacheKey, emptyResponse, 300);
+      return res.json(emptyResponse);
+    }
 
     // Try cache
     const cached = await redis.get(cacheKey);
@@ -86,45 +119,164 @@ exports.getLayerDataByPath = async (req, res, next) => {
 
     // Build query with optional date filter
     let query;
+    let queryParams = [];
 
     // ✅ Đặc biệt cho mat_rung (deforestation-alerts): Lấy đầy đủ properties + X,Y coordinates
     if (layerName === 'deforestation-alerts') {
-      query = `
-        SELECT
-          gid,
-          start_sau,
-          area,
-          start_dau,
-          end_sau,
-          mahuyen,
-          end_dau,
-          detection_status,
-          detection_date,
-          verified_by,
-          verified_area,
-          verification_reason,
-          verification_notes,
-          created_at,
-          updated_at,
-          -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
-          ST_Area(geom::geography) as dtich,
-          COALESCE(verified_area, 0) as "dtichXM",
-          ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x_coordinate,
-          ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y_coordinate,
-          -- ✅ FIX: Thêm x, y shorthand cho Table.jsx
-          ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x,
-          ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y,
-          ST_AsGeoJSON(ST_Transform(geom, 4326)) as geometry
-        FROM ${tableName}
-        WHERE geom IS NOT NULL
-      `;
+      // ✅ FIX: Cho restricted users, dùng spatial join với admin_db để filter trực tiếp trong SQL
+      // Điều này nhanh hơn nhiều so với load tất cả rồi filter trong JS
+      const effectiveXa = req.headers['x-user-xa'] ? decodeURIComponent(req.headers['x-user-xa']) : null;
+      const effectiveTk = req.headers['x-user-tieukhu'] ? decodeURIComponent(req.headers['x-user-tieukhu']) : null;
+      const effectiveKhoanh = req.headers['x-user-khoanh'] ? decodeURIComponent(req.headers['x-user-khoanh']) : null;
 
-      // Add date filter - ✅ FIXED: Sử dụng start_dau thay vì end_sau vì end_sau rỗng
-      if (days) {
-        query += ` AND start_dau::date >= CURRENT_DATE - INTERVAL '${parseInt(days)} days'`;
+      if (!isAdminOrLeaderForCache && effectiveXa) {
+        // ✅ Query với spatial filter cho restricted user có xa
+        // Bước 1: Lấy union geometry từ admin_db cho khu vực xa
+        logger.info('Using spatial filter query for restricted user', { effectiveXa, effectiveTk, effectiveKhoanh });
+
+        try {
+          const { Pool } = require('pg');
+          adminDb = new Pool({
+            host: process.env.DB_HOST || 'localhost',
+            port: process.env.DB_PORT || 5432,
+            user: process.env.DB_USER || 'postgres',
+            password: process.env.DB_PASSWORD,
+            database: 'admin_db',
+            max: 5,
+            idleTimeoutMillis: 10000,
+            connectionTimeoutMillis: 10000
+          });
+
+          // Lấy union geometry của tất cả khu vực trong xa
+          let adminQuery = `
+            SELECT ST_AsText(ST_Union(geom)) as union_geom
+            FROM sonla_tkkl
+            WHERE xa = $1
+          `;
+          const adminParams = [effectiveXa];
+
+          if (effectiveTk) {
+            adminQuery = `
+              SELECT ST_AsText(ST_Union(geom)) as union_geom
+              FROM sonla_tkkl
+              WHERE xa = $1 AND tieukhu = $2
+            `;
+            adminParams.push(effectiveTk);
+          }
+          if (effectiveKhoanh) {
+            adminQuery = `
+              SELECT ST_AsText(ST_Union(geom)) as union_geom
+              FROM sonla_tkkl
+              WHERE xa = $1 AND tieukhu = $2 AND khoanh = $3
+            `;
+            adminParams.push(effectiveKhoanh);
+          }
+
+          const adminResult = await adminDb.query(adminQuery, adminParams);
+
+          if (adminResult.rows[0]?.union_geom) {
+            const unionGeomWKT = adminResult.rows[0].union_geom;
+
+            // Bước 2: Query gis_db với spatial filter
+            query = `
+              SELECT
+                gid,
+                start_sau,
+                area,
+                start_dau,
+                end_sau,
+                mahuyen,
+                end_dau,
+                detection_status,
+                detection_date,
+                verified_by,
+                verified_area,
+                verification_reason,
+                verification_notes,
+                created_at,
+                updated_at,
+                ST_Area(geom::geography) as dtich,
+                COALESCE(verified_area, 0) as "dtichXM",
+                ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x_coordinate,
+                ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y_coordinate,
+                ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x,
+                ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y,
+                ST_AsGeoJSON(ST_Transform(geom, 4326)) as geometry,
+                '${effectiveXa.replace(/'/g, "''")}' as xa,
+                ${effectiveTk ? `'${effectiveTk.replace(/'/g, "''")}'` : 'NULL'} as tk,
+                ${effectiveKhoanh ? `'${effectiveKhoanh.replace(/'/g, "''")}'` : 'NULL'} as khoanh
+              FROM ${tableName}
+              WHERE geom IS NOT NULL
+                AND ST_Intersects(geom, ST_GeomFromText('${unionGeomWKT}', 4326))
+            `;
+
+            if (days) {
+              query += ` AND start_dau::date >= CURRENT_DATE - INTERVAL '${parseInt(days)} days'`;
+            }
+
+            query += ' ORDER BY start_dau DESC LIMIT 5000';
+            logger.info('Spatial filter query built successfully');
+
+          } else {
+            logger.warn('No geometry found for xa, returning empty', { effectiveXa });
+            // Return empty response
+            const emptyResponse = formatResponse(
+              true,
+              `No data available for area ${effectiveXa}`,
+              { type: 'FeatureCollection', features: [] },
+              { layer: layerName, cached: false }
+            );
+            return res.json(emptyResponse);
+          }
+
+        } catch (adminErr) {
+          logger.error('Failed to get admin geometry:', adminErr.message);
+          // Fallback: return empty for restricted user if admin query fails
+          const emptyResponse = formatResponse(
+            true,
+            `Unable to filter by area - please try again`,
+            { type: 'FeatureCollection', features: [] },
+            { layer: layerName, cached: false, error: adminErr.message }
+          );
+          return res.json(emptyResponse);
+        }
+
+      } else {
+        // ✅ Query đơn giản cho Admin/LanhDao hoặc user không có xa
+        query = `
+          SELECT
+            gid,
+            start_sau,
+            area,
+            start_dau,
+            end_sau,
+            mahuyen,
+            end_dau,
+            detection_status,
+            detection_date,
+            verified_by,
+            verified_area,
+            verification_reason,
+            verification_notes,
+            created_at,
+            updated_at,
+            ST_Area(geom::geography) as dtich,
+            COALESCE(verified_area, 0) as "dtichXM",
+            ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x_coordinate,
+            ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y_coordinate,
+            ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x,
+            ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y,
+            ST_AsGeoJSON(ST_Transform(geom, 4326)) as geometry
+          FROM ${tableName}
+          WHERE geom IS NOT NULL
+        `;
+
+        if (days) {
+          query += ` AND start_dau::date >= CURRENT_DATE - INTERVAL '${parseInt(days)} days'`;
+        }
+
+        query += ' ORDER BY start_dau DESC LIMIT 5000';
       }
-
-      query += ' ORDER BY start_dau DESC LIMIT 10000';
 
     } else {
       // Query mặc định cho các layer khác
@@ -138,20 +290,30 @@ exports.getLayerDataByPath = async (req, res, next) => {
       `;
     }
 
-    const result = await db.query(query);
+    const result = await db.query(query, queryParams);
 
-    // ✅ Nếu là deforestation-alerts, thêm admin info từ admin_db
-    if (layerName === 'deforestation-alerts' && result.rows.length > 0) {
+    // ✅ FIX: Kiểm tra xem result đã có xa từ spatial filter query chưa
+    // Nếu có thì không cần enrich thêm
+    const alreadyHasAdminInfo = result.rows.length > 0 && result.rows[0].xa !== undefined;
+
+    // ✅ FIX: Nếu Admin/LanhDao, skip admin info query (không cần filter) để tránh timeout
+    // Admin info chỉ cần cho restricted users để filter theo xa/tk/khoanh
+    const needsAdminInfo = !isAdminOrLeaderForCache && !alreadyHasAdminInfo;
+
+    // ✅ Nếu là deforestation-alerts VÀ cần admin info VÀ chưa có từ spatial filter
+    if (layerName === 'deforestation-alerts' && result.rows.length > 0 && needsAdminInfo) {
       try {
         const { Pool } = require('pg');
         adminDb = new Pool({
           host: process.env.DB_HOST || 'localhost',
-          port: process.env.DB_PORT || 5433,
+          port: process.env.DB_PORT || 5432,
           user: process.env.DB_USER || 'postgres',
           password: process.env.DB_PASSWORD,
           database: 'admin_db',
-          max: 5,
-          idleTimeoutMillis: 5000
+          max: 10,
+          idleTimeoutMillis: 30000,
+          connectionTimeoutMillis: 15000,
+          statement_timeout: 60000  // 60s timeout cho query
         });
 
         // Batch query admin info
@@ -246,27 +408,41 @@ exports.getLayerDataByPath = async (req, res, next) => {
     }
 
     // ✅ FIX: Apply scope filtering based on user headers
+    // Skip nếu đã filter trong spatial query (alreadyHasAdminInfo)
     const userRolesStr = req.headers['x-user-roles'] ? decodeURIComponent(req.headers['x-user-roles']) : '';
-    const userRoles = userRolesStr.split(',');
-    const isRestricted = !userRoles.includes('Admin') && !userRoles.includes('LanhDao');
+    const userRoles = userRolesStr.split(',').filter(r => r);
+    // Sử dụng cùng ADMIN_ROLES constant
+    const isRestricted = !userRoles.some(role => ADMIN_ROLES.includes(role));
 
-    if (isRestricted && layerName === 'deforestation-alerts') {
+    // ✅ FIX: Skip scope filter nếu đã filter bằng spatial query (result đã có xa)
+    if (isRestricted && layerName === 'deforestation-alerts' && !alreadyHasAdminInfo) {
       const effectiveXa = req.headers['x-user-xa'] ? decodeURIComponent(req.headers['x-user-xa']) : null;
       const effectiveTk = req.headers['x-user-tieukhu'] ? decodeURIComponent(req.headers['x-user-tieukhu']) : null;
       const effectiveKhoanh = req.headers['x-user-khoanh'] ? decodeURIComponent(req.headers['x-user-khoanh']) : null;
 
-      logger.info('Applying scope filter', { effectiveXa, effectiveTk, effectiveKhoanh, isRestricted });
+      logger.info('Applying scope filter (post-query)', { effectiveXa, effectiveTk, effectiveKhoanh, isRestricted });
 
-      // Filter rows by user scope
-      const originalCount = result.rows.length;
-      result.rows = result.rows.filter(row => {
-        if (effectiveXa && row.xa !== effectiveXa) return false;
-        if (effectiveTk && row.tk !== effectiveTk) return false;
-        if (effectiveKhoanh && row.khoanh !== effectiveKhoanh) return false;
-        return true;
-      });
+      // ✅ FIX: Nếu restricted user KHÔNG có bất kỳ scope nào → return empty data
+      if (!effectiveXa && !effectiveTk && !effectiveKhoanh) {
+        logger.warn('Restricted user without scope assigned, returning empty data', {
+          userId: req.headers['x-user-id'],
+          username: req.headers['x-user-username']
+        });
+        result.rows = [];  // Không cho phép xem data nếu chưa được gán khu vực quản lý
+      } else {
+        // Filter rows by user scope
+        const originalCount = result.rows.length;
+        result.rows = result.rows.filter(row => {
+          if (effectiveXa && row.xa !== effectiveXa) return false;
+          if (effectiveTk && row.tk !== effectiveTk) return false;
+          if (effectiveKhoanh && row.khoanh !== effectiveKhoanh) return false;
+          return true;
+        });
 
-      logger.info(`Scope filter applied: ${result.rows.length}/${originalCount} features after filtering`);
+        logger.info(`Scope filter applied: ${result.rows.length}/${originalCount} features after filtering`);
+      }
+    } else if (alreadyHasAdminInfo) {
+      logger.info('Skipping post-query scope filter - already filtered via spatial query', { count: result.rows.length });
     }
 
     const features = result.rows.map(row => {

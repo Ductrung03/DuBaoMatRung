@@ -89,7 +89,7 @@ export const GeoDataProvider = ({ children }) => {
           setLayerLoading(layer.key, true);
 
           // Use relative path to work with Vite proxy
-          let endpoint = `/api/layer-data/${mapLayers[layer.key].endpoint}`;
+          let endpoint = `/layer-data/${mapLayers[layer.key].endpoint}`;
 
           // ✅ SPECIAL: Cho deforestationAlerts, thêm param để chỉ lấy 3 tháng
           if (layer.key === 'deforestationAlerts') {
@@ -309,7 +309,7 @@ export const GeoDataProvider = ({ children }) => {
         toast.info(`🔄 Đang tải ${layer.name}...`, { autoClose: 2000 });
 
         const startTime = Date.now();
-        let endpoint = `/api/layer-data/${layer.endpoint}`;
+        let endpoint = `/layer-data/${layer.endpoint}`;
 
         // Special handling cho deforestationAlerts
         if (layerKey === 'deforestationAlerts') {

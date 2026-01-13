@@ -1652,3 +1652,15 @@
 {"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2026-01-12T14:57:26.129Z"}
 {"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2026-01-12 21:57:26"}
 {"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2026-01-12 21:57:26"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2026-01-12T15:36:13.324Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2026-01-12 22:36:13"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2026-01-12 22:36:13"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2026-01-12T23:43:04.298Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2026-01-13 06:43:04"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2026-01-13 06:43:04"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2026-01-13T00:12:08.804Z"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2026-01-13 07:12:08"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2026-01-13 07:12:08"}
+{"database":"gis_db","level":"info","message":"Database connection test successful","service":"report-service","timestamp":"2026-01-13T06:13:48.120Z"}
+{"level":"info","message":"Report Service running on port 3004","service":"report-service","timestamp":"2026-01-13 13:13:48"}
+{"level":"info","message":"Database pool initialized successfully","service":"report-service","timestamp":"2026-01-13 13:13:48"}

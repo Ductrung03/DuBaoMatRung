@@ -4694,3 +4694,559 @@
 {"batchEnd":300,"batchNumber":6,"batchStart":250,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-12 17:32:10","total":350}
 {"batchEnd":350,"batchNumber":7,"batchStart":300,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-12 17:32:10","total":350}
 {"errors":0,"filteredFeatures":60,"inserted":350,"level":"info","message":"GeoJSON import completed","service":"shapefile-controller","timestamp":"2026-01-12 17:32:10","totalFeatures":410,"validFeatures":350}
+{"level":"info","message":"Downloading GeoJSON from URL","service":"shapefile-controller","timestamp":"2026-01-13 08:27:36","url":"https://earthengine.googleapis.com/v1/projects/earthengine-legacy/tables/6717af462c51c71cfd84084d1fb5fcfe-4a0d56810b979f93139d766c2cb92fed:getFeatures"}
+{"contentType":"application/geo+json; charset=utf-8","level":"info","message":"GeoJSON response received","service":"shapefile-controller","status":200,"timestamp":"2026-01-13 08:27:50"}
+{"level":"info","message":"GeoJSON validated","service":"shapefile-controller","timestamp":"2026-01-13 08:27:50","totalFeatures":1336}
+{"level":"info","message":"Starting spatial intersection validation with sonla_hientrangrung table","service":"shapefile-controller","timestamp":"2026-01-13 08:27:50"}
+{"batchEnd":20,"batchNumber":1,"batchStart":0,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:50","total":1336}
+{"batchEnd":40,"batchNumber":2,"batchStart":20,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":60,"batchNumber":3,"batchStart":40,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":80,"batchNumber":4,"batchStart":60,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":100,"batchNumber":5,"batchStart":80,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":120,"batchNumber":6,"batchStart":100,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":140,"batchNumber":7,"batchStart":120,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":160,"batchNumber":8,"batchStart":140,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":180,"batchNumber":9,"batchStart":160,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":200,"batchNumber":10,"batchStart":180,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":220,"batchNumber":11,"batchStart":200,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":240,"batchNumber":12,"batchStart":220,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":260,"batchNumber":13,"batchStart":240,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":280,"batchNumber":14,"batchStart":260,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":300,"batchNumber":15,"batchStart":280,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":320,"batchNumber":16,"batchStart":300,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":340,"batchNumber":17,"batchStart":320,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":360,"batchNumber":18,"batchStart":340,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":380,"batchNumber":19,"batchStart":360,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:51","total":1336}
+{"batchEnd":400,"batchNumber":20,"batchStart":380,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":420,"batchNumber":21,"batchStart":400,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":440,"batchNumber":22,"batchStart":420,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":460,"batchNumber":23,"batchStart":440,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":480,"batchNumber":24,"batchStart":460,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":500,"batchNumber":25,"batchStart":480,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":520,"batchNumber":26,"batchStart":500,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":540,"batchNumber":27,"batchStart":520,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":560,"batchNumber":28,"batchStart":540,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":580,"batchNumber":29,"batchStart":560,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":600,"batchNumber":30,"batchStart":580,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":620,"batchNumber":31,"batchStart":600,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":640,"batchNumber":32,"batchStart":620,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":660,"batchNumber":33,"batchStart":640,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":680,"batchNumber":34,"batchStart":660,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":700,"batchNumber":35,"batchStart":680,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":720,"batchNumber":36,"batchStart":700,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":740,"batchNumber":37,"batchStart":720,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":760,"batchNumber":38,"batchStart":740,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":780,"batchNumber":39,"batchStart":760,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":800,"batchNumber":40,"batchStart":780,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":820,"batchNumber":41,"batchStart":800,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":840,"batchNumber":42,"batchStart":820,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":860,"batchNumber":43,"batchStart":840,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":880,"batchNumber":44,"batchStart":860,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":900,"batchNumber":45,"batchStart":880,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":920,"batchNumber":46,"batchStart":900,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":940,"batchNumber":47,"batchStart":920,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":960,"batchNumber":48,"batchStart":940,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":980,"batchNumber":49,"batchStart":960,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":1000,"batchNumber":50,"batchStart":980,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:52","total":1336}
+{"batchEnd":1020,"batchNumber":51,"batchStart":1000,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1040,"batchNumber":52,"batchStart":1020,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1060,"batchNumber":53,"batchStart":1040,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1080,"batchNumber":54,"batchStart":1060,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1100,"batchNumber":55,"batchStart":1080,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1120,"batchNumber":56,"batchStart":1100,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1140,"batchNumber":57,"batchStart":1120,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1160,"batchNumber":58,"batchStart":1140,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1180,"batchNumber":59,"batchStart":1160,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1200,"batchNumber":60,"batchStart":1180,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1220,"batchNumber":61,"batchStart":1200,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1240,"batchNumber":62,"batchStart":1220,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1260,"batchNumber":63,"batchStart":1240,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1280,"batchNumber":64,"batchStart":1260,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1300,"batchNumber":65,"batchStart":1280,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1320,"batchNumber":66,"batchStart":1300,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:53","total":1336}
+{"batchEnd":1336,"batchNumber":67,"batchStart":1320,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:54","total":1336}
+{"invalidFeatures":138,"level":"info","message":"Spatial intersection validation completed","service":"shapefile-controller","timestamp":"2026-01-13 08:27:54","totalFeatures":1336,"validFeatures":1198,"validationErrors":0}
+{"level":"info","message":"Starting insertion of valid features into son_la_mat_rung","service":"shapefile-controller","timestamp":"2026-01-13 08:27:54"}
+{"batchEnd":50,"batchNumber":1,"batchStart":0,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:54","total":1198}
+{"batchEnd":100,"batchNumber":2,"batchStart":50,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:55","total":1198}
+{"batchEnd":150,"batchNumber":3,"batchStart":100,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:55","total":1198}
+{"batchEnd":200,"batchNumber":4,"batchStart":150,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:55","total":1198}
+{"batchEnd":250,"batchNumber":5,"batchStart":200,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:56","total":1198}
+{"batchEnd":300,"batchNumber":6,"batchStart":250,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:56","total":1198}
+{"batchEnd":350,"batchNumber":7,"batchStart":300,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:56","total":1198}
+{"batchEnd":400,"batchNumber":8,"batchStart":350,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:57","total":1198}
+{"batchEnd":450,"batchNumber":9,"batchStart":400,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:57","total":1198}
+{"batchEnd":500,"batchNumber":10,"batchStart":450,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:57","total":1198}
+{"batchEnd":550,"batchNumber":11,"batchStart":500,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:57","total":1198}
+{"batchEnd":600,"batchNumber":12,"batchStart":550,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:57","total":1198}
+{"batchEnd":650,"batchNumber":13,"batchStart":600,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:58","total":1198}
+{"batchEnd":700,"batchNumber":14,"batchStart":650,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:58","total":1198}
+{"batchEnd":750,"batchNumber":15,"batchStart":700,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:58","total":1198}
+{"batchEnd":800,"batchNumber":16,"batchStart":750,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:58","total":1198}
+{"batchEnd":850,"batchNumber":17,"batchStart":800,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:58","total":1198}
+{"batchEnd":900,"batchNumber":18,"batchStart":850,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:27:59","total":1198}
+{"batchEnd":950,"batchNumber":19,"batchStart":900,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:28:01","total":1198}
+{"batchEnd":1000,"batchNumber":20,"batchStart":950,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:28:03","total":1198}
+{"batchEnd":1050,"batchNumber":21,"batchStart":1000,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:28:04","total":1198}
+{"batchEnd":1100,"batchNumber":22,"batchStart":1050,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:28:04","total":1198}
+{"batchEnd":1150,"batchNumber":23,"batchStart":1100,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:28:04","total":1198}
+{"batchEnd":1198,"batchNumber":24,"batchStart":1150,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:28:06","total":1198}
+{"errors":0,"filteredFeatures":138,"inserted":1198,"level":"info","message":"GeoJSON import completed","service":"shapefile-controller","timestamp":"2026-01-13 08:28:07","totalFeatures":1336,"validFeatures":1198}
+{"level":"info","message":"Downloading GeoJSON from URL","service":"shapefile-controller","timestamp":"2026-01-13 08:35:13","url":"https://earthengine.googleapis.com/v1/projects/earthengine-legacy/tables/5151a7f2a31ec0fbdd980ce959647f91-f528331a71cd38e443d7bf8fac392092:getFeatures"}
+{"contentType":"application/geo+json; charset=utf-8","level":"info","message":"GeoJSON response received","service":"shapefile-controller","status":200,"timestamp":"2026-01-13 08:35:23"}
+{"level":"info","message":"GeoJSON validated","service":"shapefile-controller","timestamp":"2026-01-13 08:35:23","totalFeatures":728}
+{"level":"info","message":"Starting spatial intersection validation with sonla_hientrangrung table","service":"shapefile-controller","timestamp":"2026-01-13 08:35:23"}
+{"batchEnd":20,"batchNumber":1,"batchStart":0,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:23","total":728}
+{"batchEnd":40,"batchNumber":2,"batchStart":20,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:24","total":728}
+{"batchEnd":60,"batchNumber":3,"batchStart":40,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:24","total":728}
+{"batchEnd":80,"batchNumber":4,"batchStart":60,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:24","total":728}
+{"batchEnd":100,"batchNumber":5,"batchStart":80,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:24","total":728}
+{"batchEnd":120,"batchNumber":6,"batchStart":100,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:24","total":728}
+{"batchEnd":140,"batchNumber":7,"batchStart":120,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:24","total":728}
+{"batchEnd":160,"batchNumber":8,"batchStart":140,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:24","total":728}
+{"batchEnd":180,"batchNumber":9,"batchStart":160,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:24","total":728}
+{"batchEnd":200,"batchNumber":10,"batchStart":180,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:24","total":728}
+{"batchEnd":220,"batchNumber":11,"batchStart":200,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:24","total":728}
+{"batchEnd":240,"batchNumber":12,"batchStart":220,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:24","total":728}
+{"batchEnd":260,"batchNumber":13,"batchStart":240,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":280,"batchNumber":14,"batchStart":260,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":300,"batchNumber":15,"batchStart":280,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":320,"batchNumber":16,"batchStart":300,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":340,"batchNumber":17,"batchStart":320,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":360,"batchNumber":18,"batchStart":340,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":380,"batchNumber":19,"batchStart":360,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":400,"batchNumber":20,"batchStart":380,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":420,"batchNumber":21,"batchStart":400,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":440,"batchNumber":22,"batchStart":420,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":460,"batchNumber":23,"batchStart":440,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":480,"batchNumber":24,"batchStart":460,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":500,"batchNumber":25,"batchStart":480,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":520,"batchNumber":26,"batchStart":500,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":540,"batchNumber":27,"batchStart":520,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:25","total":728}
+{"batchEnd":560,"batchNumber":28,"batchStart":540,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:26","total":728}
+{"batchEnd":580,"batchNumber":29,"batchStart":560,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:26","total":728}
+{"batchEnd":600,"batchNumber":30,"batchStart":580,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:26","total":728}
+{"batchEnd":620,"batchNumber":31,"batchStart":600,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:26","total":728}
+{"batchEnd":640,"batchNumber":32,"batchStart":620,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:26","total":728}
+{"batchEnd":660,"batchNumber":33,"batchStart":640,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:26","total":728}
+{"batchEnd":680,"batchNumber":34,"batchStart":660,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:26","total":728}
+{"batchEnd":700,"batchNumber":35,"batchStart":680,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:26","total":728}
+{"batchEnd":720,"batchNumber":36,"batchStart":700,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:26","total":728}
+{"batchEnd":728,"batchNumber":37,"batchStart":720,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:26","total":728}
+{"invalidFeatures":23,"level":"info","message":"Spatial intersection validation completed","service":"shapefile-controller","timestamp":"2026-01-13 08:35:26","totalFeatures":728,"validFeatures":705,"validationErrors":0}
+{"level":"info","message":"Starting insertion of valid features into son_la_mat_rung","service":"shapefile-controller","timestamp":"2026-01-13 08:35:26"}
+{"batchEnd":50,"batchNumber":1,"batchStart":0,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:26","total":705}
+{"batchEnd":100,"batchNumber":2,"batchStart":50,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:27","total":705}
+{"batchEnd":150,"batchNumber":3,"batchStart":100,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:27","total":705}
+{"batchEnd":200,"batchNumber":4,"batchStart":150,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:29","total":705}
+{"batchEnd":250,"batchNumber":5,"batchStart":200,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:29","total":705}
+{"batchEnd":300,"batchNumber":6,"batchStart":250,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:30","total":705}
+{"batchEnd":350,"batchNumber":7,"batchStart":300,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:34","total":705}
+{"batchEnd":400,"batchNumber":8,"batchStart":350,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:35","total":705}
+{"batchEnd":450,"batchNumber":9,"batchStart":400,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:35","total":705}
+{"batchEnd":500,"batchNumber":10,"batchStart":450,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:35","total":705}
+{"batchEnd":550,"batchNumber":11,"batchStart":500,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:37","total":705}
+{"batchEnd":600,"batchNumber":12,"batchStart":550,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:38","total":705}
+{"batchEnd":650,"batchNumber":13,"batchStart":600,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:38","total":705}
+{"batchEnd":700,"batchNumber":14,"batchStart":650,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:42","total":705}
+{"batchEnd":705,"batchNumber":15,"batchStart":700,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:35:42","total":705}
+{"errors":0,"filteredFeatures":23,"inserted":705,"level":"info","message":"GeoJSON import completed","service":"shapefile-controller","timestamp":"2026-01-13 08:35:42","totalFeatures":728,"validFeatures":705}
+{"level":"info","message":"Downloading GeoJSON from URL","service":"shapefile-controller","timestamp":"2026-01-13 08:40:14","url":"https://earthengine.googleapis.com/v1/projects/earthengine-legacy/tables/3967c0f5f253b3c99b10cf71ace08a2e-415952ab03e33db90cd10f824fed4892:getFeatures"}
+{"contentType":"application/geo+json; charset=utf-8","level":"info","message":"GeoJSON response received","service":"shapefile-controller","status":200,"timestamp":"2026-01-13 08:40:56"}
+{"level":"info","message":"GeoJSON validated","service":"shapefile-controller","timestamp":"2026-01-13 08:40:56","totalFeatures":979}
+{"level":"info","message":"Starting spatial intersection validation with sonla_hientrangrung table","service":"shapefile-controller","timestamp":"2026-01-13 08:40:56"}
+{"batchEnd":20,"batchNumber":1,"batchStart":0,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:56","total":979}
+{"batchEnd":40,"batchNumber":2,"batchStart":20,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":60,"batchNumber":3,"batchStart":40,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":80,"batchNumber":4,"batchStart":60,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":100,"batchNumber":5,"batchStart":80,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":120,"batchNumber":6,"batchStart":100,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":140,"batchNumber":7,"batchStart":120,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":160,"batchNumber":8,"batchStart":140,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":180,"batchNumber":9,"batchStart":160,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":200,"batchNumber":10,"batchStart":180,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":220,"batchNumber":11,"batchStart":200,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":240,"batchNumber":12,"batchStart":220,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":260,"batchNumber":13,"batchStart":240,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":280,"batchNumber":14,"batchStart":260,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":300,"batchNumber":15,"batchStart":280,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":320,"batchNumber":16,"batchStart":300,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":340,"batchNumber":17,"batchStart":320,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":360,"batchNumber":18,"batchStart":340,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":380,"batchNumber":19,"batchStart":360,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":400,"batchNumber":20,"batchStart":380,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":420,"batchNumber":21,"batchStart":400,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:57","total":979}
+{"batchEnd":440,"batchNumber":22,"batchStart":420,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:58","total":979}
+{"batchEnd":460,"batchNumber":23,"batchStart":440,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:58","total":979}
+{"batchEnd":480,"batchNumber":24,"batchStart":460,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:58","total":979}
+{"batchEnd":500,"batchNumber":25,"batchStart":480,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:58","total":979}
+{"batchEnd":520,"batchNumber":26,"batchStart":500,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:58","total":979}
+{"batchEnd":540,"batchNumber":27,"batchStart":520,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:58","total":979}
+{"batchEnd":560,"batchNumber":28,"batchStart":540,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:58","total":979}
+{"batchEnd":580,"batchNumber":29,"batchStart":560,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:58","total":979}
+{"batchEnd":600,"batchNumber":30,"batchStart":580,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:58","total":979}
+{"batchEnd":620,"batchNumber":31,"batchStart":600,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:58","total":979}
+{"batchEnd":640,"batchNumber":32,"batchStart":620,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:58","total":979}
+{"batchEnd":660,"batchNumber":33,"batchStart":640,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:58","total":979}
+{"batchEnd":680,"batchNumber":34,"batchStart":660,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:58","total":979}
+{"batchEnd":700,"batchNumber":35,"batchStart":680,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:59","total":979}
+{"batchEnd":720,"batchNumber":36,"batchStart":700,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:59","total":979}
+{"batchEnd":740,"batchNumber":37,"batchStart":720,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:59","total":979}
+{"batchEnd":760,"batchNumber":38,"batchStart":740,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:59","total":979}
+{"batchEnd":780,"batchNumber":39,"batchStart":760,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:59","total":979}
+{"batchEnd":800,"batchNumber":40,"batchStart":780,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:59","total":979}
+{"batchEnd":820,"batchNumber":41,"batchStart":800,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:59","total":979}
+{"batchEnd":840,"batchNumber":42,"batchStart":820,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:59","total":979}
+{"batchEnd":860,"batchNumber":43,"batchStart":840,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:59","total":979}
+{"batchEnd":880,"batchNumber":44,"batchStart":860,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:59","total":979}
+{"batchEnd":900,"batchNumber":45,"batchStart":880,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:59","total":979}
+{"batchEnd":920,"batchNumber":46,"batchStart":900,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:40:59","total":979}
+{"batchEnd":940,"batchNumber":47,"batchStart":920,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:00","total":979}
+{"batchEnd":960,"batchNumber":48,"batchStart":940,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:00","total":979}
+{"batchEnd":979,"batchNumber":49,"batchStart":960,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:00","total":979}
+{"invalidFeatures":150,"level":"info","message":"Spatial intersection validation completed","service":"shapefile-controller","timestamp":"2026-01-13 08:41:00","totalFeatures":979,"validFeatures":829,"validationErrors":0}
+{"level":"info","message":"Starting insertion of valid features into son_la_mat_rung","service":"shapefile-controller","timestamp":"2026-01-13 08:41:00"}
+{"batchEnd":50,"batchNumber":1,"batchStart":0,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:00","total":829}
+{"batchEnd":100,"batchNumber":2,"batchStart":50,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:01","total":829}
+{"batchEnd":150,"batchNumber":3,"batchStart":100,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:02","total":829}
+{"batchEnd":200,"batchNumber":4,"batchStart":150,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:02","total":829}
+{"batchEnd":250,"batchNumber":5,"batchStart":200,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:02","total":829}
+{"batchEnd":300,"batchNumber":6,"batchStart":250,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:03","total":829}
+{"batchEnd":350,"batchNumber":7,"batchStart":300,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:03","total":829}
+{"batchEnd":400,"batchNumber":8,"batchStart":350,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:04","total":829}
+{"batchEnd":450,"batchNumber":9,"batchStart":400,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:09","total":829}
+{"batchEnd":500,"batchNumber":10,"batchStart":450,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:09","total":829}
+{"batchEnd":550,"batchNumber":11,"batchStart":500,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:10","total":829}
+{"batchEnd":600,"batchNumber":12,"batchStart":550,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:10","total":829}
+{"batchEnd":650,"batchNumber":13,"batchStart":600,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:11","total":829}
+{"batchEnd":700,"batchNumber":14,"batchStart":650,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:11","total":829}
+{"batchEnd":750,"batchNumber":15,"batchStart":700,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:15","total":829}
+{"batchEnd":800,"batchNumber":16,"batchStart":750,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:17","total":829}
+{"batchEnd":829,"batchNumber":17,"batchStart":800,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:41:19","total":829}
+{"errors":0,"filteredFeatures":150,"inserted":829,"level":"info","message":"GeoJSON import completed","service":"shapefile-controller","timestamp":"2026-01-13 08:41:19","totalFeatures":979,"validFeatures":829}
+{"level":"info","message":"Downloading GeoJSON from URL","service":"shapefile-controller","timestamp":"2026-01-13 08:46:06","url":"https://earthengine.googleapis.com/v1/projects/earthengine-legacy/tables/edb45b731795262c4f4971d4ca7c9311-0e37f1f74ffac8e47d570adfb46ff1cb:getFeatures"}
+{"contentType":"application/geo+json; charset=utf-8","level":"info","message":"GeoJSON response received","service":"shapefile-controller","status":200,"timestamp":"2026-01-13 08:46:17"}
+{"level":"info","message":"GeoJSON validated","service":"shapefile-controller","timestamp":"2026-01-13 08:46:17","totalFeatures":869}
+{"level":"info","message":"Starting spatial intersection validation with sonla_hientrangrung table","service":"shapefile-controller","timestamp":"2026-01-13 08:46:17"}
+{"batchEnd":20,"batchNumber":1,"batchStart":0,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:17","total":869}
+{"batchEnd":40,"batchNumber":2,"batchStart":20,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:17","total":869}
+{"batchEnd":60,"batchNumber":3,"batchStart":40,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:17","total":869}
+{"batchEnd":80,"batchNumber":4,"batchStart":60,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:17","total":869}
+{"batchEnd":100,"batchNumber":5,"batchStart":80,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":120,"batchNumber":6,"batchStart":100,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":140,"batchNumber":7,"batchStart":120,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":160,"batchNumber":8,"batchStart":140,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":180,"batchNumber":9,"batchStart":160,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":200,"batchNumber":10,"batchStart":180,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":220,"batchNumber":11,"batchStart":200,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":240,"batchNumber":12,"batchStart":220,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":260,"batchNumber":13,"batchStart":240,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":280,"batchNumber":14,"batchStart":260,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":300,"batchNumber":15,"batchStart":280,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":320,"batchNumber":16,"batchStart":300,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":340,"batchNumber":17,"batchStart":320,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":360,"batchNumber":18,"batchStart":340,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":380,"batchNumber":19,"batchStart":360,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":400,"batchNumber":20,"batchStart":380,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":420,"batchNumber":21,"batchStart":400,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":440,"batchNumber":22,"batchStart":420,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":460,"batchNumber":23,"batchStart":440,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":480,"batchNumber":24,"batchStart":460,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":500,"batchNumber":25,"batchStart":480,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":520,"batchNumber":26,"batchStart":500,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":540,"batchNumber":27,"batchStart":520,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":560,"batchNumber":28,"batchStart":540,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":580,"batchNumber":29,"batchStart":560,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":600,"batchNumber":30,"batchStart":580,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":620,"batchNumber":31,"batchStart":600,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":640,"batchNumber":32,"batchStart":620,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":660,"batchNumber":33,"batchStart":640,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":680,"batchNumber":34,"batchStart":660,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":700,"batchNumber":35,"batchStart":680,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":720,"batchNumber":36,"batchStart":700,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":740,"batchNumber":37,"batchStart":720,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":760,"batchNumber":38,"batchStart":740,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:18","total":869}
+{"batchEnd":780,"batchNumber":39,"batchStart":760,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:19","total":869}
+{"batchEnd":800,"batchNumber":40,"batchStart":780,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:19","total":869}
+{"batchEnd":820,"batchNumber":41,"batchStart":800,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:19","total":869}
+{"batchEnd":840,"batchNumber":42,"batchStart":820,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:19","total":869}
+{"batchEnd":860,"batchNumber":43,"batchStart":840,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:19","total":869}
+{"batchEnd":869,"batchNumber":44,"batchStart":860,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:19","total":869}
+{"invalidFeatures":1,"level":"info","message":"Spatial intersection validation completed","service":"shapefile-controller","timestamp":"2026-01-13 08:46:19","totalFeatures":869,"validFeatures":868,"validationErrors":0}
+{"level":"info","message":"Starting insertion of valid features into son_la_mat_rung","service":"shapefile-controller","timestamp":"2026-01-13 08:46:19"}
+{"batchEnd":50,"batchNumber":1,"batchStart":0,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:19","total":868}
+{"batchEnd":100,"batchNumber":2,"batchStart":50,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:20","total":868}
+{"batchEnd":150,"batchNumber":3,"batchStart":100,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:20","total":868}
+{"batchEnd":200,"batchNumber":4,"batchStart":150,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:20","total":868}
+{"batchEnd":250,"batchNumber":5,"batchStart":200,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:20","total":868}
+{"batchEnd":300,"batchNumber":6,"batchStart":250,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:20","total":868}
+{"batchEnd":350,"batchNumber":7,"batchStart":300,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:20","total":868}
+{"batchEnd":400,"batchNumber":8,"batchStart":350,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:20","total":868}
+{"batchEnd":450,"batchNumber":9,"batchStart":400,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:20","total":868}
+{"batchEnd":500,"batchNumber":10,"batchStart":450,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:21","total":868}
+{"batchEnd":550,"batchNumber":11,"batchStart":500,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:21","total":868}
+{"batchEnd":600,"batchNumber":12,"batchStart":550,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:21","total":868}
+{"batchEnd":650,"batchNumber":13,"batchStart":600,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:21","total":868}
+{"batchEnd":700,"batchNumber":14,"batchStart":650,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:21","total":868}
+{"batchEnd":750,"batchNumber":15,"batchStart":700,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:22","total":868}
+{"batchEnd":800,"batchNumber":16,"batchStart":750,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:22","total":868}
+{"batchEnd":850,"batchNumber":17,"batchStart":800,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:22","total":868}
+{"batchEnd":868,"batchNumber":18,"batchStart":850,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:46:22","total":868}
+{"errors":0,"filteredFeatures":1,"inserted":868,"level":"info","message":"GeoJSON import completed","service":"shapefile-controller","timestamp":"2026-01-13 08:46:22","totalFeatures":869,"validFeatures":868}
+{"level":"info","message":"Downloading GeoJSON from URL","service":"shapefile-controller","timestamp":"2026-01-13 08:49:28","url":"https://earthengine.googleapis.com/v1/projects/earthengine-legacy/tables/615ecffa9bfa937fdc5dd01b081281ff-c995b77f9ebd11a293aa24b67c8ff57b:getFeatures"}
+{"contentType":"application/geo+json; charset=utf-8","level":"info","message":"GeoJSON response received","service":"shapefile-controller","status":200,"timestamp":"2026-01-13 08:50:09"}
+{"level":"info","message":"GeoJSON validated","service":"shapefile-controller","timestamp":"2026-01-13 08:50:09","totalFeatures":952}
+{"level":"info","message":"Starting spatial intersection validation with sonla_hientrangrung table","service":"shapefile-controller","timestamp":"2026-01-13 08:50:09"}
+{"batchEnd":20,"batchNumber":1,"batchStart":0,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:09","total":952}
+{"batchEnd":40,"batchNumber":2,"batchStart":20,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:10","total":952}
+{"batchEnd":60,"batchNumber":3,"batchStart":40,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:10","total":952}
+{"batchEnd":80,"batchNumber":4,"batchStart":60,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:10","total":952}
+{"batchEnd":100,"batchNumber":5,"batchStart":80,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:10","total":952}
+{"batchEnd":120,"batchNumber":6,"batchStart":100,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:10","total":952}
+{"batchEnd":140,"batchNumber":7,"batchStart":120,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:10","total":952}
+{"batchEnd":160,"batchNumber":8,"batchStart":140,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:10","total":952}
+{"batchEnd":180,"batchNumber":9,"batchStart":160,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:10","total":952}
+{"batchEnd":200,"batchNumber":10,"batchStart":180,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:10","total":952}
+{"batchEnd":220,"batchNumber":11,"batchStart":200,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:11","total":952}
+{"batchEnd":240,"batchNumber":12,"batchStart":220,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:11","total":952}
+{"batchEnd":260,"batchNumber":13,"batchStart":240,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:11","total":952}
+{"batchEnd":280,"batchNumber":14,"batchStart":260,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:11","total":952}
+{"batchEnd":300,"batchNumber":15,"batchStart":280,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:11","total":952}
+{"batchEnd":320,"batchNumber":16,"batchStart":300,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:11","total":952}
+{"batchEnd":340,"batchNumber":17,"batchStart":320,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:11","total":952}
+{"batchEnd":360,"batchNumber":18,"batchStart":340,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:11","total":952}
+{"batchEnd":380,"batchNumber":19,"batchStart":360,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:11","total":952}
+{"batchEnd":400,"batchNumber":20,"batchStart":380,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:11","total":952}
+{"batchEnd":420,"batchNumber":21,"batchStart":400,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:11","total":952}
+{"batchEnd":440,"batchNumber":22,"batchStart":420,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:11","total":952}
+{"batchEnd":460,"batchNumber":23,"batchStart":440,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:11","total":952}
+{"batchEnd":480,"batchNumber":24,"batchStart":460,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":500,"batchNumber":25,"batchStart":480,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":520,"batchNumber":26,"batchStart":500,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":540,"batchNumber":27,"batchStart":520,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":560,"batchNumber":28,"batchStart":540,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":580,"batchNumber":29,"batchStart":560,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":600,"batchNumber":30,"batchStart":580,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":620,"batchNumber":31,"batchStart":600,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":640,"batchNumber":32,"batchStart":620,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":660,"batchNumber":33,"batchStart":640,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":680,"batchNumber":34,"batchStart":660,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":700,"batchNumber":35,"batchStart":680,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":720,"batchNumber":36,"batchStart":700,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":740,"batchNumber":37,"batchStart":720,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:12","total":952}
+{"batchEnd":760,"batchNumber":38,"batchStart":740,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13","total":952}
+{"batchEnd":780,"batchNumber":39,"batchStart":760,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13","total":952}
+{"batchEnd":800,"batchNumber":40,"batchStart":780,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13","total":952}
+{"batchEnd":820,"batchNumber":41,"batchStart":800,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13","total":952}
+{"batchEnd":840,"batchNumber":42,"batchStart":820,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13","total":952}
+{"batchEnd":860,"batchNumber":43,"batchStart":840,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13","total":952}
+{"batchEnd":880,"batchNumber":44,"batchStart":860,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13","total":952}
+{"batchEnd":900,"batchNumber":45,"batchStart":880,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13","total":952}
+{"batchEnd":920,"batchNumber":46,"batchStart":900,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13","total":952}
+{"batchEnd":940,"batchNumber":47,"batchStart":920,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13","total":952}
+{"batchEnd":952,"batchNumber":48,"batchStart":940,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13","total":952}
+{"invalidFeatures":128,"level":"info","message":"Spatial intersection validation completed","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13","totalFeatures":952,"validFeatures":824,"validationErrors":0}
+{"level":"info","message":"Starting insertion of valid features into son_la_mat_rung","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13"}
+{"batchEnd":50,"batchNumber":1,"batchStart":0,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:13","total":824}
+{"batchEnd":100,"batchNumber":2,"batchStart":50,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:14","total":824}
+{"batchEnd":150,"batchNumber":3,"batchStart":100,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:15","total":824}
+{"batchEnd":200,"batchNumber":4,"batchStart":150,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:15","total":824}
+{"batchEnd":250,"batchNumber":5,"batchStart":200,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:23","total":824}
+{"batchEnd":300,"batchNumber":6,"batchStart":250,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:24","total":824}
+{"batchEnd":350,"batchNumber":7,"batchStart":300,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:24","total":824}
+{"batchEnd":400,"batchNumber":8,"batchStart":350,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:24","total":824}
+{"batchEnd":450,"batchNumber":9,"batchStart":400,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:25","total":824}
+{"batchEnd":500,"batchNumber":10,"batchStart":450,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:26","total":824}
+{"batchEnd":550,"batchNumber":11,"batchStart":500,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:26","total":824}
+{"batchEnd":600,"batchNumber":12,"batchStart":550,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:26","total":824}
+{"batchEnd":650,"batchNumber":13,"batchStart":600,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:34","total":824}
+{"batchEnd":700,"batchNumber":14,"batchStart":650,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:35","total":824}
+{"batchEnd":750,"batchNumber":15,"batchStart":700,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:35","total":824}
+{"batchEnd":800,"batchNumber":16,"batchStart":750,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:35","total":824}
+{"batchEnd":824,"batchNumber":17,"batchStart":800,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 08:50:36","total":824}
+{"errors":0,"filteredFeatures":128,"inserted":824,"level":"info","message":"GeoJSON import completed","service":"shapefile-controller","timestamp":"2026-01-13 08:50:36","totalFeatures":952,"validFeatures":824}
+{"level":"info","message":"Downloading GeoJSON from URL","service":"shapefile-controller","timestamp":"2026-01-13 09:01:52","url":"https://earthengine.googleapis.com/v1/projects/earthengine-legacy/tables/5019f225492bd0e29dfaf97e3e51fd6d-2bed3201132c3d89f46567d448660b91:getFeatures"}
+{"contentType":"application/geo+json; charset=utf-8","level":"info","message":"GeoJSON response received","service":"shapefile-controller","status":200,"timestamp":"2026-01-13 09:02:34"}
+{"level":"info","message":"GeoJSON validated","service":"shapefile-controller","timestamp":"2026-01-13 09:02:34","totalFeatures":641}
+{"level":"info","message":"Starting spatial intersection validation with sonla_hientrangrung table","service":"shapefile-controller","timestamp":"2026-01-13 09:02:34"}
+{"batchEnd":20,"batchNumber":1,"batchStart":0,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:34","total":641}
+{"batchEnd":40,"batchNumber":2,"batchStart":20,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":60,"batchNumber":3,"batchStart":40,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":80,"batchNumber":4,"batchStart":60,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":100,"batchNumber":5,"batchStart":80,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":120,"batchNumber":6,"batchStart":100,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":140,"batchNumber":7,"batchStart":120,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":160,"batchNumber":8,"batchStart":140,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":180,"batchNumber":9,"batchStart":160,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":200,"batchNumber":10,"batchStart":180,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":220,"batchNumber":11,"batchStart":200,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":240,"batchNumber":12,"batchStart":220,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":260,"batchNumber":13,"batchStart":240,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":280,"batchNumber":14,"batchStart":260,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":300,"batchNumber":15,"batchStart":280,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":320,"batchNumber":16,"batchStart":300,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":340,"batchNumber":17,"batchStart":320,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":360,"batchNumber":18,"batchStart":340,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":380,"batchNumber":19,"batchStart":360,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":400,"batchNumber":20,"batchStart":380,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":420,"batchNumber":21,"batchStart":400,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":440,"batchNumber":22,"batchStart":420,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":460,"batchNumber":23,"batchStart":440,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":480,"batchNumber":24,"batchStart":460,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":500,"batchNumber":25,"batchStart":480,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":520,"batchNumber":26,"batchStart":500,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":540,"batchNumber":27,"batchStart":520,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":560,"batchNumber":28,"batchStart":540,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":580,"batchNumber":29,"batchStart":560,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":600,"batchNumber":30,"batchStart":580,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":620,"batchNumber":31,"batchStart":600,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":640,"batchNumber":32,"batchStart":620,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"batchEnd":641,"batchNumber":33,"batchStart":640,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":641}
+{"invalidFeatures":170,"level":"info","message":"Spatial intersection validation completed","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","totalFeatures":641,"validFeatures":471,"validationErrors":0}
+{"level":"info","message":"Starting insertion of valid features into son_la_mat_rung","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35"}
+{"batchEnd":50,"batchNumber":1,"batchStart":0,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:35","total":471}
+{"batchEnd":100,"batchNumber":2,"batchStart":50,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:36","total":471}
+{"batchEnd":150,"batchNumber":3,"batchStart":100,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:36","total":471}
+{"batchEnd":200,"batchNumber":4,"batchStart":150,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:37","total":471}
+{"batchEnd":250,"batchNumber":5,"batchStart":200,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:37","total":471}
+{"batchEnd":300,"batchNumber":6,"batchStart":250,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:37","total":471}
+{"batchEnd":350,"batchNumber":7,"batchStart":300,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:37","total":471}
+{"batchEnd":400,"batchNumber":8,"batchStart":350,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:37","total":471}
+{"batchEnd":450,"batchNumber":9,"batchStart":400,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:38","total":471}
+{"batchEnd":471,"batchNumber":10,"batchStart":450,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:02:38","total":471}
+{"errors":0,"filteredFeatures":170,"inserted":471,"level":"info","message":"GeoJSON import completed","service":"shapefile-controller","timestamp":"2026-01-13 09:02:38","totalFeatures":641,"validFeatures":471}
+{"level":"info","message":"Downloading GeoJSON from URL","service":"shapefile-controller","timestamp":"2026-01-13 09:15:57","url":"https://earthengine.googleapis.com/v1/projects/earthengine-legacy/tables/5019f225492bd0e29dfaf97e3e51fd6d-b721f57631bb5b83ea2afa590f9c43ce:getFeatures"}
+{"contentType":"application/geo+json; charset=utf-8","level":"info","message":"GeoJSON response received","service":"shapefile-controller","status":200,"timestamp":"2026-01-13 09:16:01"}
+{"level":"info","message":"GeoJSON validated","service":"shapefile-controller","timestamp":"2026-01-13 09:16:01","totalFeatures":641}
+{"level":"info","message":"Starting spatial intersection validation with sonla_hientrangrung table","service":"shapefile-controller","timestamp":"2026-01-13 09:16:01"}
+{"batchEnd":20,"batchNumber":1,"batchStart":0,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:01","total":641}
+{"batchEnd":40,"batchNumber":2,"batchStart":20,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:02","total":641}
+{"batchEnd":60,"batchNumber":3,"batchStart":40,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:02","total":641}
+{"batchEnd":80,"batchNumber":4,"batchStart":60,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:02","total":641}
+{"batchEnd":100,"batchNumber":5,"batchStart":80,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:02","total":641}
+{"batchEnd":120,"batchNumber":6,"batchStart":100,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:02","total":641}
+{"batchEnd":140,"batchNumber":7,"batchStart":120,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:02","total":641}
+{"batchEnd":160,"batchNumber":8,"batchStart":140,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:02","total":641}
+{"batchEnd":180,"batchNumber":9,"batchStart":160,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:02","total":641}
+{"batchEnd":200,"batchNumber":10,"batchStart":180,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":220,"batchNumber":11,"batchStart":200,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":240,"batchNumber":12,"batchStart":220,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":260,"batchNumber":13,"batchStart":240,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":280,"batchNumber":14,"batchStart":260,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":300,"batchNumber":15,"batchStart":280,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":320,"batchNumber":16,"batchStart":300,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":340,"batchNumber":17,"batchStart":320,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":360,"batchNumber":18,"batchStart":340,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":380,"batchNumber":19,"batchStart":360,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":400,"batchNumber":20,"batchStart":380,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":420,"batchNumber":21,"batchStart":400,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":440,"batchNumber":22,"batchStart":420,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":460,"batchNumber":23,"batchStart":440,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":480,"batchNumber":24,"batchStart":460,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":500,"batchNumber":25,"batchStart":480,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":520,"batchNumber":26,"batchStart":500,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":540,"batchNumber":27,"batchStart":520,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":560,"batchNumber":28,"batchStart":540,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":580,"batchNumber":29,"batchStart":560,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":600,"batchNumber":30,"batchStart":580,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":620,"batchNumber":31,"batchStart":600,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":640,"batchNumber":32,"batchStart":620,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"batchEnd":641,"batchNumber":33,"batchStart":640,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":641}
+{"invalidFeatures":170,"level":"info","message":"Spatial intersection validation completed","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","totalFeatures":641,"validFeatures":471,"validationErrors":0}
+{"level":"info","message":"Starting insertion of valid features into son_la_mat_rung","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03"}
+{"batchEnd":50,"batchNumber":1,"batchStart":0,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:03","total":471}
+{"batchEnd":100,"batchNumber":2,"batchStart":50,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:04","total":471}
+{"batchEnd":150,"batchNumber":3,"batchStart":100,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:04","total":471}
+{"batchEnd":200,"batchNumber":4,"batchStart":150,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:04","total":471}
+{"batchEnd":250,"batchNumber":5,"batchStart":200,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:05","total":471}
+{"batchEnd":300,"batchNumber":6,"batchStart":250,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:05","total":471}
+{"batchEnd":350,"batchNumber":7,"batchStart":300,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:05","total":471}
+{"batchEnd":400,"batchNumber":8,"batchStart":350,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:05","total":471}
+{"batchEnd":450,"batchNumber":9,"batchStart":400,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:05","total":471}
+{"batchEnd":471,"batchNumber":10,"batchStart":450,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:16:05","total":471}
+{"errors":0,"filteredFeatures":170,"inserted":471,"level":"info","message":"GeoJSON import completed","service":"shapefile-controller","timestamp":"2026-01-13 09:16:05","totalFeatures":641,"validFeatures":471}
+{"level":"info","message":"Downloading GeoJSON from URL","service":"shapefile-controller","timestamp":"2026-01-13 09:30:08","url":"https://earthengine.googleapis.com/v1/projects/earthengine-legacy/tables/17b9c3867b6bfe8f846a70fa7121d585-341b53450ad861db6905b75fd164c600:getFeatures"}
+{"contentType":"application/geo+json; charset=utf-8","level":"info","message":"GeoJSON response received","service":"shapefile-controller","status":200,"timestamp":"2026-01-13 09:30:12"}
+{"level":"info","message":"GeoJSON validated","service":"shapefile-controller","timestamp":"2026-01-13 09:30:12","totalFeatures":641}
+{"level":"info","message":"Starting spatial intersection validation with sonla_hientrangrung table","service":"shapefile-controller","timestamp":"2026-01-13 09:30:12"}
+{"batchEnd":20,"batchNumber":1,"batchStart":0,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:12","total":641}
+{"batchEnd":40,"batchNumber":2,"batchStart":20,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:13","total":641}
+{"batchEnd":60,"batchNumber":3,"batchStart":40,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:13","total":641}
+{"batchEnd":80,"batchNumber":4,"batchStart":60,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:13","total":641}
+{"batchEnd":100,"batchNumber":5,"batchStart":80,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":120,"batchNumber":6,"batchStart":100,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":140,"batchNumber":7,"batchStart":120,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":160,"batchNumber":8,"batchStart":140,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":180,"batchNumber":9,"batchStart":160,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":200,"batchNumber":10,"batchStart":180,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":220,"batchNumber":11,"batchStart":200,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":240,"batchNumber":12,"batchStart":220,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":260,"batchNumber":13,"batchStart":240,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":280,"batchNumber":14,"batchStart":260,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":300,"batchNumber":15,"batchStart":280,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":320,"batchNumber":16,"batchStart":300,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":340,"batchNumber":17,"batchStart":320,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":360,"batchNumber":18,"batchStart":340,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":380,"batchNumber":19,"batchStart":360,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":400,"batchNumber":20,"batchStart":380,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":420,"batchNumber":21,"batchStart":400,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":440,"batchNumber":22,"batchStart":420,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":460,"batchNumber":23,"batchStart":440,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":480,"batchNumber":24,"batchStart":460,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":500,"batchNumber":25,"batchStart":480,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":520,"batchNumber":26,"batchStart":500,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":540,"batchNumber":27,"batchStart":520,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":560,"batchNumber":28,"batchStart":540,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":580,"batchNumber":29,"batchStart":560,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":600,"batchNumber":30,"batchStart":580,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":620,"batchNumber":31,"batchStart":600,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":640,"batchNumber":32,"batchStart":620,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"batchEnd":641,"batchNumber":33,"batchStart":640,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":641}
+{"invalidFeatures":170,"level":"info","message":"Spatial intersection validation completed","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","totalFeatures":641,"validFeatures":471,"validationErrors":0}
+{"level":"info","message":"Starting insertion of valid features into son_la_mat_rung","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14"}
+{"batchEnd":50,"batchNumber":1,"batchStart":0,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:14","total":471}
+{"batchEnd":100,"batchNumber":2,"batchStart":50,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:15","total":471}
+{"batchEnd":150,"batchNumber":3,"batchStart":100,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:15","total":471}
+{"batchEnd":200,"batchNumber":4,"batchStart":150,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:16","total":471}
+{"batchEnd":250,"batchNumber":5,"batchStart":200,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:16","total":471}
+{"batchEnd":300,"batchNumber":6,"batchStart":250,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:16","total":471}
+{"batchEnd":350,"batchNumber":7,"batchStart":300,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:16","total":471}
+{"batchEnd":400,"batchNumber":8,"batchStart":350,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:17","total":471}
+{"batchEnd":450,"batchNumber":9,"batchStart":400,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:17","total":471}
+{"batchEnd":471,"batchNumber":10,"batchStart":450,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:30:17","total":471}
+{"errors":0,"filteredFeatures":170,"inserted":471,"level":"info","message":"GeoJSON import completed","service":"shapefile-controller","timestamp":"2026-01-13 09:30:17","totalFeatures":641,"validFeatures":471}
+{"level":"info","message":"Downloading GeoJSON from URL","service":"shapefile-controller","timestamp":"2026-01-13 09:34:00","url":"https://earthengine.googleapis.com/v1/projects/earthengine-legacy/tables/244cdb589a9db9195ed825cbebbbf547-2c85c474dbbefcf320c4c13adaa1b625:getFeatures"}
+{"contentType":"application/geo+json; charset=utf-8","level":"info","message":"GeoJSON response received","service":"shapefile-controller","status":200,"timestamp":"2026-01-13 09:34:03"}
+{"level":"info","message":"GeoJSON validated","service":"shapefile-controller","timestamp":"2026-01-13 09:34:03","totalFeatures":410}
+{"level":"info","message":"Starting spatial intersection validation with sonla_hientrangrung table","service":"shapefile-controller","timestamp":"2026-01-13 09:34:03"}
+{"batchEnd":20,"batchNumber":1,"batchStart":0,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:04","total":410}
+{"batchEnd":40,"batchNumber":2,"batchStart":20,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":60,"batchNumber":3,"batchStart":40,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":80,"batchNumber":4,"batchStart":60,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":100,"batchNumber":5,"batchStart":80,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":120,"batchNumber":6,"batchStart":100,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":140,"batchNumber":7,"batchStart":120,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":160,"batchNumber":8,"batchStart":140,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":180,"batchNumber":9,"batchStart":160,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":200,"batchNumber":10,"batchStart":180,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":220,"batchNumber":11,"batchStart":200,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":240,"batchNumber":12,"batchStart":220,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":260,"batchNumber":13,"batchStart":240,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":280,"batchNumber":14,"batchStart":260,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":300,"batchNumber":15,"batchStart":280,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":320,"batchNumber":16,"batchStart":300,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":340,"batchNumber":17,"batchStart":320,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":360,"batchNumber":18,"batchStart":340,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":380,"batchNumber":19,"batchStart":360,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":400,"batchNumber":20,"batchStart":380,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"batchEnd":410,"batchNumber":21,"batchStart":400,"level":"info","message":"Validating batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":410}
+{"invalidFeatures":60,"level":"info","message":"Spatial intersection validation completed","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","totalFeatures":410,"validFeatures":350,"validationErrors":0}
+{"level":"info","message":"Starting insertion of valid features into son_la_mat_rung","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05"}
+{"batchEnd":50,"batchNumber":1,"batchStart":0,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:05","total":350}
+{"batchEnd":100,"batchNumber":2,"batchStart":50,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:06","total":350}
+{"batchEnd":150,"batchNumber":3,"batchStart":100,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:06","total":350}
+{"batchEnd":200,"batchNumber":4,"batchStart":150,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:07","total":350}
+{"batchEnd":250,"batchNumber":5,"batchStart":200,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:07","total":350}
+{"batchEnd":300,"batchNumber":6,"batchStart":250,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:07","total":350}
+{"batchEnd":350,"batchNumber":7,"batchStart":300,"level":"info","message":"Inserting batch","service":"shapefile-controller","timestamp":"2026-01-13 09:34:07","total":350}
+{"errors":0,"filteredFeatures":60,"inserted":350,"level":"info","message":"GeoJSON import completed","service":"shapefile-controller","timestamp":"2026-01-13 09:34:07","totalFeatures":410,"validFeatures":350}

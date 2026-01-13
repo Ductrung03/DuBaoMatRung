@@ -166,16 +166,23 @@ const optionalAuth = (req, res, next) => {
       permissions: decoded.permissions || []
     };
 
-    req.headers['x-user-id'] = decoded.id;
-    req.headers['x-user-username'] = decoded.username;
+    // ✅ FIX: All headers MUST be strings for http-proxy-middleware
+    req.headers['x-user-id'] = String(decoded.id);
+    req.headers['x-user-username'] = String(decoded.username || '');
     // Encode roles to avoid invalid characters in headers (Vietnamese text)
     const rolesArray = decoded.roles ? decoded.roles.map(r => typeof r === 'object' ? r.name || r.id : r) : [];
     req.headers['x-user-roles'] = encodeURIComponent(rolesArray.join(','));
     req.headers['x-user-permissions'] = decoded.permissions ? decoded.permissions.join(',') : '';
-    // ✅ FIX: Forward location scope headers
-    req.headers['x-user-xa'] = decoded.xa ? encodeURIComponent(decoded.xa) : '';
-    req.headers['x-user-tieukhu'] = decoded.tieukhu ? encodeURIComponent(decoded.tieukhu) : '';
-    req.headers['x-user-khoanh'] = decoded.khoanh ? encodeURIComponent(decoded.khoanh) : '';
+    // ✅ FIX: Forward location scope headers (must be strings)
+    req.headers['x-user-xa'] = decoded.xa ? encodeURIComponent(String(decoded.xa)) : '';
+    req.headers['x-user-tieukhu'] = decoded.tieukhu ? encodeURIComponent(String(decoded.tieukhu)) : '';
+    req.headers['x-user-khoanh'] = decoded.khoanh ? encodeURIComponent(String(decoded.khoanh)) : '';
+
+    console.log('[OptionalAuth] Headers set:', {
+      'x-user-id': req.headers['x-user-id'],
+      'x-user-xa': req.headers['x-user-xa'],
+      'x-user-roles': req.headers['x-user-roles']
+    });
   } catch (error) {
     // Ignore errors for optional auth
     console.warn('Optional auth failed:', error.message);

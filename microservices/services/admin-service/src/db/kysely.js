@@ -13,9 +13,9 @@ function createKyselyAdminDb(connectionString) {
   const dialect = new PostgresDialect({
     pool: new Pool({
       connectionString: connectionString || process.env.ADMIN_DATABASE_URL,
-      max: 10,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000,
+      max: 30,                         // Tăng từ 10 → 30 để handle nhiều concurrent requests
+      idleTimeoutMillis: 60000,        // Tăng từ 30s → 60s
+      connectionTimeoutMillis: 15000,  // Tăng từ 5s → 15s để tránh timeout
     })
   });
 

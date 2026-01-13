@@ -330,10 +330,12 @@ app.use('/api/bao-cao',
 
 // Admin Service
 app.use('/api/dropdown',
+  authMiddleware.optionalAuth, // ✅ FIX: Add auth to decode JWT and extract user scope
   createProxy(logger, {
     target: process.env.ADMIN_SERVICE_URL || 'http://localhost:3005',
     pathRewrite: (path, req) => '/api/dropdown' + path,
-    serviceName: 'Admin Dropdown'
+    serviceName: 'Admin Dropdown',
+    forwardUserHeaders: true // ✅ FIX: Forward x-user-xa/tieukhu/khoanh headers
   })
 );
 

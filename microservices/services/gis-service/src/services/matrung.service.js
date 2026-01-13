@@ -510,6 +510,93 @@ class MatRungService {
       queryTime
     };
   }
+
+  /**
+   * Get mat rung data with spatial filter for restricted users
+   * @param {Object} params - Query parameters
+   * @param {string} params.spatialFilterWKT - WKT geometry for spatial filter
+   * @param {string} params.userXa - User's xa scope
+   * @param {string} params.userTk - User's tk scope
+   * @param {string} params.userKhoanh - User's khoanh scope
+   */
+  async getMatRungWithSpatialFilter({
+    fromDate, toDate, huyen, xa, tk, khoanh, churung, limit = 1000,
+    spatialFilterWKT, userXa, userTk, userKhoanh
+  }) {
+    logger.info('Loading mat rung data with spatial filter', { userXa, userTk, userKhoanh });
+
+    const hasUsers = await this.tableExists('users');
+
+    // No filters - return 12 months data within spatial boundary
+    let dateFilter = sql`m.end_sau::date >= CURRENT_DATE - INTERVAL '12 months'`;
+    if (fromDate && toDate) {
+      dateFilter = sql`m.end_sau::date BETWEEN ${fromDate}::date AND ${toDate}::date`;
+    } else if (fromDate) {
+      dateFilter = sql`m.end_sau::date >= ${fromDate}::date`;
+    } else if (toDate) {
+      dateFilter = sql`m.end_sau::date <= ${toDate}::date`;
+    }
+
+    let query = this.db
+      .selectFrom('son_la_mat_rung as m')
+      .select([
+        'm.gid',
+        'm.start_sau',
+        'm.area',
+        'm.start_dau',
+        'm.end_sau',
+        'm.mahuyen',
+        'm.end_dau',
+        'm.detection_status',
+        'm.detection_date',
+        'm.verified_by',
+        'm.verified_area',
+        'm.verification_reason',
+        'm.verification_notes',
+        sql`ST_X(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('x_coordinate'),
+        sql`ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('y_coordinate'),
+        sql`ST_Area(m.geom::geography)`.as('dtich'),
+        sql`COALESCE(m.verified_area, 0)`.as('dtichXM'),
+        sql`ST_AsGeoJSON(ST_Transform(ST_MakeValid(m.geom), 4326), 6)`.as('geometry'),
+        sql`NULL`.as('huyen'),
+        // ✅ Set xa/tk/khoanh from user scope (already filtered by spatial)
+        sql`${userXa}`.as('xa'),
+        sql`${userTk || null}`.as('tk'),
+        sql`${userKhoanh || null}`.as('khoanh')
+      ])
+      .where('m.geom', 'is not', null)
+      .where(sql`NOT ST_IsEmpty(m.geom)`)
+      .where(dateFilter)
+      // ✅ Spatial filter
+      .where(sql`ST_Intersects(m.geom, ST_GeomFromText(${spatialFilterWKT}, 4326))`)
+      .orderBy('m.end_sau', 'desc')
+      .orderBy('m.gid', 'desc')
+      .limit(parseInt(limit));
+
+    // Add optional filters
+    if (huyen) {
+      query = query.where('m.mahuyen', '=', huyen);
+    }
+
+    // Add user join if users table exists
+    if (hasUsers) {
+      query = query
+        .leftJoin('users as u', 'u.id', 'm.verified_by')
+        .select([
+          sql`u.full_name`.as('verified_by_name'),
+          sql`u.username`.as('verified_by_username')
+        ]);
+    } else {
+      query = query.select([
+        sql`NULL`.as('verified_by_name'),
+        sql`NULL`.as('verified_by_username')
+      ]);
+    }
+
+    const result = await query.execute();
+    // Không cần enrichWithAdminInfo vì đã có xa/tk/khoanh từ spatial filter
+    return result;
+  }
 }
 
 module.exports = MatRungService;

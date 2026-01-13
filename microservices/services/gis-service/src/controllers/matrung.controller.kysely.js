@@ -8,6 +8,9 @@ const MatRungService = require('../services/matrung.service');
 
 const logger = createLogger('matrung-controller-kysely');
 
+// ✅ FIX: Danh sách roles có toàn quyền xem dữ liệu (không cần filter theo khu vực)
+const ADMIN_ROLES = ['Công ty Fis', 'Chi cục kiểm lâm', 'Admin', 'LanhDao'];
+
 // Mapping huyện
 const HUYEN_MAPPING = {
   '01': 'Lào Cai',
@@ -91,8 +94,27 @@ exports.getMatRung = async (req, res, next) => {
     const kyselyDb = req.app.locals.kyselyDb;
     const redis = req.app.locals.redis;
 
-    // Build cache key
-    const cacheKey = `matrung:kysely:${JSON.stringify(req.query)}`;
+    // ✅ FIX: Đọc user scope từ headers
+    const userRolesStr = req.headers['x-user-roles'] ? decodeURIComponent(req.headers['x-user-roles']) : '';
+    const userRoles = userRolesStr.split(',').filter(r => r);
+    const isAdminOrLeader = userRoles.some(role => ADMIN_ROLES.includes(role));
+
+    const userXa = req.headers['x-user-xa'] ? decodeURIComponent(req.headers['x-user-xa']) : null;
+    const userTk = req.headers['x-user-tieukhu'] ? decodeURIComponent(req.headers['x-user-tieukhu']) : null;
+    const userKhoanh = req.headers['x-user-khoanh'] ? decodeURIComponent(req.headers['x-user-khoanh']) : null;
+
+    // ✅ FIX: Xác định user scope cho cache key
+    let userScopeKey;
+    if (isAdminOrLeader) {
+      userScopeKey = 'admin';
+    } else if (userXa || userTk || userKhoanh) {
+      userScopeKey = `scoped:${userXa || ''}:${userTk || ''}:${userKhoanh || ''}`;
+    } else {
+      userScopeKey = 'noscope';
+    }
+
+    // Build cache key với user scope
+    const cacheKey = `matrung:kysely:${userScopeKey}:${JSON.stringify(req.query)}`;
 
     // Try cache first
     const cached = await redis.get(cacheKey);
@@ -108,23 +130,80 @@ exports.getMatRung = async (req, res, next) => {
     // Create service instance
     const matRungService = new MatRungService(kyselyDb);
 
-    // Get data using Kysely
-    const rows = await matRungService.getMatRung({
-      fromDate,
-      toDate,
-      huyen,
-      xa,
-      tk,
-      khoanh,
-      churung,
-      limit
-    });
+    let rows;
 
-    logger.info(`Retrieved ${rows.length} son_la_mat_rung records`);
+    // ✅ FIX: Cho restricted users có xa, dùng spatial filter trực tiếp
+    if (!isAdminOrLeader && userXa) {
+      logger.info('Using spatial filter for restricted user', { userXa, userTk, userKhoanh });
+
+      // Lấy union geometry từ admin_db
+      const adminDbPool = matRungService.adminDb;
+      let adminQuery = `
+        SELECT ST_AsText(ST_Union(geom)) as union_geom
+        FROM sonla_tkkl
+        WHERE xa = $1
+      `;
+      const adminParams = [userXa];
+
+      if (userTk) {
+        adminQuery = `
+          SELECT ST_AsText(ST_Union(geom)) as union_geom
+          FROM sonla_tkkl
+          WHERE xa = $1 AND tieukhu = $2
+        `;
+        adminParams.push(userTk);
+      }
+
+      const adminResult = await adminDbPool.query(adminQuery, adminParams);
+
+      if (adminResult.rows[0]?.union_geom) {
+        // Dùng spatial filter trong getMatRung
+        rows = await matRungService.getMatRungWithSpatialFilter({
+          fromDate,
+          toDate,
+          huyen,
+          xa,
+          tk,
+          khoanh,
+          churung,
+          limit,
+          spatialFilterWKT: adminResult.rows[0].union_geom,
+          userXa,
+          userTk,
+          userKhoanh
+        });
+        logger.info(`Spatial filter applied: ${rows.length} records for ${userXa}`);
+      } else {
+        logger.warn('No geometry found for user scope', { userXa });
+        rows = [];
+      }
+    } else if (!isAdminOrLeader && !userXa && !userTk && !userKhoanh) {
+      // Restricted user không có scope
+      logger.warn('Restricted user without scope assigned, returning empty data', {
+        userId: req.headers['x-user-id'],
+        username: req.headers['x-user-username']
+      });
+      rows = [];
+    } else {
+      // Admin/LanhDao hoặc có query filters cụ thể
+      rows = await matRungService.getMatRung({
+        fromDate,
+        toDate,
+        huyen,
+        xa,
+        tk,
+        khoanh,
+        churung,
+        limit
+      });
+      logger.info(`Retrieved ${rows.length} son_la_mat_rung records`);
+    }
+
+    const filteredRows = rows;
 
     // ✅ Service đã join với sonla_tkkl để lấy xa, tk, khoanh
     // Không cần query thêm từ admin_db
-    const geoJSON = buildGeoJSON(rows);
+    const geoJSON = buildGeoJSON(filteredRows);
     const isDefault = !fromDate && !toDate && !huyen && !xa && !tk && !khoanh && !churung;
 
     // Cache for 5 minutes
@@ -159,7 +238,26 @@ exports.getAllMatRung = async (req, res, next) => {
     const kyselyDb = req.app.locals.kyselyDb;
     const redis = req.app.locals.redis;
 
-    const cacheKey = `matrung:kysely:all:${months}:${limit}`;
+    // ✅ FIX: Đọc user scope từ headers
+    const userRolesStr = req.headers['x-user-roles'] ? decodeURIComponent(req.headers['x-user-roles']) : '';
+    const userRoles = userRolesStr.split(',').filter(r => r);
+    const isAdminOrLeader = userRoles.some(role => ADMIN_ROLES.includes(role));
+
+    const userXa = req.headers['x-user-xa'] ? decodeURIComponent(req.headers['x-user-xa']) : null;
+    const userTk = req.headers['x-user-tieukhu'] ? decodeURIComponent(req.headers['x-user-tieukhu']) : null;
+    const userKhoanh = req.headers['x-user-khoanh'] ? decodeURIComponent(req.headers['x-user-khoanh']) : null;
+
+    // ✅ FIX: Xác định user scope cho cache key
+    let userScopeKey;
+    if (isAdminOrLeader) {
+      userScopeKey = 'admin';
+    } else if (userXa || userTk || userKhoanh) {
+      userScopeKey = `scoped:${userXa || ''}:${userTk || ''}:${userKhoanh || ''}`;
+    } else {
+      userScopeKey = 'noscope';
+    }
+
+    const cacheKey = `matrung:kysely:all:${userScopeKey}:${months}:${limit}`;
 
     // Try cache
     const cached = await redis.get(cacheKey);
@@ -174,7 +272,25 @@ exports.getAllMatRung = async (req, res, next) => {
 
     // Get data using Kysely
     const rows = await matRungService.getAllMatRung({ limit, months });
-    const geoJSON = buildGeoJSON(rows);
+
+    // ✅ FIX: Áp dụng scope filter cho restricted users
+    let filteredRows = rows;
+    if (!isAdminOrLeader) {
+      if (!userXa && !userTk && !userKhoanh) {
+        logger.warn('Restricted user without scope, returning empty data for getAllMatRung');
+        filteredRows = [];
+      } else {
+        filteredRows = rows.filter(row => {
+          if (userXa && row.xa !== userXa) return false;
+          if (userTk && row.tk !== userTk) return false;
+          if (userKhoanh && row.khoanh !== userKhoanh) return false;
+          return true;
+        });
+        logger.info(`getAllMatRung scope filter: ${filteredRows.length}/${rows.length} records`);
+      }
+    }
+
+    const geoJSON = buildGeoJSON(filteredRows);
 
     const response = {
       success: true,
@@ -309,6 +425,15 @@ exports.autoForecast = async (req, res, next) => {
 
     const kyselyDb = req.app.locals.kyselyDb;
 
+    // ✅ FIX: Đọc user scope từ headers
+    const userRolesStr = req.headers['x-user-roles'] ? decodeURIComponent(req.headers['x-user-roles']) : '';
+    const userRoles = userRolesStr.split(',').filter(r => r);
+    const isAdminOrLeader = userRoles.some(role => ADMIN_ROLES.includes(role));
+
+    const userXa = req.headers['x-user-xa'] ? decodeURIComponent(req.headers['x-user-xa']) : null;
+    const userTk = req.headers['x-user-tieukhu'] ? decodeURIComponent(req.headers['x-user-tieukhu']) : null;
+    const userKhoanh = req.headers['x-user-khoanh'] ? decodeURIComponent(req.headers['x-user-khoanh']) : null;
+
     logger.info('Auto forecast request', { year, month, period, fromDate, toDate });
 
     // Create service instance
@@ -319,7 +444,24 @@ exports.autoForecast = async (req, res, next) => {
 
     logger.info(`Auto forecast query completed in ${result.queryTime}ms, found ${result.rows.length} records`);
 
-    if (result.rows.length === 0) {
+    // ✅ FIX: Áp dụng scope filter cho restricted users
+    let filteredRows = result.rows;
+    if (!isAdminOrLeader) {
+      if (!userXa && !userTk && !userKhoanh) {
+        logger.warn('Restricted user without scope, returning empty data for autoForecast');
+        filteredRows = [];
+      } else {
+        filteredRows = result.rows.filter(row => {
+          if (userXa && row.xa !== userXa) return false;
+          if (userTk && row.tk !== userTk) return false;
+          if (userKhoanh && row.khoanh !== userKhoanh) return false;
+          return true;
+        });
+        logger.info(`autoForecast scope filter: ${filteredRows.length}/${result.rows.length} records`);
+      }
+    }
+
+    if (filteredRows.length === 0) {
       return res.json({
         success: true,
         message: `No data found for period ${fromDate} to ${toDate}`,
@@ -332,7 +474,7 @@ exports.autoForecast = async (req, res, next) => {
       });
     }
 
-    const geoJSON = buildGeoJSON(result.rows, {
+    const geoJSON = buildGeoJSON(filteredRows, {
       forecast_period: period,
       forecast_year: parseInt(year),
       forecast_month: parseInt(month)
