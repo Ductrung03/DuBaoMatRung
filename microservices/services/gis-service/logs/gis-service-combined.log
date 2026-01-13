@@ -9095,3 +9095,21 @@
 {"level":"info","message":"PostGIS database (gis_db) connected","service":"gis-service","timestamp":"2026-01-13 15:19:06"}
 {"level":"info","message":"Kysely Query Builder ready","service":"gis-service","timestamp":"2026-01-13 15:19:06"}
 {"level":"info","message":"Redis cache connected","service":"gis-service","timestamp":"2026-01-13 15:19:06"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/verification/mat-rung/1794/verify","service":"gis-service","timestamp":"2026-01-13 15:21:00","userId":"29"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-13 15:25:22","userId":"1"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2026-01-13 15:25:40","userId":"29"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2026-01-13 15:27:13","userId":"1"}
+{"ip":"66.132.153.119","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-13 15:33:13"}
+{"ip":"66.132.153.119","level":"info","message":"GET /","service":"gis-service","timestamp":"2026-01-13 15:33:17"}
+{"ip":"66.132.153.119","level":"info","message":"GET /security.txt","service":"gis-service","timestamp":"2026-01-13 15:33:24"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/layer-data/deforestation-alerts","service":"gis-service","timestamp":"2026-01-13 15:35:12","userId":"1"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2026-01-13 15:35:36","userId":"1"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2026-01-13 15:37:38","userId":"1"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2026-01-13 15:38:08","userId":"1"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2026-01-13 15:38:26","userId":"1"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2026-01-13 15:38:30","userId":"1"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2026-01-13 15:38:42","userId":"1"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/verification/mat-rung/14867/verify","service":"gis-service","timestamp":"2026-01-13 15:40:19","userId":"31"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2026-01-13 15:42:02","userId":"1"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/mat-rung/forecast-preview","service":"gis-service","timestamp":"2026-01-13 15:43:33","userId":"1"}
+{"ip":"127.0.0.1","level":"info","message":"GET /api/mat-rung/","service":"gis-service","timestamp":"2026-01-13 15:44:06","userId":"1"}

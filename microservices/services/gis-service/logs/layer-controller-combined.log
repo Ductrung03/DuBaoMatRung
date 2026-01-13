@@ -1543,3 +1543,10 @@
 {"level":"info","message":"Starting admin info enrichment for 5000 features","service":"layer-controller","timestamp":"2026-01-13 15:16:32"}
 {"level":"info","message":"Admin info enriched: 5000/5000 records in 4709ms","service":"layer-controller","timestamp":"2026-01-13 15:16:37"}
 {"level":"info","message":"Added admin info for 5000/5000 features","service":"layer-controller","timestamp":"2026-01-13 15:16:37"}
+{"authorization":"Bearer ***","layerName":"deforestation-alerts","level":"info","message":"🔍 DEBUG - Headers received:","service":"layer-controller","timestamp":"2026-01-13 15:25:22","x-user-id":"1","x-user-khoanh":"","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-tieukhu":"","x-user-username":"admin","x-user-xa":""}
+{"layerName":"deforestation-alerts","level":"info","message":"Loading layer data from database","service":"layer-controller","tableName":"son_la_mat_rung","timestamp":"2026-01-13 15:25:22"}
+{"level":"info","message":"Starting admin info enrichment for 5000 features","service":"layer-controller","timestamp":"2026-01-13 15:25:26"}
+{"level":"info","message":"Admin info enriched: 5000/5000 records in 3550ms","service":"layer-controller","timestamp":"2026-01-13 15:25:30"}
+{"level":"info","message":"Added admin info for 5000/5000 features","service":"layer-controller","timestamp":"2026-01-13 15:25:30"}
+{"authorization":"Bearer ***","layerName":"deforestation-alerts","level":"info","message":"🔍 DEBUG - Headers received:","service":"layer-controller","timestamp":"2026-01-13 15:35:12","x-user-id":"1","x-user-khoanh":"","x-user-roles":"C%C3%B4ng%20ty%20Fis","x-user-tieukhu":"","x-user-username":"admin","x-user-xa":""}
+{"layerName":"deforestation-alerts","level":"info","message":"Cache hit for layer data","service":"layer-controller","timestamp":"2026-01-13 15:35:22","userScope":"admin"}
