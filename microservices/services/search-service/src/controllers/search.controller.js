@@ -197,35 +197,43 @@ exports.searchMatRung = async (req, res, next) => {
       try {
         // Tạo temporary table với centroids
         // ✅ FIX: JOIN với sonla_tkkl để lấy xa, tieukhu, khoanh
-        const tempTableQuery = `
-          WITH centroids AS (
-            SELECT
-              unnest(ARRAY[${centroids.map((_, idx) => `$${idx + 1}::text`).join(',')}]) as point_wkt
-          )
-          SELECT
-            tk.xa,
-            tk.tieukhu,
-            tk.khoanh,
-            c.point_wkt as centroid_key
-          FROM centroids c
-          LEFT JOIN sonla_tkkl tk
-            ON ST_Intersects(tk.geom, ST_GeomFromText(c.point_wkt, 4326))
-        `;
+        // ✅ FIX: Fallback to sonla_rgx if sonla_tkkl misses
+        const BATCH_SIZE = 100;
 
-        const adminResult = await adminDb.query(tempTableQuery, centroids);
+        for (let i = 0; i < centroids.length; i += BATCH_SIZE) {
+          const batchCentroids = centroids.slice(i, i + BATCH_SIZE);
+          const tempTableQuery = `
+              WITH centroids AS (
+                SELECT
+                  unnest(ARRAY[${batchCentroids.map((_, idx) => `$${idx + 1}::text`).join(',')}]) as point_wkt
+              )
+              SELECT
+                COALESCE(tk.xa, rgx.xa) as xa,
+                tk.tieukhu,
+                tk.khoanh,
+                c.point_wkt as centroid_key
+              FROM centroids c
+              LEFT JOIN sonla_tkkl tk
+                ON ST_Intersects(tk.geom, ST_GeomFromText(c.point_wkt, 4326))
+              LEFT JOIN sonla_rgx rgx 
+                ON tk.xa IS NULL AND ST_Intersects(rgx.geom, ST_GeomFromText(c.point_wkt, 4326))
+            `;
 
-        // Map kết quả theo centroid
-        // ✅ FIX: Data trong sonla_tkkl đã là Unicode, KHÔNG cần convert
-        adminResult.rows.forEach(row => {
-          if (row.centroid_key) {
-            adminInfoMap[row.centroid_key] = {
-              huyen_name: null, // Không có thông tin huyện trong sonla_tkkl
-              xa_name: row.xa, // Đã là Unicode, không cần convert
-              tk: row.tieukhu,
-              khoanh: row.khoanh
-            };
-          }
-        });
+          const adminResult = await adminDb.query(tempTableQuery, batchCentroids);
+
+          // Map kết quả theo centroid
+          // ✅ FIX: Data trong sonla_tkkl đã là Unicode, KHÔNG cần convert
+          adminResult.rows.forEach(row => {
+            if (row.centroid_key) {
+              adminInfoMap[row.centroid_key] = {
+                huyen_name: null,
+                xa_name: row.xa,
+                tk: row.tieukhu,
+                khoanh: row.khoanh
+              };
+            }
+          });
+        }
 
         logger.info(`Retrieved admin info for ${Object.keys(adminInfoMap).length} locations`);
       } catch (err) {
@@ -234,7 +242,7 @@ exports.searchMatRung = async (req, res, next) => {
     }
 
     // ✅ Map kết quả với admin info
-    const features = result.rows.map((row) => {
+    let features = result.rows.map((row) => {
       const adminInfo = adminInfoMap[row.centroid_wkt] || {
         huyen_name: row.mahuyen,
         xa_name: null,
@@ -268,6 +276,18 @@ exports.searchMatRung = async (req, res, next) => {
         }
       };
     });
+
+    // ✅ FIX: Post-filter to remove boundary overlaps
+    if (effectiveXa) {
+      features = features.filter(f => f.properties.xa_name === effectiveXa);
+    }
+    // Note: search params use 'huyen', 'xa', but properties map filtering.
+    // 'req.query.xa' is mapped to 'effectiveXa'.
+    // If user filtered by 'tk' or 'khoanh' (not currently in search params but good practice)
+    // The search-service routes (lines 13) don't seem to extract tk/khoanh from req.query. 
+    // Checking lines 13: const { q, status, fromDate, toDate, limit = 100, huyen, xa, xacMinh } = req.query;
+    // Tk and Khoanh are NOT in req.query. 
+    // However, if the user requested filtering by Xa, we must ensure the result is in that Xa.
 
     const geoJSON = {
       type: 'FeatureCollection',

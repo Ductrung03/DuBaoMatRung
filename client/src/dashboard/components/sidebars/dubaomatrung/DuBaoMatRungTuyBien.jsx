@@ -56,7 +56,12 @@ const DuBaoMatRungTuyBien = () => {
       if (selectedKhoanh) queryParams.append('khoanh', selectedKhoanh);
 
       const res = await fetch(
-        `/api/mat-rung?${queryParams.toString()}`
+        `/api/mat-rung?${queryParams.toString()}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        }
       );
 
       if (!res.ok) {

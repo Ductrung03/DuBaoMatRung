@@ -201,12 +201,141 @@ class MatRungService {
 
   /**
    * Get mat rung data with filters
+   * ✅ FIX: Sử dụng spatial filter khi có xa/tk/khoanh thay vì post-filter
    */
   async getMatRung({ fromDate, toDate, huyen, xa, tk, khoanh, churung, limit = 1000 }) {
     const hasUsers = await this.tableExists('users');
 
-    // No filters - return 12 months data
-    if (!fromDate && !toDate && !huyen && !xa && !tk && !khoanh && !churung) {
+    // ✅ FIX: Nếu có xa/tk/khoanh, sử dụng spatial filter từ admin_db
+    if (xa || tk || khoanh) {
+      logger.info('Loading mat rung data with spatial filter (xa/tk/khoanh)', { fromDate, toDate, xa, tk, khoanh });
+
+      try {
+        // Lấy union geometry từ admin_db cho khu vực xa/tk/khoanh
+        let adminQuery = `SELECT ST_AsText(ST_Union(geom)) as union_geom FROM sonla_tkkl WHERE 1=1`;
+        const adminParams = [];
+
+        if (xa) {
+          adminParams.push(xa);
+          adminQuery = `SELECT ST_AsText(ST_Union(geom)) as union_geom FROM sonla_tkkl WHERE xa = $1`;
+        }
+        if (tk) {
+          adminParams.push(tk);
+          adminQuery = `SELECT ST_AsText(ST_Union(geom)) as union_geom FROM sonla_tkkl WHERE xa = $1 AND tieukhu = $2`;
+        }
+        if (khoanh) {
+          adminParams.push(khoanh);
+          adminQuery = `SELECT ST_AsText(ST_Union(geom)) as union_geom FROM sonla_tkkl WHERE xa = $1 AND tieukhu = $2 AND khoanh = $3`;
+        }
+
+        logger.info('Executing admin geometry query', { adminQuery: adminQuery.substring(0, 100), adminParams });
+        let adminResult = await this.adminDb.query(adminQuery, adminParams);
+
+        // ✅ FIX: Fallback to sonla_rgx if sonla_tkkl doesn't have this xa
+        if (!adminResult.rows[0]?.union_geom && xa && !tk && !khoanh) {
+          logger.info('No geometry in sonla_tkkl, trying sonla_rgx fallback', { xa });
+          const fallbackQuery = `SELECT ST_AsText(ST_Union(geom)) as union_geom FROM sonla_rgx WHERE xa = $1`;
+          adminResult = await this.adminDb.query(fallbackQuery, [xa]);
+        }
+
+        if (!adminResult.rows[0]?.union_geom) {
+          logger.warn('No geometry found for spatial filter in both tables', { xa, tk, khoanh });
+          return [];
+        }
+
+        const unionGeomWKT = adminResult.rows[0].union_geom;
+
+        // Build date filter 
+        let dateFilter = sql`m.end_sau::date >= CURRENT_DATE - INTERVAL '12 months'`;
+        if (fromDate && toDate) {
+          dateFilter = sql`m.start_dau >= ${fromDate} AND m.end_sau <= ${toDate}`;
+        } else if (fromDate) {
+          dateFilter = sql`m.start_dau >= ${fromDate}`;
+        } else if (toDate) {
+          dateFilter = sql`m.end_sau <= ${toDate}`;
+        }
+
+        let query = this.db
+          .selectFrom('son_la_mat_rung as m')
+          .select([
+            'm.gid',
+            'm.start_sau',
+            'm.area',
+            'm.start_dau',
+            'm.end_sau',
+            'm.mahuyen',
+            'm.end_dau',
+            'm.detection_status',
+            'm.detection_date',
+            'm.verified_by',
+            'm.verified_area',
+            'm.verification_reason',
+            'm.verification_notes',
+            sql`ST_X(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('x_coordinate'),
+            sql`ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('y_coordinate'),
+            sql`ST_Area(m.geom::geography)`.as('dtich'),
+            sql`COALESCE(m.verified_area, 0)`.as('dtichXM'),
+            sql`ST_AsGeoJSON(ST_Transform(ST_MakeValid(m.geom), 4326), 6)`.as('geometry'),
+            sql`NULL`.as('huyen'),
+            sql`NULL`.as('xa'),
+            sql`NULL`.as('tk'),
+            sql`NULL`.as('khoanh')
+          ])
+          .where('m.geom', 'is not', null)
+          .where(sql`NOT ST_IsEmpty(m.geom)`)
+          .where(dateFilter)
+          // ✅ SPATIAL FILTER: Lọc trực tiếp trong SQL
+          .where(sql`ST_Intersects(m.geom, ST_GeomFromText(${unionGeomWKT}, 4326))`)
+          .orderBy('m.end_sau', 'desc')
+          .orderBy('m.gid', 'desc')
+          .limit(parseInt(limit));
+
+        // Add user join if users table exists
+        if (hasUsers) {
+          query = query
+            .leftJoin('users as u', 'u.id', 'm.verified_by')
+            .select([
+              'u.full_name as verified_by_name',
+              'u.username as verified_by_username'
+            ]);
+        } else {
+          query = query.select([
+            sql`NULL`.as('verified_by_name'),
+            sql`NULL`.as('verified_by_username')
+          ]);
+        }
+
+        let result = await query.execute();
+        logger.info(`Spatial filter returned ${result.length} records for xa=${xa}, tk=${tk}, khoanh=${khoanh}`);
+
+        // ✅ Enrich với xa, tk, khoanh từ admin_db cho từng điểm
+        let enrichedResult = await this.enrichWithAdminInfo(result);
+
+        // ✅ FIX: Post-filter để chỉ giữ records có xa/tk/khoanh khớp chính xác
+        // Vì ST_Intersects có thể trả về records ở biên giới overlap sang xã khác
+        const beforeFilter = enrichedResult.length;
+        if (xa) {
+          enrichedResult = enrichedResult.filter(r => r.xa === xa);
+        }
+        if (tk) {
+          enrichedResult = enrichedResult.filter(r => r.tk === tk);
+        }
+        if (khoanh) {
+          enrichedResult = enrichedResult.filter(r => r.khoanh === khoanh);
+        }
+        logger.info(`Post-filter: ${enrichedResult.length}/${beforeFilter} records after exact match filter`);
+
+        return enrichedResult;
+
+      } catch (error) {
+        logger.error('Error in spatial filter query:', error.message);
+        // Fallback: return empty array on error
+        return [];
+      }
+    }
+
+    // No spatial filters - original logic
+    if (!fromDate && !toDate && !huyen && !churung) {
       logger.info('Loading mat rung data: 12 months default');
 
       let query = this.db
@@ -262,8 +391,8 @@ class MatRungService {
       return await this.enrichWithAdminInfo(result);
     }
 
-    // With filters
-    logger.info('Loading mat rung data with filters', { fromDate, toDate, huyen, xa });
+    // With date/huyen filters only (no spatial)
+    logger.info('Loading mat rung data with date filters', { fromDate, toDate, huyen });
 
     let query = this.db
       .selectFrom('son_la_mat_rung as m')
@@ -319,14 +448,7 @@ class MatRungService {
     let result = await query.execute();
 
     // ✅ Enrich với xa, tk, khoanh từ admin_db
-    result = await this.enrichWithAdminInfo(result);
-
-    // Filter by xa, tk, khoanh after enrichment
-    if (xa) result = result.filter(r => r.xa === xa);
-    if (tk) result = result.filter(r => r.tk === tk);
-    if (khoanh) result = result.filter(r => r.khoanh === khoanh);
-
-    return result;
+    return await this.enrichWithAdminInfo(result);
   }
 
   /**
@@ -559,10 +681,10 @@ class MatRungService {
         sql`COALESCE(m.verified_area, 0)`.as('dtichXM'),
         sql`ST_AsGeoJSON(ST_Transform(ST_MakeValid(m.geom), 4326), 6)`.as('geometry'),
         sql`NULL`.as('huyen'),
-        // ✅ Set xa/tk/khoanh from user scope (already filtered by spatial)
-        sql`${userXa}`.as('xa'),
-        sql`${userTk || null}`.as('tk'),
-        sql`${userKhoanh || null}`.as('khoanh')
+        // ✅ FIX: Set NULL để enrichWithAdminInfo lookup chính xác từ sonla_tkkl
+        sql`NULL`.as('xa'),
+        sql`NULL`.as('tk'),
+        sql`NULL`.as('khoanh')
       ])
       .where('m.geom', 'is not', null)
       .where(sql`NOT ST_IsEmpty(m.geom)`)
@@ -594,8 +716,8 @@ class MatRungService {
     }
 
     const result = await query.execute();
-    // Không cần enrichWithAdminInfo vì đã có xa/tk/khoanh từ spatial filter
-    return result;
+    // ✅ FIX: Enrich với xa, tk, khoanh từ admin_db cho từng điểm
+    return await this.enrichWithAdminInfo(result);
   }
 }
 

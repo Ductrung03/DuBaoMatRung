@@ -178,6 +178,8 @@ exports.getLayerDataByPath = async (req, res, next) => {
             const unionGeomWKT = adminResult.rows[0].union_geom;
 
             // Bước 2: Query gis_db với spatial filter
+            // ✅ FIX: Không set cố định xa/tk/khoanh từ user scope
+            // enrichWithAdminInfo sẽ lookup chính xác cho từng điểm
             query = `
               SELECT
                 gid,
@@ -201,10 +203,7 @@ exports.getLayerDataByPath = async (req, res, next) => {
                 ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y_coordinate,
                 ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x,
                 ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y,
-                ST_AsGeoJSON(ST_Transform(geom, 4326)) as geometry,
-                '${effectiveXa.replace(/'/g, "''")}' as xa,
-                ${effectiveTk ? `'${effectiveTk.replace(/'/g, "''")}'` : 'NULL'} as tk,
-                ${effectiveKhoanh ? `'${effectiveKhoanh.replace(/'/g, "''")}'` : 'NULL'} as khoanh
+                ST_AsGeoJSON(ST_Transform(geom, 4326)) as geometry
               FROM ${tableName}
               WHERE geom IS NOT NULL
                 AND ST_Intersects(geom, ST_GeomFromText('${unionGeomWKT}', 4326))
@@ -296,9 +295,9 @@ exports.getLayerDataByPath = async (req, res, next) => {
     // Nếu có thì không cần enrich thêm
     const alreadyHasAdminInfo = result.rows.length > 0 && result.rows[0].xa !== undefined;
 
-    // ✅ FIX: Nếu Admin/LanhDao, skip admin info query (không cần filter) để tránh timeout
-    // Admin info chỉ cần cho restricted users để filter theo xa/tk/khoanh
-    const needsAdminInfo = !isAdminOrLeaderForCache && !alreadyHasAdminInfo;
+    // ✅ FIX: Admin/LanhDao cũng cần admin info để hiển thị xa/tk/khoanh trong bảng
+    // Chỉ skip nếu đã có từ spatial filter query
+    const needsAdminInfo = !alreadyHasAdminInfo;
 
     // ✅ Nếu là deforestation-alerts VÀ cần admin info VÀ chưa có từ spatial filter
     if (layerName === 'deforestation-alerts' && result.rows.length > 0 && needsAdminInfo) {
@@ -313,51 +312,76 @@ exports.getLayerDataByPath = async (req, res, next) => {
           max: 10,
           idleTimeoutMillis: 30000,
           connectionTimeoutMillis: 15000,
-          statement_timeout: 60000  // 60s timeout cho query
+          statement_timeout: 120000  // 120s timeout cho query
         });
 
-        // Batch query admin info
-        const geometries = result.rows.map(row => row.geometry);
-        const placeholders = geometries.map((_, idx) => `$${idx + 1}`).join(',');
-
-        // Query admin info từ sonla_rgx và sonla_tkkl với centroid cho faster query
-        const adminQuery = `
-          WITH geoms AS (
-            SELECT
-              unnest(ARRAY[${placeholders}])::text as geom_json,
-              generate_series(1, ${geometries.length}) as idx
-          ),
-          centroids AS (
-            SELECT
-              idx,
-              ST_Centroid(ST_GeomFromGeoJSON(geom_json)) as centroid
-            FROM geoms
-          )
-          SELECT DISTINCT ON (c.idx)
-            c.idx,
-            rgx.xa,
-            tkkl.tieukhu as tk,
-            tkkl.khoanh
-          FROM centroids c
-          LEFT JOIN sonla_rgx rgx
-            ON ST_Intersects(rgx.geom, c.centroid)
-          LEFT JOIN sonla_tkkl tkkl
-            ON ST_Intersects(tkkl.geom, c.centroid)
-          ORDER BY c.idx
-        `;
-
-        const adminResult = await adminDb.query(adminQuery, geometries);
+        // ✅ FIX: Sử dụng point-based lookup với x_coordinate, y_coordinate
+        // Hiệu quả hơn nhiều so với ST_GeomFromGeoJSON
+        const BATCH_SIZE = 100;
         const adminInfoMap = {};
 
-        adminResult.rows.forEach(row => {
-          if (row.idx) {
-            adminInfoMap[row.idx - 1] = {
-              xa: row.xa || null,
-              tk: row.tk || null,
-              khoanh: row.khoanh || null
-            };
+        logger.info(`Starting admin info enrichment for ${result.rows.length} features`);
+        const enrichStartTime = Date.now();
+
+        for (let i = 0; i < result.rows.length; i += BATCH_SIZE) {
+          const batch = result.rows.slice(i, i + BATCH_SIZE);
+          const validPoints = [];
+          const pointIndexMap = [];
+
+          batch.forEach((row, batchIdx) => {
+            // Sử dụng x_coordinate và y_coordinate đã query sẵn
+            if (row.x_coordinate && row.y_coordinate &&
+              !isNaN(row.x_coordinate) && !isNaN(row.y_coordinate)) {
+              validPoints.push(`${row.x_coordinate},${row.y_coordinate}`);
+              pointIndexMap.push(i + batchIdx);
+            }
+          });
+
+          if (validPoints.length === 0) continue;
+
+          const adminQuery = `
+            WITH input_points AS (
+              SELECT
+                ordinality as idx,
+                ST_SetSRID(ST_MakePoint(
+                  NULLIF(split_part(coords, ',', 1), '')::float,
+                  NULLIF(split_part(coords, ',', 2), '')::float
+                ), 4326) as pt
+              FROM unnest($1::text[]) WITH ORDINALITY AS t(coords, ordinality)
+              WHERE coords IS NOT NULL AND coords != 'null,null' AND coords != ','
+            )
+            SELECT DISTINCT ON (g.idx)
+              g.idx,
+              COALESCE(t.xa, r.xa) as xa,
+              t.tieukhu as tk,
+              t.khoanh
+            FROM input_points g
+            LEFT JOIN sonla_tkkl t ON t.geom IS NOT NULL AND ST_Intersects(t.geom, g.pt)
+            LEFT JOIN sonla_rgx r ON t.xa IS NULL AND r.geom IS NOT NULL AND ST_Intersects(r.geom, g.pt)
+            WHERE g.pt IS NOT NULL
+            ORDER BY g.idx
+          `;
+
+          try {
+            const batchResult = await adminDb.query(adminQuery, [validPoints]);
+
+            batchResult.rows.forEach(row => {
+              if (row.idx && row.idx > 0 && row.idx <= pointIndexMap.length) {
+                const originalIdx = pointIndexMap[row.idx - 1];
+                adminInfoMap[originalIdx] = {
+                  xa: row.xa,
+                  tk: row.tk,
+                  khoanh: row.khoanh
+                };
+              }
+            });
+          } catch (batchErr) {
+            logger.warn(`Batch ${i}-${i + BATCH_SIZE} failed:`, batchErr.message);
           }
-        });
+        }
+
+        const enrichDuration = Date.now() - enrichStartTime;
+        logger.info(`Admin info enriched: ${Object.keys(adminInfoMap).length}/${result.rows.length} records in ${enrichDuration}ms`);
 
         // Get usernames from auth_db
         const userIds = [...new Set(result.rows.map(r => r.verified_by).filter(id => id))];
