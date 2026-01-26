@@ -17,11 +17,13 @@ import { toast } from "react-toastify";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType, BorderStyle, AlignmentType } from 'docx';
+import { useIsMobile } from "../../hooks/useMediaQuery";
 
 const ThongKeBaoCaoMatRung = () => {
   const { reportData, reportLoading, setReportData } = useReport();
   const location = useLocation();
   const reportRef = useRef(null); // Ref để lấy nội dung báo cáo
+  const isMobile = useIsMobile();
 
   // Lấy thông tin từ URL params
   const [reportParams, setReportParams] = useState({
@@ -37,6 +39,9 @@ const ThongKeBaoCaoMatRung = () => {
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [isExportingGeoJSON, setIsExportingGeoJSON] = useState(false);
+
+  // State for mobile table/card view toggle
+  const [viewMode, setViewMode] = useState('table');
 
   useEffect(() => {
     // Lấy params từ URL
@@ -121,8 +126,8 @@ const ThongKeBaoCaoMatRung = () => {
         new TableCell({ children: [new Paragraph({ text: "Lô cảnh báo", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
         new TableCell({ children: [new Paragraph({ text: "Tiểu khu", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
         new TableCell({ children: [new Paragraph({ text: "Khoảnh", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
-        new TableCell({ children: [new Paragraph({ text: "Tọa độ VN-2000 X", alignment: AlignmentType.CENTER })], width: { size: 13, type: WidthType.PERCENTAGE } }),
-        new TableCell({ children: [new Paragraph({ text: "Tọa độ VN-2000 Y", alignment: AlignmentType.CENTER })], width: { size: 13, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Tọa độ X", alignment: AlignmentType.CENTER })], width: { size: 13, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Tọa độ Y", alignment: AlignmentType.CENTER })], width: { size: 13, type: WidthType.PERCENTAGE } }),
         new TableCell({ children: [new Paragraph({ text: "Diện tích (ha)", alignment: AlignmentType.CENTER })], width: { size: 13, type: WidthType.PERCENTAGE } }),
       ];
 
@@ -472,17 +477,17 @@ const ThongKeBaoCaoMatRung = () => {
     }, 0) / 10000;
 
     return (
-      <div className="p-6 font-sans max-h-[calc(100vh-100px)] overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-center text-lg font-bold flex-1">
+      <div className="p-4 sm:p-6 font-sans max-h-[calc(100vh-100px)] overflow-y-auto">
+        <div className="mb-4">
+          <h2 className="text-center text-base sm:text-lg font-bold mb-3 sm:mb-4">
             {reportTitle}
           </h2>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 sm:justify-center">
             <button
               onClick={handleExportDocx}
               disabled={isExportingDocx}
-              className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm"
+              className="flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded text-sm w-full sm:w-auto"
               title="Xuất file Word"
             >
               {isExportingDocx ? (
@@ -501,7 +506,7 @@ const ThongKeBaoCaoMatRung = () => {
             <button
               onClick={handleExportPdf}
               disabled={isExportingPdf}
-              className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-sm"
+              className="flex items-center justify-center gap-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded text-sm w-full sm:w-auto"
               title="Xuất file PDF"
             >
               {isExportingPdf ? (
@@ -520,7 +525,7 @@ const ThongKeBaoCaoMatRung = () => {
             <button
               onClick={handleExportGeoJSON}
               disabled={isExportingGeoJSON}
-              className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded text-sm"
+              className="flex items-center justify-center gap-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded text-sm w-full sm:w-auto"
               title="Xuất file GeoJSON"
             >
               {isExportingGeoJSON ? (
@@ -538,9 +543,9 @@ const ThongKeBaoCaoMatRung = () => {
           </div>
         </div>
 
-        <div ref={reportRef} className="overflow-auto border border-gray-300 rounded shadow px-6 pt-2 pb-6">
-          <div className="text-sm mb-2">
-            <div className="flex justify-between font-semibold">
+        <div ref={reportRef} className="overflow-auto border border-gray-300 rounded shadow px-3 sm:px-6 pt-2 pb-4 sm:pb-6">
+          <div className="text-xs sm:text-sm mb-2">
+            <div className="flex flex-col sm:flex-row sm:justify-between font-semibold gap-1">
               <span>Tỉnh: Sơn La</span>
               <span>Xã: {reportData.length > 0 ? (reportData[0].properties.xa_name || convertTcvn3ToUnicode(reportData[0].properties.xa) || reportData[0].properties.maxa || '..........') : (reportParams.xa ? convertTcvn3ToUnicode(reportParams.xa) : '..........')}</span>
             </div>
@@ -553,85 +558,177 @@ const ThongKeBaoCaoMatRung = () => {
             </div>
           </div>
 
-          <table className="w-full border border-black text-sm text-center table-fixed">
-            <thead>
-              <tr>
-                <th className="border border-black px-2 py-1 w-12">TT</th>
-                <th className="border border-black px-2 py-1">Xã</th>
-                <th className="border border-black px-2 py-1">Lô cảnh báo</th>
-                <th className="border border-black px-2 py-1">Tiểu khu</th>
-                <th className="border border-black px-2 py-1">Khoảnh</th>
-                <th className="border border-black px-2 py-1">Tọa độ VN-2000<br />X</th>
-                <th className="border border-black px-2 py-1">Tọa độ VN-2000<br />Y</th>
-                <th className="border border-black px-2 py-1">Diện tích (ha)</th>
-                {isVerified && (
-                  <th className="border border-black px-2 py-1">Nguyên nhân</th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {reportData.map((item, idx) => (
-                <tr key={idx}>
-                  <td className="border border-black px-2 py-1">{idx + 1}</td>
-                  <td className="border border-black px-2 py-1">
-                    {item.properties.xa_name || (item.properties.xa ? convertTcvn3ToUnicode(item.properties.xa) : "") || item.properties.maxa || ""}
-                  </td>
-                  <td className="border border-black px-2 py-1">
-                    {item.properties.lo_canbao || (item.properties.gid ? `CB-${item.properties.gid}` : "")}
-                  </td>
-                  <td className="border border-black px-2 py-1">
-                    {item.properties.tk || item.properties.tieukhu || ""}
-                  </td>
-                  <td className="border border-black px-2 py-1">
-                    {item.properties.khoanh || ""}
-                  </td>
-                  <td className="border border-black px-2 py-1">
-                    {item.properties.x ? parseFloat(item.properties.x).toFixed(3) : ""}
-                  </td>
-                  <td className="border border-black px-2 py-1">
-                    {item.properties.y ? parseFloat(item.properties.y).toFixed(3) : ""}
-                  </td>
-                  <td className="border border-black px-2 py-1">
-                    {(() => {
-                      const areaField = isVerified ? (item.properties.dtichXM || item.properties.dtich_xm) : item.properties.dtich;
-                      // ✅ FIX: Return "0.0" if null/undefined
-                      const val = areaField || 0;
-                      return (val / 10000).toFixed(1);
-                    })()}
-                  </td>
+          {/* Mobile: Toggle between table and card view */}
+          {isMobile && (
+            <div className="flex gap-2 mb-3 border-b pb-2">
+              <button
+                onClick={() => setViewMode('table')}
+                className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
+                  viewMode === 'table'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                Bảng
+              </button>
+              <button
+                onClick={() => setViewMode('cards')}
+                className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
+                  viewMode === 'cards'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                Thẻ
+              </button>
+            </div>
+          )}
+
+          {/* Table View */}
+          {(!isMobile || viewMode === 'table') && (
+            <div className="overflow-x-auto -mx-3 sm:mx-0">
+              <table className="w-full border border-black text-xs sm:text-sm text-center table-fixed min-w-[800px]">
+              <thead>
+                <tr>
+                  <th className="border border-black px-1 sm:px-2 py-1 w-8 sm:w-12">TT</th>
+                  <th className="border border-black px-1 sm:px-2 py-1">Xã</th>
+                  <th className="border border-black px-1 sm:px-2 py-1">Lô cảnh báo</th>
+                  <th className="border border-black px-1 sm:px-2 py-1">Tiểu khu</th>
+                  <th className="border border-black px-1 sm:px-2 py-1">Khoảnh</th>
+                  <th className="border border-black px-1 sm:px-2 py-1">Tọa độ<br />X</th>
+                  <th className="border border-black px-1 sm:px-2 py-1">Tọa độ<br />Y</th>
+                  <th className="border border-black px-1 sm:px-2 py-1">Diện tích (ha)</th>
                   {isVerified && (
-                    <td className="border border-black px-2 py-1">
-                      {item.properties.verification_reason || item.properties.nguyennhan || item.properties.verification_notes || ""}
-                    </td>
+                    <th className="border border-black px-1 sm:px-2 py-1">Nguyên nhân</th>
                   )}
                 </tr>
+              </thead>
+              <tbody>
+                {reportData.map((item, idx) => (
+                  <tr key={idx}>
+                    <td className="border border-black px-1 sm:px-2 py-1">{idx + 1}</td>
+                    <td className="border border-black px-1 sm:px-2 py-1">
+                      {item.properties.xa_name || (item.properties.xa ? convertTcvn3ToUnicode(item.properties.xa) : "") || item.properties.maxa || ""}
+                    </td>
+                    <td className="border border-black px-1 sm:px-2 py-1">
+                      {item.properties.lo_canbao || (item.properties.gid ? `CB-${item.properties.gid}` : "")}
+                    </td>
+                    <td className="border border-black px-1 sm:px-2 py-1">
+                      {item.properties.tk || item.properties.tieukhu || ""}
+                    </td>
+                    <td className="border border-black px-1 sm:px-2 py-1">
+                      {item.properties.khoanh || ""}
+                    </td>
+                    <td className="border border-black px-1 sm:px-2 py-1">
+                      {item.properties.x ? parseFloat(item.properties.x).toFixed(3) : ""}
+                    </td>
+                    <td className="border border-black px-1 sm:px-2 py-1">
+                      {item.properties.y ? parseFloat(item.properties.y).toFixed(3) : ""}
+                    </td>
+                    <td className="border border-black px-1 sm:px-2 py-1">
+                      {(() => {
+                        const areaField = isVerified ? (item.properties.dtichXM || item.properties.dtich_xm) : item.properties.dtich;
+                        // ✅ FIX: Return "0.0" if null/undefined
+                        const val = areaField || 0;
+                        return (val / 10000).toFixed(1);
+                      })()}
+                    </td>
+                    {isVerified && (
+                      <td className="border border-black px-1 sm:px-2 py-1">
+                        {item.properties.verification_reason || item.properties.nguyennhan || item.properties.verification_notes || ""}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+
+                <tr className="font-bold">
+                  <td className="border border-black px-1 sm:px-2 py-1" colSpan={isVerified ? "8" : "7"}>
+                    Tổng {totalLots} lô
+                  </td>
+                  <td className="border border-black px-1 sm:px-2 py-1">
+                    {totalArea.toFixed(1)}
+                  </td>
+                  {isVerified && <td className="border border-black px-1 sm:px-2 py-1"></td>}
+                </tr>
+              </tbody>
+            </table>
+            </div>
+          )}
+
+          {/* Card View for Mobile */}
+          {isMobile && viewMode === 'cards' && (
+            <div className="space-y-3">
+              {reportData.map((item, idx) => (
+                <div key={idx} className="border border-gray-300 rounded-lg p-3 bg-white shadow-sm">
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="font-semibold text-blue-600">TT:</div>
+                    <div>{idx + 1}</div>
+
+                    <div className="font-semibold text-blue-600">Xã:</div>
+                    <div>{item.properties.xa_name || (item.properties.xa ? convertTcvn3ToUnicode(item.properties.xa) : "") || item.properties.maxa || ""}</div>
+
+                    <div className="font-semibold text-blue-600">Lô cảnh báo:</div>
+                    <div>{item.properties.lo_canbao || (item.properties.gid ? `CB-${item.properties.gid}` : "")}</div>
+
+                    <div className="font-semibold text-blue-600">Tiểu khu:</div>
+                    <div>{item.properties.tk || item.properties.tieukhu || ""}</div>
+
+                    <div className="font-semibold text-blue-600">Khoảnh:</div>
+                    <div>{item.properties.khoanh || ""}</div>
+
+                    <div className="font-semibold text-blue-600">Tọa độ X:</div>
+                    <div>{item.properties.x ? parseFloat(item.properties.x).toFixed(3) : ""}</div>
+
+                    <div className="font-semibold text-blue-600">Tọa độ Y:</div>
+                    <div>{item.properties.y ? parseFloat(item.properties.y).toFixed(3) : ""}</div>
+
+                    <div className="font-semibold text-blue-600">Diện tích (ha):</div>
+                    <div>
+                      {(() => {
+                        const areaField = isVerified ? (item.properties.dtichXM || item.properties.dtich_xm) : item.properties.dtich;
+                        const val = areaField || 0;
+                        return (val / 10000).toFixed(1);
+                      })()}
+                    </div>
+
+                    {isVerified && (
+                      <>
+                        <div className="font-semibold text-blue-600">Nguyên nhân:</div>
+                        <div>{item.properties.verification_reason || item.properties.nguyennhan || item.properties.verification_notes || ""}</div>
+                      </>
+                    )}
+                  </div>
+                </div>
               ))}
 
-              <tr className="font-bold">
-                <td className="border border-black px-2 py-1" colSpan={isVerified ? "8" : "7"}>
-                  Tổng {totalLots} lô
-                </td>
-                <td className="border border-black px-2 py-1">
-                  {totalArea.toFixed(1)}
-                </td>
-                {isVerified && <td className="border border-black px-2 py-1"></td>}
-              </tr>
-            </tbody>
-          </table>
+              {/* Total summary card */}
+              <div className="border border-blue-600 rounded-lg p-3 bg-blue-50 font-bold">
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="text-blue-600">Tổng số lô:</div>
+                  <div>{totalLots} lô</div>
 
-          <div className="flex justify-between mt-6 text-sm px-2">
+                  <div className="text-blue-600">Tổng diện tích:</div>
+                  <div>{totalArea.toFixed(1)} ha</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mt-4 sm:mt-6 text-xs sm:text-sm px-2">
             <div>
               <div className="mb-2">
                 <strong>Người tổng hợp</strong>
               </div>
-              <div className="text-xs text-gray-600">
-                Lưu ý:<br />
-                + Diện tích tính từ geometry, lấy 1 chữ số thập phân<br />
-                + Dòng tổng: tính toán tổng số lô và tổng diện tích<br />
-                + Tọa độ X,Y làm tròn 3 chữ số thập phân
-              </div>
+              {!isMobile && (
+                <div className="text-xs text-gray-600">
+                  Lưu ý:<br />
+                  + Diện tích tính từ geometry, lấy 1 chữ số thập phân<br />
+                  + Dòng tổng: tính toán tổng số lô và tổng diện tích<br />
+                  + Tọa độ X,Y làm tròn 3 chữ số thập phân
+                </div>
+              )}
             </div>
-            <div className="text-right">
+            <div className="text-left sm:text-right">
               <div>
                 Sơn La, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
               </div>
@@ -661,13 +758,13 @@ const ThongKeBaoCaoMatRung = () => {
     }));
 
     return (
-      <div className="p-6 font-sans max-h-[calc(100vh-100px)] overflow-y-auto">
-        <h2 className="text-center text-lg font-bold mb-4">
+      <div className="p-4 sm:p-6 font-sans max-h-[calc(100vh-100px)] overflow-y-auto">
+        <h2 className="text-center text-base sm:text-lg font-bold mb-3 sm:mb-4">
           THỐNG KÊ KẾT QUẢ DỰ BÁO MẤT RỪNG
         </h2>
 
         {/* Hiển thị thông tin từ params thực tế */}
-        <div className="text-center text-sm mb-4 bg-gray-50 p-3 rounded">
+        <div className="text-center text-xs sm:text-sm mb-3 sm:mb-4 bg-gray-50 p-3 rounded">
           <div className="font-semibold">
             Tỉnh: Sơn La |
             Từ ngày: {formatDate(reportParams.fromDate)} -
@@ -681,23 +778,23 @@ const ThongKeBaoCaoMatRung = () => {
             </div>
           )}
           {/* ✅ Hiển thị loại báo cáo */}
-          <div className="text-sm text-green-600 font-medium mt-1">
+          <div className="text-xs sm:text-sm text-green-600 font-medium mt-1">
             {reportParams.type === 'Biểu đồ' ? '📊 Báo cáo biểu đồ thống kê' : (reportParams.xacMinh === 'true' ? '✅ Báo cáo xác minh (Loại 2)' : '📋 Báo cáo tổng hợp (Loại 1)')}
           </div>
         </div>
 
-        <div className="flex gap-6">
-          <div className="w-1/2 space-y-8">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+          <div className="w-full lg:w-1/2 space-y-6 lg:space-y-8">
             <div>
-              <h3 className="text-center font-semibold mb-2">
+              <h3 className="text-center text-sm sm:text-base font-semibold mb-2">
                 Biểu đồ mức độ tin cậy dự báo mất rừng (%)
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={isMobile ? 250 : 300}>
                 <BarChart data={dataTinCay}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
+                  <XAxis dataKey="name" style={{ fontSize: isMobile ? '10px' : '12px' }} />
+                  <YAxis style={{ fontSize: isMobile ? '10px' : '12px' }} />
                   <Tooltip />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: isMobile ? '12px' : '14px' }} />
                   <Bar dataKey="Chưa xác minh" fill="#3399ff" />
                   <Bar dataKey="Đã xác minh" fill="#ff6633" />
                 </BarChart>
@@ -705,15 +802,15 @@ const ThongKeBaoCaoMatRung = () => {
             </div>
 
             <div>
-              <h3 className="text-center font-semibold mb-2">
+              <h3 className="text-center text-sm sm:text-base font-semibold mb-2">
                 Biểu đồ diện tích dự báo mất rừng
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={isMobile ? 250 : 300}>
                 <BarChart data={dataDienTich}>
-                  <XAxis dataKey="name" />
-                  <YAxis unit=" ha" />
+                  <XAxis dataKey="name" style={{ fontSize: isMobile ? '10px' : '12px' }} />
+                  <YAxis unit=" ha" style={{ fontSize: isMobile ? '10px' : '12px' }} />
                   <Tooltip />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: isMobile ? '12px' : '14px' }} />
                   <Bar dataKey="Chưa xác minh" fill="#3399ff" />
                   <Bar dataKey="Đã xác minh" fill="#ff6633" />
                 </BarChart>

@@ -2,10 +2,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { FaUser, FaSignOutAlt, FaKey } from "react-icons/fa";
+import { FaUser, FaSignOutAlt, FaKey, FaBars } from "react-icons/fa";
 import ChangePasswordModal from "../components/ChangePasswordModal";
 
-const Header = () => {
+const Header = ({ onMenuClick }) => {
   const location = useLocation();
   const currentPath = location.pathname;
   const { user, logout, isAdmin } = useAuth();
@@ -67,28 +67,39 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-gradient-to-r from-forest-green-primary from-30% to-forest-green-secondary text-white w-full flex items-center h-16 px-4 shadow-md relative z-40">
+    <header className="bg-gradient-to-r from-forest-green-primary from-30% to-forest-green-secondary text-white w-full flex items-center h-16 px-3 sm:px-4 shadow-md relative z-40">
+      {/* Hamburger button (mobile/tablet only) */}
+      {onMenuClick && (
+        <button
+          className="lg:hidden mr-2 sm:mr-3 p-2 hover:bg-white/10 rounded-lg transition-colors"
+          onClick={onMenuClick}
+          aria-label="Toggle sidebar"
+        >
+          <FaBars className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
+      )}
+
       {/* Logo và icon */}
-      <div className="flex items-center gap-2">
-        <Link to="/dashboard">
-          <div className="w-10 h-10 bg-white rounded-md flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-green-700 rounded flex items-center justify-center">
+      <div className="flex items-center gap-1 sm:gap-2">
+        <Link to="/dashboard" className="flex-shrink-0">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-md flex items-center justify-center">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 border-2 border-green-700 rounded flex items-center justify-center">
               <div className="grid grid-cols-2 grid-rows-2 gap-0.5">
-                <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
-                <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
-                <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
-                <div className="w-2 h-2 bg-green-700 rounded-sm"></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-700 rounded-sm"></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-700 rounded-sm"></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-700 rounded-sm"></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-700 rounded-sm"></div>
               </div>
             </div>
           </div>
         </Link>
 
         {/* ✅ FIXED: Tiêu đề với navigation links đúng syntax */}
-        <div>
-          <h1 className="text-xl font-bold uppercase">
+        <div className="min-w-0">
+          <h1 className="text-xs sm:text-sm md:text-base lg:text-xl font-bold uppercase truncate">
             Hệ thống giám sát mất rừng tỉnh Sơn La
           </h1>
-          <div className="flex gap-8 mt-1">
+          <div className="hidden lg:flex gap-4 xl:gap-8 mt-1">
             {/* Giám sát mất rừng - Hiển thị nếu có quyền forecast */}
             {hasPagePermission('forecast') && (
               <Link
@@ -161,7 +172,7 @@ const Header = () => {
                   : "text-white"
                   }`}
               >
-                Quản lý Roles
+                Quản lý phân quyền
               </Link>
             )}
           </div>
@@ -169,18 +180,18 @@ const Header = () => {
       </div>
 
       {/* User Profile */}
-      <div className="ml-auto relative" ref={userMenuRef}>
+      <div className="ml-auto relative flex-shrink-0" ref={userMenuRef}>
         <div
           className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
           onClick={() => setShowUserMenu(!showUserMenu)}
         >
-          <div className="w-10 h-10 rounded-full bg-red-100 border-2 border-white overflow-hidden flex items-center justify-center">
-            <FaUser className="text-gray-600 text-lg" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-100 border-2 border-white overflow-hidden flex items-center justify-center">
+            <FaUser className="text-gray-600 text-base sm:text-lg" />
           </div>
           {user && (
-            <div className="ml-2 text-sm">
-              <div className="font-semibold">{user.username}</div>
-              <div className="text-xs opacity-80">
+            <div className="hidden sm:block ml-2 text-sm">
+              <div className="font-semibold truncate max-w-[120px] lg:max-w-none">{user.username}</div>
+              <div className="text-xs opacity-80 truncate max-w-[120px] lg:max-w-none">
                 {getPermissionLevelDisplay()}
               </div>
             </div>

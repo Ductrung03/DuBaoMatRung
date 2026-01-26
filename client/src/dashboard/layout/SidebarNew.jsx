@@ -47,7 +47,7 @@ const SidebarNew = () => {
       features: [
         {
           code: 'data_management.forecast_lookup',
-          name: 'Tra cứu dự báo',
+          name: 'Tra cứu phân tích',
           path: '/dashboard/quanlydulieu/forecast-lookup'
         },
         {
@@ -57,7 +57,7 @@ const SidebarNew = () => {
         },
         {
           code: 'data_management.verification',
-          name: 'Xác minh dự báo',
+          name: 'Xác minh phân tích',
           path: '/dashboard/quanlydulieu/verification'
         },
         {
@@ -124,7 +124,7 @@ const SidebarNew = () => {
       ]
     },
     role_management: {
-      name: 'Quản lý vai trò',
+      name: 'Quản lý phân quyền',
       icon: FaUserShield,
       path: '/dashboard/quanlyrole',
       features: [

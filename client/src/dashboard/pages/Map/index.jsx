@@ -1,11 +1,12 @@
 // client/src/dashboard/pages/Map/index.jsx - FIXED TABLE DISPLAY FOR ALL PAGES
 import { getLayerStyle } from "./utils/mapStyles";
 import { toast } from "react-toastify";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, WMSTileLayer, useMap } from "react-leaflet";
 import { useLocation } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useIsMobile } from "../../../hooks/useMediaQuery";
 
 // Components
 import LoadingOverlay from "./components/LoadingOverlay";
@@ -62,6 +63,8 @@ const Map = () => {
   const { geoData, loading, mapLayers, toggleLayerVisibility } = useGeoData();
   const location = useLocation();
   const geoJsonLayerRef = useRef(null);
+  const isMobile = useIsMobile();
+  const [showMapOnMobile, setShowMapOnMobile] = useState(true);
 
   // Map state
   const {
@@ -298,14 +301,41 @@ const Map = () => {
   // RENDER
   // ===================================
   return (
-    <div className="p-2 md:p-5 font-sans relative">
+    <div className="p-2 sm:p-4 lg:p-5 font-sans relative">
       {/* Header */}
-      <h2 className="text-center text-lg md:text-xl font-bold mb-2 md:mb-5">
+      <h2 className="text-center text-base sm:text-lg lg:text-xl font-bold mb-2 sm:mb-3 lg:mb-5">
         Bản đồ khu vực
       </h2>
 
-      {/* Map Container */}
-      <div className={`flex justify-center items-center ${shouldShowTable ? "mb-2 md:mb-5" : ""} relative`}>
+      {/* Mobile Toggle Buttons (only show when table data exists) */}
+      {isMobile && shouldShowTable && (
+        <div className="flex gap-2 mb-3">
+          <button
+            onClick={() => setShowMapOnMobile(true)}
+            className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-colors ${
+              showMapOnMobile
+                ? 'bg-forest-green-primary text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            🗺️ Bản đồ
+          </button>
+          <button
+            onClick={() => setShowMapOnMobile(false)}
+            className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-colors ${
+              !showMapOnMobile
+                ? 'bg-forest-green-primary text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            📊 Dữ liệu ({geoData?.features?.length || 0})
+          </button>
+        </div>
+      )}
+
+      {/* Map Container - Hidden on mobile when table is shown */}
+      {(!isMobile || showMapOnMobile) && (
+        <div className={`flex justify-center items-center ${shouldShowTable ? "mb-2 sm:mb-3 lg:mb-5" : ""} relative`}>
 
         {/* Loading Overlay */}
         {loading && (
@@ -362,16 +392,20 @@ const Map = () => {
             toggleLayerVisibility={toggleLayerVisibility}
           />
         </MapContainer>
-      </div>
+        </div>
+      )}
 
       {/* ✅ FIX: Table Display - Luôn render khi có dữ liệu, không phụ thuộc trang */}
-      <TableDisplay
-        loading={loading}
-        geoData={geoData}
-        loadingDetails={loadingDetails}
-        loadingMessage={loadingMessage}
-        onRowClick={handleRowClick}
-      />
+      {/* On mobile: only show when showMapOnMobile is false */}
+      {(!isMobile || !showMapOnMobile) && (
+        <TableDisplay
+          loading={loading}
+          geoData={geoData}
+          loadingDetails={loadingDetails}
+          loadingMessage={loadingMessage}
+          onRowClick={handleRowClick}
+        />
+      )}
     </div>
   );
 };

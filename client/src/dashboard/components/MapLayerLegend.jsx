@@ -6,8 +6,26 @@ import L from "leaflet";
 const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
   const map = useMap();
   const controlRef = useRef(null);
-  const [isExpanded, setIsExpanded] = useState(true);
+  // Start collapsed on mobile for better UX
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isExpanded, setIsExpanded] = useState(!isMobile);
 
+  // Listen for window resize to detect mobile/desktop
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      // Auto-collapse on mobile, auto-expand on desktop
+      if (mobile && isExpanded) {
+        setIsExpanded(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isExpanded]);
+
+  // Main effect for Leaflet control
   useEffect(() => {
     // Remove existing control
     if (controlRef.current) {
@@ -21,6 +39,13 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
     L.DomEvent.disableClickPropagation(container);
     L.DomEvent.disableScrollPropagation(container);
 
+    // Responsive dimensions based on screen size
+    const legendWidth = isMobile ? '180px' : '280px';
+    const legendMaxWidth = isMobile ? '200px' : '320px';
+    const legendPadding = isMobile ? '8px' : '12px';
+    const fontSize = isMobile ? '11px' : '13px';
+    const maxContentHeight = isMobile ? '250px' : '600px';
+
     // Create legend HTML
     const createLegendHTML = () => {
       return `
@@ -29,11 +54,11 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
         border: 2px solid rgba(0,0,0,0.2);
         border-radius: 8px;
         box-shadow: 0 3px 14px rgba(0,0,0,0.4);
-        padding: 12px;
+        padding: ${legendPadding};
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 13px;
-        max-width: 320px;
-        min-width: 280px;
+        font-size: ${fontSize};
+        max-width: ${legendMaxWidth};
+        min-width: ${legendWidth};
       ">
         <!-- Header -->
         <div style="
@@ -66,7 +91,7 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
         <!-- Content -->
         <div id="legend-content" style="
           display: ${isExpanded ? 'block' : 'none'};
-          max-height: 600px;
+          max-height: ${maxContentHeight};
           overflow-y: auto;
           overflow-x: hidden;
         ">
@@ -74,14 +99,14 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
         </div>
       </div>
       `;
-    };
+  };
 
-    // Create layer sections based on MapServer layers (Sơn La - 3 layers)
-    const createLayerSections = () => {
-      const sections = [];
+  // Create layer sections based on MapServer layers (Sơn La - 3 layers)
+  const createLayerSections = () => {
+    const sections = [];
 
-      // 1. Lớp Ranh Giới Xã (sonla_rgx)
-      sections.push(`
+    // 1. Lớp Ranh Giới Xã (sonla_rgx)
+    sections.push(`
         <div class="legend-layer" style="margin-bottom: 12px;">
           <div style="
             display: flex;
@@ -115,8 +140,8 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
         </div>
       `);
 
-      // 2. Lớp Tiểu Khu Khoảnh Lô (sonla_tkkl)
-      sections.push(`
+    // 2. Lớp Tiểu Khu Khoảnh Lô (sonla_tkkl)
+    sections.push(`
         <div class="legend-layer" style="margin-bottom: 12px;">
           <div style="
             display: flex;
@@ -150,8 +175,8 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
         </div>
       `);
 
-      // 3. Lớp Hiện Trạng Rừng (sonla_hientrangrung - PRIMARY LAYER)
-      sections.push(`
+    // 3. Lớp Hiện Trạng Rừng (sonla_hientrangrung - PRIMARY LAYER)
+    sections.push(`
         <div class="legend-layer" style="margin-bottom: 12px;">
           <div style="
             display: flex;
@@ -256,67 +281,67 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
         </div>
       `);
 
-      return sections.join('');
+    return sections.join('');
+  };
+
+  // Update HTML
+  container.innerHTML = createLegendHTML();
+
+  // Setup event listeners
+  const setupEventListeners = () => {
+    // Header toggle
+    const header = container.querySelector("#legend-header");
+    const content = container.querySelector("#legend-content");
+    const icon = container.querySelector("#toggle-icon");
+
+    header.onclick = () => {
+      const newState = !isExpanded;
+      setIsExpanded(newState);
+      content.style.display = newState ? "block" : "none";
+      icon.style.transform = `rotate(${newState ? '0' : '-90'}deg)`;
     };
 
-    // Update HTML
-    container.innerHTML = createLegendHTML();
-
-    // Setup event listeners
-    const setupEventListeners = () => {
-      // Header toggle
-      const header = container.querySelector("#legend-header");
-      const content = container.querySelector("#legend-content");
-      const icon = container.querySelector("#toggle-icon");
-
-      header.onclick = () => {
-        const newState = !isExpanded;
-        setIsExpanded(newState);
-        content.style.display = newState ? "block" : "none";
-        icon.style.transform = `rotate(${newState ? '0' : '-90'}deg)`;
-      };
-
-      // Layer checkboxes - Map checkbox IDs to layer keys (Sơn La 3 layers)
-      const layerMapping = {
-        'layer-ranhgioixa': 'ranhgioixa',
-        'layer-tieukukhoanh': 'tieukukhoanh',
-        'layer-hientrangrung': 'hientrangrung'
-      };
-
-      Object.entries(layerMapping).forEach(([checkboxId, layerKey]) => {
-        const checkbox = container.querySelector(`#${checkboxId}`);
-        if (checkbox) {
-          checkbox.addEventListener("change", (e) => {
-            e.stopPropagation();
-            if (toggleLayerVisibility) {
-              toggleLayerVisibility(layerKey);
-            }
-          });
-        }
-      });
+    // Layer checkboxes - Map checkbox IDs to layer keys (Sơn La 3 layers)
+    const layerMapping = {
+      'layer-ranhgioixa': 'ranhgioixa',
+      'layer-tieukukhoanh': 'tieukukhoanh',
+      'layer-hientrangrung': 'hientrangrung'
     };
 
-    setupEventListeners();
-
-    // Create Leaflet control
-    const CustomControl = L.Control.extend({
-      onAdd: () => container,
-      onRemove: () => {},
-    });
-
-    const control = new CustomControl({ position: "topright" });
-    map.addControl(control);
-    controlRef.current = control;
-
-    return () => {
-      if (controlRef.current) {
-        map.removeControl(controlRef.current);
-        controlRef.current = null;
+    Object.entries(layerMapping).forEach(([checkboxId, layerKey]) => {
+      const checkbox = container.querySelector(`#${checkboxId}`);
+      if (checkbox) {
+        checkbox.addEventListener("change", (e) => {
+          e.stopPropagation();
+          if (toggleLayerVisibility) {
+            toggleLayerVisibility(layerKey);
+          }
+        });
       }
-    };
-  }, [map, mapLayers, toggleLayerVisibility, isExpanded]);
+    });
+  };
 
-  return null;
+  setupEventListeners();
+
+  // Create Leaflet control
+  const CustomControl = L.Control.extend({
+    onAdd: () => container,
+    onRemove: () => { },
+  });
+
+  const control = new CustomControl({ position: "topright" });
+  map.addControl(control);
+  controlRef.current = control;
+
+  return () => {
+    if (controlRef.current) {
+      map.removeControl(controlRef.current);
+      controlRef.current = null;
+    }
+  };
+}, [map, mapLayers, toggleLayerVisibility, isExpanded, isMobile]);
+
+return null;
 };
 
 export default MapLayerLegend;

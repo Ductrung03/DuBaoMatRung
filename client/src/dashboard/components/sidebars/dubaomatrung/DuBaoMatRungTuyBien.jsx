@@ -139,12 +139,12 @@ const DuBaoMatRungTuyBien = () => {
 
           {isInputOpen && (
             <div className="flex flex-col gap-2 px-1 pt-1">
-              <div className="px-2 ml-8">
+              <div className="px-2 ml-0 sm:ml-8">
                 <div className="font-medium text-sm mb-1">Khu vực</div>
 
                 {/* Xã */}
-                <div className="flex items-center justify-between mb-1 pl-4">
-                  <label className="text-sm">Xã</label>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2 sm:mb-1 pl-0 sm:pl-4">
+                  <label className="text-sm w-full sm:w-auto">Xã</label>
                   <Dropdown
                     selectedValue={selectedXa}
                     onValueChange={adminUnits.xa.onChange}
@@ -152,14 +152,14 @@ const DuBaoMatRungTuyBien = () => {
                     placeholder="Chọn xã"
                     disabled={adminUnits.xa.loading || adminUnits.xa.disabled}
                     loading={adminUnits.xa.loading}
-                    className="w-36"
-                    selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="w-full sm:w-36"
+                    selectClassName="w-full border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
 
                 {/* Tiểu khu */}
-                <div className="flex items-center justify-between mb-1 pl-4">
-                  <label className="text-sm">Tiểu khu</label>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2 sm:mb-1 pl-0 sm:pl-4">
+                  <label className="text-sm w-full sm:w-auto">Tiểu khu</label>
                   <Dropdown
                     selectedValue={selectedTieukhu}
                     onValueChange={adminUnits.tieukhu.onChange}
@@ -167,14 +167,14 @@ const DuBaoMatRungTuyBien = () => {
                     placeholder="Chọn tiểu khu"
                     disabled={adminUnits.tieukhu.loading || adminUnits.tieukhu.disabled}
                     loading={adminUnits.tieukhu.loading}
-                    className="w-36"
-                    selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="w-full sm:w-36"
+                    selectClassName="w-full border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
 
                 {/* Khoảnh */}
-                <div className="flex items-center justify-between mb-2 pl-4">
-                  <label className="text-sm">Khoảnh</label>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2 pl-0 sm:pl-4">
+                  <label className="text-sm w-full sm:w-auto">Khoảnh</label>
                   <Dropdown
                     selectedValue={selectedKhoanh}
                     onValueChange={adminUnits.khoanh.onChange}
@@ -182,47 +182,47 @@ const DuBaoMatRungTuyBien = () => {
                     placeholder="Chọn khoảnh"
                     disabled={adminUnits.khoanh.loading || adminUnits.khoanh.disabled}
                     loading={adminUnits.khoanh.loading}
-                    className="w-36"
-                    selectClassName="w-full border border-green-400 rounded-md py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="w-full sm:w-36"
+                    selectClassName="w-full border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
 
-                <div className="font-medium text-sm mb-1">Kỳ trước:</div>
-                <div className="flex items-center justify-between mb-1 pl-4 relative ">
-                  <label className="text-sm">Ngày bắt đầu</label>
+                <div className="font-medium text-sm mb-1 mt-3">Kỳ trước:</div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2 sm:mb-1 pl-0 sm:pl-4">
+                  <label className="text-sm w-full sm:w-auto">Ngày bắt đầu</label>
                   <input
                     type="date"
                     value={kyTruocStart}
                     onChange={(e) => setKyTruocStart(e.target.value)}
-                    className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="w-full sm:flex-1 border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
-                <div className="flex items-center justify-between mb-2 pl-4">
-                  <label className="text-sm">Ngày kết thúc</label>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2 pl-0 sm:pl-4">
+                  <label className="text-sm w-full sm:w-auto">Ngày kết thúc</label>
                   <input
                     type="date"
                     value={kyTruocEnd}
                     onChange={(e) => setKyTruocEnd(e.target.value)}
-                    className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="w-full sm:flex-1 border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
-                <div className="font-medium text-sm mb-1">Kỳ sau:</div>
-                <div className="flex items-center justify-between mb-1 pl-4">
-                  <label className="text-sm">Ngày bắt đầu</label>
+                <div className="font-medium text-sm mb-1 mt-3">Kỳ sau:</div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2 sm:mb-1 pl-0 sm:pl-4">
+                  <label className="text-sm w-full sm:w-auto">Ngày bắt đầu</label>
                   <input
                     type="date"
                     value={kySauStart}
                     onChange={(e) => setKySauStart(e.target.value)}
-                    className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="w-full sm:flex-1 border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
-                <div className="flex items-center justify-between mb-2 pl-4">
-                  <label className="text-sm">Ngày kết thúc</label>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2 pl-0 sm:pl-4">
+                  <label className="text-sm w-full sm:w-auto">Ngày kết thúc</label>
                   <input
                     type="date"
                     value={kySauEnd}
                     onChange={(e) => setKySauEnd(e.target.value)}
-                    className="w-full border border-green-400 rounded-md py-0.2 pr-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="w-full sm:flex-1 border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
 
@@ -230,7 +230,7 @@ const DuBaoMatRungTuyBien = () => {
               <button
                 onClick={handleAnalyze}
                 disabled={loading}
-                className="w-36 bg-forest-green-gray hover:bg-green-200 text-black-800 font-medium py-0.5 px-3 rounded-full text-center mt-2 self-center disabled:opacity-50"
+                className="w-full sm:w-36 min-h-[44px] sm:min-h-0 bg-forest-green-gray hover:bg-green-200 text-black-800 font-medium py-2 sm:py-0.5 px-3 rounded-full text-center mt-2 self-center disabled:opacity-50"
               >
                 {loading ? "Đang phân tích..." : "Phân tích"}
               </button>

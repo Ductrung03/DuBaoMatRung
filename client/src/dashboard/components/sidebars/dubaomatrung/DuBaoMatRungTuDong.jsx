@@ -41,7 +41,7 @@ const DuBaoMatRungTuDong = () => {
         ? `từ 15/${selectedMonth === "01" ? "12" : (parseInt(selectedMonth) - 1).toString().padStart(2, '0')} đến 15/${selectedMonth}`
         : `toàn bộ tháng ${selectedMonth}`;
         
-      toast.info(`🔍 Đang tải dữ liệu dự báo mất rừng ${periodDescription}/${selectedYear}...`, {
+      toast.info(`🔍 Đang tải dữ liệu phân tích mất rừng ${periodDescription}/${selectedYear}...`, {
         autoClose: 3000
       });
 
@@ -53,7 +53,7 @@ const DuBaoMatRungTuDong = () => {
         const totalAreaHa = result.summary?.total_area_ha || 0;
 
         toast.success(
-          `✅ Dự báo hoàn tất: ${count} khu vực mất rừng (${totalAreaHa} ha) ${periodDescription}/${selectedYear}. Xem bảng dữ liệu bên dưới bản đồ!`,
+          `✅ Phân tích hoàn tất: ${count} khu vực mất rừng (${totalAreaHa} ha) ${periodDescription}/${selectedYear}. Xem bảng dữ liệu bên dưới bản đồ!`,
           { autoClose: 5000, position: "top-center" }
         );
 
@@ -82,7 +82,7 @@ const DuBaoMatRungTuDong = () => {
 
     } catch (error) {
       console.error('❌ Lỗi dự báo tự động:', error);
-      toast.error(`❌ Lỗi khi thực hiện dự báo: ${error.message}`);
+      toast.error(`❌ Lỗi khi thực hiện phân tích: ${error.message}`);
     } finally {
       setIsProcessing(false);
     }
@@ -173,8 +173,8 @@ const DuBaoMatRungTuDong = () => {
           <div className="flex flex-col gap-3">
 
             {/* Năm */}
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-16 flex-shrink-0">Năm</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+              <label className="text-sm font-medium w-full sm:w-16 flex-shrink-0">Năm</label>
               <div className="flex-1 min-w-0 overflow-hidden">
                 <Dropdown
                   selectedValue={selectedYear}
@@ -183,15 +183,15 @@ const DuBaoMatRungTuDong = () => {
                   placeholder="Chọn năm"
                   disabled={isProcessing || loading}
                   loading={isProcessing || loading}
-                  className="border border-green-400 rounded-md bg-white"
-                  selectClassName="text-sm py-1"
+                  className="border border-green-400 rounded-md bg-white w-full"
+                  selectClassName="text-sm py-1.5 sm:py-1"
                 />
               </div>
             </div>
 
             {/* Tháng */}
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-16 flex-shrink-0">Tháng</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+              <label className="text-sm font-medium w-full sm:w-16 flex-shrink-0">Tháng</label>
               <div className="flex-1 min-w-0 overflow-hidden">
                 <Dropdown
                   selectedValue={selectedMonth}
@@ -200,15 +200,15 @@ const DuBaoMatRungTuDong = () => {
                   placeholder="Chọn tháng"
                   disabled={isProcessing || loading}
                   loading={isProcessing || loading}
-                  className="border border-green-400 rounded-md bg-white"
-                  selectClassName="text-sm py-1"
+                  className="border border-green-400 rounded-md bg-white w-full"
+                  selectClassName="text-sm py-1.5 sm:py-1"
                 />
               </div>
             </div>
 
             {/* Kỳ */}
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-16 flex-shrink-0">Kỳ</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+              <label className="text-sm font-medium w-full sm:w-16 flex-shrink-0">Kỳ</label>
               <div className="flex-1 min-w-0 overflow-hidden">
                 <Dropdown
                   selectedValue={selectedPeriod}
@@ -217,23 +217,23 @@ const DuBaoMatRungTuDong = () => {
                   placeholder="Chọn kỳ"
                   disabled={isProcessing || loading}
                   loading={isProcessing || loading}
-                  className="border border-green-400 rounded-md bg-white"
-                  selectClassName="text-sm py-1"
+                  className="border border-green-400 rounded-md bg-white w-full"
+                  selectClassName="text-sm py-1.5 sm:py-1"
                 />
               </div>
             </div>
           </div>
 
           {/* ✅ ENHANCED BUTTONS */}
-          <div className="flex gap-2 mt-2 justify-center">
-            <button 
+          <div className="flex flex-col sm:flex-row gap-2 mt-2 justify-center">
+            <button
               onClick={handleAutomaticForecast}
               disabled={isProcessing || loading}
-              className={`flex-1 ${
+              className={`flex-1 min-h-[44px] sm:min-h-0 ${
                 isProcessing || loading
-                  ? 'bg-gray-400 cursor-not-allowed' 
+                  ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-forest-green-gray hover:bg-green-200 hover:shadow-md'
-              } text-black-800 font-medium py-1 px-3 rounded-full text-center transition-all duration-200`}
+              } text-black-800 font-medium py-2 sm:py-1 px-3 rounded-full text-center transition-all duration-200`}
             >
               {isProcessing ? (
                 <span className="flex items-center justify-center">
@@ -245,10 +245,10 @@ const DuBaoMatRungTuDong = () => {
               )}
             </button>
 
-            <button 
+            <button
               onClick={handleResetToDefault}
               disabled={isProcessing || loading}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
+              className={`w-full sm:w-auto min-h-[44px] sm:min-h-0 px-3 py-2 sm:py-1 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
                 isProcessing || loading
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-orange-100 text-orange-700 hover:bg-orange-200 hover:shadow-sm'

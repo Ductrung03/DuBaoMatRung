@@ -7,11 +7,13 @@ import { useGeoData } from "../../../contexts/GeoDataContext";
 import { useAuth } from "../../../contexts/AuthContext";
 import config from "../../../../config";
 import Dropdown from "../../../../components/Dropdown";
+import { useIsMobile } from "../../../../hooks/useMediaQuery";
  // Import the generic Dropdown
 
 const XacMinhDuBaoMatRung = () => {
   const { geoData, setGeoData } = useGeoData();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   
   const nguyenNhanList = [
     "Khai thác rừng trái phép",
@@ -340,16 +342,16 @@ const XacMinhDuBaoMatRung = () => {
         className="bg-forest-green-primary text-white py-0.2 px-4 rounded-full text-sm font-medium uppercase tracking-wide text-left shadow-md w-full cursor-pointer"
         onClick={() => setIsForecastOpen(!isForecastOpen)}
       >
-        Xác minh dự báo mất rừng
+        Xác minh phân tích mất rừng
       </div>
 
       {isForecastOpen && (
-        <div className="flex flex-col gap-2 px-1 pt-3">
-         
+        <div className="flex flex-col gap-2 px-1 sm:px-2 pt-3">
+
 
           {/* ✅ FIX: Hiển thị thông tin lô được tìm thấy */}
           {selectedRecord && (
-            <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded-md">
+            <div className={`mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md ${isMobile ? 'text-sm' : ''}`}>
               <div className="text-sm font-medium text-blue-800">
                 🎯 Đang xác minh: <span className="font-bold text-red-600">CB-{selectedRecord.properties.gid}</span>
               </div>
@@ -369,9 +371,9 @@ const XacMinhDuBaoMatRung = () => {
           {/* Form */}
           <div className="flex flex-col gap-3">
             {/* Mã lô dự báo */}
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Mã lô CB</label>
-              <div className="flex items-center gap-2 w-36">
+            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
+              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Mã lô CB</label>
+              <div className={`flex ${isMobile ? 'flex-col' : 'items-center'} gap-2 ${isMobile ? 'w-full' : 'w-36'}`}>
                 <input
                   type="text"
                   value={formData.maLoDuBao}
@@ -386,13 +388,13 @@ const XacMinhDuBaoMatRung = () => {
                     }
                   }}
                   placeholder="VD: 3619"
-                  className="w-16 border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                  className={`${isMobile ? 'w-full' : 'w-16'} border border-green-400 rounded-md py-2 px-3 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400`}
                   disabled={loading || searchLoading}
                 />
-                <button 
+                <button
                   onClick={handleTimKiem}
                   disabled={loading || searchLoading || !formData.maLoDuBao.trim()}
-                  className="w-16 bg-forest-green-gray hover:bg-green-200 text-black-800 whitespace-nowrap font-medium py-0.5 px-2 rounded-md text-center self-center disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className={`${isMobile ? 'w-full' : 'w-16'} bg-forest-green-gray hover:bg-green-200 text-black-800 whitespace-nowrap font-medium py-2 px-2 rounded-md text-center disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px] flex items-center justify-center`}
                 >
                   {searchLoading ? (
                     <ClipLoader color="#027e02" size={12} />
@@ -404,9 +406,9 @@ const XacMinhDuBaoMatRung = () => {
             </div>
 
             {/* Nguyên nhân */}
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-24 flex-shrink-0">Nguyên nhân *</label>
-              <div className="flex-1 min-w-0 overflow-hidden">
+            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
+              <label className={`text-sm font-medium ${isMobile ? '' : 'w-24 flex-shrink-0'}`}>Nguyên nhân *</label>
+              <div className={isMobile ? 'w-full' : 'flex-1 min-w-0 overflow-hidden'}>
                 <Dropdown
                   selectedValue={formData.nguyenNhan}
                   onValueChange={handleNguyenNhanChange}
@@ -414,81 +416,77 @@ const XacMinhDuBaoMatRung = () => {
                   placeholder="Chọn nguyên nhân"
                   disabled={loading || searchLoading}
                   loading={loading || searchLoading}
-                  className="border border-green-400 rounded-md bg-white"
-                  selectClassName="text-sm py-1"
+                  className={`border border-green-400 rounded-md bg-white ${isMobile ? 'w-full' : ''}`}
+                  selectClassName="text-sm py-2"
                 />
               </div>
             </div>
 
             {/* Diện tích thực tế */}
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">
+            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
+              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>
                 Diện tích thực tế (ha)
               </label>
-              <div className="relative w-36">
+              <div className={`relative ${isMobile ? 'w-full' : 'w-36'}`}>
                 <input
                   type="number"
                   step="0.01"
                   min="0"
                   value={formData.dienTichThucTe}
                   onChange={(e) => handleInputChange('dienTichThucTe', e.target.value)}
-                 
-                  className="w-full border border-green-400 rounded-md py-0.2 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                  className="w-full border border-green-400 rounded-md py-2 px-3 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   disabled={loading || searchLoading}
                 />
-               
               </div>
             </div>
 
             {/* Người xác minh */}
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Người xác minh</label>
-              <div className="relative w-36">
+            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
+              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Người xác minh</label>
+              <div className={`relative ${isMobile ? 'w-full' : 'w-36'}`}>
                 <input
                   type="text"
                   value={formData.nguoiXacMinh}
                   readOnly
-                  className="w-full border border-gray-300 rounded-md py-0.2 px-2 pr-8 appearance-none bg-gray-100 text-gray-700 cursor-not-allowed"
+                  className="w-full border border-gray-300 rounded-md py-2 px-3 appearance-none bg-gray-100 text-gray-700 cursor-not-allowed"
                 />
-               
               </div>
             </div>
 
             {/* Ngày xác minh */}
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Ngày xác minh</label>
-              <div className="relative w-36">
+            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
+              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Ngày xác minh</label>
+              <div className={`relative ${isMobile ? 'w-full' : 'w-36'}`}>
                 <input
                   type="date"
                   value={formData.ngayXacMinh}
                   onChange={(e) => handleInputChange('ngayXacMinh', e.target.value)}
-                  className="w-full border border-green-400 rounded-md py-0.2 px-1 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                  className="w-full border border-green-400 rounded-md py-2 px-3 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   disabled={loading || searchLoading}
                 />
-               
               </div>
             </div>
 
             {/* Ghi chú */}
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-40">Ghi chú</label>
-              <div className="relative w-36">
+            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
+              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Ghi chú</label>
+              <div className={`relative ${isMobile ? 'w-full' : 'w-36'}`}>
                 <textarea
                   value={formData.ghiChu}
                   onChange={(e) => handleInputChange('ghiChu', e.target.value)}
                   placeholder="Ghi chú thêm..."
                   rows="2"
-                  className="w-full border border-green-400 rounded-md py-0.2 px-2 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
+                  className="w-full border border-green-400 rounded-md py-2 px-3 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
                   disabled={loading || searchLoading}
                 />
               </div>
             </div>
           </div>
 
-          <button 
+          <button
             onClick={handleCapNhat}
             disabled={loading || searchLoading || !selectedRecord || !formData.nguyenNhan}
-            className="w-36 bg-forest-green-gray hover:bg-green-200 text-black-800 font-medium py-0.5 px-3 rounded-full text-center mt-2 self-center disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+            className={`${isMobile ? 'w-full' : 'w-36'} bg-forest-green-gray hover:bg-green-200 text-black-800 font-medium py-2.5 px-3 rounded-full text-center mt-3 ${isMobile ? '' : 'self-center'} disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center min-h-[44px]`}
           >
             {loading ? (
               <>

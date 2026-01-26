@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { ClipLoader } from 'react-spinners';
 import { FaCloudSun, FaImage, FaListAlt, FaExclamationTriangle, FaRedo, FaExternalLinkAlt, FaExpand } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { useIsMobile } from "../../hooks/useMediaQuery";
 
 export default function PhatHienMatRung() {
   const [loading, setLoading] = useState(true);
@@ -14,6 +15,7 @@ export default function PhatHienMatRung() {
   const iframeRef = useRef(null);
   const containerRef = useRef(null);
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   // ✅ BỎ TIMEOUT - Để iframe tự load
   const [loadTimeout, setLoadTimeout] = useState(null);
@@ -183,67 +185,69 @@ export default function PhatHienMatRung() {
     >
 
       {/* Header với tab navigation */}
-      <div className="bg-white shadow-sm border-b border-gray-200 px-4 py-3 flex-shrink-0">
-        {/* Tab buttons */}
-        <div className="flex gap-2 mb-2">
-          <button
-            onClick={() => handleChangeTab("phantich")}
-            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${activeTab === "phantich"
-                ? "bg-green-600 text-white shadow-md"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-              }`}
-          >
-            <FaListAlt className="mr-2" />
-            Phân tích mất rừng
-          </button>
+      <div className="bg-white shadow-sm border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-3 flex-shrink-0">
+        {/* Tab buttons - Scrollable on mobile */}
+        <div className="overflow-x-auto -mx-3 sm:mx-0 mb-2">
+          <div className="flex gap-2 px-3 sm:px-0 min-w-max sm:min-w-0">
+            <button
+              onClick={() => handleChangeTab("phantich")}
+              className={`flex items-center px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm min-h-[44px] ${activeTab === "phantich"
+                  ? "bg-green-600 text-white shadow-md"
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                }`}
+            >
+              <FaListAlt className="mr-1 sm:mr-2" />
+              {isMobile ? "Phân tích" : "Phân tích mất rừng"}
+            </button>
 
-          <button
-            onClick={() => handleChangeTab("locmay")}
-            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${activeTab === "locmay"
-                ? "bg-blue-600 text-white shadow-md"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-              }`}
-          >
-            <FaCloudSun className="mr-2" />
-            Lọc mây
-          </button>
+            <button
+              onClick={() => handleChangeTab("locmay")}
+              className={`flex items-center px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm min-h-[44px] ${activeTab === "locmay"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                }`}
+            >
+              <FaCloudSun className="mr-1 sm:mr-2" />
+              Lọc mây
+            </button>
 
-          <button
-            onClick={() => handleChangeTab("xulyanh")}
-            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all ${activeTab === "xulyanh"
-                ? "bg-purple-600 text-white shadow-md"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-              }`}
-          >
-            <FaImage className="mr-2" />
-            Xử lý ảnh
-          </button>
+            <button
+              onClick={() => handleChangeTab("xulyanh")}
+              className={`flex items-center px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm min-h-[44px] ${activeTab === "xulyanh"
+                  ? "bg-purple-600 text-white shadow-md"
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                }`}
+            >
+              <FaImage className="mr-1 sm:mr-2" />
+              Xử lý ảnh
+            </button>
 
-          {/* ✅ THÊM NÚT FULLSCREEN */}
-          <button
-            onClick={toggleFullscreen}
-            className="flex items-center px-4 py-2 rounded-lg font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all ml-auto"
-            title={isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
-          >
-            <FaExpand className="mr-2" />
-            {isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
-          </button>
+            {/* ✅ NÚT FULLSCREEN - Responsive */}
+            <button
+              onClick={toggleFullscreen}
+              className="flex items-center px-3 sm:px-4 py-2 rounded-lg font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all ml-auto text-xs sm:text-sm min-h-[44px]"
+              title={isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
+            >
+              <FaExpand className={`${isMobile ? "" : "mr-2"}`} />
+              {!isMobile && (isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình")}
+            </button>
+          </div>
         </div>
 
-        {/* Current tab info */}
-        <div className="flex items-center justify-between">
+        {/* Current tab info - Responsive */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
           <div className="flex items-center">
-            <span className="mr-2">{currentConfig.icon}</span>
-            <h1 className="text-lg font-semibold text-gray-800">{currentConfig.title}</h1>
-            <span className="ml-2 text-sm text-gray-500">• {currentConfig.description}</span>
+            <span className="mr-2 text-sm sm:text-base">{currentConfig.icon}</span>
+            <h1 className="text-sm sm:text-lg font-semibold text-gray-800">{currentConfig.title}</h1>
+            <span className="hidden md:inline ml-2 text-xs sm:text-sm text-gray-500">• {currentConfig.description}</span>
           </div>
 
-          {/* Action buttons */}
+          {/* Action buttons - Stack on mobile */}
           <div className="flex gap-2">
             <button
               onClick={handleRetry}
               disabled={retryCount > 5}
-              className="flex items-center px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600 disabled:opacity-50 transition-colors"
+              className="flex items-center px-3 py-2 text-xs sm:text-sm bg-orange-500 text-white rounded hover:bg-orange-600 disabled:opacity-50 transition-colors min-h-[40px]"
             >
               <FaRedo className="mr-1" />
               Tải lại
@@ -251,10 +255,10 @@ export default function PhatHienMatRung() {
 
             <button
               onClick={handleOpenInNewTab}
-              className="flex items-center px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              className="flex items-center px-3 py-2 text-xs sm:text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors min-h-[40px]"
             >
               <FaExternalLinkAlt className="mr-1" />
-              Tab mới
+              {isMobile ? "Tab" : "Tab mới"}
             </button>
           </div>
         </div>
@@ -263,15 +267,15 @@ export default function PhatHienMatRung() {
       {/* Main content area */}
       <div className="relative flex-1 overflow-hidden">
 
-        {/* Loading overlay - CHỈ HIỂN THỊ TRONG 10 GIÂY ĐẦU */}
+        {/* Loading overlay - Responsive */}
         {loading && !error && (
           <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
-            <div className="flex flex-col items-center max-w-md mx-4 text-center">
-              <ClipLoader color="#027e02" size={50} />
-              <p className="mt-4 text-lg text-forest-green-primary font-medium">
+            <div className="flex flex-col items-center max-w-md mx-4 text-center px-4">
+              <ClipLoader color="#027e02" size={isMobile ? 40 : 50} />
+              <p className="mt-3 sm:mt-4 text-base sm:text-lg text-forest-green-primary font-medium">
                 Đang tải {currentConfig.title}...
               </p>
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-2 text-xs sm:text-sm text-gray-600">
                 {currentConfig.description}
               </p>
               <p className="mt-2 text-xs text-gray-500">
@@ -286,19 +290,19 @@ export default function PhatHienMatRung() {
           </div>
         )}
 
-        {/* Error overlay */}
+        {/* Error overlay - Responsive */}
         {error && (
           <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
-            <div className="flex flex-col items-center max-w-md mx-4 text-center p-6">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                <FaExclamationTriangle className="text-2xl text-red-500" />
+            <div className="flex flex-col items-center max-w-md mx-4 text-center p-4 sm:p-6">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-red-100 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+                <FaExclamationTriangle className="text-xl sm:text-2xl text-red-500" />
               </div>
 
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
                 Không thể tải {currentConfig.title}
               </h3>
 
-              <div className="text-sm text-gray-600 mb-4">
+              <div className="text-xs sm:text-sm text-gray-600 mb-4">
                 {error === "TIMEOUT" && (
                   <div>
                     <p className="mb-2">⏱️ Thời gian tải quá lâu</p>
@@ -318,7 +322,7 @@ export default function PhatHienMatRung() {
                 <button
                   onClick={handleRetry}
                   disabled={retryCount > 5}
-                  className="flex-1 flex items-center justify-center px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 flex items-center justify-center px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px] text-sm"
                 >
                   <FaRedo className="mr-2" />
                   {retryCount > 5 ? "Đã hết lượt thử" : `Thử lại (${retryCount}/5)`}
@@ -326,10 +330,10 @@ export default function PhatHienMatRung() {
 
                 <button
                   onClick={handleOpenInNewTab}
-                  className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                  className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors min-h-[44px] text-sm"
                 >
                   <FaExternalLinkAlt className="mr-2" />
-                  Mở tab mới
+                  {isMobile ? "Tab mới" : "Mở tab mới"}
                 </button>
               </div>
             </div>
@@ -365,17 +369,17 @@ export default function PhatHienMatRung() {
         )}
       </div>
 
-      {/* Footer info */}
-      <div className="bg-gray-800 text-white px-4 py-2 text-xs flex-shrink-0">
-        <div className="flex items-center justify-between">
+      {/* Footer info - Responsive */}
+      <div className="bg-gray-800 text-white px-3 sm:px-4 py-2 text-xs flex-shrink-0">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
           <div className="flex items-center">
             <span className="mr-2">🌍</span>
-            <span>Google Earth Engine Application</span>
+            <span className="text-xs">Google Earth Engine {!isMobile && "Application"}</span>
             {loading && <span className="ml-2 text-yellow-300">• Đang tải...</span>}
           </div>
-          <div className="flex items-center space-x-4">
-            <span>Powered by Google Earth Engine</span>
-            <span>•</span>
+          <div className="flex items-center space-x-2 sm:space-x-4 text-xs">
+            <span className="hidden sm:inline">Powered by Google Earth Engine</span>
+            <span className="hidden sm:inline">•</span>
             <span>Sơn La Forest Monitoring</span>
           </div>
         </div>

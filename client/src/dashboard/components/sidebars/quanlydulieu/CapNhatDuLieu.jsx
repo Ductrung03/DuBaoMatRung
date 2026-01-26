@@ -3,10 +3,12 @@ import React, { useState } from "react";
 import { useGeoData } from "../../../contexts/GeoDataContext";
 import { toast } from "react-toastify";
 import { ClipLoader } from 'react-spinners';
+import { useIsMobile } from "../../../../hooks/useMediaQuery";
 
 const CapNhatDuLieu = () => {
   const [isOpen, setIsOpen] = useState(true);
   const { mapLayers, loadSingleLayer, loadAllDefaultLayers } = useGeoData();
+  const isMobile = useIsMobile();
   
   // Loading state cho nút "Tải tất cả"
   const [loadingAll, setLoadingAll] = useState(false);
@@ -48,7 +50,7 @@ const CapNhatDuLieu = () => {
       </div>
 
       {isOpen && (
-        <div className="flex flex-col gap-3 px-1 pt-3">
+        <div className="flex flex-col gap-3 px-1 sm:px-2 pt-3">
           
          
          
@@ -60,9 +62,9 @@ const CapNhatDuLieu = () => {
               const isGeoJSON = layer.layerType === 'geojson';
 
               return (
-                <div key={layerKey} className="flex items-center justify-between p-2 border rounded-md hover:bg-gray-50">
+                <div key={layerKey} className={`flex ${isMobile ? 'flex-col' : 'items-center justify-between'} gap-2 p-2 sm:p-3 border rounded-md hover:bg-gray-50`}>
                   <div className="flex-1">
-                    <div className="font-medium text-sm flex items-center gap-2">
+                    <div className="font-medium text-sm flex items-center gap-2 flex-wrap">
                       {/* Icon theo layer - SƠN LA 3 LAYERS */}
                       {layerKey === 'ranhgioixa' && '🏘️'}
                       {layerKey === 'tieukukhoanh' && '📐'}
@@ -93,7 +95,9 @@ const CapNhatDuLieu = () => {
                       isWMS
                         ? (layer.visible ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 hover:bg-gray-500')
                         : 'bg-green-600 hover:bg-green-700'
-                    } text-white font-medium py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[80px]`}
+                    } text-white font-medium py-2 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${
+                      isMobile ? 'w-full' : 'min-w-[80px]'
+                    } min-h-[44px] flex items-center justify-center`}
                   >
                     {layer.loading ? (
                       <ClipLoader color="#ffffff" size={12} />

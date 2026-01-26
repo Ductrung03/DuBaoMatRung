@@ -175,8 +175,8 @@ const ReportGenerator = ({ reportData, reportParams }) => {
               <th className="border border-black px-2 py-1">Lô cảnh báo</th>
               <th className="border border-black px-2 py-1">Tiểu khu</th>
               <th className="border border-black px-2 py-1">Khoảnh</th>
-              <th className="border border-black px-2 py-1">Tọa độ VN-2000<br/>X</th>
-              <th className="border border-black px-2 py-1">Tọa độ VN-2000<br/>Y</th>
+              <th className="border border-black px-2 py-1">Tọa độ<br/>X</th>
+              <th className="border border-black px-2 py-1">Tọa độ<br/>Y</th>
               <th className="border border-black px-2 py-1">Diện tích (ha)</th>
               {isVerifiedReport && (
                 <th className="border border-black px-2 py-1">Nguyên nhân</th>

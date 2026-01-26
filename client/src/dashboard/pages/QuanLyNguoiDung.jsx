@@ -22,11 +22,13 @@ import { ClipLoader } from "react-spinners";
 import config from "../../config";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useIsMobile } from "../../hooks/useMediaQuery";
 
 import { getSonLaXa, getSonLaTieuKhu, getSonLaKhoanh } from "../../utils/dropdownService.js";
 
 const QuanLyNguoiDung = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -597,12 +599,12 @@ const QuanLyNguoiDung = () => {
   };
 
   return (
-    <div className="h-full flex flex-col p-6 max-h-screen overflow-hidden">
-      <div className="flex-none flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Quản lý người dùng</h2>
+    <div className="h-full flex flex-col p-3 sm:p-4 lg:p-6 max-h-screen overflow-hidden">
+      <div className="flex-none flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Quản lý người dùng</h2>
         <button
           onClick={openAddModal}
-          className="bg-forest-green-primary text-white py-2 px-4 rounded-md flex items-center"
+          className="w-full sm:w-auto bg-forest-green-primary text-white py-3 sm:py-2 px-4 rounded-md flex items-center justify-center min-h-[44px]"
         >
           <FaUserPlus className="mr-2" />
           Thêm người dùng
@@ -610,8 +612,8 @@ const QuanLyNguoiDung = () => {
       </div>
 
       {/* Filter section */}
-      <div className="flex-none bg-white rounded-lg shadow p-4 mb-6">
-        <div className="flex flex-col md:flex-row gap-4 items-end">
+      <div className="flex-none bg-white rounded-lg shadow p-3 sm:p-4 mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Role
@@ -620,7 +622,7 @@ const QuanLyNguoiDung = () => {
               name="role"
               value={filters.role}
               onChange={handleFilterChange}
-              className="w-full border border-gray-300 rounded-md py-2 px-3 focus:ring-forest-green-primary focus:border-forest-green-primary"
+              className="w-full border border-gray-300 rounded-md h-10 sm:h-12 px-3 text-sm sm:text-base focus:ring-forest-green-primary focus:border-forest-green-primary"
             >
               <option value="">Tất cả roles</option>
               {roles.map((role) => (
@@ -631,10 +633,10 @@ const QuanLyNguoiDung = () => {
             </select>
           </div>
 
-          <div>
+          <div className="w-full sm:w-auto">
             <button
               onClick={resetFilters}
-              className="bg-gray-200 text-gray-800 py-2 px-4 rounded-md flex items-center hover:bg-gray-300"
+              className="w-full sm:w-auto bg-gray-200 text-gray-800 h-10 sm:h-12 px-4 rounded-md flex items-center justify-center hover:bg-gray-300 min-h-[44px]"
             >
               <FaFilter className="mr-2" />
               Bỏ lọc
@@ -646,139 +648,150 @@ const QuanLyNguoiDung = () => {
       {loading ? (
         <div className="flex-1 flex justify-center items-center">
           <ClipLoader color="#027e02" size={50} />
-          <p className="ml-2 text-lg text-forest-green-primary">Đang tải...</p>
+          <p className="ml-2 text-sm sm:text-lg text-forest-green-primary">Đang tải...</p>
         </div>
       ) : (
         <div className="flex-1 min-h-0 bg-white rounded-lg shadow overflow-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tên người dùng
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Họ tên
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Chức vụ
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Đơn vị công tác
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Khu vực quản lý
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Roles
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Đăng nhập cuối
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Thao tác
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
-                  <tr key={user.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {user.username}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {user.full_name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {user.position || "Chưa cập nhật"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {user.organization || "Chưa cập nhật"}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      <div className="flex flex-col gap-1">
-                        <span className="font-medium text-gray-900">{getXaName(user.xa)}</span>
-                        {user.tieukhu && (
-                          <span className="text-xs bg-gray-100 px-2 py-0.5 rounded border border-gray-200 w-fit">
-                            Tiểu khu: {user.tieukhu}
-                          </span>
-                        )}
-                        {user.khoanh && (
-                          <span className="text-xs bg-gray-100 px-2 py-0.5 rounded border border-gray-200 w-fit">
-                            Khoảnh: {user.khoanh}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <div className="flex flex-wrap gap-1">
-                        {user.roles && user.roles.length > 0 ? (
-                          user.roles.map((role) => (
-                            <span
-                              key={role.id}
-                              className="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full"
-                            >
-                              {role.name}
+          <div className="overflow-x-auto -mx-3 sm:mx-0">
+            <table className="min-w-full divide-y divide-gray-200 text-xs sm:text-sm">
+              <thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
+                <tr>
+                  <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Tên người dùng
+                  </th>
+                  <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Họ tên
+                  </th>
+                  <th className="hidden md:table-cell px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Chức vụ
+                  </th>
+                  <th className="hidden lg:table-cell px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Đơn vị công tác
+                  </th>
+                  <th className="hidden sm:table-cell px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Khu vực
+                  </th>
+                  <th className="hidden md:table-cell px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Roles
+                  </th>
+                  <th className="hidden lg:table-cell px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Đăng nhập cuối
+                  </th>
+                  <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky right-0 bg-gray-50">
+                    Thao tác
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredUsers.length > 0 ? (
+                  filteredUsers.map((user) => (
+                    <tr key={user.id} className="hover:bg-gray-50">
+                      <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap">
+                        <div className="text-gray-900 font-medium">{user.username}</div>
+                        {/* Show hidden fields on mobile */}
+                        <div className="md:hidden text-xs text-gray-500 mt-1">
+                          {user.position || "Chưa cập nhật"}
+                        </div>
+                      </td>
+                      <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-gray-900">
+                        {user.full_name}
+                      </td>
+                      <td className="hidden md:table-cell px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-gray-900">
+                        {user.position || "Chưa cập nhật"}
+                      </td>
+                      <td className="hidden lg:table-cell px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-gray-900">
+                        {user.organization || "Chưa cập nhật"}
+                      </td>
+                      <td className="hidden sm:table-cell px-2 sm:px-4 lg:px-6 py-2 sm:py-4 text-gray-500">
+                        <div className="flex flex-col gap-1">
+                          <span className="font-medium text-gray-900">{getXaName(user.xa)}</span>
+                          {user.tieukhu && (
+                            <span className="text-xs bg-gray-100 px-2 py-0.5 rounded border border-gray-200 w-fit">
+                              TK: {user.tieukhu}
                             </span>
-                          ))
-                        ) : (
-                          <span className="text-gray-400 text-xs">Chưa có role</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.last_login
-                        ? new Date(user.last_login).toLocaleString("vi-VN")
-                        : "Chưa đăng nhập"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 space-x-2">
-                      <button
-                        onClick={() => openEditModal(user)}
-                        className="text-blue-600 hover:text-blue-900"
-                        title="Chỉnh sửa"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        onClick={() => openPasswordModal(user)}
-                        className="text-yellow-600 hover:text-yellow-900"
-                        title="Đổi mật khẩu"
-                      >
-                        <FaKey />
-                      </button>
-                      {canDeleteUser(user) && (
-                        <button
-                          onClick={() => handleDeleteUser(user)}
-                          className="text-red-600 hover:text-red-900"
-                          title="Xóa người dùng"
-                        >
-                          <FaTrash />
-                        </button>
-                      )}
+                          )}
+                          {user.khoanh && (
+                            <span className="text-xs bg-gray-100 px-2 py-0.5 rounded border border-gray-200 w-fit">
+                              Khoảnh: {user.khoanh}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="hidden md:table-cell px-2 sm:px-4 lg:px-6 py-2 sm:py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {user.roles && user.roles.length > 0 ? (
+                            user.roles.map((role) => (
+                              <span
+                                key={role.id}
+                                className="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full"
+                              >
+                                {role.name}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-gray-400 text-xs">Chưa có role</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="hidden lg:table-cell px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-gray-500">
+                        {user.last_login
+                          ? new Date(user.last_login).toLocaleString("vi-VN")
+                          : "Chưa đăng nhập"}
+                      </td>
+                      <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap sticky right-0 bg-white">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => openEditModal(user)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+                            title="Chỉnh sửa"
+                            aria-label="Chỉnh sửa người dùng"
+                          >
+                            <FaEdit className="text-base" />
+                          </button>
+                          <button
+                            onClick={() => openPasswordModal(user)}
+                            className="p-2 text-yellow-600 hover:bg-yellow-50 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+                            title="Đổi mật khẩu"
+                            aria-label="Đổi mật khẩu"
+                          >
+                            <FaKey className="text-base" />
+                          </button>
+                          {canDeleteUser(user) && (
+                            <button
+                              onClick={() => handleDeleteUser(user)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+                              title="Xóa người dùng"
+                              aria-label="Xóa người dùng"
+                            >
+                              <FaTrash className="text-base" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="8"
+                      className="px-2 sm:px-6 py-4 text-center text-sm text-gray-500"
+                    >
+                      {filters.role
+                        ? "Không tìm thấy người dùng phù hợp với bộ lọc."
+                        : "Không có dữ liệu người dùng."}
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="8"
-                    className="px-6 py-4 text-center text-sm text-gray-500"
-                  >
-                    {filters.role
-                      ? "Không tìm thấy người dùng phù hợp với bộ lọc."
-                      : "Không có dữ liệu người dùng."}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {/* ✅ IMPROVED: Modal thêm/sửa/đổi mật khẩu người dùng */}
       {showModal && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto"
           style={{
             zIndex: 100000,
             position: 'fixed',
@@ -789,36 +802,36 @@ const QuanLyNguoiDung = () => {
           }}
         >
           <div
-            className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
+            className="bg-white rounded-none sm:rounded-xl shadow-2xl w-full sm:max-w-3xl min-h-screen sm:min-h-0 sm:max-h-[90vh] overflow-hidden flex flex-col sm:my-4"
             style={{ zIndex: 100001 }}
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-forest-green-primary to-green-600 px-6 py-4">
+            <div className="bg-gradient-to-r from-forest-green-primary to-green-600 px-4 sm:px-6 py-3 sm:py-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="bg-white bg-opacity-20 rounded-full p-2 mr-3">
+                <div className="flex items-center flex-1 min-w-0">
+                  <div className="bg-white bg-opacity-20 rounded-full p-2 mr-2 sm:mr-3 flex-shrink-0">
                     {modalMode === "add" ? (
-                      <FaUserPlus className="text-white text-lg" />
+                      <FaUserPlus className="text-white text-base sm:text-lg" />
                     ) : modalMode === "edit" ? (
-                      <FaEdit className="text-white text-lg" />
+                      <FaEdit className="text-white text-base sm:text-lg" />
                     ) : modalMode === "password" ? (
-                      <FaKey className="text-white text-lg" />
+                      <FaKey className="text-white text-base sm:text-lg" />
                     ) : (
-                      <FaUserTag className="text-white text-lg" />
+                      <FaUserTag className="text-white text-base sm:text-lg" />
                     )}
                   </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-white">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-base sm:text-xl font-semibold text-white truncate">
                       {modalMode === "add"
                         ? "Thêm người dùng mới"
                         : modalMode === "edit"
-                          ? "Chỉnh sửa thông tin người dùng"
+                          ? "Chỉnh sửa thông tin"
                           : modalMode === "password"
-                            ? "Đổi mật khẩu người dùng"
-                            : "Quản lý vai trò người dùng"}
+                            ? "Đổi mật khẩu"
+                            : "Quản lý vai trò"}
                     </h3>
                     {selectedUser && modalMode !== "add" && (
-                      <p className="text-green-100 text-sm">
+                      <p className="text-green-100 text-xs sm:text-sm truncate">
                         {selectedUser.full_name} ({selectedUser.username})
                       </p>
                     )}
@@ -827,24 +840,25 @@ const QuanLyNguoiDung = () => {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="text-white hover:text-gray-200 transition-colors"
+                  className="text-white hover:text-gray-200 transition-colors p-2 ml-2 flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  aria-label="Đóng"
                 >
-                  <FaTimes className="text-xl" />
+                  <FaTimes className="text-lg sm:text-xl" />
                 </button>
               </div>
             </div>
 
             {/* Modal Body */}
             <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-              <div className="flex-1 overflow-y-auto px-6 py-6">
-                <div className="space-y-6">
+              <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6">
+                <div className="space-y-4 sm:space-y-6">
                   {modalMode === "password" ? (
                     // ✅ UPDATED: Form đổi mật khẩu với toggle
-                    <div className="space-y-6">
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div className="space-y-4 sm:space-y-6">
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4">
                         <div className="flex items-center">
-                          <FaKey className="text-yellow-600 mr-2" />
-                          <p className="text-sm text-yellow-800">
+                          <FaKey className="text-yellow-600 mr-2 flex-shrink-0" />
+                          <p className="text-xs sm:text-sm text-yellow-800">
                             Đổi mật khẩu cho: <strong className="text-yellow-900">{selectedUser?.full_name}</strong>
                           </p>
                         </div>
@@ -865,13 +879,14 @@ const QuanLyNguoiDung = () => {
                             required
                             value={passwordForm.old_password}
                             onChange={handlePasswordChange}
-                            className="user-management-input pr-12"
+                            className="user-management-input pr-12 h-10 sm:h-12 text-sm sm:text-base"
                             placeholder="Nhập mật khẩu hiện tại"
                           />
                           <button
                             type="button"
                             onClick={() => togglePasswordVisibility('old_password')}
-                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                            className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors min-h-[44px] min-w-[44px]"
+                            aria-label="Hiện/ẩn mật khẩu"
                           >
                             {showPasswords.old_password ? <FaEyeSlash /> : <FaEye />}
                           </button>
@@ -893,13 +908,14 @@ const QuanLyNguoiDung = () => {
                             required
                             value={passwordForm.new_password}
                             onChange={handlePasswordChange}
-                            className="user-management-input pr-12"
+                            className="user-management-input pr-12 h-10 sm:h-12 text-sm sm:text-base"
                             placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
                           />
                           <button
                             type="button"
                             onClick={() => togglePasswordVisibility('new_password')}
-                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                            className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors min-h-[44px] min-w-[44px]"
+                            aria-label="Hiện/ẩn mật khẩu"
                           >
                             {showPasswords.new_password ? <FaEyeSlash /> : <FaEye />}
                           </button>
@@ -921,13 +937,14 @@ const QuanLyNguoiDung = () => {
                             required
                             value={passwordForm.confirm_password}
                             onChange={handlePasswordChange}
-                            className="user-management-input pr-12"
+                            className="user-management-input pr-12 h-10 sm:h-12 text-sm sm:text-base"
                             placeholder="Nhập lại mật khẩu mới"
                           />
                           <button
                             type="button"
                             onClick={() => togglePasswordVisibility('confirm_password')}
-                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                            className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors min-h-[44px] min-w-[44px]"
+                            aria-label="Hiện/ẩn mật khẩu"
                           >
                             {showPasswords.confirm_password ? <FaEyeSlash /> : <FaEye />}
                           </button>
@@ -940,8 +957,8 @@ const QuanLyNguoiDung = () => {
                           )}
                       </div>
 
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <h4 className="text-sm font-semibold text-blue-900 mb-2">Yêu cầu mật khẩu:</h4>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+                        <h4 className="text-xs sm:text-sm font-semibold text-blue-900 mb-2">Yêu cầu mật khẩu:</h4>
                         <ul className="text-xs text-blue-800 space-y-1">
                           <li>• Tối thiểu 6 ký tự</li>
                           <li>• Khác với mật khẩu hiện tại</li>
@@ -952,7 +969,7 @@ const QuanLyNguoiDung = () => {
                   ) : (
                     // ✅ UPDATED: Form thêm/sửa người dùng với các field mới và toggle password
                     <>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         <div>
                           <label
                             htmlFor="username"
@@ -968,7 +985,7 @@ const QuanLyNguoiDung = () => {
                             readOnly={modalMode === "edit"}
                             value={formData.username}
                             onChange={handleInputChange}
-                            className="user-management-input"
+                            className="user-management-input h-10 sm:h-12 text-sm sm:text-base"
                             placeholder="Nhập tên đăng nhập"
                           />
                           {modalMode === "add" && (
@@ -992,7 +1009,7 @@ const QuanLyNguoiDung = () => {
                             required
                             value={formData.full_name}
                             onChange={handleInputChange}
-                            className="user-management-input"
+                            className="user-management-input h-10 sm:h-12 text-sm sm:text-base"
                             placeholder="Nhập họ và tên đầy đủ"
                           />
                         </div>
@@ -1014,13 +1031,14 @@ const QuanLyNguoiDung = () => {
                               required={modalMode === "add"}
                               value={formData.password}
                               onChange={handleInputChange}
-                              className="user-management-input pr-12"
+                              className="user-management-input pr-12 h-10 sm:h-12 text-sm sm:text-base"
                               placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
                             />
                             <button
                               type="button"
                               onClick={() => togglePasswordVisibility('password')}
-                              className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                              className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors min-h-[44px] min-w-[44px]"
+                              aria-label="Hiện/ẩn mật khẩu"
                             >
                               {showPasswords.password ? <FaEyeSlash /> : <FaEye />}
                             </button>
@@ -1028,7 +1046,7 @@ const QuanLyNguoiDung = () => {
                         </div>
                       )}
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         <div>
                           <label
                             htmlFor="position"
@@ -1043,8 +1061,8 @@ const QuanLyNguoiDung = () => {
                             required
                             value={formData.position}
                             onChange={handleInputChange}
-                            placeholder="VD: Cán bộ kiểm lâm, Trưởng hạt kiểm lâm..."
-                            className="user-management-input"
+                            placeholder="VD: Cán bộ kiểm lâm..."
+                            className="user-management-input h-10 sm:h-12 text-sm sm:text-base"
                           />
                         </div>
 
@@ -1062,22 +1080,22 @@ const QuanLyNguoiDung = () => {
                             required
                             value={formData.organization}
                             onChange={handleInputChange}
-                            placeholder="VD: Hạt Kiểm lâm Sơn La, Chi cục Kiểm lâm tỉnh..."
-                            className="user-management-input"
+                            placeholder="VD: Hạt Kiểm lâm Sơn La..."
+                            className="user-management-input h-10 sm:h-12 text-sm sm:text-base"
                           />
                         </div>
                       </div>
 
                       {/* Phạm vi dữ liệu - Sơn La: Xã → Tiểu khu → Khoảnh */}
-                      <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                      <div className="border border-gray-200 rounded-lg p-3 sm:p-4 bg-gray-50">
+                        <h4 className="text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
                           Phạm vi dữ liệu
                         </h4>
-                        <p className="text-xs text-gray-500 mb-4">
+                        <p className="text-xs text-gray-500 mb-3 sm:mb-4">
                           Chọn khu vực dữ liệu mà người dùng có thể truy cập. Để trống tất cả nếu muốn truy cập toàn tỉnh.
                         </p>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                           {/* Xã */}
                           <div>
                             <label
@@ -1091,7 +1109,7 @@ const QuanLyNguoiDung = () => {
                               id="xa"
                               value={formData.xa || ""}
                               onChange={handleXaChange}
-                              className="user-management-select"
+                              className="user-management-select h-10 sm:h-12 text-sm sm:text-base"
                             >
                               <option value="">Tất cả xã</option>
                               {xaList.map((xa, idx) => (
@@ -1116,7 +1134,7 @@ const QuanLyNguoiDung = () => {
                               value={formData.tieukhu || ""}
                               onChange={handleTieukhuChange}
                               disabled={!formData.xa}
-                              className={`user-management-select ${!formData.xa ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                              className={`user-management-select h-10 sm:h-12 text-sm sm:text-base ${!formData.xa ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             >
                               <option value="">Tất cả tiểu khu</option>
                               {tieukhuList.map((tk, idx) => (
@@ -1141,7 +1159,7 @@ const QuanLyNguoiDung = () => {
                               value={formData.khoanh || ""}
                               onChange={handleKhoanhChange}
                               disabled={!formData.xa}
-                              className={`user-management-select ${!formData.xa ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                              className={`user-management-select h-10 sm:h-12 text-sm sm:text-base ${!formData.xa ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             >
                               <option value="">Tất cả khoảnh</option>
                               {khoanhList.map((khoanh, idx) => (
@@ -1169,13 +1187,14 @@ const QuanLyNguoiDung = () => {
                               id="password"
                               value={formData.password}
                               onChange={handleInputChange}
-                              className="user-management-input pr-12"
+                              className="user-management-input pr-12 h-10 sm:h-12 text-sm sm:text-base"
                               placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
                             />
                             <button
                               type="button"
                               onClick={() => togglePasswordVisibility('password')}
-                              className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                              className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors min-h-[44px] min-w-[44px]"
+                              aria-label="Hiện/ẩn mật khẩu"
                             >
                               {showPasswords.password ? <FaEyeSlash /> : <FaEye />}
                             </button>
@@ -1189,7 +1208,7 @@ const QuanLyNguoiDung = () => {
                           <label className="block text-sm font-semibold text-gray-700 mb-2">
                             Vai trò (Roles) *
                           </label>
-                          <div className="border border-gray-300 rounded-lg p-3 bg-gray-50 max-h-60 overflow-y-auto role-selection-scroll">
+                          <div className="border border-gray-300 rounded-lg p-3 bg-gray-50 max-h-48 sm:max-h-60 overflow-y-auto role-selection-scroll">
                             {roles.length === 0 ? (
                               <div className="text-center py-4 text-gray-500">
                                 <FaUserTag className="mx-auto text-2xl mb-2 opacity-50" />
@@ -1265,26 +1284,26 @@ const QuanLyNguoiDung = () => {
 
                   {modalMode === "roles" && (
                     // Roles Management - Improved UI
-                    <div className="space-y-4">
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
                         <div className="flex items-center">
-                          <FaUserTag className="text-blue-600 mr-2" />
-                          <p className="text-sm text-blue-800">
+                          <FaUserTag className="text-blue-600 mr-2 flex-shrink-0" />
+                          <p className="text-xs sm:text-sm text-blue-800">
                             Quản lý vai trò cho: <strong className="text-blue-900">{selectedUser?.full_name}</strong>
                           </p>
                         </div>
                       </div>
 
                       {/* Role Selection */}
-                      <div className="space-y-3">
+                      <div className="space-y-2 sm:space-y-3">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-lg font-semibold text-gray-900">Chọn vai trò</h4>
-                          <span className="text-sm text-gray-500">
+                          <h4 className="text-base sm:text-lg font-semibold text-gray-900">Chọn vai trò</h4>
+                          <span className="text-xs sm:text-sm text-gray-500">
                             {selectedRoles.length} / {roles.length} được chọn
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-3 max-h-80 overflow-y-auto role-selection-scroll border border-gray-200 rounded-lg p-3 bg-gray-50">
+                        <div className="grid grid-cols-1 gap-2 sm:gap-3 max-h-60 sm:max-h-80 overflow-y-auto role-selection-scroll border border-gray-200 rounded-lg p-2 sm:p-3 bg-gray-50">
                           {roles.length === 0 ? (
                             <div className="text-center py-8 text-gray-500">
                               <FaUserTag className="mx-auto text-4xl mb-2 opacity-50" />
@@ -1417,12 +1436,12 @@ const QuanLyNguoiDung = () => {
               </div>
 
               {/* Modal Footer */}
-              <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+              <div className="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200">
                 <div className="flex flex-col sm:flex-row-reverse gap-3">
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-forest-green-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-green-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="w-full sm:w-auto inline-flex justify-center items-center px-4 sm:px-6 py-3 border border-transparent text-sm sm:text-base font-medium rounded-lg text-white bg-forest-green-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-green-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px]"
                   >
                     {loading ? (
                       <>
@@ -1459,7 +1478,7 @@ const QuanLyNguoiDung = () => {
                     type="button"
                     onClick={closeModal}
                     disabled={loading}
-                    className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="w-full sm:w-auto inline-flex justify-center items-center px-4 sm:px-6 py-3 border border-gray-300 text-sm sm:text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px]"
                   >
                     <FaTimes className="mr-2" />
                     Hủy bỏ
