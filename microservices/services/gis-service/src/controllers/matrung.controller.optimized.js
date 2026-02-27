@@ -514,8 +514,8 @@ function buildGeoJSON(rows, extraProps = {}) {
         // Administrative data from materialized view lookup
         huyen,
         xa: convertTcvn3ToUnicode(row.xa || ''),
-        tk: row.tk,
-        khoanh: row.khoanh,
+        tk: convertTcvn3ToUnicode(row.tk || ''),
+        khoanh: convertTcvn3ToUnicode(row.khoanh || ''),
         churung: convertTcvn3ToUnicode(row.churung || ''),
 
         x_coordinate: row.x_coordinate,

@@ -5,10 +5,10 @@ DELETE FROM "Permission";
 -- Tạo lại permissions theo cấu trúc web
 INSERT INTO "Permission" (code, name, description, module, resource, action, parent_id, ui_path, ui_category, ui_element, "order", icon) VALUES
 
--- 1. DỰ BÁO MẤT RỪNG (Parent)
-('forecast', 'Dự báo mất rừng', 'Truy cập module dự báo mất rừng', 'forecast', 'forecast', 'access', NULL, '/dashboard/dubaomatrung', 'main_menu', 'page', 1, 'trending-up'),
-('forecast.auto', 'Dự báo tự động', 'Sử dụng dự báo mất rừng tự động', 'forecast', 'auto_forecast', 'use', 1, '/dashboard/dubaomatrung/auto', 'forecast', 'feature', 1, 'cpu'),
-('forecast.custom', 'Dự báo tùy biến', 'Sử dụng dự báo mất rừng tùy biến', 'forecast', 'custom_forecast', 'use', 1, '/dashboard/dubaomatrung/custom', 'forecast', 'feature', 2, 'settings'),
+-- 1. PHÂN TÍCH MẤT RỪNG (Parent)
+('forecast', 'Phân tích mất rừng', 'Truy cập module phân tích mất rừng', 'forecast', 'forecast', 'access', NULL, '/dashboard/dubaomatrung', 'main_menu', 'page', 1, 'trending-up'),
+('forecast.auto', 'Phân tích tự động', 'Sử dụng phân tích mất rừng tự động', 'forecast', 'auto_forecast', 'use', 1, '/dashboard/dubaomatrung/auto', 'forecast', 'feature', 1, 'cpu'),
+('forecast.custom', 'Phân tích tùy biến', 'Sử dụng phân tích mất rừng tùy biến', 'forecast', 'custom_forecast', 'use', 1, '/dashboard/dubaomatrung/custom', 'forecast', 'feature', 2, 'settings'),
 
 -- 2. QUẢN LÝ DỮ LIỆU (Parent)
 ('data_management', 'Quản lý dữ liệu', 'Truy cập module quản lý dữ liệu', 'data', 'data_management', 'access', NULL, '/dashboard/quanlydulieu', 'main_menu', 'page', 2, 'database'),
@@ -40,13 +40,13 @@ INSERT INTO "Permission" (code, name, description, module, resource, action, par
 ('user_management.delete', 'Xóa người dùng', 'Xóa người dùng', 'admin', 'users', 'delete', 5, '/dashboard/quanlynguoidung/delete', 'user_management', 'action', 4, 'user-minus'),
 ('user_management.assign_roles', 'Phân quyền', 'Gán role cho người dùng', 'admin', 'users', 'assign_roles', 5, '/dashboard/quanlynguoidung/roles', 'user_management', 'action', 5, 'shield'),
 
--- 6. QUẢN LÝ ROLES (Parent)
-('role_management', 'Quản lý roles', 'Truy cập module quản lý roles', 'admin', 'role_management', 'access', NULL, '/dashboard/quanlyrole', 'main_menu', 'page', 6, 'shield'),
-('role_management.view', 'Xem roles', 'Xem danh sách roles', 'admin', 'roles', 'read', 6, '/dashboard/quanlyrole/view', 'role_management', 'action', 1, 'eye'),
-('role_management.create', 'Tạo role', 'Tạo role mới', 'admin', 'roles', 'create', 6, '/dashboard/quanlyrole/create', 'role_management', 'action', 2, 'plus'),
-('role_management.edit', 'Sửa role', 'Chỉnh sửa role', 'admin', 'roles', 'update', 6, '/dashboard/quanlyrole/edit', 'role_management', 'action', 3, 'edit'),
-('role_management.delete', 'Xóa role', 'Xóa role', 'admin', 'roles', 'delete', 6, '/dashboard/quanlyrole/delete', 'role_management', 'action', 4, 'trash'),
-('role_management.assign_permissions', 'Phân quyền chi tiết', 'Gán permissions cho role', 'admin', 'roles', 'assign_permissions', 6, '/dashboard/quanlyrole/permissions', 'role_management', 'action', 5, 'settings');
+-- 6. QUẢN LÝ PHÂN QUYỀN (Parent)
+('role_management', 'Quản lý phân quyền', 'Truy cập module quản lý phân quyền', 'admin', 'role_management', 'access', NULL, '/dashboard/quanlyrole', 'main_menu', 'page', 6, 'shield'),
+('role_management.view', 'Xem danh sách phân quyền', 'Xem danh sách vai trò và phân quyền', 'admin', 'roles', 'read', 6, '/dashboard/quanlyrole/view', 'role_management', 'action', 1, 'eye'),
+('role_management.create', 'Tạo vai trò', 'Tạo vai trò mới', 'admin', 'roles', 'create', 6, '/dashboard/quanlyrole/create', 'role_management', 'action', 2, 'plus'),
+('role_management.edit', 'Sửa vai trò', 'Chỉnh sửa vai trò', 'admin', 'roles', 'update', 6, '/dashboard/quanlyrole/edit', 'role_management', 'action', 3, 'edit'),
+('role_management.delete', 'Xóa vai trò', 'Xóa vai trò', 'admin', 'roles', 'delete', 6, '/dashboard/quanlyrole/delete', 'role_management', 'action', 4, 'trash'),
+('role_management.assign_permissions', 'Phân quyền chi tiết', 'Gán quyền cho vai trò', 'admin', 'roles', 'assign_permissions', 6, '/dashboard/quanlyrole/permissions', 'role_management', 'action', 5, 'settings');
 
 -- Cập nhật parent_id dựa trên ID thực tế
 UPDATE "Permission" SET parent_id = (SELECT id FROM "Permission" WHERE code = 'forecast') WHERE code IN ('forecast.auto', 'forecast.custom');

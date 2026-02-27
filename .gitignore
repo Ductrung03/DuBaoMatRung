@@ -76,3 +76,68 @@ docker/initial-data/admin_db.sql
 docker/initial-data/auth_db.sql
 docker/initial-data/gis_db.sql
 
+# Temporary markdown docs (AI/debug summaries)
+AUTO_CLIP_IMPLEMENTATION_RESULTS.md
+BACKEND_FRONTEND_FIX_COMPLETE.md
+CHANGES_SUMMARY.md
+DEBUG_STEP_BY_STEP.md
+FINAL_DEPLOYMENT_STATUS.md
+FINAL_FIX_TABLE_DISPLAY.md
+FIX_COMPLETED_REPORT.md
+FONT_FIX_SUMMARY.md
+FONT_FIX_TEST_PLAN.md
+IMPLEMENTATION_SUMMARY.md
+OPTION3_DEPLOYMENT_SUMMARY.md
+PERFORMANCE_OPTIMIZATION_COMPLETED.md
+PERFORMANCE_OPTIMIZATION_SUMMARY.md
+PHASE_2_DEPLOYMENT_GUIDE.md
+PRODUCTION_DEPLOYMENT_STRATEGY.md
+QUICK_DEPLOY.md
+SPATIAL_CLIPPING_CHECKLIST.md
+SPATIAL_CLIPPING_DEPLOYMENT.md
+SPATIAL_CLIPPING_IMPLEMENTATION.md
+SPATIAL_CLIPPING_QUICK_START.md
+TABLE_DATA_FIX_SUMMARY.md
+
+# Test/debug scripts at root
+check-*.js
+list-tables.js
+test-*.js
+test_*.png
+
+# Data files
+SonLa_HienTrangRung/
+SonLa_HienTrangRung.rar
+*.rar
+
+# OS artifact
+nul
+
+# Batch scripts
+CLEAR_CACHE_AND_RESTART.bat
+
+# Scripts directory (one-off utility scripts)
+scripts/
+
+# GIS service one-off scripts
+microservices/services/gis-service/import-shapefile.js
+microservices/services/gis-service/inspect-shapefile.js
+microservices/services/gis-service/optimize-performance.js
+microservices/services/gis-service/performance-tests.js
+microservices/services/gis-service/pm2-clip-worker.config.js
+microservices/services/gis-service/test-*.js
+microservices/services/gis-service/scripts/
+microservices/services/gis-service/tests/
+
+# Database migrations (one-off)
+microservices/database/
+
+# Mapserver mapfiles
+mapserver/mapfiles/
+
+# Mapserver service middleware (if generated)
+microservices/services/mapserver-service/src/middleware/
+
+# Package lock files (microservices)
+microservices/package-lock.json
+microservices/node_modules/.package-lock.json

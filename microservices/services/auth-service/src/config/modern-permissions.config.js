@@ -219,7 +219,7 @@ const MODERN_PERMISSIONS = {
   // MODULE: ROLE & PERMISSION MANAGEMENT
   // ========================================
   role: {
-    name: 'Quản lý vai trò & phân quyền',
+    name: 'Quản lý phân quyền',
     icon: 'FaUserShield',
     color: '#F59E0B',
     pages: {
@@ -1026,7 +1026,7 @@ const MODERN_PERMISSIONS = {
     color: '#A855F7',
     pages: {
       forecast: {
-        name: 'Dữ liệu dự báo mất rừng',
+        name: 'Dữ liệu phân tích mất rừng',
         path: '/data/forecast',
         icon: 'FaChartArea',
         features: {
@@ -1035,8 +1035,8 @@ const MODERN_PERMISSIONS = {
             permissions: [
               {
                 code: 'data_management.forecast.search',
-                name: 'Tra cứu dữ liệu dự báo mất rừng',
-                description: 'Tra cứu và xem dữ liệu dự báo mất rừng',
+                name: 'Tra cứu dữ liệu phân tích mất rừng',
+                description: 'Tra cứu và xem dữ liệu phân tích mất rừng',
                 ui_element: 'Search Button',
                 action: 'search'
               }
@@ -1064,7 +1064,7 @@ const MODERN_PERMISSIONS = {
         }
       },
       verification: {
-        name: 'Xác minh dự báo mất rừng',
+        name: 'Xác minh phân tích mất rừng',
         path: '/data/verification',
         icon: 'FaCheckDouble',
         features: {
@@ -1073,8 +1073,8 @@ const MODERN_PERMISSIONS = {
             permissions: [
               {
                 code: 'data_management.verification.search',
-                name: 'Tìm kiếm dự báo cần xác minh',
-                description: 'Tìm kiếm các dự báo mất rừng cần được xác minh',
+                name: 'Tìm kiếm phân tích cần xác minh',
+                description: 'Tìm kiếm các phân tích mất rừng cần được xác minh',
                 ui_element: 'Search Input',
                 action: 'search'
               }
@@ -1085,8 +1085,8 @@ const MODERN_PERMISSIONS = {
             permissions: [
               {
                 code: 'data_management.verification.verify',
-                name: 'Xác minh dự báo',
-                description: 'Thực hiện xác minh, đánh giá độ chính xác của dự báo',
+                name: 'Xác minh phân tích',
+                description: 'Thực hiện xác minh, đánh giá độ chính xác của phân tích',
                 ui_element: 'Verify Button',
                 action: 'verify'
               }

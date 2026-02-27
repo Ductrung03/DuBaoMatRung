@@ -4,23 +4,23 @@
  */
 
 const PAGE_PERMISSIONS = {
-  // Trang Dự báo mất rừng
+  // Trang Phân tích mất rừng
   forecast: {
-    name: 'Dự báo mất rừng',
+    name: 'Phân tích mất rừng',
     key: 'forecast',
     icon: 'FaChartLine',
     path: '/dashboard/dubao-matrung',
     features: [
       {
         code: 'forecast.auto',
-        name: 'Dự báo mất rừng tự động',
-        description: 'Xem và sử dụng tính năng dự báo tự động',
+        name: 'Phân tích mất rừng tự động',
+        description: 'Xem và sử dụng tính năng phân tích tự động',
         path: '/dashboard/dubao-matrung/auto'
       },
       {
         code: 'forecast.custom',
-        name: 'Dự báo mất rừng tùy biến',
-        description: 'Tạo và chỉnh sửa dự báo tùy biến',
+        name: 'Phân tích mất rừng tùy biến',
+        description: 'Tạo và chỉnh sửa phân tích tùy biến',
         path: '/dashboard/dubao-matrung/custom'
       }
     ]
@@ -35,8 +35,8 @@ const PAGE_PERMISSIONS = {
     features: [
       {
         code: 'data_management.forecast_lookup',
-        name: 'Tra cứu dữ liệu dự báo mất rừng',
-        description: 'Tra cứu và xem dữ liệu dự báo',
+        name: 'Tra cứu dữ liệu phân tích mất rừng',
+        description: 'Tra cứu và xem dữ liệu phân tích',
         path: '/dashboard/quanly-dulieu/forecast-lookup'
       },
       {
@@ -47,8 +47,8 @@ const PAGE_PERMISSIONS = {
       },
       {
         code: 'data_management.verification',
-        name: 'Xác minh dự báo mất rừng',
-        description: 'Xác minh và đánh giá độ chính xác dự báo',
+        name: 'Xác minh phân tích mất rừng',
+        description: 'Xác minh và đánh giá độ chính xác phân tích',
         path: '/dashboard/quanly-dulieu/verification'
       },
       {
@@ -144,9 +144,9 @@ const PAGE_PERMISSIONS = {
     ]
   },
 
-  // Trang quản lý role
+  // Trang quản lý phân quyền
   role_management: {
-    name: 'Quản lý vai trò',
+    name: 'Quản lý phân quyền',
     key: 'role_management',
     icon: 'FaUserShield',
     path: '/dashboard/quanly-role',

@@ -487,5 +487,3 @@ http {
 - **Initial Data**: `docker/initial-data/` (SQL dumps cho database seed)
 - **Permission Config**: `microservices/services/auth-service/src/config/`
 - **Database Schema**: `microservices/services/auth-service/prisma/schema.prisma`
-
-đ

@@ -1,5 +1,6 @@
 // client/src/dashboard/components/MapLayerLegend.jsx
-import React, { useEffect, useRef, useState } from "react";
+// ⚡ OPTIMIZED: Memoized legend to prevent unnecessary re-creations
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 
@@ -9,6 +10,16 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
   // Start collapsed on mobile for better UX
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isExpanded, setIsExpanded] = useState(!isMobile);
+
+  // ⚡ Extract only visibility state to minimize re-renders
+  const hientrangVisible = useMemo(() =>
+    mapLayers?.hientrangrung?.visible !== false,
+    [mapLayers?.hientrangrung?.visible]
+  );
+  const matrungVerifiedVisible = useMemo(() =>
+    mapLayers?.matrung_verified?.visible !== false,
+    [mapLayers?.matrung_verified?.visible]
+  );
 
   // Listen for window resize to detect mobile/desktop
   useEffect(() => {
@@ -101,81 +112,11 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
       `;
   };
 
-  // Create layer sections based on MapServer layers (Sơn La - 3 layers)
+  // Create layer sections based on MapServer layers (Unified layer)
   const createLayerSections = () => {
     const sections = [];
 
-    // 1. Lớp Ranh Giới Xã (sonla_rgx)
-    sections.push(`
-        <div class="legend-layer" style="margin-bottom: 12px;">
-          <div style="
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 8px;
-            background: #f5f5f5;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-          " onmouseover="this.style.background='#e8f5e9'" onmouseout="this.style.background='#f5f5f5'">
-            <input type="checkbox" id="layer-ranhgioixa" ${mapLayers?.ranhgioixa?.visible !== false ? 'checked' : ''}
-              style="width: 16px; height: 16px; cursor: pointer; accent-color: #4CAF50;">
-            <label for="layer-ranhgioixa" style="
-              font-weight: 600;
-              color: #333;
-              font-size: 13px;
-              cursor: pointer;
-              user-select: none;
-              flex: 1;
-            ">
-              🏘️ Ranh Giới Xã (75 xã)
-            </label>
-          </div>
-          <div style="padding: 8px 12px 4px 28px; font-size: 11px; line-height: 1.8;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="width: 24px; height: 14px; border: 2px solid #000; border-radius: 2px; background: rgba(240,240,240,0.2); flex-shrink: 0;"></div>
-              <span style="color: #555;">Ranh giới xã Sơn La</span>
-            </div>
-          </div>
-        </div>
-      `);
-
-    // 2. Lớp Tiểu Khu Khoảnh Lô (sonla_tkkl)
-    sections.push(`
-        <div class="legend-layer" style="margin-bottom: 12px;">
-          <div style="
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 8px;
-            background: #f5f5f5;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-          " onmouseover="this.style.background='#e3f2fd'" onmouseout="this.style.background='#f5f5f5'">
-            <input type="checkbox" id="layer-tieukukhoanh" ${mapLayers?.tieukukhoanh?.visible !== false ? 'checked' : ''}
-              style="width: 16px; height: 16px; cursor: pointer; accent-color: #2196F3;">
-            <label for="layer-tieukukhoanh" style="
-              font-weight: 600;
-              color: #333;
-              font-size: 13px;
-              cursor: pointer;
-              user-select: none;
-              flex: 1;
-            ">
-              📐 Tiểu Khu Khoảnh Lô (30k khoảnh)
-            </label>
-          </div>
-          <div style="padding: 8px 12px 4px 28px; font-size: 11px; line-height: 1.8;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="width: 24px; height: 14px; border: 1px solid #646464; border-radius: 2px; background: rgba(220,220,220,0.15); flex-shrink: 0;"></div>
-              <span style="color: #555;">Ranh giới tiểu khu khoảnh lô</span>
-            </div>
-          </div>
-        </div>
-      `);
-
-    // 3. Lớp Hiện Trạng Rừng (sonla_hientrangrung - PRIMARY LAYER)
+    // Unified Hiện Trạng Rừng Layer (replaces 3 old layers)
     sections.push(`
         <div class="legend-layer" style="margin-bottom: 12px;">
           <div style="
@@ -188,7 +129,7 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
             cursor: pointer;
             transition: background 0.2s;
           " onmouseover="this.style.background='#f1f8e9'" onmouseout="this.style.background='#f5f5f5'">
-            <input type="checkbox" id="layer-hientrangrung" ${mapLayers?.hientrangrung?.visible !== false ? 'checked' : ''}
+            <input type="checkbox" id="layer-hientrangrung" ${hientrangVisible ? 'checked' : ''}
               style="width: 16px; height: 16px; cursor: pointer; accent-color: #8BC34A;">
             <label for="layer-hientrangrung" style="
               font-weight: 600;
@@ -198,7 +139,7 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
               user-select: none;
               flex: 1;
             ">
-              🌳 Hiện Trạng Rừng (280k khoảnh)
+              🌳 Hiện Trạng Rừng (127k đa giác)
             </label>
           </div>
           <div style="padding: 8px 12px 4px 28px; font-size: 10px; line-height: 1.6; max-height: 300px; overflow-y: auto;">
@@ -281,6 +222,65 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
         </div>
       `);
 
+    // Mất Rừng Đã Xác Minh Layer
+    sections.push(`
+        <div class="legend-layer" style="margin-bottom: 12px;">
+          <div style="
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            background: #fff3e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+          " onmouseover="this.style.background='#ffe0b2'" onmouseout="this.style.background='#fff3e0'">
+            <input type="checkbox" id="layer-matrung_verified" ${matrungVerifiedVisible ? 'checked' : ''}
+              style="width: 16px; height: 16px; cursor: pointer; accent-color: #FF9800;">
+            <label for="layer-matrung_verified" style="
+              font-weight: 600;
+              color: #e65100;
+              font-size: 13px;
+              cursor: pointer;
+              user-select: none;
+              flex: 1;
+            ">
+              🟠 Mất Rừng (Đã Xác Minh)
+            </label>
+          </div>
+          <div style="padding: 8px 12px 4px 28px; font-size: 10px; line-height: 1.6;">
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(255, 140, 0); border: 1.5px solid rgb(200, 80, 0); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Đã xác minh (clipped)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
+              <div style="width: 18px; height: 13px; background: rgb(150, 150, 150); border: 1.5px solid rgb(100, 100, 100); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">Đã xử lý</span>
+            </div>
+          </div>
+        </div>
+      `);
+
+    // Mất Rừng Chưa Xác Minh (GeoJSON real-time)
+    sections.push(`
+        <div class="legend-layer" style="margin-bottom: 8px;">
+          <div style="
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            background: #ffebee;
+            border-radius: 6px;
+          ">
+            <div style="width: 16px; height: 16px; background: #ef5350; border-radius: 3px; flex-shrink: 0;"></div>
+            <span style="font-weight: 600; color: #c62828; font-size: 13px;">🔴 Mất Rừng (Chưa xác minh)</span>
+          </div>
+          <div style="padding: 4px 12px 0 28px; font-size: 10px; color: #888;">
+            Real-time GeoJSON data
+          </div>
+        </div>
+      `);
+
     return sections.join('');
   };
 
@@ -305,7 +305,8 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
     const layerMapping = {
       'layer-ranhgioixa': 'ranhgioixa',
       'layer-tieukukhoanh': 'tieukukhoanh',
-      'layer-hientrangrung': 'hientrangrung'
+      'layer-hientrangrung': 'hientrangrung',
+      'layer-matrung_verified': 'matrung_verified'
     };
 
     Object.entries(layerMapping).forEach(([checkboxId, layerKey]) => {
@@ -339,7 +340,8 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
       controlRef.current = null;
     }
   };
-}, [map, mapLayers, toggleLayerVisibility, isExpanded, isMobile]);
+  // ⚡ OPTIMIZED: Only re-create when visibility actually changes, not on every mapLayers update
+}, [map, hientrangVisible, matrungVerifiedVisible, toggleLayerVisibility, isExpanded, isMobile]);
 
 return null;
 };

@@ -9,10 +9,10 @@
     "test": "jest",
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate dev",
-    "prisma:seed": "node prisma/seed.js"
+    "prisma:seed": "node prisma/seed-feature-based.js"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed-feature-based.js"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

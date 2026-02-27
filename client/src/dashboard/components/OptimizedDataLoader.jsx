@@ -111,7 +111,7 @@ const OptimizedDataLoader = ({
         "Bao gồm cả địa hình, thủy văn và giao thông"
       ],
       deforestationAlerts: [
-        "Đang load dự báo mất rừng mới nhất",
+        "Đang load phân tích mất rừng mới nhất",
         "Dữ liệu được phân loại theo mức độ cảnh báo"
       ]
     };

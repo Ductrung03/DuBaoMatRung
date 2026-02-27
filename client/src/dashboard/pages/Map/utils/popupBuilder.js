@@ -244,7 +244,7 @@ export const buildDeforestationAlertsPopup = (feature) => {
   
   let popupContent = `
     <div class="custom-popup">
-      <h4 class="popup-title">Dự báo mất rừng mới nhất</h4>
+      <h4 class="popup-title">Phân tích mất rừng mới nhất</h4>
       <table class="popup-table">
   `;
 

@@ -106,7 +106,7 @@ async function getAdminDataOptimized(db, geom) {
   }
 }
 
-// Get mat rung data with filters - OPTIMIZED VERSION
+// Get mat rung data with filters - OPTIMIZED VERSION WITH PAGINATION
 exports.getMatRung = async (req, res, next) => {
   try {
     const {
@@ -117,8 +117,12 @@ exports.getMatRung = async (req, res, next) => {
       tk,
       khoanh,
       churung,
-      limit = 1000
+      limit = 100,  // ⚡ OPTIMIZED: Default to 100 instead of 1000
+      page = 1      // ⚡ NEW: Pagination support
     } = req.query;
+
+    // ⚡ Calculate offset for pagination
+    const offset = (parseInt(page) - 1) * parseInt(limit);
 
     // ✅ SCOPE ENFORCEMENT
     const userRolesStr = req.headers['x-user-roles'] ? decodeURIComponent(req.headers['x-user-roles']) : '';
@@ -139,8 +143,16 @@ exports.getMatRung = async (req, res, next) => {
     const db = req.app.locals.db;
     const redis = req.app.locals.redis;
 
-    // Build cache key with effective filters
-    const cacheKey = `matrung:${JSON.stringify({ ...req.query, xa: effectiveXa, tk: effectiveTk, khoanh: effectiveKhoanh, isRestricted })}`;
+    // ⚡ Build cache key with effective filters AND pagination params
+    const cacheKey = `matrung:${JSON.stringify({
+      ...req.query,
+      xa: effectiveXa,
+      tk: effectiveTk,
+      khoanh: effectiveKhoanh,
+      isRestricted,
+      limit: parseInt(limit),
+      page: parseInt(page)
+    })}`;
 
     // Try cache first
     const cached = await redis.get(cacheKey);
@@ -166,7 +178,15 @@ exports.getMatRung = async (req, res, next) => {
     // But this block is "12 months data".
     // Let's modify the condition:
     if (!isRestricted && !fromDate && !toDate && !huyen && !xa && !tk && !khoanh && !churung) {
-      logger.info('Loading mat rung data: 12 months default (Unrestricted)');
+      logger.info('Loading mat rung data: 12 months default (Unrestricted)', { limit, page, offset });
+
+      // ⚡ Count total records for pagination
+      const countQuery = `
+        SELECT COUNT(*) as total
+        FROM son_la_mat_rung m
+        WHERE m.geom IS NOT NULL
+          AND m.start_dau::date >= CURRENT_DATE - INTERVAL '12 months'
+      `;
 
       const query = `
         SELECT
@@ -218,7 +238,7 @@ exports.getMatRung = async (req, res, next) => {
 
           ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
 
-        FROM mat_rung m
+        FROM son_la_mat_rung m
         ${hasRg3lr ? `
         LEFT JOIN laocai_rg3lr r ON ST_Intersects(
           ST_Transform(m.geom, 4326),
@@ -229,25 +249,43 @@ exports.getMatRung = async (req, res, next) => {
         WHERE m.geom IS NOT NULL
           AND m.start_dau::date >= CURRENT_DATE - INTERVAL '12 months'
         ORDER BY m.start_dau DESC, m.gid DESC
-        LIMIT $1
+        LIMIT $1 OFFSET $2
       `;
 
-      const result = await db.query(query, [parseInt(limit)]);
+      // ⚡ Run both queries in parallel
+      const [result, countResult] = await Promise.all([
+        db.query(query, [parseInt(limit), offset]),
+        db.query(countQuery, [])
+      ]);
+
+      const totalRecords = parseInt(countResult.rows[0].total);
+      const totalPages = Math.ceil(totalRecords / parseInt(limit));
       const geoJSON = buildGeoJSON(result.rows);
+
+      // ⚡ Pagination metadata
+      const pagination = {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: totalRecords,
+        totalPages: totalPages,
+        hasNext: parseInt(page) < totalPages,
+        hasPrev: parseInt(page) > 1
+      };
 
       // Cache for 5 minutes
       await redis.set(cacheKey, {
         message: `Loaded ${geoJSON.features.length} mat rung features (12 months)`,
         data: geoJSON,
+        pagination,
         isDefault: true,
         timeRange: '12_months'
       }, 300);
 
       return res.json(formatResponse(
         true,
-        `Loaded ${geoJSON.features.length} features (12 months)`,
+        `Loaded ${geoJSON.features.length} features (12 months, page ${page}/${totalPages})`,
         geoJSON,
-        { isDefault: true, cached: false }
+        { isDefault: true, cached: false, pagination }
       ));
     }
 
@@ -275,7 +313,16 @@ exports.getMatRung = async (req, res, next) => {
       }
     }
 
-    logger.info('Loading mat rung data with filters', { fromDate: effectiveFromDate, toDate: effectiveToDate, huyen, xa: effectiveXa, isRestricted });
+    logger.info('Loading mat rung data with filters', {
+      fromDate: effectiveFromDate,
+      toDate: effectiveToDate,
+      huyen,
+      xa: effectiveXa,
+      isRestricted,
+      limit,
+      page,
+      offset
+    });
 
     // Build WHERE clause
     const conditions = ['m.start_dau >= $1', 'm.start_dau <= $2'];
@@ -329,6 +376,14 @@ exports.getMatRung = async (req, res, next) => {
 
     const whereClause = `WHERE ${conditions.join(' AND ')} AND m.geom IS NOT NULL`;
 
+    // ⚡ Count query for pagination
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM son_la_mat_rung m
+      ${spatialJoin}
+      ${whereClause}
+    `;
+
     const query = `
       SELECT
         m.gid,
@@ -379,31 +434,49 @@ exports.getMatRung = async (req, res, next) => {
 
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
 
-      FROM mat_rung m
+      FROM son_la_mat_rung m
       ${spatialJoin}
       ${hasUsers ? 'LEFT JOIN users u ON m.verified_by = u.id' : ''}
       ${whereClause}
       ORDER BY m.start_dau DESC, m.gid DESC
-      LIMIT $${index}
+      LIMIT $${index} OFFSET $${index + 1}
     `;
 
-    params.push(parseInt(limit));
+    params.push(parseInt(limit), offset);
 
-    const result = await db.query(query, params);
+    // ⚡ Run both queries in parallel
+    const [result, countResult] = await Promise.all([
+      db.query(query, params),
+      db.query(countQuery, params.slice(0, -2)) // Remove LIMIT/OFFSET params for count
+    ]);
+
+    const totalRecords = parseInt(countResult.rows[0].total);
+    const totalPages = Math.ceil(totalRecords / parseInt(limit));
     const geoJSON = buildGeoJSON(result.rows);
+
+    // ⚡ Pagination metadata
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      total: totalRecords,
+      totalPages: totalPages,
+      hasNext: parseInt(page) < totalPages,
+      hasPrev: parseInt(page) > 1
+    };
 
     // Cache for 5 minutes
     await redis.set(cacheKey, {
       message: `Loaded ${geoJSON.features.length} features`,
       data: geoJSON,
+      pagination,
       filters: { fromDate, toDate, huyen, xa, tk, khoanh, churung }
     }, 300);
 
     res.json(formatResponse(
       true,
-      `Loaded ${geoJSON.features.length} features with filters`,
+      `Loaded ${geoJSON.features.length} features with filters (page ${page}/${totalPages})`,
       geoJSON,
-      { isDefault: false, cached: false }
+      { isDefault: false, cached: false, pagination }
     ));
 
   } catch (error) {
@@ -483,7 +556,7 @@ exports.getAllMatRung = async (req, res, next) => {
 
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
 
-      FROM mat_rung m
+      FROM son_la_mat_rung m
       ${hasRg3lr ? `
       LEFT JOIN laocai_rg3lr r ON ST_Intersects(
         ST_Transform(m.geom, 4326),
@@ -551,7 +624,7 @@ exports.getStats = async (req, res, next) => {
         COUNT(DISTINCT m.mahuyen) as unique_districts,
         COUNT(CASE WHEN m.detection_status = 'Đã xác minh' THEN 1 END) as verified_records,
         COUNT(CASE WHEN m.verified_by IS NOT NULL THEN 1 END) as records_with_verifier
-      FROM mat_rung m
+      FROM son_la_mat_rung m
       ${hasRg3lr ? `
       LEFT JOIN laocai_rg3lr r ON ST_Intersects(
         ST_Transform(m.geom, 4326),
@@ -616,7 +689,7 @@ exports.forecastPreview = async (req, res, next) => {
         SUM(m.area) as total_area,
         MIN(m.start_dau) as earliest_date,
         MAX(m.start_dau) as latest_date
-      FROM mat_rung m
+      FROM son_la_mat_rung m
       WHERE m.geom IS NOT NULL
         AND m.start_dau::date >= $1::date
         AND m.start_dau::date <= $2::date
@@ -723,7 +796,7 @@ exports.autoForecast = async (req, res, next) => {
 
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry
 
-      FROM mat_rung m
+      FROM son_la_mat_rung m
       ${hasRg3lr ? `
       LEFT JOIN laocai_rg3lr r ON ST_Intersects(
         ST_Transform(m.geom, 4326),
@@ -818,8 +891,8 @@ function buildGeoJSON(rows, extraProps = {}) {
 
         huyen,
         xa: convertTcvn3ToUnicode(row.xa || ''),
-        tk: row.tk,
-        khoanh: row.khoanh,
+        tk: convertTcvn3ToUnicode(row.tk || ''),
+        khoanh: convertTcvn3ToUnicode(row.khoanh || ''),
         churung: convertTcvn3ToUnicode(row.churung || ''),
 
         x_coordinate: row.x_coordinate,
@@ -838,5 +911,299 @@ function buildGeoJSON(rows, extraProps = {}) {
     features
   };
 }
+
+/**
+ * ✅ NEW: Get recent/unverified mat rung data as GeoJSON (real-time)
+ * Used for dynamic layer on map (data with clipped_geom from auto-clip trigger)
+ */
+exports.getRecentGeoJson = async (req, res, next) => {
+  try {
+    const db = req.app.locals.db;
+    const { bbox, days = 7, status = 'Chưa xác minh' } = req.query;
+
+    let bboxFilter = '';
+    let params = [days];
+
+    // Parse bbox if provided: minX,minY,maxX,maxY
+    if (bbox) {
+      const [minX, minY, maxX, maxY] = bbox.split(',').map(Number);
+      bboxFilter = `AND clipped_geom && ST_MakeEnvelope($2, $3, $4, $5, 4326)`;
+      params.push(minX, minY, maxX, maxY);
+    }
+
+    // Check if laocai_rg3lr table exists
+    const hasRg3lr = await tableExists(db, 'laocai_rg3lr');
+
+    const query = `
+      SELECT
+        m.gid,
+        ST_AsGeoJSON(m.clipped_geom)::json as geometry,
+        m.area as original_area,
+        m.clipped_area,
+        COALESCE(m.clipped_area, ST_Area(m.geom::geography)) as dtich,
+        COALESCE(m.verified_area, 0) as "dtichXM",
+        m.verified_area,
+        m.verification_reason,
+        m.detection_status,
+        m.detection_date,
+        m.verification_notes,
+        m.verified_by,
+        m.start_dau,
+        m.end_sau,
+        m.mahuyen,
+        ST_X(ST_Transform(ST_Centroid(COALESCE(m.clipped_geom, m.geom)), 4326)) as x,
+        ST_Y(ST_Transform(ST_Centroid(COALESCE(m.clipped_geom, m.geom)), 4326)) as y,
+        m.created_at,
+        m.updated_at,
+        m.has_intersection,
+        m.last_clipped_at,
+        ${hasRg3lr ? `
+        r.huyen,
+        r.xa,
+        r.tk,
+        r.khoanh,
+        r.churung
+        ` : `
+        NULL as huyen,
+        NULL as xa,
+        NULL as tk,
+        NULL as khoanh,
+        NULL as churung
+        `}
+      FROM son_la_mat_rung m
+      ${hasRg3lr ? `
+      LEFT JOIN laocai_rg3lr r ON ST_Intersects(
+        ST_Transform(m.geom, 4326),
+        ST_Transform(r.geom, 4326)
+      )
+      ` : ''}
+      WHERE m.clipped_geom IS NOT NULL
+        AND m.has_intersection = true
+        AND (
+          m.detection_status = $1
+          OR m.created_at >= NOW() - INTERVAL '${days} days'
+        )
+        ${bboxFilter}
+      ORDER BY m.created_at DESC
+      LIMIT 1000
+    `;
+
+    const startTime = Date.now();
+    const result = await db.query(query, params);
+    const queryTime = Date.now() - startTime;
+
+    const geojson = {
+      type: 'FeatureCollection',
+      features: result.rows.map(row => ({
+        type: 'Feature',
+        id: row.gid,
+        geometry: row.geometry,
+        properties: {
+          gid: row.gid,
+          original_area: row.original_area,
+          clipped_area: row.clipped_area,
+          clipped_area_ha: row.clipped_area ? (row.clipped_area / 10000).toFixed(2) : '0',
+          dtich: row.dtich,
+          dtichXM: row.dtichXM,
+          verified_area: row.verified_area,
+          verification_reason: convertTcvn3ToUnicode(row.verification_reason || ''),
+          detection_status: row.detection_status,
+          detection_date: row.detection_date,
+          verification_notes: row.verification_notes,
+          verified_by: row.verified_by,
+          start_dau: row.start_dau,
+          end_sau: row.end_sau,
+          mahuyen: row.mahuyen,
+          huyen: convertTcvn3ToUnicode(row.huyen || HUYEN_MAPPING[row.mahuyen] || `Huyện ${row.mahuyen}`),
+          xa: convertTcvn3ToUnicode(row.xa || ''),
+          tk: convertTcvn3ToUnicode(row.tk || ''),
+          khoanh: convertTcvn3ToUnicode(row.khoanh || ''),
+          churung: convertTcvn3ToUnicode(row.churung || ''),
+          x: row.x,
+          y: row.y,
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+          has_intersection: row.has_intersection,
+          last_clipped_at: row.last_clipped_at
+        }
+      }))
+    };
+
+    logger.info('Recent GeoJSON fetched', {
+      count: result.rows.length,
+      bbox: bbox || 'all',
+      days,
+      status,
+      query_time: `${queryTime}ms`
+    });
+
+    // Set cache-control: 30 seconds for real-time data
+    res.set('Cache-Control', 'public, max-age=30');
+    res.json({
+      success: true,
+      data: geojson,
+      metadata: {
+        count: result.rows.length,
+        query_time: `${queryTime}ms`,
+        bbox: bbox || null,
+        days: parseInt(days)
+      }
+    });
+
+  } catch (error) {
+    logger.error('Failed to fetch recent GeoJSON', { error: error.message });
+    next(error);
+  }
+};
+
+/**
+ * ✅ NEW: Get clip progress for background worker
+ */
+exports.getClipProgress = async (req, res, next) => {
+  try {
+    const db = req.app.locals.db;
+
+    // Get progress from tracking table
+    const progressResult = await db.query(`
+      SELECT
+        total_records,
+        clipped_records,
+        progress_percent,
+        last_updated
+      FROM clip_progress
+      WHERE id = 1
+    `);
+
+    // Get real-time stats from main table
+    const statsResult = await db.query(`
+      SELECT
+        COUNT(*) as total,
+        COUNT(clipped_geom) as clipped,
+        COUNT(CASE WHEN has_intersection THEN 1 END) as intersected
+      FROM son_la_mat_rung
+    `);
+
+    const stats = statsResult.rows[0];
+    const total = parseInt(stats.total);
+    const clipped = parseInt(stats.clipped);
+    const remaining = total - clipped;
+    const progress = total > 0 ? ((clipped / total) * 100).toFixed(2) : 0;
+
+    // Estimate time remaining (based on 1s per record)
+    const etaSeconds = remaining * 1; // ~1 second per record
+    const etaMinutes = Math.ceil(etaSeconds / 60);
+    const etaHours = Math.ceil(etaMinutes / 60);
+
+    let eta = '';
+    if (etaHours > 24) {
+      eta = `${Math.ceil(etaHours / 24)} ngày`;
+    } else if (etaHours > 1) {
+      eta = `${etaHours} giờ`;
+    } else {
+      eta = `${etaMinutes} phút`;
+    }
+
+    const response = {
+      total,
+      clipped,
+      remaining,
+      intersected: parseInt(stats.intersected),
+      progress: parseFloat(progress),
+      progress_display: `${progress}%`,
+      eta,
+      is_complete: remaining === 0,
+      last_updated: progressResult.rows[0]?.last_updated || null
+    };
+
+    logger.info('Clip progress fetched', { progress: response.progress });
+
+    res.json({
+      success: true,
+      data: response
+    });
+
+  } catch (error) {
+    logger.error('Failed to fetch clip progress', { error: error.message });
+    next(error);
+  }
+};
+
+/**
+ * ✅ NEW: Get statistics about mat rung data and clipping
+ */
+exports.getStatistics = async (req, res, next) => {
+  try {
+    const db = req.app.locals.db;
+
+    const startTime = Date.now();
+
+    const result = await db.query(`
+      SELECT
+        COUNT(*) as total,
+        COUNT(clipped_geom) as clipped,
+        COUNT(CASE WHEN has_intersection THEN 1 END) as has_intersection,
+        COUNT(CASE WHEN detection_status = 'Chưa xác minh' THEN 1 END) as unverified,
+        COUNT(CASE WHEN detection_status = 'Đã xác minh' THEN 1 END) as verified,
+        COUNT(CASE WHEN detection_status = 'Đã xử lý' THEN 1 END) as processed,
+        COALESCE(SUM(area), 0) as total_original_area,
+        COALESCE(SUM(clipped_area), 0) as total_clipped_area_m2,
+        COALESCE(SUM(clipped_area) / 10000, 0) as total_clipped_area_ha,
+        MIN(created_at) as oldest_record,
+        MAX(created_at) as newest_record,
+        MAX(last_clipped_at) as last_clip_time
+      FROM son_la_mat_rung
+    `);
+
+    const queryTime = Date.now() - startTime;
+
+    const stats = result.rows[0];
+
+    // Calculate clipping efficiency
+    const clippingEfficiency = stats.total > 0
+      ? ((parseInt(stats.clipped) / parseInt(stats.total)) * 100).toFixed(2)
+      : 0;
+
+    const intersectionRate = stats.clipped > 0
+      ? ((parseInt(stats.has_intersection) / parseInt(stats.clipped)) * 100).toFixed(2)
+      : 0;
+
+    logger.info('Statistics fetched', { query_time: `${queryTime}ms` });
+
+    res.json({
+      success: true,
+      data: {
+        total: parseInt(stats.total),
+        clipped: parseInt(stats.clipped),
+        has_intersection: parseInt(stats.has_intersection),
+        status: {
+          unverified: parseInt(stats.unverified),
+          verified: parseInt(stats.verified),
+          processed: parseInt(stats.processed)
+        },
+        area: {
+          total_original_ha: parseFloat(stats.total_original_area).toFixed(2),
+          total_clipped_m2: parseFloat(stats.total_clipped_area_m2).toFixed(2),
+          total_clipped_ha: parseFloat(stats.total_clipped_area_ha).toFixed(2)
+        },
+        efficiency: {
+          clipping_rate: `${clippingEfficiency}%`,
+          intersection_rate: `${intersectionRate}%`
+        },
+        timeline: {
+          oldest_record: stats.oldest_record,
+          newest_record: stats.newest_record,
+          last_clip_time: stats.last_clip_time
+        }
+      },
+      metadata: {
+        query_time: `${queryTime}ms`
+      }
+    });
+
+  } catch (error) {
+    logger.error('Failed to fetch statistics', { error: error.message });
+    next(error);
+  }
+};
 
 module.exports = exports;

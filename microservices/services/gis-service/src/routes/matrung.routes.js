@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 // Use Kysely-based controller for better query building
 const matRungController = require('../controllers/matrung.controller.kysely');
+// ✅ NEW: Import standard controller for new endpoints
+const matRungControllerStd = require('../controllers/matrung.controller');
 const { asyncHandler } = require('../../../../shared/errors');
 
 /**
@@ -305,6 +307,133 @@ router.post('/forecast-preview', asyncHandler(matRungController.forecastPreview)
  *       400:
  *         description: Missing required parameters
  */
+// ✅ Use kysely controller with MatRungService
 router.post('/auto-forecast', asyncHandler(matRungController.autoForecast));
+
+/**
+ * @swagger
+ * /api/mat-rung/geojson/recent:
+ *   get:
+ *     summary: Get recent/unverified mat rung as GeoJSON (real-time)
+ *     description: Retrieve recent forest loss data with clipped geometries for real-time display
+ *     tags: [Mat Rung]
+ *     parameters:
+ *       - in: query
+ *         name: bbox
+ *         schema:
+ *           type: string
+ *         description: Bounding box (minX,minY,maxX,maxY)
+ *         example: "103.9,21.2,104.1,21.4"
+ *       - in: query
+ *         name: days
+ *         schema:
+ *           type: integer
+ *           default: 7
+ *         description: Number of days to look back
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           default: "Chưa xác minh"
+ *         description: Detection status filter
+ *     responses:
+ *       200:
+ *         description: Recent GeoJSON data retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     type:
+ *                       type: string
+ *                       example: FeatureCollection
+ *                     features:
+ *                       type: array
+ *                 metadata:
+ *                   type: object
+ *                   properties:
+ *                     count:
+ *                       type: integer
+ *                     query_time:
+ *                       type: string
+ */
+router.get('/geojson/recent', asyncHandler(matRungControllerStd.getRecentGeoJson));
+
+/**
+ * @swagger
+ * /api/mat-rung/clip-progress:
+ *   get:
+ *     summary: Get background clip worker progress
+ *     description: Get real-time progress of background geometry clipping
+ *     tags: [Mat Rung]
+ *     responses:
+ *       200:
+ *         description: Progress retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     clipped:
+ *                       type: integer
+ *                     remaining:
+ *                       type: integer
+ *                     progress:
+ *                       type: number
+ *                     eta:
+ *                       type: string
+ *                     is_complete:
+ *                       type: boolean
+ */
+router.get('/clip-progress', asyncHandler(matRungControllerStd.getClipProgress));
+
+/**
+ * @swagger
+ * /api/mat-rung/statistics:
+ *   get:
+ *     summary: Get statistics about mat rung and clipping
+ *     description: Retrieve comprehensive statistics including clipping efficiency
+ *     tags: [Mat Rung]
+ *     responses:
+ *       200:
+ *         description: Statistics retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     clipped:
+ *                       type: integer
+ *                     has_intersection:
+ *                       type: integer
+ *                     status:
+ *                       type: object
+ *                     area:
+ *                       type: object
+ *                     efficiency:
+ *                       type: object
+ *                     timeline:
+ *                       type: object
+ */
+router.get('/statistics', asyncHandler(matRungControllerStd.getStatistics));
 
 module.exports = router;

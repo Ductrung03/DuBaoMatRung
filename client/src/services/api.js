@@ -1,10 +1,8 @@
 import axios from 'axios';
 import config from '../config';
 
-// Use VITE_API_URL from env or fallback to relative path
-const API_BASE_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL}/api`
-  : (import.meta.env.PROD ? '/api' : 'http://localhost:3000/api');
+// Use config.API_BASE_URL for consistent API URL handling
+const API_BASE_URL = config.API_BASE_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,

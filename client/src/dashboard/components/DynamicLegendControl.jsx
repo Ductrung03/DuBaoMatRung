@@ -386,7 +386,7 @@ ${
               : ""
           }
 
-          <!-- Lớp dự báo mất rừng mới nhất với chú thích màu đầy đủ -->
+          <!-- Lớp phân tích mất rừng mới nhất với chú thích màu đầy đủ -->
           ${
             mapLayers.deforestationAlerts?.data
               ? `
@@ -399,7 +399,7 @@ ${
                 mapLayers.deforestationAlerts?.visible ? "checked" : ""
               } style="margin-right: 8px;">
               <span style="color: #dc2626;">⚠️</span>
-              <span style="margin-left: 6px; font-weight: 500;">Dự báo mất rừng mới nhất</span>
+              <span style="margin-left: 6px; font-weight: 500;">Phân tích mất rừng mới nhất</span>
               <span style="margin-left: 8px; font-size: 10px; color: #dc2626; background: #fecaca; padding: 1px 4px; border-radius: 8px;">
                 ${mapLayers.deforestationAlerts.data.features?.length || 0}
               </span>

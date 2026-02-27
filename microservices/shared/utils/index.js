@@ -12,13 +12,59 @@ const isUnicode = (text) => {
   return unicodePattern.test(text);
 };
 
-// Convert TCVN3 to Unicode (only if not already Unicode)
+// Convert TCVN3 to Unicode và sửa lỗi typo phổ biến
 const convertTcvn3ToUnicode = (text) => {
   if (!text) return '';
-  // If already Unicode, return as-is
-  if (isUnicode(text)) return text;
-  // Otherwise convert from TCVN3
-  return toUnicode(text, 'tcvn3');
+
+  let fixed = text;
+
+  // Fix common typos in Vietnamese place names - nhiều patterns
+  // Pattern 1: Xó/Xo → Xã (với hoặc không có space sau)
+  fixed = fixed.replace(/^Xó(\s|$)/gi, 'Xã$1');  // "Xó Chiềng" hoặc "Xó"
+  fixed = fixed.replace(/^Xo(\s|$)/gi, 'Xã$1');   // "Xo Chiềng" hoặc "Xo"
+
+  // Pattern 2: xa → xã (lowercase)
+  fixed = fixed.replace(/^xa(\s|$)/g, 'xã$1');
+
+  // Pattern 3: XA → Xã (all caps)
+  fixed = fixed.replace(/^XA(\s|$)/g, 'Xã$1');
+
+  // Pattern 4: Fix "Phường Xó", "Thị trấn Xó", etc.
+  fixed = fixed.replace(/(Phường|Thị\s+trấn|Thành\s+phố)\s+Xó(\s|$)/gi, '$1 Xã$2');
+
+  // Pattern 5: Double characters - Xaa → Xã
+  fixed = fixed.replace(/^Xaa?(\s|$)/gi, 'Xã$1');
+
+  // Try conversion from different encodings
+  if (!isUnicode(fixed)) {
+    try {
+      // Try VNI first
+      const vniConverted = toUnicode(fixed, 'vni');
+      if (vniConverted && vniConverted !== fixed) {
+        fixed = vniConverted;
+      }
+    } catch (e) {
+      // Ignore VNI error
+    }
+
+    try {
+      // Then try TCVN3
+      const tcvn3Converted = toUnicode(fixed, 'tcvn3');
+      if (tcvn3Converted && tcvn3Converted !== fixed) {
+        fixed = tcvn3Converted;
+      }
+    } catch (e) {
+      // Ignore TCVN3 error
+    }
+  }
+
+  // Apply fixes again after conversion (in case conversion introduced issues)
+  fixed = fixed.replace(/^Xó(\s|$)/gi, 'Xã$1');
+  fixed = fixed.replace(/^Xo(\s|$)/gi, 'Xã$1');
+  fixed = fixed.replace(/^xa(\s|$)/g, 'xã$1');
+  fixed = fixed.replace(/^XA(\s|$)/g, 'Xã$1');
+
+  return fixed;
 };
 
 // Generate random string

@@ -229,7 +229,7 @@ const RealTimeDataLoader = ({
             )}
             {layerKey === 'deforestationAlerts' && (
               <div className="space-y-1">
-                <div>⚠️ Dự báo mất rừng mới nhất</div>
+                <div>⚠️ Phân tích mất rừng mới nhất</div>
                 <div>📅 Phân loại theo mức cảnh báo</div>
               </div>
             )}

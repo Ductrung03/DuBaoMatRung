@@ -41,7 +41,20 @@ function createProxy(logger, options) {
         logger.info(`${serviceName} request: ${req.method} ${req.url} -> ${proxyReq.path}`);
 
         // Forward user authentication headers if enabled
-        if (forwardUserHeaders) {
+        if (forwardUserHeaders && req.user) {
+          // Set headers directly from req.user (populated by auth middleware)
+          // This is more reliable than reading req.headers which may not reflect
+          // middleware modifications due to http-proxy-middleware header copying
+          proxyReq.setHeader('x-user-id', String(req.user.id || ''));
+          proxyReq.setHeader('x-user-username', String(req.user.username || ''));
+          const rolesArray = (req.user.roles || []).map(r => typeof r === 'object' ? r.name || r.id : r);
+          proxyReq.setHeader('x-user-roles', encodeURIComponent(rolesArray.join(',')));
+          proxyReq.setHeader('x-user-permissions', (req.user.permissions || []).join(','));
+          proxyReq.setHeader('x-user-xa', req.user.xa ? encodeURIComponent(String(req.user.xa)) : '');
+          proxyReq.setHeader('x-user-tieukhu', req.user.tieukhu ? encodeURIComponent(String(req.user.tieukhu)) : '');
+          proxyReq.setHeader('x-user-khoanh', req.user.khoanh ? encodeURIComponent(String(req.user.khoanh)) : '');
+        } else if (forwardUserHeaders) {
+          // Fallback: forward from req.headers if req.user not set
           const userHeaders = ['x-user-id', 'x-user-roles', 'x-user-permissions', 'x-user-username', 'x-user-name', 'x-user-full-name', 'x-user-xa', 'x-user-tieukhu', 'x-user-khoanh'];
           userHeaders.forEach(header => {
             if (req.headers[header]) {

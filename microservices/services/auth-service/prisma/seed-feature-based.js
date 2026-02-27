@@ -11,13 +11,13 @@ const SAMPLE_ROLES = [
   {
     name: 'super_admin',
     description: 'Quản trị viên tối cao - Toàn quyền hệ thống',
-    is_system: true,
+    is_system: false,
     permissions: '*' // Tất cả quyền
   },
   {
     name: 'admin',
     description: 'Quản trị viên - Quản lý toàn bộ',
-    is_system: true,
+    is_system: false,
     permissions: [
       'forecast.*',
       'data_management.*',
@@ -29,7 +29,7 @@ const SAMPLE_ROLES = [
   },
   {
     name: 'forecast_specialist',
-    description: 'Chuyên viên dự báo - Chỉ dự báo mất rừng',
+    description: 'Chuyên viên phân tích - Chỉ phân tích mất rừng',
     is_system: false,
     permissions: [
       'forecast.auto',

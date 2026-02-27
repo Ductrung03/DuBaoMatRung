@@ -163,7 +163,7 @@ const MapLegendControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
             </div>
           </div>
 
-          <!-- 6. Lớp dự báo mất rừng mới nhất -->
+          <!-- 6. Lớp phân tích mất rừng mới nhất -->
           <div class="legend-layer" style="margin-bottom: 12px;">
             <div class="layer-header" style="display: flex; align-items: center; margin-bottom: 6px;">
               <button class="eye-toggle" data-layer="deforestationAlerts" style="
@@ -172,7 +172,7 @@ const MapLegendControl = ({ setMapType, mapLayers, toggleLayerVisibility }) => {
                 font-size: 16px; width: 20px; text-align: center;
               ">👁</button>
               <span style="color: #4ade80; margin-right: 6px;">🟢</span>
-              <span style="font-weight: 500; color: #333;">Lớp dự báo mất rừng mới nhất</span>
+              <span style="font-weight: 500; color: #333;">Lớp phân tích mất rừng mới nhất</span>
             </div>
             <div style="margin-left: 34px; font-size: 11px; color: #666;">
               <div style="display: flex; align-items: center;">

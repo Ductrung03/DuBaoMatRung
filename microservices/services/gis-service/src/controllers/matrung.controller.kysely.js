@@ -54,8 +54,8 @@ function buildGeoJSON(rows, extraProps = {}) {
 
         huyen,
         xa: convertTcvn3ToUnicode(row.xa || ''),
-        tk: row.tk,
-        khoanh: row.khoanh,
+        tk: convertTcvn3ToUnicode(row.tk || ''),
+        khoanh: convertTcvn3ToUnicode(row.khoanh || ''),
         churung: convertTcvn3ToUnicode(row.churung || ''),
 
         x_coordinate: row.x_coordinate,
@@ -444,22 +444,10 @@ exports.autoForecast = async (req, res, next) => {
 
     logger.info(`Auto forecast query completed in ${result.queryTime}ms, found ${result.rows.length} records`);
 
-    // ✅ FIX: Áp dụng scope filter cho restricted users
+    // ✅ FIX: Auto forecast is public - no scope filtering
+    // Let all users see all data for analysis purposes
     let filteredRows = result.rows;
-    if (!isAdminOrLeader) {
-      if (!userXa && !userTk && !userKhoanh) {
-        logger.warn('Restricted user without scope, returning empty data for autoForecast');
-        filteredRows = [];
-      } else {
-        filteredRows = result.rows.filter(row => {
-          if (userXa && row.xa !== userXa) return false;
-          if (userTk && row.tk !== userTk) return false;
-          if (userKhoanh && row.khoanh !== userKhoanh) return false;
-          return true;
-        });
-        logger.info(`autoForecast scope filter: ${filteredRows.length}/${result.rows.length} records`);
-      }
-    }
+    logger.info(`autoForecast: returning all ${filteredRows.length} records (no scope filter)`);
 
     if (filteredRows.length === 0) {
       return res.json({

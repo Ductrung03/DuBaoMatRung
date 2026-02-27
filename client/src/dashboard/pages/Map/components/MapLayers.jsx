@@ -122,16 +122,13 @@ const MapLayers = ({
   return (
     <>
       {/* ===================================
-          ⚡ SƠN LA 3 WMS LAYERS (STATIC DATA - SUPER FAST!)
-          - Ranh giới xã: 75 records
-          - Tiểu khu khoảnh lô: 30k records
-          - Hiện trạng rừng: 280k records (PRIMARY)
+          ⚡ SƠN LA UNIFIED WMS LAYER (STATIC DATA - SUPER FAST!)
+          - Hiện trạng rừng: 127k polygons (UNIFIED LAYER)
           ================================== */}
       <MapServerLayers
         visibleLayers={[
-          mapLayers.ranhgioixa?.visible !== false && 'ranhgioixa',
-          mapLayers.tieukukhoanh?.visible !== false && 'tieukukhoanh',
-          mapLayers.hientrangrung?.visible !== false && 'hientrangrung'
+          mapLayers.hientrangrung?.visible !== false && 'hientrangrung',
+          mapLayers.matrung_verified?.visible !== false && 'matrung_verified'
         ].filter(Boolean)}
       />
 
@@ -140,7 +137,7 @@ const MapLayers = ({
           ================================== */}
       {geoData?.type === "FeatureCollection" && geoData.features?.length > 0 && (
         <GeoJSON
-          key={`mat-rung-default-${Date.now()}`}
+          key={`mat-rung-default-${geoData?.loadTimestamp || geoData?.features?.length || 'default'}`}
           data={geoData}
           onEachFeature={onEachMatRungFeature}
           style={(feature) => getLayerStyle(feature, "mat_rung_default", selectedFeature === feature)}
@@ -153,7 +150,7 @@ const MapLayers = ({
           ================================== */}
       {mapLayers.deforestationAlerts?.data && mapLayers.deforestationAlerts.visible && (
         <GeoJSON
-          key={`deforestation-alerts-${Date.now()}`}
+          key={`deforestation-alerts-${mapLayers.deforestationAlerts?.data?.loadTimestamp || 'default'}`}
           data={mapLayers.deforestationAlerts.data}
           onEachFeature={onEachDeforestationAlertsFeature}
           style={(feature) => getLayerStyle(feature, "deforestationAlerts", selectedFeature === feature)}
@@ -163,11 +160,11 @@ const MapLayers = ({
       {/* ===================================
           6. FALLBACK: DỰ BÁO MẤT RỪNG TỪ GEODATA
           ================================== */}
-      {!mapLayers.deforestationAlerts?.data && 
-       geoData?.type === "FeatureCollection" && 
+      {!mapLayers.deforestationAlerts?.data &&
+       geoData?.type === "FeatureCollection" &&
        geoData.features?.length > 0 && (
         <GeoJSON
-          key={`deforestation-fallback-${Date.now()}`}
+          key={`deforestation-fallback-${geoData?.loadTimestamp || geoData?.features?.length || 'default'}`}
           data={geoData}
           onEachFeature={(feature, layer) => {
             // Popup cho fallback data

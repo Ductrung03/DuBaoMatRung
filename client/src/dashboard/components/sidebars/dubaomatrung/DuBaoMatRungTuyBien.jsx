@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useGeoData } from "../../../contexts/GeoDataContext";
-import config from "../../../../config";
+import api from "../../../../services/api";
 import { toast } from "react-toastify";
 import { useSonLaAdminUnits } from "../../../hooks/useSonLaAdminUnits";
 import Dropdown from "../../../../components/Dropdown";
+import { convertTcvn3ToUnicode } from "../../../../utils/fontConverter";
 
 const DuBaoMatRungTuyBien = () => {
   const { isAdmin, user } = useAuth();
@@ -48,29 +49,17 @@ const DuBaoMatRungTuyBien = () => {
       setLoading(true);
       setLoadingState(true);
 
-      const queryParams = new URLSearchParams();
-      queryParams.append('fromDate', fromDate);
-      queryParams.append('toDate', toDate);
-      if (selectedXa) queryParams.append('xa', selectedXa);
-      if (selectedTieukhu) queryParams.append('tk', selectedTieukhu);
-      if (selectedKhoanh) queryParams.append('khoanh', selectedKhoanh);
+      const params = { fromDate, toDate };
+      if (selectedXa) params.xa = selectedXa;
+      if (selectedTieukhu) params.tk = selectedTieukhu;
+      if (selectedKhoanh) params.khoanh = selectedKhoanh;
 
-      const res = await fetch(
-        `/api/mat-rung?${queryParams.toString()}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        }
-      );
+      const response = await api.get('/mat-rung', {
+        params,
+        timeout: 120000 // 2 minutes timeout
+      });
 
-      if (!res.ok) {
-        const errData = await res.json();
-        toast.error(errData.message || "Lỗi khi truy vấn dữ liệu");
-        return;
-      }
-
-      const data = await res.json();
+      const data = response.data;
 
       if (!data.success) {
         toast.error(data.message || "Lỗi từ backend");
@@ -83,10 +72,30 @@ const DuBaoMatRungTuyBien = () => {
         return;
       }
 
-      setGeoData(data.data);
+      // ✅ Apply font conversion to all text fields
+      const processedData = {
+        ...data.data,
+        features: data.data.features.map(feature => ({
+          ...feature,
+          properties: {
+            ...feature.properties,
+            xa: feature.properties.xa ? convertTcvn3ToUnicode(feature.properties.xa) : feature.properties.xa,
+            xa_name: feature.properties.xa_name ? convertTcvn3ToUnicode(feature.properties.xa_name) : feature.properties.xa_name,
+            maxa: feature.properties.maxa ? convertTcvn3ToUnicode(feature.properties.maxa) : feature.properties.maxa,
+            huyen: feature.properties.huyen ? convertTcvn3ToUnicode(feature.properties.huyen) : feature.properties.huyen,
+            mahuyen: feature.properties.mahuyen ? convertTcvn3ToUnicode(feature.properties.mahuyen) : feature.properties.mahuyen,
+            tk: feature.properties.tk ? convertTcvn3ToUnicode(feature.properties.tk) : feature.properties.tk,
+            tieukhu: feature.properties.tieukhu ? convertTcvn3ToUnicode(feature.properties.tieukhu) : feature.properties.tieukhu,
+            khoanh: feature.properties.khoanh ? convertTcvn3ToUnicode(feature.properties.khoanh) : feature.properties.khoanh,
+            churung: feature.properties.churung ? convertTcvn3ToUnicode(feature.properties.churung) : feature.properties.churung,
+          }
+        }))
+      };
+
+      setGeoData(processedData);
 
       toast.success(
-        `✅ Phân tích hoàn tất: tìm thấy ${data.data.features.length} khu vực mất rừng! Xem bảng dữ liệu bên dưới bản đồ.`,
+        `✅ Phân tích hoàn tất: tìm thấy ${processedData.features.length} khu vực mất rừng! Xem bảng dữ liệu bên dưới bản đồ.`,
         {
           autoClose: 5000,
           position: "top-center"

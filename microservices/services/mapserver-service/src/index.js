@@ -1,18 +1,19 @@
 // mapserver-service/src/index.js
 const express = require('express');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 const cors = require('cors');
 const compression = require('compression');
 const { spawn } = require('child_process');
-const path = require('path');
 const winston = require('winston');
+const TileCacheMiddleware = require('./middleware/tileCache');
 
 const app = express();
 const PORT = process.env.PORT || 3008;
 
 // Logger setup
 const logger = winston.createLogger({
-  level: 'info',
+  level: process.env.LOG_LEVEL || 'info',
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
@@ -27,6 +28,9 @@ const logger = winston.createLogger({
   ]
 });
 
+// Tile Cache initialization
+const tileCache = new TileCacheMiddleware(logger);
+
 // Middleware
 app.use(cors());
 app.use(compression());
@@ -39,7 +43,7 @@ const MAPSERV_BIN = process.env.MAPSERV_BIN ||
 
 const MAPFILE_PATH = process.env.MAPFILE_PATH
   ? path.resolve(process.env.MAPFILE_PATH)
-  : path.join(__dirname, '../../../..', 'mapserver/mapfiles/laocai.map');
+  : path.join(__dirname, '../../../..', 'mapserver/mapfiles/sonla-ultra-optimized.map');
 
 // MapServer config file - Auto detect Windows
 const MS_CONFIG_FILE = process.env.MS_CONFIG_FILE ||
@@ -47,40 +51,79 @@ const MS_CONFIG_FILE = process.env.MS_CONFIG_FILE ||
     ? path.join(__dirname, '../../../..', 'mapserver/mapserver-windows.conf')
     : path.join(__dirname, '../../../..', 'mapserver/mapserver.conf'));
 
-// Health check
+// Cache TTL per layer (in seconds)
+const CACHE_TTL = {
+  'ranggioixa': 7200,        // Commune boundaries: 2 hours (rarely changes)
+  'tieukukhoanh': 3600,      // Sub-compartments: 1 hour
+  'hientrangrung': 1800,     // Forest status: 30 minutes (may change more frequently)
+  'default': 3600            // Default: 1 hour
+};
+
+// Get TTL for specific layer
+function getCacheTTL(layer) {
+  return CACHE_TTL[layer] || CACHE_TTL.default;
+}
+
+// Health check with cache stats
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     service: 'mapserver-service',
-    mapfile: MAPFILE_PATH
+    mapfile: MAPFILE_PATH,
+    cache: tileCache.getStats()
   });
 });
 
+// Cache stats endpoint
+app.get('/cache/stats', (req, res) => {
+  res.json(tileCache.getStats());
+});
+
+// Clear cache endpoint (admin only in production)
+app.post('/cache/clear', async (req, res) => {
+  try {
+    const pattern = req.query.pattern || '*';
+    const count = await tileCache.clearCache(pattern);
+    res.json({
+      success: true,
+      message: `Cleared ${count} cache entries`,
+      pattern
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 const handleMapServerRequest = async (req, res) => {
-  logger.info('--- NEW MAPSERVER REQUEST ---', { path: req.path, query: req.query });
+  const startTime = Date.now();
+  logger.info('MapServer request', {
+    path: req.path,
+    layer: req.query.layers,
+    bbox: req.query.bbox
+  });
+
   try {
     // Build query string from request
     const queryParams = new URLSearchParams(req.query);
-    // ❌ KHÔNG set 'map' trong query params - dùng MS_MAPFILE env var thay vì
-    // queryParams.set('map', MAPFILE_PATH);
-
     const queryString = queryParams.toString();
 
     logger.info('Executing MapServer', {
       binary: MAPSERV_BIN,
       mapfile: MAPFILE_PATH,
-      queryString: queryString
+      layer: req.query.layers
     });
 
     // Set up environment for MapServer
-    // MapServer 8.x requires MAPSERVER_CONFIG_FILE
     const configFile = process.env.MS_CONFIG_FILE || MS_CONFIG_FILE;
     const env = {
       ...process.env,
       QUERY_STRING: queryString,
       REQUEST_METHOD: 'GET',
-      MS_MAPFILE: MAPFILE_PATH,  // ✅ Sử dụng MS_MAPFILE để MapServer tự động load
-      MAPSERVER_CONFIG_FILE: configFile, // ✅ Required for MapServer 8.x
+      MS_MAPFILE: MAPFILE_PATH,
+      MAPSERVER_CONFIG_FILE: configFile,
       // MS4W environment variables
       PROJ_DATA: process.env.PROJ_LIB || 'C:\\ms4w\\share\\proj',
       PROJ_LIB: process.env.PROJ_LIB || 'C:\\ms4w\\share\\proj',
@@ -98,6 +141,7 @@ const handleMapServerRequest = async (req, res) => {
     let output = Buffer.alloc(0);
     let headers = '';
     let headersParsed = false;
+    let contentType = 'image/png';
 
     mapserv.stdout.on('data', (data) => {
       if (!headersParsed) {
@@ -115,6 +159,11 @@ const handleMapServerRequest = async (req, res) => {
               const key = header.substring(0, colonIndex).trim();
               const value = header.substring(colonIndex + 1).trim();
               res.setHeader(key, value);
+
+              // Capture content type for caching
+              if (key.toLowerCase() === 'content-type') {
+                contentType = value;
+              }
             }
           });
 
@@ -130,59 +179,88 @@ const handleMapServerRequest = async (req, res) => {
     });
 
     mapserv.stderr.on('data', (data) => {
-      logger.error('--> MAPSERVER STDERR', { stderr: data.toString() });
+      logger.error('MapServer stderr', { stderr: data.toString() });
     });
 
-    mapserv.on('close', (code) => {
-      logger.info(`MapServer process closed with code: ${code}`);
+    mapserv.on('close', async (code) => {
+      const duration = Date.now() - startTime;
+
       if (code !== 0) {
-        logger.error('MapServer exited with non-zero code', { code });
+        logger.error('MapServer exited with error', { code, duration: `${duration}ms` });
         if (!res.headersSent) {
           res.status(500).send('MapServer process exited with an error.');
         }
       } else {
         if (!res.headersSent) {
           res.setHeader('X-MapServer-Service', 'mapserver-service');
+          res.setHeader('X-Render-Time', `${duration}ms`);
         }
+
+        // Store in cache if cache key exists
+        if (req.tileCacheKey && output.length > 0) {
+          const layer = req.query.layers || 'unknown';
+          const ttl = getCacheTTL(layer);
+          await tileCache.storeInCache(req.tileCacheKey, output, contentType, ttl);
+        }
+
         res.send(output);
-        logger.info('Successfully sent MapServer response.');
+        logger.info('MapServer response sent', {
+          duration: `${duration}ms`,
+          size: `${(output.length / 1024).toFixed(2)}KB`,
+          layer: req.query.layers
+        });
       }
     });
 
     mapserv.on('error', (err) => {
-      logger.error('--> FAILED TO SPAWN MAPSERVER PROCESS', { error: err.message, stack: err.stack });
+      logger.error('Failed to spawn MapServer', { error: err.message });
       if (!res.headersSent) {
         res.status(500).json({ error: 'Failed to execute MapServer binary.', details: err.message });
       }
     });
 
   } catch (error) {
-    logger.error('--> UNEXPECTED ERROR in handleMapServerRequest', { error: error.message, stack: error.stack });
+    logger.error('Unexpected error', { error: error.message, stack: error.stack });
     res.status(500).json({ error: 'Unexpected error in MapServer service.', details: error.message });
   }
 };
 
-// WMS endpoint
-app.get('/wms', handleMapServerRequest);
+// WMS endpoint with cache middleware
+app.get('/wms', (req, res, next) => {
+  tileCache.checkCache(req, res, next).catch(next);
+}, handleMapServerRequest);
 
-// WFS endpoint
+// WFS endpoint (no caching for WFS)
 app.get('/wfs', handleMapServerRequest);
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
-  logger.info(`MapServer Service running on port ${PORT}`);
-  logger.info(`Mapfile: ${MAPFILE_PATH}`);
-  logger.info(`MapServer binary: ${MAPSERV_BIN}`);
-  logger.info(`Config file: ${MS_CONFIG_FILE}`);
-});
+async function startServer() {
+  try {
+    // Initialize tile cache
+    await tileCache.initialize();
+
+    app.listen(PORT, '0.0.0.0', () => {
+      logger.info(`MapServer Service running on port ${PORT}`);
+      logger.info(`Mapfile: ${MAPFILE_PATH}`);
+      logger.info(`MapServer binary: ${MAPSERV_BIN}`);
+      logger.info(`Config file: ${MS_CONFIG_FILE}`);
+      logger.info(`Tile cache: ${tileCache.enabled ? 'ENABLED' : 'DISABLED'}`);
+    });
+  } catch (error) {
+    logger.error('Failed to start server', { error: error.message });
+    process.exit(1);
+  }
+}
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received, shutting down gracefully');
+async function shutdown() {
+  logger.info('Shutting down gracefully...');
+  await tileCache.close();
   process.exit(0);
-});
+}
 
-process.on('SIGINT', () => {
-  logger.info('SIGINT received, shutting down gracefully');
-  process.exit(0);
-});
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
+
+// Start the server
+startServer();

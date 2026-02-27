@@ -7,13 +7,9 @@ const logger = createLogger('layer-controller');
 
 // Map frontend layer names to database tables (Sơn La)
 const layerMapping = {
-  // New Sơn La layers
-  'hientrangrung': 'sonla_hientrangrung',
-  'ranhgioixa': 'sonla_rgx',
-  'tieukukhoanh': 'sonla_tkkl',
-  // Legacy endpoints
-  'administrative': 'sonla_rgx',
-  'forest-management': 'sonla_hientrangrung',
+  // New unified Sơn La forest layer (replaces 3 old layers)
+  'hientrangrung': 'sonla_hientrangrung_new',
+  // Deforestation alerts
   'deforestation-alerts': 'son_la_mat_rung',
   'matrung': 'son_la_mat_rung'
 };
@@ -259,15 +255,17 @@ exports.getLayerDataByPath = async (req, res, next) => {
             verification_notes,
             created_at,
             updated_at,
-            ST_Area(geom::geography) as dtich,
+            COALESCE(clipped_area, ST_Area(geom::geography)) as dtich,
             COALESCE(verified_area, 0) as "dtichXM",
-            ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x_coordinate,
-            ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y_coordinate,
-            ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x,
-            ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y,
-            ST_AsGeoJSON(ST_Transform(geom, 4326)) as geometry
+            ST_X(ST_Transform(ST_Centroid(COALESCE(clipped_geom, geom)), 4326)) as x_coordinate,
+            ST_Y(ST_Transform(ST_Centroid(COALESCE(clipped_geom, geom)), 4326)) as y_coordinate,
+            ST_X(ST_Transform(ST_Centroid(COALESCE(clipped_geom, geom)), 4326)) as x,
+            ST_Y(ST_Transform(ST_Centroid(COALESCE(clipped_geom, geom)), 4326)) as y,
+            ST_AsGeoJSON(ST_Transform(COALESCE(clipped_geom, geom), 4326)) as geometry,
+            has_intersection
           FROM ${tableName}
           WHERE geom IS NOT NULL
+            AND has_intersection = true
         `;
 
         if (days) {

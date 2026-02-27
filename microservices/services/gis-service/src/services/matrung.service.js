@@ -23,7 +23,9 @@ function getAdminDbPool() {
       idleTimeoutMillis: 60000,
       connectionTimeoutMillis: 30000,
       keepAlive: true,
-      keepAliveInitialDelayMillis: 10000
+      keepAliveInitialDelayMillis: 10000,
+      // ✅ FIX: Force UTF8 encoding to prevent garbled characters
+      client_encoding: 'UTF8'
     });
 
     adminDbPool.on('error', (err) => {
@@ -58,6 +60,8 @@ class MatRungService {
       try {
         // Refresh pool reference in case it was reset
         this.adminDb = getAdminDbPool();
+        // ✅ FIX: Set client encoding to UTF8 before EVERY query
+        await this.adminDb.query('SET CLIENT_ENCODING TO UTF8');
         return await this.adminDb.query(query, params);
       } catch (error) {
         if (retries < MAX_RETRIES && (error.message.includes('terminated') || error.message.includes('Connection'))) {
@@ -92,7 +96,10 @@ class MatRungService {
 
         if (validPoints.length === 0) continue;
 
-        // Optimized query - sonla_tkkl geometry is already in 4326
+        // ✅ FIX: Use sonla_tkkl instead of sonla_hientrangrung_new
+        // sonla_hientrangrung_new stores xa in TCVN3 encoding (garbled Unicode like 'XÃ£ Mai SÆ¡n')
+        // sonla_tkkl stores xa in proper Unicode ('Xã Mai Sơn')
+        // Column mapping: sonla_tkkl uses 'tieukhu' instead of 'tk'
         const adminQuery = `
           WITH input_points AS (
             SELECT
@@ -106,12 +113,12 @@ class MatRungService {
           )
           SELECT DISTINCT ON (g.idx)
             g.idx,
-            COALESCE(t.xa, r.xa) as xa,
-            t.tieukhu as tk,
-            t.khoanh
+            h.xa,
+            h.tieukhu as tk,
+            h.khoanh
           FROM input_points g
-          LEFT JOIN sonla_tkkl t ON t.geom IS NOT NULL AND ST_Intersects(t.geom, g.pt)
-          LEFT JOIN sonla_rgx r ON t.xa IS NULL AND r.geom IS NOT NULL AND ST_Intersects(r.geom, g.pt)
+          LEFT JOIN sonla_tkkl h
+            ON h.geom IS NOT NULL AND ST_Intersects(h.geom, g.pt)
           WHERE g.pt IS NOT NULL
           ORDER BY g.idx
         `;
@@ -245,14 +252,15 @@ class MatRungService {
 
         const unionGeomWKT = adminResult.rows[0].union_geom;
 
-        // Build date filter 
+        // Build date filter
         let dateFilter = sql`m.end_sau::date >= CURRENT_DATE - INTERVAL '12 months'`;
         if (fromDate && toDate) {
-          dateFilter = sql`m.start_dau >= ${fromDate} AND m.end_sau <= ${toDate}`;
+          // ✅ FIX: Use start_dau for both conditions (more predictable)
+          dateFilter = sql`m.start_dau::date >= ${fromDate}::date AND m.start_dau::date <= ${toDate}::date`;
         } else if (fromDate) {
-          dateFilter = sql`m.start_dau >= ${fromDate}`;
+          dateFilter = sql`m.start_dau::date >= ${fromDate}::date`;
         } else if (toDate) {
-          dateFilter = sql`m.end_sau <= ${toDate}`;
+          dateFilter = sql`m.start_dau::date <= ${toDate}::date`;
         }
 
         let query = this.db
@@ -271,11 +279,12 @@ class MatRungService {
             'm.verified_area',
             'm.verification_reason',
             'm.verification_notes',
-            sql`ST_X(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('x_coordinate'),
-            sql`ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('y_coordinate'),
-            sql`ST_Area(m.geom::geography)`.as('dtich'),
+            sql`ST_X(ST_Centroid(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)))`.as('x_coordinate'),
+            sql`ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)))`.as('y_coordinate'),
+            sql`COALESCE(m.clipped_area, ST_Area(m.geom::geography))`.as('dtich'),
             sql`COALESCE(m.verified_area, 0)`.as('dtichXM'),
-            sql`ST_AsGeoJSON(ST_Transform(ST_MakeValid(m.geom), 4326), 6)`.as('geometry'),
+            sql`ST_AsGeoJSON(ST_Transform(COALESCE(m.clipped_geom, m.geom), 4326), 6)`.as('geometry'),
+            'm.has_intersection',
             sql`NULL`.as('huyen'),
             sql`NULL`.as('xa'),
             sql`NULL`.as('tk'),
@@ -283,9 +292,12 @@ class MatRungService {
           ])
           .where('m.geom', 'is not', null)
           .where(sql`NOT ST_IsEmpty(m.geom)`)
+          // ✅ FIX: Only show records within forest boundary (clipped)
+          .where('m.has_intersection', '=', true)
+          .where('m.clipped_geom', 'is not', null)
           .where(dateFilter)
-          // ✅ SPATIAL FILTER: Lọc trực tiếp trong SQL
-          .where(sql`ST_Intersects(m.geom, ST_GeomFromText(${unionGeomWKT}, 4326))`)
+          // ✅ SPATIAL FILTER: Using pre-clipped geometries
+          .where(sql`ST_Intersects(COALESCE(m.clipped_geom, m.geom), ST_GeomFromText(${unionGeomWKT}, 4326))`)
           .orderBy('m.end_sau', 'desc')
           .orderBy('m.gid', 'desc')
           .limit(parseInt(limit));
@@ -314,6 +326,10 @@ class MatRungService {
         // ✅ FIX: Post-filter để chỉ giữ records có xa/tk/khoanh khớp chính xác
         // Vì ST_Intersects có thể trả về records ở biên giới overlap sang xã khác
         const beforeFilter = enrichedResult.length;
+
+        // ✅ CRITICAL: Filter ra records KHÔNG có xa (không nằm trong sonla_hientrangrung)
+        enrichedResult = enrichedResult.filter(r => r.xa && r.xa.trim() !== '');
+
         if (xa) {
           enrichedResult = enrichedResult.filter(r => r.xa === xa);
         }
@@ -354,11 +370,11 @@ class MatRungService {
           'm.verified_area',
           'm.verification_reason',
           'm.verification_notes',
-          sql`ST_X(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('x_coordinate'),
-          sql`ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('y_coordinate'),
-          sql`ST_Area(m.geom::geography)`.as('dtich'),
+          sql`ST_X(ST_Centroid(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)))`.as('x_coordinate'),
+          sql`ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)))`.as('y_coordinate'),
+          sql`COALESCE(m.clipped_area, ST_Area(m.geom::geography))`.as('dtich'),
           sql`COALESCE(m.verified_area, 0)`.as('dtichXM'),
-          sql`ST_AsGeoJSON(ST_Transform(ST_MakeValid(m.geom), 4326), 6)`.as('geometry'),
+          sql`ST_AsGeoJSON(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326), 6)`.as('geometry'),
           sql`NULL`.as('huyen'),
           sql`NULL`.as('xa'),
           sql`NULL`.as('tk'),
@@ -366,6 +382,9 @@ class MatRungService {
         ])
         .where('m.geom', 'is not', null)
         .where(sql`NOT ST_IsEmpty(m.geom)`)
+        // ✅ FIX: Only show records within forest boundary (clipped)
+        .where('m.has_intersection', '=', true)
+        .where('m.clipped_geom', 'is not', null)
         .where(sql`m.end_sau::date`, '>=', sql`CURRENT_DATE - INTERVAL '12 months'`)
         .orderBy('m.end_sau', 'desc')
         .orderBy('m.gid', 'desc')
@@ -386,9 +405,18 @@ class MatRungService {
         ]);
       }
 
-      const result = await query.execute();
+      let result = await query.execute();
       // ✅ Enrich với xa, tk, khoanh từ admin_db
-      return await this.enrichWithAdminInfo(result);
+      result = await this.enrichWithAdminInfo(result);
+
+      // ✅ FIX: Filter để CHỈ lấy records CÓ XA
+      const beforeFilter = result.length;
+      result = result.filter(r => r.xa && r.xa.trim() !== '');
+      if (beforeFilter > result.length) {
+        logger.info(`getMatRung (12mo default): Filtered out ${beforeFilter - result.length} records without xa`);
+      }
+
+      return result;
     }
 
     // With date/huyen filters only (no spatial)
@@ -410,11 +438,11 @@ class MatRungService {
         'm.verified_area',
         'm.verification_reason',
         'm.verification_notes',
-        sql`ST_X(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('x_coordinate'),
-        sql`ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326)))`.as('y_coordinate'),
-        sql`ST_Area(m.geom::geography)`.as('dtich'),
+        sql`ST_X(ST_Centroid(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)))`.as('x_coordinate'),
+        sql`ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)))`.as('y_coordinate'),
+        sql`COALESCE(m.clipped_area, ST_Area(m.geom::geography))`.as('dtich'),
         sql`COALESCE(m.verified_area, 0)`.as('dtichXM'),
-        sql`ST_AsGeoJSON(ST_Transform(ST_MakeValid(m.geom), 4326), 6)`.as('geometry'),
+        sql`ST_AsGeoJSON(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326), 6)`.as('geometry'),
         sql`NULL`.as('huyen'),
         sql`NULL`.as('xa'),
         sql`NULL`.as('tk'),
@@ -422,8 +450,12 @@ class MatRungService {
       ])
       .where('m.geom', 'is not', null)
       .where(sql`NOT ST_IsEmpty(m.geom)`)
-      .where('m.start_dau', '>=', fromDate)
-      .where('m.end_sau', '<=', toDate);
+      // ✅ FIX: Only show records within forest boundary (like "Dữ liệu mới nhất")
+      .where('m.has_intersection', '=', true)
+      .where('m.clipped_geom', 'is not', null)
+      // ✅ FIX: Use start_dau with date cast for consistent filtering
+      .where(sql`m.start_dau::date`, '>=', sql`${fromDate}::date`)
+      .where(sql`m.start_dau::date`, '<=', sql`${toDate}::date`);
 
     // Add user join if users table exists
     if (hasUsers) {
@@ -448,7 +480,16 @@ class MatRungService {
     let result = await query.execute();
 
     // ✅ Enrich với xa, tk, khoanh từ admin_db
-    return await this.enrichWithAdminInfo(result);
+    result = await this.enrichWithAdminInfo(result);
+
+    // ✅ FIX: Filter để CHỈ lấy records CÓ XA
+    const beforeFilter = result.length;
+    result = result.filter(r => r.xa && r.xa.trim() !== '');
+    if (beforeFilter > result.length) {
+      logger.info(`getMatRung (date filter): Filtered out ${beforeFilter - result.length} records without xa`);
+    }
+
+    return result;
   }
 
   /**
@@ -475,15 +516,21 @@ class MatRungService {
         'm.verified_area',
         'm.verification_reason',
         'm.verification_notes',
-        sql`ST_X(ST_Centroid(ST_Transform(m.geom, 4326)))`.as('x_coordinate'),
-        sql`ST_Y(ST_Centroid(ST_Transform(m.geom, 4326)))`.as('y_coordinate'),
-        sql`ST_AsGeoJSON(ST_Transform(m.geom, 4326))`.as('geometry'),
+        // ✅ FIX: Calculate area from clipped geometry (prioritize clipped over original)
+        sql`COALESCE(m.clipped_area, ST_Area(m.geom::geography))`.as('dtich'),
+        sql`COALESCE(m.verified_area, 0)`.as('dtichXM'),
+        sql`ST_X(ST_Centroid(ST_Transform(COALESCE(m.clipped_geom, m.geom), 4326)))`.as('x_coordinate'),
+        sql`ST_Y(ST_Centroid(ST_Transform(COALESCE(m.clipped_geom, m.geom), 4326)))`.as('y_coordinate'),
+        sql`ST_AsGeoJSON(ST_Transform(COALESCE(m.clipped_geom, m.geom), 4326))`.as('geometry'),
         sql`NULL`.as('huyen'),
         sql`NULL`.as('xa'),
         sql`NULL`.as('tk'),
         sql`NULL`.as('khoanh')
       ])
       .where('m.geom', 'is not', null)
+      // ✅ FIX: Only show records within forest boundary (clipped)
+      .where('m.has_intersection', '=', true)
+      .where('m.clipped_geom', 'is not', null)
       .where(sql`m.end_sau::date`, '>=', sql`CURRENT_DATE - INTERVAL '${sql.raw(months.toString())} months'`)
       .orderBy('m.end_sau', 'desc')
       .orderBy('m.gid', 'desc')
@@ -503,9 +550,18 @@ class MatRungService {
       ]);
     }
 
-    const result = await query.execute();
+    let result = await query.execute();
     // ✅ Enrich với xa, tk, khoanh từ admin_db
-    return await this.enrichWithAdminInfo(result);
+    result = await this.enrichWithAdminInfo(result);
+
+    // ✅ FIX: Filter để CHỈ lấy records CÓ XA
+    const beforeFilter = result.length;
+    result = result.filter(r => r.xa && r.xa.trim() !== '');
+    if (beforeFilter > result.length) {
+      logger.info(`getAllMatRung: Filtered out ${beforeFilter - result.length} records without xa`);
+    }
+
+    return result;
   }
 
   /**
@@ -589,18 +645,24 @@ class MatRungService {
         'm.verified_area',
         'm.verification_reason',
         'm.verification_notes',
-        sql`ST_X(ST_Centroid(ST_Transform(m.geom, 4326)))`.as('x_coordinate'),
-        sql`ST_Y(ST_Centroid(ST_Transform(m.geom, 4326)))`.as('y_coordinate'),
-        sql`ST_AsGeoJSON(ST_Transform(m.geom, 4326))`.as('geometry'),
+        // ✅ FIX: Calculate area from clipped geometry (prioritize clipped over original)
+        sql`COALESCE(m.clipped_area, ST_Area(m.geom::geography))`.as('dtich'),
+        sql`COALESCE(m.verified_area, 0)`.as('dtichXM'),
+        sql`ST_X(ST_Centroid(ST_Transform(COALESCE(m.clipped_geom, m.geom), 4326)))`.as('x_coordinate'),
+        sql`ST_Y(ST_Centroid(ST_Transform(COALESCE(m.clipped_geom, m.geom), 4326)))`.as('y_coordinate'),
+        sql`ST_AsGeoJSON(ST_Transform(COALESCE(m.clipped_geom, m.geom), 4326))`.as('geometry'),
         sql`NULL`.as('huyen'),
         sql`NULL`.as('xa'),
         sql`NULL`.as('tk'),
         sql`NULL`.as('khoanh')
       ])
       .where('m.geom', 'is not', null)
-      .where(sql`m.end_sau::date`, '>=', sql`${fromDate}::date`)
-      .where(sql`m.end_sau::date`, '<=', sql`${toDate}::date`)
-      .orderBy('m.end_sau', 'desc')
+      // ✅ FIX: Only show records within forest boundary (clipped)
+      .where('m.has_intersection', '=', true)
+      .where('m.clipped_geom', 'is not', null)
+      .where(sql`m.start_dau::date`, '>=', sql`${fromDate}::date`)
+      .where(sql`m.start_dau::date`, '<=', sql`${toDate}::date`)
+      .orderBy('m.start_dau', 'desc')
       .orderBy('m.gid', 'desc')
       .limit(5000);
 
@@ -622,6 +684,13 @@ class MatRungService {
 
     // ✅ Enrich với xa, tk, khoanh từ admin_db
     result = await this.enrichWithAdminInfo(result);
+
+    // ✅ FIX: Filter để CHỈ lấy records CÓ XA (nằm trong sonla_hientrangrung)
+    const beforeFilter = result.length;
+    result = result.filter(r => r.xa && r.xa.trim() !== '');
+    if (beforeFilter > result.length) {
+      logger.info(`Filtered out ${beforeFilter - result.length} records without xa (not in sonla_hientrangrung)`);
+    }
 
     const queryTime = Date.now() - startTime;
 
@@ -715,9 +784,18 @@ class MatRungService {
       ]);
     }
 
-    const result = await query.execute();
+    let result = await query.execute();
     // ✅ FIX: Enrich với xa, tk, khoanh từ admin_db cho từng điểm
-    return await this.enrichWithAdminInfo(result);
+    result = await this.enrichWithAdminInfo(result);
+
+    // ✅ FIX: Filter để CHỈ lấy records CÓ XA
+    const beforeFilter = result.length;
+    result = result.filter(r => r.xa && r.xa.trim() !== '');
+    if (beforeFilter > result.length) {
+      logger.info(`getMatRungWithSpatialFilter: Filtered out ${beforeFilter - result.length} records without xa`);
+    }
+
+    return result;
   }
 }
 

@@ -1,7 +1,12 @@
 const config = {
-  // Use relative path for production (to go through Nginx), absolute URL for development
-  API_URL: import.meta.env.VITE_API_URL ||
-           (import.meta.env.PROD ? "" : "http://localhost:3000")
+  // Gateway URL - Always use production server since we're deployed
+  API_URL: "http://103.56.160.66:3000",
+
+  // API Base URL (for axios calls) - All requests go through Gateway
+  API_BASE_URL: "http://103.56.160.66:3000/api",
+
+  // MapServer URL - Direct to MapServer service
+  MAPSERVER_URL: "http://103.56.160.66:3007/wms"
 };
 
 // Log để debug

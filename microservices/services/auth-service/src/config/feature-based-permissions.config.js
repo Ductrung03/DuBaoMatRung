@@ -16,29 +16,29 @@
 
 const FEATURE_PERMISSIONS = {
   // ============================================
-  // 1. TRANG DỰ BÁO MẤT RỪNG
+  // 1. TRANG PHÂN TÍCH MẤT RỪNG
   // ============================================
   forecast: {
-    name: 'Dự báo mất rừng',
-    description: 'Trang dự báo mất rừng với các chức năng tự động và tùy biến',
+    name: 'Phân tích mất rừng',
+    description: 'Trang phân tích mất rừng với các chức năng tự động và tùy biến',
     icon: 'FaChartLine',
     path: '/dashboard/dubaomatrung',
     color: '#10B981',
     features: {
       auto: {
         code: 'forecast.auto',
-        name: 'Dự báo mất rừng tự động',
-        description: 'Sử dụng AI/ML để dự báo tự động các khu vực có nguy cơ mất rừng',
-        ui_element: 'Tab "Dự báo tự động", Form nhập tham số, Nút "Chạy dự báo", Kết quả dự báo',
+        name: 'Phân tích mất rừng tự động',
+        description: 'Sử dụng AI/ML để phân tích tự động các khu vực có nguy cơ mất rừng',
+        ui_element: 'Tab "Phân tích tự động", Form nhập tham số, Nút "Chạy phân tích", Kết quả phân tích',
         module: 'forecast',
         resource: 'auto',
         action: 'execute'
       },
       custom: {
         code: 'forecast.custom',
-        name: 'Dự báo mất rừng tùy biến',
-        description: 'Tùy chỉnh các tham số để dự báo theo nhu cầu cụ thể',
-        ui_element: 'Tab "Dự báo tùy biến", Form cấu hình nâng cao, Nút "Tạo dự báo", Xuất báo cáo',
+        name: 'Phân tích mất rừng tùy biến',
+        description: 'Tùy chỉnh các tham số để phân tích theo nhu cầu cụ thể',
+        ui_element: 'Tab "Phân tích tùy biến", Form cấu hình nâng cao, Nút "Tạo phân tích", Xuất báo cáo',
         module: 'forecast',
         resource: 'custom',
         action: 'execute'
@@ -58,9 +58,9 @@ const FEATURE_PERMISSIONS = {
     features: {
       forecast_search: {
         code: 'data_management.forecast_search',
-        name: 'Tra cứu dữ liệu dự báo mất rừng',
-        description: 'Tra cứu, xem và tải xuống dữ liệu dự báo mất rừng',
-        ui_element: 'Tab "Tra cứu dữ liệu dự báo mất rừng", Form tìm kiếm, Bảng kết quả, Nút xuất Excel/PDF',
+        name: 'Tra cứu dữ liệu phân tích mất rừng',
+        description: 'Tra cứu, xem và tải xuống dữ liệu phân tích mất rừng',
+        ui_element: 'Tab "Tra cứu dữ liệu phân tích mất rừng", Form tìm kiếm, Bảng kết quả, Nút xuất Excel/PDF',
         module: 'data_management',
         resource: 'forecast',
         action: 'search'
@@ -76,9 +76,9 @@ const FEATURE_PERMISSIONS = {
       },
       verification: {
         code: 'data_management.verification',
-        name: 'Xác minh dự báo mất rừng',
-        description: 'Xác minh độ chính xác của các dự báo mất rừng',
-        ui_element: 'Tab "Xác minh dự báo mất rừng", Danh sách dự báo cần xác minh, Nút phê duyệt/từ chối, Form ghi chú',
+        name: 'Xác minh phân tích mất rừng',
+        description: 'Xác minh độ chính xác của các phân tích mất rừng',
+        ui_element: 'Tab "Xác minh phân tích mất rừng", Danh sách phân tích cần xác minh, Nút phê duyệt/từ chối, Form ghi chú',
         module: 'data_management',
         resource: 'verification',
         action: 'verify'
@@ -162,10 +162,10 @@ const FEATURE_PERMISSIONS = {
   },
 
   // ============================================
-  // 6. TRANG QUẢN LÝ ROLE
+  // 6. TRANG QUẢN LÝ PHÂN QUYỀN
   // ============================================
   role_management: {
-    name: 'Quản lý vai trò',
+    name: 'Quản lý phân quyền',
     description: 'Trang quản lý vai trò và phân quyền',
     icon: 'FaUserShield',
     path: '/dashboard/quanlyrole',

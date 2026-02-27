@@ -3,16 +3,15 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import api from "../../services/api"; // ✅ FIX: Use authenticated api instead of raw axios
 import config from "../../config";
 import { toast } from "react-toastify";
+import { convertTcvn3ToUnicode } from "../../utils/fontConverter";
 
 const GeoDataContext = createContext();
 
 export const useGeoData = () => useContext(GeoDataContext);
 
-// ✅ MAPSERVER CONSTANTS - Sơn La 3 layers via WMS
+// ✅ MAPSERVER CONSTANTS - Sơn La unified forest layer via WMS
 export const MAPSERVER_LAYERS = {
-  RANH_GIOI_XA: 'ranhgioixa',         // Ranh giới xã (75 xã)
-  TIEU_KU_KHOANH: 'tieukukhoanh',     // Tiểu khu khoảnh lô (30k khoảnh)
-  HIEN_TRANG_RUNG: 'hientrangrung'    // Hiện trạng rừng (280k khoảnh - PRIMARY)
+  HIEN_TRANG_RUNG: 'hientrangrung'    // Hiện trạng rừng (127k polygons - UNIFIED LAYER)
 };
 
 // ✅ MapServer WMS qua API Gateway
@@ -22,33 +21,21 @@ export const GeoDataProvider = ({ children }) => {
   const [geoData, setGeoData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Enhanced map layers config - SƠN LA 3 LAYERS
+  // ⚡ Pagination state for Mat Rung data
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 100,
+    total: 0,
+    totalPages: 0,
+    hasNext: false,
+    hasPrev: false
+  });
+
+  // Enhanced map layers config - Unified Sơn La Forest Layer
   const [mapLayers, setMapLayers] = useState({
-    // ✅ SƠN LA 3 WMS LAYERS - Render qua MapServer
+    // ✅ UNIFIED WMS LAYER - Single forest status layer
 
-    // 1. Ranh Giới Xã (75 xã)
-    ranhgioixa: {
-      data: null,
-      visible: true,
-      loading: false,
-      name: "Ranh Giới Xã",
-      endpoint: "ranhgioixa",
-      layerType: "wms",
-      wmsLayer: MAPSERVER_LAYERS.RANH_GIOI_XA
-    },
-
-    // 2. Tiểu Khu Khoảnh Lô (30k khoảnh)
-    tieukukhoanh: {
-      data: null,
-      visible: true,
-      loading: false,
-      name: "Tiểu Khu Khoảnh Lô",
-      endpoint: "tieukukhoanh",
-      layerType: "wms",
-      wmsLayer: MAPSERVER_LAYERS.TIEU_KU_KHOANH
-    },
-
-    // 3. Hiện Trạng Rừng (280k khoảnh - PRIMARY LAYER)
+    // Hiện Trạng Rừng (127k polygons - UNIFIED LAYER replacing 3 old layers)
     hientrangrung: {
       data: null,
       visible: true,
@@ -59,12 +46,23 @@ export const GeoDataProvider = ({ children }) => {
       wmsLayer: MAPSERVER_LAYERS.HIEN_TRANG_RUNG
     },
 
+    // Mất Rừng Đã Xác Minh (WMS - cached 30min, clipped geometry)
+    matrung_verified: {
+      data: null,
+      visible: true,
+      loading: false,
+      name: "Mất Rừng (Đã Xác Minh)",
+      endpoint: "matrung_verified",
+      layerType: "wms",
+      wmsLayer: 'matrung_verified'
+    },
+
     // ✅ GEOJSON LAYERS - Load data từ API (optional)
     deforestationAlerts: {
       data: null,
       visible: true, // ✅ ENABLE: Hiển thị mặc định để có dữ liệu cho table
       loading: false,
-      name: "Dự báo mất rừng mới nhất",
+      name: "Phân tích mất rừng mới nhất",
       endpoint: "deforestation-alerts",
       layerType: "geojson",
       useViewport: true
@@ -72,6 +70,7 @@ export const GeoDataProvider = ({ children }) => {
   });
 
   // ✅ HÀM CẬP NHẬT: Auto load chỉ GeoJSON layers (WMS layers tự động hiển thị)
+  // ⚡ OPTIMIZED: Parallel loading for faster initial load (5-10s → 2-3s)
   const loadAllDefaultLayers = async () => {
     try {
 
@@ -83,8 +82,8 @@ export const GeoDataProvider = ({ children }) => {
       // ✅ TRACK: Kiểm tra xem deforestationAlerts có load thành công không
       let deforestationAlertsLoaded = false;
 
-      // Load từng GeoJSON layer
-      for (const layer of geojsonLayers) {
+      // ⚡ PARALLEL LOADING: Load tất cả layers cùng lúc thay vì tuần tự
+      const loadPromises = geojsonLayers.map(async (layer) => {
         try {
           setLayerLoading(layer.key, true);
 
@@ -106,8 +105,24 @@ export const GeoDataProvider = ({ children }) => {
 
           // ✅ API returns { success, data: { type, features } }
           if (response.data && response.data.data && response.data.data.features) {
+            // ✅ Apply font conversion to all text fields
+            const processedFeatures = response.data.data.features.map(feature => ({
+              ...feature,
+              properties: {
+                ...feature.properties,
+                xa: feature.properties.xa ? convertTcvn3ToUnicode(feature.properties.xa) : feature.properties.xa,
+                xa_name: feature.properties.xa_name ? convertTcvn3ToUnicode(feature.properties.xa_name) : feature.properties.xa_name,
+                maxa: feature.properties.maxa ? convertTcvn3ToUnicode(feature.properties.maxa) : feature.properties.maxa,
+                mahuyen: feature.properties.mahuyen ? convertTcvn3ToUnicode(feature.properties.mahuyen) : feature.properties.mahuyen,
+                tk: feature.properties.tk ? convertTcvn3ToUnicode(feature.properties.tk) : feature.properties.tk,
+                tieukhu: feature.properties.tieukhu ? convertTcvn3ToUnicode(feature.properties.tieukhu) : feature.properties.tieukhu,
+                khoanh: feature.properties.khoanh ? convertTcvn3ToUnicode(feature.properties.khoanh) : feature.properties.khoanh,
+              }
+            }));
+
             const layerData = {
-              ...response.data.data, // Use nested data object
+              ...response.data.data,
+              features: processedFeatures, // Use processed features with font conversion
               layerType: layer.key,
               loadTime: 0,
               loadStrategy: 'auto_load_default',
@@ -129,18 +144,28 @@ export const GeoDataProvider = ({ children }) => {
               }
             }
 
+            return { success: true, layer: layer.key };
           }
+
+          return { success: false, layer: layer.key };
 
         } catch (error) {
           console.error(`❌ Error auto loading ${layer.name}:`, error);
           // Không toast error để tránh spam, chỉ log
+          return { success: false, layer: layer.key, error };
         } finally {
           setLayerLoading(layer.key, false);
         }
+      });
 
-        // Delay ngắn giữa các layer để tránh overload
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
+      // ⚡ Đợi tất cả layers load xong (parallel)
+      const results = await Promise.allSettled(loadPromises);
+
+      // Check if deforestationAlerts loaded successfully
+      const deforestationResult = results.find(r =>
+        r.status === 'fulfilled' && r.value.layer === 'deforestationAlerts' && r.value.success
+      );
+      deforestationAlertsLoaded = !!deforestationResult;
 
       // ✅ WMS layers tự động visible - không cần load data
 
@@ -159,36 +184,81 @@ export const GeoDataProvider = ({ children }) => {
     }
   };
 
-  // ✅ HÀM CẬP NHẬT: Load dữ liệu mặc định từ bảng mat_rung - CHỈ 3 THÁNG
-  const loadDefaultMatRungData = async () => {
+  // ✅ Load dữ liệu mặc định từ endpoint geojson/recent (clipped geometry)
+  const loadDefaultMatRungData = async (page = 1, limit = 100) => {
     try {
       setLoading(true);
 
-      // ✅ Gọi API /api/mat-rung - mặc định trả về 12 tháng, limit 1000
-      const response = await api.get(`/mat-rung`, {
+      const response = await api.get(`/mat-rung/geojson/recent`, {
         params: {
-          limit: 1000
+          days: 365,
+          limit
         }
       });
 
-      // ✅ API trả về: { success: true, data: { type: "FeatureCollection", features: [...] } }
       if (response.data && response.data.success && response.data.data) {
-        const matRungData = response.data.data; // ✅ KEY LÀ 'data' KHÔNG PHẢI 'mat_rung'
+        // ✅ Apply font conversion to all text fields
+        const processedFeatures = response.data.data.features ? response.data.data.features.map(feature => ({
+          ...feature,
+          properties: {
+            ...feature.properties,
+            xa: feature.properties.xa ? convertTcvn3ToUnicode(feature.properties.xa) : feature.properties.xa,
+            xa_name: feature.properties.xa_name ? convertTcvn3ToUnicode(feature.properties.xa_name) : feature.properties.xa_name,
+            maxa: feature.properties.maxa ? convertTcvn3ToUnicode(feature.properties.maxa) : feature.properties.maxa,
+            mahuyen: feature.properties.mahuyen ? convertTcvn3ToUnicode(feature.properties.mahuyen) : feature.properties.mahuyen,
+            tk: feature.properties.tk ? convertTcvn3ToUnicode(feature.properties.tk) : feature.properties.tk,
+            tieukhu: feature.properties.tieukhu ? convertTcvn3ToUnicode(feature.properties.tieukhu) : feature.properties.tieukhu,
+            khoanh: feature.properties.khoanh ? convertTcvn3ToUnicode(feature.properties.khoanh) : feature.properties.khoanh,
+          }
+        })) : [];
 
-        // Log đã tắt để tránh spam console
+        const matRungData = {
+          ...response.data.data,
+          features: processedFeatures, // Use processed features with font conversion
+          loadTimestamp: new Date().toISOString(),
+          loadStrategy: 'default_mat_rung',
+          autoLoaded: true
+        };
 
-        // ✅ API đã tự động filter 12 tháng, không cần filter lại
-        // Set vào geoData để hiển thị trong Map và Table
+        // Update pagination from metadata
+        if (response.data.metadata) {
+          setPagination(prev => ({
+            ...prev,
+            total: response.data.metadata.count || 0,
+            page: 1,
+            limit: limit
+          }));
+        }
+
         setGeoData(matRungData);
 
       } else {
         console.warn('⚠️ No mat_rung data in response:', response.data);
       }
     } catch (error) {
-      console.error("❌ Lỗi khi load dữ liệu mat_rung mặc định:", error);
-      // Không toast error để tránh spam khi auto load
+      console.error("❌ Lỗi khi load dữ liệu mat_rung:", error);
+      toast.error('Lỗi khi tải dữ liệu mất rừng');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // ⚡ Pagination control functions
+  const loadNextPage = () => {
+    if (pagination.hasNext && !loading) {
+      loadDefaultMatRungData(pagination.page + 1, pagination.limit);
+    }
+  };
+
+  const loadPrevPage = () => {
+    if (pagination.hasPrev && !loading) {
+      loadDefaultMatRungData(pagination.page - 1, pagination.limit);
+    }
+  };
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= pagination.totalPages && !loading) {
+      loadDefaultMatRungData(page, pagination.limit);
     }
   };
 
@@ -405,8 +475,27 @@ export const GeoDataProvider = ({ children }) => {
       });
 
       if (response.data.success && response.data.data) {
+        // ✅ FIX: Backend convert không hoạt động đúng, cần convert ở frontend
+        // Apply font conversion giống như loadDefaultMatRungData
+        const processedFeatures = response.data.data.features ? response.data.data.features.map(feature => ({
+          ...feature,
+          properties: {
+            ...feature.properties,
+            xa: feature.properties.xa ? convertTcvn3ToUnicode(feature.properties.xa) : feature.properties.xa,
+            xa_name: feature.properties.xa_name ? convertTcvn3ToUnicode(feature.properties.xa_name) : feature.properties.xa_name,
+            maxa: feature.properties.maxa ? convertTcvn3ToUnicode(feature.properties.maxa) : feature.properties.maxa,
+            huyen: feature.properties.huyen ? convertTcvn3ToUnicode(feature.properties.huyen) : feature.properties.huyen,
+            mahuyen: feature.properties.mahuyen ? convertTcvn3ToUnicode(feature.properties.mahuyen) : feature.properties.mahuyen,
+            tk: feature.properties.tk ? convertTcvn3ToUnicode(feature.properties.tk) : feature.properties.tk,
+            tieukhu: feature.properties.tieukhu ? convertTcvn3ToUnicode(feature.properties.tieukhu) : feature.properties.tieukhu,
+            khoanh: feature.properties.khoanh ? convertTcvn3ToUnicode(feature.properties.khoanh) : feature.properties.khoanh,
+            churung: feature.properties.churung ? convertTcvn3ToUnicode(feature.properties.churung) : feature.properties.churung,
+          }
+        })) : [];
+
         const forecastData = {
           ...response.data.data,
+          features: processedFeatures, // Use processed features with font conversion
           loadType: 'auto_forecast',
           loadTimestamp: new Date().toISOString(),
           forecastMetadata: response.data.metadata || {}
@@ -551,6 +640,12 @@ export const GeoDataProvider = ({ children }) => {
       refreshDefaultData,
       loadSingleLayer,
       loadAllDefaultLayers,
+
+      // ⚡ PAGINATION STATE & FUNCTIONS
+      pagination,
+      loadNextPage,
+      loadPrevPage,
+      goToPage,
 
       // ✅ NEW AUTO FORECAST FUNCTIONS
       loadAutoForecastData,

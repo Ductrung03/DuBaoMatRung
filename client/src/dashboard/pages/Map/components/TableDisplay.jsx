@@ -1,15 +1,19 @@
-// client/src/dashboard/pages/Map/components/TableDisplay.jsx - FIXED VERSION
+// client/src/dashboard/pages/Map/components/TableDisplay.jsx - VIRTUALIZED VERSION WITH PAGINATION
 import React from "react";
-import Table from "../../Table";
+import Table from "../../TableVirtualized"; // ✅ Using virtualized table for 60 FPS scrolling
 import LoadingOverlay from "./LoadingOverlay";
+import PaginationControls from "../../../components/PaginationControls"; // ⚡ Pagination
+import { useGeoData } from "../../../contexts/GeoDataContext"; // ⚡ Access pagination state
 
-const TableDisplay = ({ 
-  loading, 
-  geoData, 
-  loadingDetails, 
-  loadingMessage, 
-  onRowClick 
+const TableDisplay = ({
+  loading,
+  geoData,
+  loadingDetails,
+  loadingMessage,
+  onRowClick
 }) => {
+  // ⚡ Get pagination state and functions from context
+  const { pagination, goToPage } = useGeoData();
   // ✅ REMOVED: Không còn kiểm tra trang nào nữa - Hiển thị table cho TẤT CẢ trang
 
   // Hiển thị loading
@@ -42,6 +46,13 @@ const TableDisplay = ({
           data={geoData.features.map((f) => f.properties)}
           onRowClick={onRowClick}
           tableName="mat_rung"
+        />
+
+        {/* ⚡ Pagination controls */}
+        <PaginationControls
+          pagination={pagination}
+          onPageChange={goToPage}
+          loading={loading}
         />
       </div>
     );

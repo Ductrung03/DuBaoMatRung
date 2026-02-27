@@ -6,6 +6,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { useGeoData } from "../../../contexts/GeoDataContext";
 import Dropdown from "../../../../components/Dropdown";
 import { useIsMobile } from "../../../../hooks/useMediaQuery";
+import api from "../../../../services/api";
+import { convertTcvn3ToUnicode } from "../../../../utils/fontConverter";
 
 const TraCuuDuLieuDuBaoMatRung = () => {
   const { user, isAdmin } = useAuth();
@@ -49,45 +51,53 @@ const TraCuuDuLieuDuBaoMatRung = () => {
       setLoading(true);
 
       // Tạo query parameters theo backend API
-      const queryParams = new URLSearchParams();
-      queryParams.append('fromDate', fromDate);
-      queryParams.append('toDate', toDate);
+      const params = {
+        fromDate,
+        toDate,
+        page: 1,
+        limit: 1000
+      };
 
-      if (selectedXa) queryParams.append('xa', selectedXa);
-      if (selectedTieukhu) queryParams.append('tk', selectedTieukhu);
-      if (selectedKhoanh) queryParams.append('khoanh', selectedKhoanh);
+      if (selectedXa) params.xa = selectedXa;
+      if (selectedTieukhu) params.tk = selectedTieukhu;
+      if (selectedKhoanh) params.khoanh = selectedKhoanh;
+      if (selectedChucNangRung) params.chucNangRung = selectedChucNangRung;
+      if (selectedTrangThaiXacMinh) params.detectionStatus = selectedTrangThaiXacMinh;
 
-      // Gọi API backend đúng
-      const response = await fetch(`/api/mat-rung?${queryParams.toString()}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      // Gọi API backend qua axios (có auth interceptor)
+      const response = await api.get('/mat-rung', { params });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Lỗi khi tra cứu dữ liệu');
-      }
-
-      const data = await response.json();
-      
-      if (!data.success) {
-        toast.error(data.message || "Lỗi từ backend.");
+      if (!response.data.success) {
+        toast.error(response.data.message || "Lỗi từ backend.");
         return;
       }
 
-      if (!data.data || data.data.features.length === 0) {
-        toast.warning("Không có dữ liệu phù hợp.");
+      const responseData = response.data.data;
+
+      if (!responseData || !responseData.features || responseData.features.length === 0) {
+        toast.warning("Không có dữ liệu phù hợp với điều kiện tra cứu.");
         return;
       }
+
+      // ✅ Apply font conversion to xa field
+      const processedData = {
+        ...responseData,
+        features: responseData.features.map(feature => ({
+          ...feature,
+          properties: {
+            ...feature.properties,
+            xa: convertTcvn3ToUnicode(feature.properties.xa || '')
+          }
+        }))
+      };
 
       // Load dữ liệu lên bản đồ
-      setGeoData(data.data);
-      toast.success(`Tìm thấy ${data.data.features.length} kết quả phù hợp`);
-      
+      setGeoData(processedData);
+      toast.success(`✅ Tìm thấy ${processedData.features.length} kết quả phù hợp`);
+
     } catch (error) {
       console.error('Lỗi tra cứu:', error);
-      toast.error('Lỗi khi tra cứu dữ liệu: ' + error.message);
+      toast.error('❌ Lỗi khi tra cứu dữ liệu: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -109,10 +119,10 @@ const TraCuuDuLieuDuBaoMatRung = () => {
           getNguyenNhan(),
         ]);
 
-        setChucNangRungList(chucNangRungRes.data.map(item => ({ value: item.value, label: item.label })));
-        setChuRungList(chuRungRes.data.map(item => ({ value: item.value, label: item.label })));
-        setTrangThaiXacMinhList(trangThaiXacMinhRes.data.map(item => ({ value: item.value, label: item.label })));
-        setNguyenNhanList(nguyenNhanRes.data.map(item => ({ value: item.value, label: item.label })));
+        setChucNangRungList((chucNangRungRes.data?.data || []).map(item => ({ value: item.value, label: item.label })));
+        setChuRungList((chuRungRes.data?.data || []).map(item => ({ value: item.value, label: item.label })));
+        setTrangThaiXacMinhList((trangThaiXacMinhRes.data?.data || []).map(item => ({ value: item.value, label: item.label })));
+        setNguyenNhanList((nguyenNhanRes.data?.data || []).map(item => ({ value: item.value, label: item.label })));
       } catch (error) {
         toast.error("Lỗi khi tải dữ liệu dropdown.");
         console.error("Error fetching dropdown data:", error);

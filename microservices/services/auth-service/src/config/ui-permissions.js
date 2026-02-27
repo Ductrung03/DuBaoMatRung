@@ -34,43 +34,43 @@ const UI_PAGES_PERMISSIONS = {
     ]
   },
 
-  // 2. DỰ BÁO MẤT RỪNG
+  // 2. PHÂN TÍCH MẤT RỪNG
   'du-bao-mat-rung': {
-    name: 'Dự báo mất rừng',
+    name: 'Phân tích mất rừng',
     icon: 'FaChartLine',
     path: '/dashboard/dubaomatrung',
-    description: 'Xem dự báo và phân tích xu hướng mất rừng',
+    description: 'Xem phân tích và phân tích xu hướng mất rừng',
     permissions: [
       {
         code: 'forecast.view',
-        name: 'Xem dự báo',
-        description: 'Xem dữ liệu dự báo mất rừng',
+        name: 'Xem phân tích',
+        description: 'Xem dữ liệu phân tích mất rừng',
         module: 'forecast',
         resource: 'forecast',
         action: 'view',
-        ui_category: 'Dự báo',
+        ui_category: 'Phân tích',
         icon: 'FaEye',
         order: 10
       },
       {
         code: 'forecast.map.view',
-        name: 'Xem bản đồ dự báo',
-        description: 'Xem bản đồ hiển thị khu vực dự báo',
+        name: 'Xem bản đồ phân tích',
+        description: 'Xem bản đồ hiển thị khu vực phân tích',
         module: 'forecast',
         resource: 'map',
         action: 'view',
-        ui_category: 'Dự báo',
+        ui_category: 'Phân tích',
         icon: 'FaMapMarkedAlt',
         order: 11
       },
       {
         code: 'forecast.data.export',
-        name: 'Xuất dữ liệu dự báo',
-        description: 'Xuất dữ liệu dự báo ra file',
+        name: 'Xuất dữ liệu phân tích',
+        description: 'Xuất dữ liệu phân tích ra file',
         module: 'forecast',
         resource: 'data',
         action: 'export',
-        ui_category: 'Dự báo',
+        ui_category: 'Phân tích',
         icon: 'FaDownload',
         order: 12
       }
@@ -523,9 +523,9 @@ const UI_PAGES_PERMISSIONS = {
     ]
   },
 
-  // 8. QUẢN LÝ ROLES & PERMISSIONS (Admin)
+  // 8. QUẢN LÝ PHÂN QUYỀN (Admin)
   'quan-ly-role': {
-    name: 'Quản lý vai trò',
+    name: 'Quản lý phân quyền',
     icon: 'FaUserShield',
     path: '/dashboard/quanlyrole',
     description: 'Quản lý vai trò và phân quyền',

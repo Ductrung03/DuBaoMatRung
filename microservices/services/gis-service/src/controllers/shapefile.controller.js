@@ -617,38 +617,134 @@ exports.importFromGeeUrl = async (req, res, next) => {
     }
 
     // Get recently added data for display (only new records from this import)
+    // ✅ FIX: Update has_intersection and clipped_geom for newly imported records
+    try {
+      await db.query(`
+        UPDATE son_la_mat_rung
+        SET has_intersection = true,
+            clipped_geom = geom,
+            clipped_area = ST_Area(geom::geography)
+        WHERE created_at >= NOW() - INTERVAL '2 minutes'
+          AND has_intersection IS NULL
+      `);
+      logger.info('Updated has_intersection/clipped_geom for GEE imported records');
+    } catch (updateErr) {
+      logger.warn('Failed to update has_intersection for GEE records:', updateErr.message);
+    }
+
+    // ✅ FIX: Get recently added data with ALL fields needed by Table component
     const getAllQuery = `
       SELECT
-        gid,
-        ST_AsGeoJSON(geom)::json as geometry,
-        area,
-        start_dau,
-        end_sau,
-        mahuyen,
-        detection_status,
-        verification_notes,
-        created_at
-      FROM son_la_mat_rung
-      WHERE created_at >= NOW() - INTERVAL '1 minute'
-      ORDER BY created_at DESC
+        m.gid,
+        ST_AsGeoJSON(ST_Transform(ST_MakeValid(m.geom), 4326), 6)::json as geometry,
+        m.area,
+        m.start_dau,
+        m.end_sau,
+        m.mahuyen,
+        m.detection_status,
+        m.detection_date,
+        m.verification_notes,
+        m.verification_reason,
+        m.verified_by,
+        m.verified_area,
+        m.created_at,
+        COALESCE(m.clipped_area, ST_Area(m.geom::geography)) as dtich,
+        COALESCE(m.verified_area, 0) as "dtichXM",
+        ST_X(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326))) as x_coordinate,
+        ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326))) as y_coordinate
+      FROM son_la_mat_rung m
+      WHERE m.created_at >= NOW() - INTERVAL '2 minutes'
+      ORDER BY m.created_at DESC
       LIMIT 500
     `;
 
     const allDataResult = await db.query(getAllQuery);
 
+    // ✅ FIX: Enrich with xa, tk, khoanh from sonla_tkkl
+    const { Pool } = require('pg');
+    const adminDbPool = new Pool({
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 5432,
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD,
+      database: 'admin_db',
+      max: 5
+    });
+
+    try {
+      const validPoints = allDataResult.rows
+        .filter(r => r.x_coordinate && r.y_coordinate && !isNaN(r.x_coordinate) && !isNaN(r.y_coordinate))
+        .map(r => `${r.x_coordinate},${r.y_coordinate}`);
+
+      if (validPoints.length > 0) {
+        const enrichQuery = `
+          WITH input_points AS (
+            SELECT ordinality as idx,
+              ST_SetSRID(ST_MakePoint(
+                NULLIF(split_part(coords, ',', 1), '')::float,
+                NULLIF(split_part(coords, ',', 2), '')::float
+              ), 4326) as pt
+            FROM unnest($1::text[]) WITH ORDINALITY AS t(coords, ordinality)
+            WHERE coords IS NOT NULL AND coords != 'null,null'
+          )
+          SELECT DISTINCT ON (g.idx) g.idx, h.xa, h.tieukhu as tk, h.khoanh
+          FROM input_points g
+          LEFT JOIN sonla_tkkl h ON h.geom IS NOT NULL AND ST_Intersects(h.geom, g.pt)
+          WHERE g.pt IS NOT NULL
+          ORDER BY g.idx
+        `;
+        const enrichResult = await adminDbPool.query(enrichQuery, [validPoints]);
+        const enrichMap = {};
+        enrichResult.rows.forEach(r => { if (r.idx && r.idx > 0) enrichMap[r.idx - 1] = r; });
+
+        let validIdx = 0;
+        allDataResult.rows.forEach(row => {
+          if (row.x_coordinate && row.y_coordinate && !isNaN(row.x_coordinate) && !isNaN(row.y_coordinate)) {
+            const info = enrichMap[validIdx] || {};
+            row.xa = info.xa || null;
+            row.tk = info.tk || null;
+            row.khoanh = info.khoanh || null;
+            validIdx++;
+          }
+        });
+      }
+    } catch (enrichErr) {
+      logger.warn('Failed to enrich GEE import data:', enrichErr.message);
+    } finally {
+      await adminDbPool.end();
+    }
+
+    const filteredRows = allDataResult.rows.filter(r => r.xa && r.xa.trim() !== '');
+
     const geojsonData = {
       type: 'FeatureCollection',
-      features: allDataResult.rows.map(row => ({
+      features: filteredRows.map(row => ({
         type: 'Feature',
         geometry: row.geometry,
         properties: {
           gid: row.gid,
           area: row.area,
+          dtich: row.dtich,
+          dtichXM: row.dtichXM,
           start_dau: row.start_dau,
           end_sau: row.end_sau,
           mahuyen: row.mahuyen,
-          detection_status: row.detection_status,
+          huyen: row.mahuyen,
+          xa: row.xa,
+          tk: row.tk,
+          khoanh: row.khoanh,
+          x: row.x_coordinate,
+          y: row.y_coordinate,
+          x_coordinate: row.x_coordinate,
+          y_coordinate: row.y_coordinate,
+          detection_status: row.detection_status || 'Chưa xác minh',
+          detection_date: row.detection_date,
           verification_notes: row.verification_notes,
+          verification_reason: row.verification_reason,
+          verified_by: row.verified_by,
+          verified_area: row.verified_area,
+          verified_by_name: null,
+          verified_by_username: null,
           created_at: row.created_at
         }
       }))
@@ -687,25 +783,25 @@ exports.importFromGeeUrl = async (req, res, next) => {
 
       if (status === 401 || status === 403) {
         message = '🔐 Không có quyền truy cập URL.\n\n' +
-                  '💡 Nguyên nhân có thể:\n' +
-                  '• URL chỉ hoạt động khi đăng nhập Google Earth Engine\n' +
-                  '• Asset chưa được share public\n' +
-                  '• Phiên đăng nhập GEE đã hết hạn\n\n' +
-                  '✅ Giải pháp:\n' +
-                  '• Export data to Asset → Share → Make PUBLIC\n' +
-                  '• Hoặc đăng nhập lại Google Earth Engine và lấy URL mới';
+          '💡 Nguyên nhân có thể:\n' +
+          '• URL chỉ hoạt động khi đăng nhập Google Earth Engine\n' +
+          '• Asset chưa được share public\n' +
+          '• Phiên đăng nhập GEE đã hết hạn\n\n' +
+          '✅ Giải pháp:\n' +
+          '• Export data to Asset → Share → Make PUBLIC\n' +
+          '• Hoặc đăng nhập lại Google Earth Engine và lấy URL mới';
       } else if (status === 404) {
         message = '❌ Không tìm thấy dữ liệu tại URL này.\n\n' +
-                  '💡 Nguyên nhân có thể:\n' +
-                  '• URL đã hết hạn (URL từ Console chỉ tạm thời)\n' +
-                  '• Asset đã bị xóa\n' +
-                  '• URL không đúng định dạng\n' +
-                  '• Đang sử dụng URL TIFF thay vì FeatureCollection\n\n' +
-                  '✅ Giải pháp:\n' +
-                  '• Sử dụng Export.table.toAsset() để tạo asset vĩnh viễn\n' +
-                  '• Share asset thành PUBLIC\n' +
-                  '• Copy URL có ":getFeatures" từ asset\n' +
-                  '• Đảm bảo URL là FeatureCollection (vector), không phải Image (raster)';
+          '💡 Nguyên nhân có thể:\n' +
+          '• URL đã hết hạn (URL từ Console chỉ tạm thời)\n' +
+          '• Asset đã bị xóa\n' +
+          '• URL không đúng định dạng\n' +
+          '• Đang sử dụng URL TIFF thay vì FeatureCollection\n\n' +
+          '✅ Giải pháp:\n' +
+          '• Sử dụng Export.table.toAsset() để tạo asset vĩnh viễn\n' +
+          '• Share asset thành PUBLIC\n' +
+          '• Copy URL có ":getFeatures" từ asset\n' +
+          '• Đảm bảo URL là FeatureCollection (vector), không phải Image (raster)';
       }
 
       return res.status(error.response.status).json({
@@ -815,7 +911,7 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
     const { Pool } = require('pg');
     const adminDbPool = new Pool({
       host: process.env.DB_HOST || 'localhost',
-      port: process.env.DB_PORT || 5433,
+      port: process.env.DB_PORT || 5432,
       user: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASSWORD,
       database: 'admin_db',
@@ -846,11 +942,11 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
                 throw new Error('Feature has no valid geometry');
               }
 
-              // ✅ Query to check spatial intersection with sonla_hientrangrung
+              // ✅ Query to check spatial intersection with sonla_hientrangrung_new
               const intersectQuery = `
                 SELECT EXISTS (
                   SELECT 1
-                  FROM sonla_hientrangrung
+                  FROM sonla_hientrangrung_new
                   WHERE ST_Intersects(
                     geom,
                     ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)
@@ -1009,39 +1105,143 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
         errors: errorCount
       });
 
-      // Get recently added data for display
+      // ✅ FIX: Update has_intersection and clipped_geom for newly imported records
+      // so they appear in getMatRung/autoForecast queries
+      try {
+        await db.query(`
+          UPDATE son_la_mat_rung
+          SET has_intersection = true,
+              clipped_geom = geom,
+              clipped_area = ST_Area(geom::geography)
+          WHERE created_at >= NOW() - INTERVAL '2 minutes'
+            AND has_intersection IS NULL
+        `);
+        logger.info('Updated has_intersection/clipped_geom for newly imported records');
+      } catch (updateErr) {
+        logger.warn('Failed to update has_intersection for new records:', updateErr.message);
+      }
+
+      // ✅ FIX: Get recently added data with ALL fields needed by Table component
+      // Matching the same format as getMatRung/autoForecast
       const getAllQuery = `
         SELECT
-          gid,
-          ST_AsGeoJSON(geom)::json as geometry,
-          area,
-          start_dau,
-          end_sau,
-          mahuyen,
-          detection_status,
-          verification_notes,
-          created_at
-        FROM son_la_mat_rung
-        WHERE created_at >= NOW() - INTERVAL '1 minute'
-        ORDER BY created_at DESC
+          m.gid,
+          ST_AsGeoJSON(ST_Transform(ST_MakeValid(m.geom), 4326), 6)::json as geometry,
+          m.area,
+          m.start_dau,
+          m.end_sau,
+          m.mahuyen,
+          m.detection_status,
+          m.detection_date,
+          m.verification_notes,
+          m.verification_reason,
+          m.verified_by,
+          m.verified_area,
+          m.created_at,
+          COALESCE(m.clipped_area, ST_Area(m.geom::geography)) as dtich,
+          COALESCE(m.verified_area, 0) as "dtichXM",
+          ST_X(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326))) as x_coordinate,
+          ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326))) as y_coordinate
+        FROM son_la_mat_rung m
+        WHERE m.created_at >= NOW() - INTERVAL '2 minutes'
+        ORDER BY m.created_at DESC
         LIMIT 500
       `;
 
       const allDataResult = await db.query(getAllQuery);
 
+      // ✅ FIX: Enrich with xa, tk, khoanh from sonla_tkkl (same as enrichWithAdminInfo)
+      const enrichedRows = [];
+      const ENRICH_BATCH = 50;
+
+      for (let i = 0; i < allDataResult.rows.length; i += ENRICH_BATCH) {
+        const batch = allDataResult.rows.slice(i, i + ENRICH_BATCH);
+        const validPoints = batch
+          .filter(r => r.x_coordinate && r.y_coordinate && !isNaN(r.x_coordinate) && !isNaN(r.y_coordinate))
+          .map(r => `${r.x_coordinate},${r.y_coordinate}`);
+
+        if (validPoints.length > 0) {
+          try {
+            const enrichQuery = `
+              WITH input_points AS (
+                SELECT
+                  ordinality as idx,
+                  ST_SetSRID(ST_MakePoint(
+                    NULLIF(split_part(coords, ',', 1), '')::float,
+                    NULLIF(split_part(coords, ',', 2), '')::float
+                  ), 4326) as pt
+                FROM unnest($1::text[]) WITH ORDINALITY AS t(coords, ordinality)
+                WHERE coords IS NOT NULL AND coords != 'null,null' AND coords != ','
+              )
+              SELECT DISTINCT ON (g.idx)
+                g.idx,
+                h.xa,
+                h.tieukhu as tk,
+                h.khoanh
+              FROM input_points g
+              LEFT JOIN sonla_tkkl h
+                ON h.geom IS NOT NULL AND ST_Intersects(h.geom, g.pt)
+              WHERE g.pt IS NOT NULL
+              ORDER BY g.idx
+            `;
+            const enrichResult = await adminDbPool.query(enrichQuery, [validPoints]);
+
+            // Map enrich data back to rows
+            const enrichMap = {};
+            enrichResult.rows.forEach(r => {
+              if (r.idx && r.idx > 0) enrichMap[r.idx - 1] = r;
+            });
+
+            let validIdx = 0;
+            batch.forEach(row => {
+              if (row.x_coordinate && row.y_coordinate && !isNaN(row.x_coordinate) && !isNaN(row.y_coordinate)) {
+                const adminInfo = enrichMap[validIdx] || {};
+                row.xa = adminInfo.xa || null;
+                row.tk = adminInfo.tk || null;
+                row.khoanh = adminInfo.khoanh || null;
+                validIdx++;
+              }
+            });
+          } catch (enrichErr) {
+            logger.warn('Failed to enrich batch with admin info:', enrichErr.message);
+          }
+        }
+
+        enrichedRows.push(...batch);
+      }
+
+      // ✅ FIX: Only return records that have xa (within forest area)
+      const filteredEnrichedRows = enrichedRows.filter(r => r.xa && r.xa.trim() !== '');
+
       const geojsonData = {
         type: 'FeatureCollection',
-        features: allDataResult.rows.map(row => ({
+        features: filteredEnrichedRows.map(row => ({
           type: 'Feature',
           geometry: row.geometry,
           properties: {
             gid: row.gid,
             area: row.area,
+            dtich: row.dtich,
+            dtichXM: row.dtichXM,
             start_dau: row.start_dau,
             end_sau: row.end_sau,
             mahuyen: row.mahuyen,
-            detection_status: row.detection_status,
+            huyen: row.mahuyen,
+            xa: row.xa,
+            tk: row.tk,
+            khoanh: row.khoanh,
+            x: row.x_coordinate,
+            y: row.y_coordinate,
+            x_coordinate: row.x_coordinate,
+            y_coordinate: row.y_coordinate,
+            detection_status: row.detection_status || 'Chưa xác minh',
+            detection_date: row.detection_date,
             verification_notes: row.verification_notes,
+            verification_reason: row.verification_reason,
+            verified_by: row.verified_by,
+            verified_area: row.verified_area,
+            verified_by_name: null,
+            verified_by_username: null,
             created_at: row.created_at
           }
         }))

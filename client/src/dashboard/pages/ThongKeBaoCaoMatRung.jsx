@@ -90,7 +90,22 @@ const ThongKeBaoCaoMatRung = () => {
           );
         }
 
-        setReportData(filteredData);
+        // ✅ Apply font conversion to all text fields
+        const processedData = filteredData.map(feature => ({
+          ...feature,
+          properties: {
+            ...feature.properties,
+            xa: feature.properties.xa ? convertTcvn3ToUnicode(feature.properties.xa) : feature.properties.xa,
+            xa_name: feature.properties.xa_name ? convertTcvn3ToUnicode(feature.properties.xa_name) : feature.properties.xa_name,
+            maxa: feature.properties.maxa ? convertTcvn3ToUnicode(feature.properties.maxa) : feature.properties.maxa,
+            mahuyen: feature.properties.mahuyen ? convertTcvn3ToUnicode(feature.properties.mahuyen) : feature.properties.mahuyen,
+            tk: feature.properties.tk ? convertTcvn3ToUnicode(feature.properties.tk) : feature.properties.tk,
+            tieukhu: feature.properties.tieukhu ? convertTcvn3ToUnicode(feature.properties.tieukhu) : feature.properties.tieukhu,
+            khoanh: feature.properties.khoanh ? convertTcvn3ToUnicode(feature.properties.khoanh) : feature.properties.khoanh,
+          }
+        }));
+
+        setReportData(processedData);
       }
     } catch (error) {
       console.error('Error fetching report data:', error);
@@ -376,7 +391,8 @@ const ThongKeBaoCaoMatRung = () => {
         const chartData = {};
 
         features.forEach(feature => {
-          const huyenName = feature.properties.mahuyen || 'Unknown';
+          // ✅ Apply font conversion to huyenName
+          const huyenName = feature.properties.mahuyen ? convertTcvn3ToUnicode(feature.properties.mahuyen) : 'Unknown';
           if (!chartData[huyenName]) {
             chartData[huyenName] = {
               "Chưa xác minh": 0,
@@ -760,7 +776,7 @@ const ThongKeBaoCaoMatRung = () => {
     return (
       <div className="p-4 sm:p-6 font-sans max-h-[calc(100vh-100px)] overflow-y-auto">
         <h2 className="text-center text-base sm:text-lg font-bold mb-3 sm:mb-4">
-          THỐNG KÊ KẾT QUẢ DỰ BÁO MẤT RỪNG
+          THỐNG KÊ KẾT QUẢ PHÂN TÍCH MẤT RỪNG
         </h2>
 
         {/* Hiển thị thông tin từ params thực tế */}
@@ -787,7 +803,7 @@ const ThongKeBaoCaoMatRung = () => {
           <div className="w-full lg:w-1/2 space-y-6 lg:space-y-8">
             <div>
               <h3 className="text-center text-sm sm:text-base font-semibold mb-2">
-                Biểu đồ mức độ tin cậy dự báo mất rừng (%)
+                Biểu đồ mức độ tin cậy phân tích mất rừng (%)
               </h3>
               <ResponsiveContainer width="100%" height={isMobile ? 250 : 300}>
                 <BarChart data={dataTinCay}>
@@ -803,7 +819,7 @@ const ThongKeBaoCaoMatRung = () => {
 
             <div>
               <h3 className="text-center text-sm sm:text-base font-semibold mb-2">
-                Biểu đồ diện tích dự báo mất rừng
+                Biểu đồ diện tích phân tích mất rừng
               </h3>
               <ResponsiveContainer width="100%" height={isMobile ? 250 : 300}>
                 <BarChart data={dataDienTich}>

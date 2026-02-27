@@ -264,8 +264,8 @@ export default function PhatHienMatRung() {
         </div>
       </div>
 
-      {/* Main content area */}
-      <div className="relative flex-1 overflow-hidden">
+      {/* Main content area - ✅ FIXED: Đổi overflow-hidden thành overflow-auto để iframe scroll được */}
+      <div className="relative flex-1 overflow-auto">
 
         {/* Loading overlay - Responsive */}
         {loading && !error && (
@@ -340,13 +340,13 @@ export default function PhatHienMatRung() {
           </div>
         )}
 
-        {/* ✅ MAIN IFRAME với CSS tối ưu cho scroll */}
+        {/* ✅ MAIN IFRAME với CSS tối ưu cho scroll - FIXED: Đảm bảo hiển thị đầy đủ */}
         {!error && (
           <iframe
             ref={iframeRef}
             src={currentConfig.url}
             title={currentConfig.title}
-            className="w-full h-full border-0"
+            className="w-full border-0"
             onLoad={handleIframeLoad}
             onError={handleIframeError}
             // ✅ BỎ SANDBOX hoặc cấu hình nhẹ hơn để cho phép scroll
@@ -356,15 +356,17 @@ export default function PhatHienMatRung() {
               display: "block", // Luôn hiển thị, không ẩn khi loading
               opacity: loading ? 0.3 : 1, // Làm mờ khi loading thay vì ẩn
               transition: "opacity 0.3s ease",
+              // ✅ FIXED: Set min-height để đảm bảo iframe luôn hiển thị đầy đủ
+              minHeight: "100%",
+              height: "100%",
               // ✅ CSS để iframe có thể scroll trong mọi trường hợp
-              overflow: "auto",
               WebkitOverflowScrolling: "touch", // iOS smooth scrolling
-              scrollBehavior: "smooth"
             }}
             // ✅ Thêm các attributes để tối ưu scrolling
             allow="geolocation; camera; microphone; encrypted-media; fullscreen; autoplay"
             referrerPolicy="strict-origin-when-cross-origin"
             loading="eager"
+            scrolling="yes"
           />
         )}
       </div>
@@ -385,7 +387,7 @@ export default function PhatHienMatRung() {
         </div>
       </div>
 
-      {/* ✅ CSS STYLES CHO FULLSCREEN */}
+      {/* ✅ CSS STYLES CHO FULLSCREEN và FIX IFRAME SCROLL */}
       <style>{`
         .fullscreen-container {
           position: fixed !important;
@@ -399,13 +401,23 @@ export default function PhatHienMatRung() {
 
         .fullscreen-container iframe {
           width: 100% !important;
-          height: calc(100vh - 120px) !important; /* Trừ header và footer */
+          min-height: calc(100vh - 120px) !important; /* Trừ header và footer */
+          height: auto !important;
         }
 
-        /* ✅ Tối ưu scroll cho iframe */
+        /* ✅ FIXED: Đảm bảo iframe luôn hiển thị đầy đủ và có thể scroll */
         iframe {
           -webkit-overflow-scrolling: touch;
+          display: block !important;
+          min-height: 100vh !important; /* Đảm bảo ít nhất cao bằng viewport */
+          height: auto !important; /* Tự động điều chỉnh theo nội dung */
+          overflow: visible !important; /* Cho phép nội dung hiển thị đầy đủ */
+        }
+
+        /* ✅ Container của iframe cũng phải cho phép scroll */
+        .relative.flex-1 {
           overflow: auto !important;
+          -webkit-overflow-scrolling: touch;
         }
 
         /* ✅ Đảm bảo iframe có thể scroll khi zoom */
@@ -413,6 +425,13 @@ export default function PhatHienMatRung() {
           iframe {
             transform-origin: 0 0;
             zoom: 1;
+          }
+        }
+
+        /* ✅ Mobile optimization */
+        @media (max-width: 768px) {
+          iframe {
+            min-height: calc(100vh - 160px) !important;
           }
         }
       `}</style>

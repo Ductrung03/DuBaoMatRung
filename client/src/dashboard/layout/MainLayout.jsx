@@ -4,6 +4,7 @@ import Header from "./Header";
 import { Outlet, useLocation } from "react-router-dom";
 import { FaTimes } from "react-icons/fa";
 import { useIsMobileOrTablet } from "../../hooks/useMediaQuery";
+import ClipProgressBanner from "../components/ClipProgressBanner";
 
 const MainLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -19,6 +20,7 @@ const MainLayout = () => {
 
   return (
     <div className="flex flex-col h-screen">
+      <ClipProgressBanner />
       <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
       <div className="flex flex-1 overflow-hidden relative">
