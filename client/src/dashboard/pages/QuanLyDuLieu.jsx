@@ -15,7 +15,6 @@ const QuanLyDuLieu = () => {
     { id: 'search', label: 'Tra cứu', icon: '🔍' },
     { id: 'satellite', label: 'Ảnh VT', icon: '🛰️' },
     { id: 'verify', label: 'Xác minh', icon: '✓' },
-    { id: 'update', label: 'Cập nhật', icon: '📊' }
   ];
 
   return (
@@ -72,7 +71,6 @@ const QuanLyDuLieu = () => {
                   {activeSidebar === 'search' && <TraCuuDuLieuDuBaoMatRung />}
                   {activeSidebar === 'satellite' && <TraCuuAnhVeTinh />}
                   {activeSidebar === 'verify' && <XacMinhDuBaoMatRung />}
-                  {activeSidebar === 'update' && <CapNhatDuLieu />}
                 </div>
               </div>
             )}

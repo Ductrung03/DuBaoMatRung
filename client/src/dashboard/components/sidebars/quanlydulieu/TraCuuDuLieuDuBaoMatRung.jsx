@@ -178,12 +178,9 @@ const TraCuuDuLieuDuBaoMatRung = () => {
               </div>
             </div>
 
-            {/* Khu vực section */}
-            <div className="font-medium text-sm mt-3">Khu vực</div>
-
             {/* Xã */}
             <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
-              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Xã</label>
+              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Chọn xã</label>
               <div className={isMobile ? 'w-full' : 'w-36'}>
                 <Dropdown
                   selectedValue={selectedXa}
@@ -192,114 +189,6 @@ const TraCuuDuLieuDuBaoMatRung = () => {
                   placeholder="Chọn xã"
                   disabled={adminUnits.xa.loading || adminUnits.xa.disabled}
                   loading={adminUnits.xa.loading}
-                  className={isMobile ? 'w-full' : ''}
-                  selectClassName="w-full border border-green-400 rounded-md py-2 px-3 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                />
-              </div>
-            </div>
-
-            {/* Tiểu khu */}
-            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
-              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Tiểu khu</label>
-              <div className={isMobile ? 'w-full' : 'w-36'}>
-                <Dropdown
-                  selectedValue={selectedTieukhu}
-                  onValueChange={adminUnits.tieukhu.onChange}
-                  options={adminUnits.tieukhu.list}
-                  placeholder="Chọn tiểu khu"
-                  disabled={adminUnits.tieukhu.loading || adminUnits.tieukhu.disabled}
-                  loading={adminUnits.tieukhu.loading}
-                  className={isMobile ? 'w-full' : ''}
-                  selectClassName="w-full border border-green-400 rounded-md py-2 px-3 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                />
-              </div>
-            </div>
-
-            {/* Khoảnh */}
-            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
-              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Khoảnh</label>
-              <div className={isMobile ? 'w-full' : 'w-36'}>
-                <Dropdown
-                  selectedValue={selectedKhoanh}
-                  onValueChange={adminUnits.khoanh.onChange}
-                  options={adminUnits.khoanh.list}
-                  placeholder="Chọn khoảnh"
-                  disabled={adminUnits.khoanh.loading || adminUnits.khoanh.disabled}
-                  loading={adminUnits.khoanh.loading}
-                  className={isMobile ? 'w-full' : ''}
-                  selectClassName="w-full border border-green-400 rounded-md py-2 px-3 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                />
-              </div>
-            </div>
-
-            {/* Thuộc tính rừng section */}
-            <div className="font-medium text-sm mt-3">Thuộc tính rừng</div>
-
-            {/* Chức năng rừng */}
-            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
-              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Chức năng</label>
-              <div className={isMobile ? 'w-full' : 'w-36'}>
-                <Dropdown
-                  selectedValue={selectedChucNangRung}
-                  onValueChange={handleChucNangRungChange}
-                  options={chucNangRungList}
-                  placeholder="Chọn chức năng"
-                  disabled={loading}
-                  loading={loading}
-                  className={isMobile ? 'w-full' : ''}
-                  selectClassName="w-full border border-green-400 rounded-md py-2 px-3 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                />
-              </div>
-            </div>
-
-            {/* Chủ rừng */}
-            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
-              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Chủ rừng</label>
-              <div className={isMobile ? 'w-full' : 'w-36'}>
-                <Dropdown
-                  selectedValue={adminUnits.selectedChuRung}
-                  onValueChange={adminUnits.handleChuRungChange}
-                  options={chuRungList}
-                  placeholder="Chọn chủ rừng"
-                  disabled={loading}
-                  loading={loading}
-                  className={isMobile ? 'w-full' : ''}
-                  selectClassName="w-full border border-green-400 rounded-md py-2 px-3 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                />
-              </div>
-            </div>
-
-            {/* Trạng thái xác minh section */}
-            <div className="font-medium text-sm mt-3">Trạng thái xác minh</div>
-
-            {/* Trạng thái xác minh */}
-            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
-              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Trạng thái</label>
-              <div className={isMobile ? 'w-full' : 'w-36'}>
-                <Dropdown
-                  selectedValue={selectedTrangThaiXacMinh}
-                  onValueChange={handleTrangThaiXacMinhChange}
-                  options={trangThaiXacMinhList}
-                  placeholder="Chọn trạng thái"
-                  disabled={loading}
-                  loading={loading}
-                  className={isMobile ? 'w-full' : ''}
-                  selectClassName="w-full border border-green-400 rounded-md py-2 px-3 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                />
-              </div>
-            </div>
-
-            {/* Nguyên nhân */}
-            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
-              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Nguyên nhân</label>
-              <div className={isMobile ? 'w-full' : 'w-36'}>
-                <Dropdown
-                  selectedValue={selectedNguyenNhan}
-                  onValueChange={handleNguyenNhanChange}
-                  options={nguyenNhanList}
-                  placeholder="Chọn nguyên nhân"
-                  disabled={loading}
-                  loading={loading}
                   className={isMobile ? 'w-full' : ''}
                   selectClassName="w-full border border-green-400 rounded-md py-2 px-3 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                 />

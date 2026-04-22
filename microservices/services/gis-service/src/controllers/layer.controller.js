@@ -193,13 +193,13 @@ exports.getLayerDataByPath = async (req, res, next) => {
                 verification_notes,
                 created_at,
                 updated_at,
-                ST_Area(geom::geography) as dtich,
+                COALESCE(NULLIF(clipped_area, 0), ST_Area(ST_Transform(ST_MakeValid(COALESCE(clipped_geom, geom)), 4326)::geography)) as dtich,
                 COALESCE(verified_area, 0) as "dtichXM",
-                ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x_coordinate,
-                ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y_coordinate,
-                ST_X(ST_Transform(ST_Centroid(geom), 4326)) as x,
-                ST_Y(ST_Transform(ST_Centroid(geom), 4326)) as y,
-                ST_AsGeoJSON(ST_Transform(geom, 4326)) as geometry
+                ST_X(ST_Transform(ST_Centroid(COALESCE(clipped_geom, geom)), 4326)) as x_coordinate,
+                ST_Y(ST_Transform(ST_Centroid(COALESCE(clipped_geom, geom)), 4326)) as y_coordinate,
+                ST_X(ST_Transform(ST_Centroid(COALESCE(clipped_geom, geom)), 4326)) as x,
+                ST_Y(ST_Transform(ST_Centroid(COALESCE(clipped_geom, geom)), 4326)) as y,
+                ST_AsGeoJSON(ST_Transform(COALESCE(clipped_geom, geom), 4326)) as geometry
               FROM ${tableName}
               WHERE geom IS NOT NULL
                 AND ST_Intersects(geom, ST_GeomFromText('${unionGeomWKT}', 4326))
@@ -255,7 +255,7 @@ exports.getLayerDataByPath = async (req, res, next) => {
             verification_notes,
             created_at,
             updated_at,
-            COALESCE(clipped_area, ST_Area(geom::geography)) as dtich,
+            COALESCE(NULLIF(clipped_area, 0), ST_Area(ST_Transform(ST_MakeValid(COALESCE(clipped_geom, geom)), 4326)::geography)) as dtich,
             COALESCE(verified_area, 0) as "dtichXM",
             ST_X(ST_Transform(ST_Centroid(COALESCE(clipped_geom, geom)), 4326)) as x_coordinate,
             ST_Y(ST_Transform(ST_Centroid(COALESCE(clipped_geom, geom)), 4326)) as y_coordinate,

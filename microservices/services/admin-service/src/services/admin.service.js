@@ -173,6 +173,21 @@ class AdminService {
   }
 
   /**
+   * Get list of xa with maxa code from Sơn La (sonla_rgx table)
+   */
+  async getSonLaXaWithMaXa() {
+    const result = await this.db
+      .selectFrom('sonla_rgx')
+      .select(['xa', 'maxa'])
+      .where('xa', 'is not', null)
+      .where('maxa', 'is not', null)
+      .orderBy('xa')
+      .execute();
+
+    return result;
+  }
+
+  /**
    * Get list of tieu khu from Sơn La filtered by xa
    */
   async getSonLaTieuKhu(xa) {

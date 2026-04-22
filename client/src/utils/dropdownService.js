@@ -125,6 +125,20 @@ export const getNguyenNhan = async () => {
 };
 
 /**
+ * Fetches a list of communes from Sơn La with their commune codes (mã xã).
+ * @returns {Promise<Array<{xa: string, maxa: string|number}>>}
+ */
+export const getSonLaXaVoiMaXa = async () => {
+  try {
+    const response = await api.get(`${API_URL}/sonla/xa-voi-ma`);
+    return response.data.data || [];
+  } catch (error) {
+    console.error('Error fetching Sơn La communes with codes:', error);
+    throw error;
+  }
+};
+
+/**
  * Fetches a list of communes from Sơn La (xã).
  * @returns {Promise<Array<{label: string, value: string}>>}
  */

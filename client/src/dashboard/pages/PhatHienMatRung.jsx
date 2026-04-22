@@ -1,10 +1,12 @@
 // client/src/dashboard/pages/PhatHienMatRung.jsx - FIXED VERSION
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { ClipLoader } from 'react-spinners';
-import { FaCloudSun, FaImage, FaListAlt, FaExclamationTriangle, FaRedo, FaExternalLinkAlt, FaExpand } from "react-icons/fa";
+import { FaCloudSun, FaImage, FaListAlt, FaExclamationTriangle, FaRedo, FaExternalLinkAlt, FaExpand, FaSearch, FaCopy, FaChevronDown, FaChevronUp, FaTable } from "react-icons/fa";
+import BangKeXuLyAnhVienTham from "../components/sidebars/phathienmatrung/BangKeXuLyAnhVienTham";
 import { toast } from "react-toastify";
 import { useIsMobile } from "../../hooks/useMediaQuery";
+import { getSonLaXaVoiMaXa } from "../../utils/dropdownService";
 
 export default function PhatHienMatRung() {
   const [loading, setLoading] = useState(true);
@@ -16,6 +18,45 @@ export default function PhatHienMatRung() {
   const containerRef = useRef(null);
   const location = useLocation();
   const isMobile = useIsMobile();
+
+  // --- Tra cứu mã xã ---
+  const [showLookup, setShowLookup] = useState(false);
+  const [showBangKe, setShowBangKe] = useState(false);
+  const [xaList, setXaList] = useState([]);
+  const [xaLoading, setXaLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [selectedXaItem, setSelectedXaItem] = useState(null);
+
+  useEffect(() => {
+    const fetchXa = async () => {
+      setXaLoading(true);
+      try {
+        const data = await getSonLaXaVoiMaXa();
+        setXaList(data);
+      } catch {
+        toast.error("Không thể tải danh sách xã");
+      } finally {
+        setXaLoading(false);
+      }
+    };
+    fetchXa();
+  }, []);
+
+  const filteredXaList = useMemo(() => {
+    if (!searchText.trim()) return xaList;
+    const kw = searchText.trim().toLowerCase();
+    return xaList.filter(
+      (item) => item.xa?.toLowerCase().includes(kw) || String(item.maxa).includes(kw)
+    );
+  }, [xaList, searchText]);
+
+  const handleCopyMaXa = () => {
+    if (!selectedXaItem) return;
+    navigator.clipboard
+      .writeText(String(selectedXaItem.maxa))
+      .then(() => toast.success("Đã sao chép mã xã: " + selectedXaItem.maxa))
+      .catch(() => toast.error("Không thể sao chép"));
+  };
 
   // ✅ BỎ TIMEOUT - Để iframe tự load
   const [loadTimeout, setLoadTimeout] = useState(null);
@@ -222,6 +263,28 @@ export default function PhatHienMatRung() {
               Xử lý ảnh
             </button>
 
+            {/* Nút tra cứu mã xã */}
+            <button
+              onClick={() => { setShowLookup(!showLookup); setShowBangKe(false); }}
+              className={`flex items-center px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm min-h-[44px] ${showLookup ? "bg-green-600 text-white shadow-md" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}
+              title="Tra cứu mã xã"
+            >
+              <FaSearch className={`${isMobile ? "" : "mr-2"}`} />
+              {!isMobile && "Tra cứu mã xã"}
+              {showLookup ? <FaChevronUp className="ml-1" /> : <FaChevronDown className="ml-1" />}
+            </button>
+
+            {/* Nút bảng kê xử lý ảnh viễn thám */}
+            <button
+              onClick={() => { setShowBangKe(!showBangKe); setShowLookup(false); }}
+              className={`flex items-center px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm min-h-[44px] ${showBangKe ? "bg-teal-600 text-white shadow-md" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}
+              title="Bảng kê xử lý ảnh viễn thám"
+            >
+              <FaTable className={`${isMobile ? "" : "mr-2"}`} />
+              {!isMobile && "Bảng kê"}
+              {showBangKe ? <FaChevronUp className="ml-1" /> : <FaChevronDown className="ml-1" />}
+            </button>
+
             {/* ✅ NÚT FULLSCREEN - Responsive */}
             <button
               onClick={toggleFullscreen}
@@ -233,6 +296,75 @@ export default function PhatHienMatRung() {
             </button>
           </div>
         </div>
+
+        {/* Panel tra cứu mã xã */}
+        {showLookup && (
+          <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            <div className="flex flex-col sm:flex-row gap-2 flex-1 w-full">
+              {/* Ô tìm kiếm */}
+              <input
+                type="text"
+                value={searchText}
+                onChange={(e) => { setSearchText(e.target.value); setSelectedXaItem(null); }}
+                placeholder="Nhập tên xã hoặc mã xã..."
+                className="border border-green-300 rounded-md py-1.5 px-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-400 w-full sm:w-56"
+              />
+              {/* Dropdown chọn xã */}
+              {xaLoading ? (
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span>Đang tải...</span>
+                </div>
+              ) : (
+                <select
+                  value={selectedXaItem ? selectedXaItem.xa : ""}
+                  onChange={(e) => {
+                    const found = filteredXaList.find((item) => item.xa === e.target.value);
+                    setSelectedXaItem(found || null);
+                  }}
+                  className="border border-green-300 rounded-md py-1.5 px-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-400 w-full sm:w-60"
+                >
+                  <option value="">-- Chọn xã --</option>
+                  {filteredXaList.map((item) => (
+                    <option key={item.maxa} value={item.xa}>
+                      {item.xa}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {/* Hiển thị mã xã */}
+            {selectedXaItem ? (
+              <div className="flex items-center gap-2 bg-white border border-green-300 rounded-lg px-3 py-1.5 flex-shrink-0">
+                <div className="flex flex-col">
+                  <span className="text-xs text-gray-500">{selectedXaItem.xa}</span>
+                  <span className="text-lg font-bold text-green-700 leading-tight tracking-widest">
+                    {selectedXaItem.maxa}
+                  </span>
+                </div>
+                <button
+                  onClick={handleCopyMaXa}
+                  title="Sao chép mã xã"
+                  className="p-1.5 rounded-md bg-green-100 hover:bg-green-200 text-green-700 transition-colors ml-1"
+                >
+                  <FaCopy className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <span className="text-xs text-gray-400 italic flex-shrink-0">
+                Chọn xã để xem mã xã
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Panel bảng kê xử lý ảnh viễn thám */}
+        {showBangKe && (
+          <div className="mt-2">
+            <BangKeXuLyAnhVienTham />
+          </div>
+        )}
 
         {/* Current tab info - Responsive */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">

@@ -289,6 +289,18 @@ app.use('/api/import-geojson-url',
   })
 );
 
+// Bảng kê xử lý ảnh viễn thám
+app.use('/api/bang-ke-xu-ly-anh',
+  authMiddleware.authenticate,
+  createProxy(logger, {
+    target: process.env.GIS_SERVICE_URL || 'http://localhost:3003',
+    pathRewrite: (path, req) => '/api/bang-ke-xu-ly-anh' + path,
+    serviceName: 'Bang Ke Xu Ly Anh',
+    timeout: 30000,
+    forwardUserHeaders: true
+  })
+);
+
 app.use('/api/layer-data',
   authMiddleware.optionalAuth, // ✅ FIX: Use optionalAuth to decode JWT and extract user scope
   createProxy(logger, {

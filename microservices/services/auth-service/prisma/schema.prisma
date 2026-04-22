@@ -8,25 +8,25 @@ datasource db {
 }
 
 model User {
-  id             Int        @id @default(autoincrement())
-  username       String     @unique
-  password_hash  String
-  full_name      String
-  position       String?
-  organization   String?
-  district_id    String?
-  xa             String?    // Xã
-  khoanh         String?    // Khoảnh
-  tieukhu        String?    // Tiểu khu
-  is_active      Boolean    @default(true)
-  created_at     DateTime   @default(now())
-  updated_at     DateTime   @updatedAt
-  last_login     DateTime?
-  email          String?
-  phone          String?
-  avatar_url     String?
-  userRoles      UserRole[]
-  createdRoles   Role[]     @relation("RoleCreator")
+  id            Int        @id @default(autoincrement())
+  username      String     @unique
+  password_hash String
+  full_name     String
+  position      String?
+  organization  String?
+  district_id   String?
+  is_active     Boolean    @default(true)
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+  last_login    DateTime?
+  email         String?
+  phone         String?
+  avatar_url    String?
+  khoanh        String?
+  tieukhu       String?
+  xa            String?
+  createdRoles  Role[]     @relation("RoleCreator")
+  userRoles     UserRole[]
 
   @@index([email])
   @@index([full_name])
@@ -44,7 +44,7 @@ model Role {
   created_at      DateTime         @default(now())
   updated_at      DateTime         @updatedAt
   created_by      Int?
-  creator         User?            @relation("RoleCreator", fields: [created_by], references: [id], onDelete: SetNull)
+  creator         User?            @relation("RoleCreator", fields: [created_by], references: [id])
   roleDataScopes  RoleDataScope[]
   rolePermissions RolePermission[]
   userRoles       UserRole[]
@@ -57,25 +57,25 @@ model Role {
 }
 
 model Permission {
-  id               Int              @id @default(autoincrement())
-  code             String           @unique
-  name             String
-  description      String?
-  module           String
-  resource         String
-  action           String
-  parent_id        Int?
-  is_active        Boolean          @default(true)
-  created_at       DateTime         @default(now())
-  updated_at       DateTime         @updatedAt
-  icon             String?
-  order            Int              @default(0)
-  ui_path          String?
-  ui_category      String?
-  ui_element       String?
-  parent           Permission?      @relation("PermissionHierarchy", fields: [parent_id], references: [id], onDelete: Cascade)
-  children         Permission[]     @relation("PermissionHierarchy")
-  rolePermissions  RolePermission[]
+  id              Int              @id @default(autoincrement())
+  code            String           @unique
+  name            String
+  description     String?
+  module          String
+  resource        String
+  action          String
+  parent_id       Int?
+  is_active       Boolean          @default(true)
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+  icon            String?
+  order           Int              @default(0)
+  ui_path         String?
+  ui_category     String?
+  ui_element      String?
+  parent          Permission?      @relation("PermissionHierarchy", fields: [parent_id], references: [id], onDelete: Cascade)
+  children        Permission[]     @relation("PermissionHierarchy")
+  rolePermissions RolePermission[]
 
   @@unique([module, resource, action])
   @@index([code])

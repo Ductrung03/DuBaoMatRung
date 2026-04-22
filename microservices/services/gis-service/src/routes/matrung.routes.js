@@ -436,4 +436,8 @@ router.get('/clip-progress', asyncHandler(matRungControllerStd.getClipProgress))
  */
 router.get('/statistics', asyncHandler(matRungControllerStd.getStatistics));
 
+// Inline table edit: cập nhật và xóa bản ghi
+router.put('/:gid', asyncHandler(matRungControllerStd.updateMatRung));
+router.delete('/:gid', asyncHandler(matRungControllerStd.deleteMatRung));
+
 module.exports = router;

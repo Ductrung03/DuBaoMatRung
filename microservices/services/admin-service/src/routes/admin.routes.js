@@ -245,6 +245,7 @@ router.get('/dropdown/nguyennhan', asyncHandler(adminController.getNguyenNhan));
  *         description: Sơn La commune list retrieved successfully
  */
 router.get('/dropdown/sonla/xa', asyncHandler(adminController.getSonLaXa));
+router.get('/dropdown/sonla/xa-voi-ma', asyncHandler(adminController.getSonLaXaWithMaXa));
 
 /**
  * @swagger

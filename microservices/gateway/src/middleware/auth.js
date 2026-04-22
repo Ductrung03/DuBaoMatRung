@@ -41,7 +41,10 @@ const authenticate = (req, res, next) => {
       full_name: decoded.full_name,
       email: decoded.email,
       roles: decoded.roles || [],
-      permissions: decoded.permissions || []
+      permissions: decoded.permissions || [],
+      xa: decoded.xa || null,
+      tieukhu: decoded.tieukhu || null,
+      khoanh: decoded.khoanh || null
     };
 
     // Forward user info to downstream services (must be strings)
@@ -163,7 +166,10 @@ const optionalAuth = (req, res, next) => {
       full_name: decoded.full_name,
       email: decoded.email,
       roles: decoded.roles || [],
-      permissions: decoded.permissions || []
+      permissions: decoded.permissions || [],
+      xa: decoded.xa || null,
+      tieukhu: decoded.tieukhu || null,
+      khoanh: decoded.khoanh || null
     };
 
     // ✅ FIX: All headers MUST be strings for http-proxy-middleware
@@ -226,7 +232,10 @@ const authenticateFlexible = (req, res, next) => {
       full_name: decoded.full_name,
       email: decoded.email,
       roles: decoded.roles || [],
-      permissions: decoded.permissions || []
+      permissions: decoded.permissions || [],
+      xa: decoded.xa || null,
+      tieukhu: decoded.tieukhu || null,
+      khoanh: decoded.khoanh || null
     };
 
     // Forward user info to downstream services (must be strings)

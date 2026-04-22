@@ -11,6 +11,83 @@ const { formatResponse } = require('../../../../shared/utils');
 
 const logger = createLogger('shapefile-controller');
 
+// ─── Helpers cho Bảng kê xử lý ảnh viễn thám ──────────────────────────────
+
+function datesEqual(d1, d2) {
+  if (!d1 && !d2) return true;
+  if (!d1 || !d2) return false;
+  try {
+    return new Date(d1).toISOString().substring(0, 10) === new Date(d2).toISOString().substring(0, 10);
+  } catch { return false; }
+}
+
+/**
+ * Ghi nhận lịch sử xử lý ảnh viễn thám vào bảng bang_ke_xu_ly_anh.
+ * entries: [{ maxa, ten_xa, start_dau, end_dau, start_sau, end_sau }]
+ */
+async function trackBangKeXuLyAnh(db, entries) {
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS bang_ke_xu_ly_anh (
+        id SERIAL PRIMARY KEY,
+        maxa TEXT,
+        ten_xa TEXT,
+        start_dau TIMESTAMP,
+        end_dau TIMESTAMP,
+        start_sau TIMESTAMP,
+        end_sau TIMESTAMP,
+        so_lan INTEGER DEFAULT 1,
+        ghi_chu TEXT,
+        ngay_xu_ly TIMESTAMP DEFAULT NOW(),
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await db.query(`ALTER TABLE bang_ke_xu_ly_anh ADD COLUMN IF NOT EXISTS ghi_chu TEXT`);
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_bkxla_maxa ON bang_ke_xu_ly_anh(maxa)`);
+
+    for (const entry of entries) {
+      const { maxa, ten_xa, start_dau, end_dau, start_sau, end_sau } = entry;
+      if (!maxa && !ten_xa) continue;
+
+      const key = maxa || ten_xa;
+      const col = maxa ? 'maxa' : 'ten_xa';
+
+      const existing = await db.query(
+        `SELECT id, start_dau, end_dau, start_sau, end_sau, so_lan
+         FROM bang_ke_xu_ly_anh WHERE ${col} = $1
+         ORDER BY so_lan DESC, ngay_xu_ly DESC LIMIT 1`,
+        [key]
+      );
+
+      if (existing.rows.length === 0) {
+        await db.query(
+          `INSERT INTO bang_ke_xu_ly_anh (maxa, ten_xa, start_dau, end_dau, start_sau, end_sau, so_lan)
+           VALUES ($1,$2,$3,$4,$5,$6,1)`,
+          [maxa || null, ten_xa || null, start_dau || null, end_dau || null, start_sau || null, end_sau || null]
+        );
+      } else {
+        const last = existing.rows[0];
+        const changed = !datesEqual(last.start_dau, start_dau)
+          || !datesEqual(last.end_dau, end_dau)
+          || !datesEqual(last.start_sau, start_sau)
+          || !datesEqual(last.end_sau, end_sau);
+        if (changed) {
+          await db.query(
+            `INSERT INTO bang_ke_xu_ly_anh (maxa, ten_xa, start_dau, end_dau, start_sau, end_sau, so_lan)
+             VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+            [maxa || null, ten_xa || null, start_dau || null, end_dau || null, start_sau || null, end_sau || null, last.so_lan + 1]
+          );
+        }
+      }
+    }
+    logger.info('Bang ke xu ly anh tracked', { count: entries.length });
+  } catch (err) {
+    logger.warn('trackBangKeXuLyAnh failed', { error: err.message });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ✅ Hàm đọc file .prj và phát hiện SRID
 async function detectSRIDFromPrj(prjPath) {
   try {
@@ -623,7 +700,7 @@ exports.importFromGeeUrl = async (req, res, next) => {
         UPDATE son_la_mat_rung
         SET has_intersection = true,
             clipped_geom = geom,
-            clipped_area = ST_Area(geom::geography)
+            clipped_area = ST_Area(ST_MakeValid(geom)::geography)
         WHERE created_at >= NOW() - INTERVAL '2 minutes'
           AND has_intersection IS NULL
       `);
@@ -648,7 +725,7 @@ exports.importFromGeeUrl = async (req, res, next) => {
         m.verified_by,
         m.verified_area,
         m.created_at,
-        COALESCE(m.clipped_area, ST_Area(m.geom::geography)) as dtich,
+        COALESCE(NULLIF(m.clipped_area, 0), ST_Area(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)::geography)) as dtich,
         COALESCE(m.verified_area, 0) as "dtichXM",
         ST_X(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326))) as x_coordinate,
         ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326))) as y_coordinate
@@ -707,6 +784,30 @@ exports.importFromGeeUrl = async (req, res, next) => {
             validIdx++;
           }
         });
+
+        // ── Ghi nhận bảng kê xử lý ảnh viễn thám ──
+        try {
+          const firstProps = geoJSON.features[0]?.properties || {};
+          const dates = {
+            start_dau: firstProps.start_dau || null,
+            end_dau: firstProps.end_dau || null,
+            start_sau: firstProps.start_sau || null,
+            end_sau: firstProps.end_sau || null
+          };
+          const uniqueXaNames = [...new Set(allDataResult.rows.map(r => r.xa).filter(Boolean))];
+          if (uniqueXaNames.length > 0) {
+            const maxaRes = await adminDbPool.query(
+              `SELECT DISTINCT xa, CAST(maxa AS TEXT) as maxa FROM sonla_rgx WHERE xa = ANY($1) AND maxa IS NOT NULL`,
+              [uniqueXaNames]
+            );
+            const maxaMap = {};
+            maxaRes.rows.forEach(r => { maxaMap[r.xa] = r.maxa; });
+            const entries = uniqueXaNames.map(xa => ({ maxa: maxaMap[xa] || null, ten_xa: xa, ...dates }));
+            await trackBangKeXuLyAnh(db, entries);
+          }
+        } catch (tkErr) {
+          logger.warn('Failed to track bang ke xu ly anh (GEE)', { error: tkErr.message });
+        }
       }
     } catch (enrichErr) {
       logger.warn('Failed to enrich GEE import data:', enrichErr.message);
@@ -1112,7 +1213,7 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
           UPDATE son_la_mat_rung
           SET has_intersection = true,
               clipped_geom = geom,
-              clipped_area = ST_Area(geom::geography)
+              clipped_area = ST_Area(ST_MakeValid(geom)::geography)
           WHERE created_at >= NOW() - INTERVAL '2 minutes'
             AND has_intersection IS NULL
         `);
@@ -1138,7 +1239,7 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
           m.verified_by,
           m.verified_area,
           m.created_at,
-          COALESCE(m.clipped_area, ST_Area(m.geom::geography)) as dtich,
+          COALESCE(NULLIF(m.clipped_area, 0), ST_Area(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)::geography)) as dtich,
           COALESCE(m.verified_area, 0) as "dtichXM",
           ST_X(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326))) as x_coordinate,
           ST_Y(ST_Centroid(ST_Transform(ST_MakeValid(m.geom), 4326))) as y_coordinate
@@ -1212,6 +1313,30 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
 
       // ✅ FIX: Only return records that have xa (within forest area)
       const filteredEnrichedRows = enrichedRows.filter(r => r.xa && r.xa.trim() !== '');
+
+      // ── Ghi nhận bảng kê xử lý ảnh viễn thám ──
+      try {
+        const firstProps = validFeatures[0]?.properties || {};
+        const dates = {
+          start_dau: firstProps.start_dau || firstProps.startDate || null,
+          end_dau: firstProps.end_dau || null,
+          start_sau: firstProps.start_sau || null,
+          end_sau: firstProps.end_sau || firstProps.endDate || null
+        };
+        const uniqueXaNames = [...new Set(filteredEnrichedRows.map(r => r.xa).filter(Boolean))];
+        if (uniqueXaNames.length > 0) {
+          const maxaRes = await adminDbPool.query(
+            `SELECT DISTINCT xa, CAST(maxa AS TEXT) as maxa FROM sonla_rgx WHERE xa = ANY($1) AND maxa IS NOT NULL`,
+            [uniqueXaNames]
+          );
+          const maxaMap = {};
+          maxaRes.rows.forEach(r => { maxaMap[r.xa] = r.maxa; });
+          const entries = uniqueXaNames.map(xa => ({ maxa: maxaMap[xa] || null, ten_xa: xa, ...dates }));
+          await trackBangKeXuLyAnh(db, entries);
+        }
+      } catch (tkErr) {
+        logger.warn('Failed to track bang ke xu ly anh (GeoJSON)', { error: tkErr.message });
+      }
 
       const geojsonData = {
         type: 'FeatureCollection',

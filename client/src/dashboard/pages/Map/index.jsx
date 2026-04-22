@@ -198,7 +198,7 @@ const Map = () => {
           }
         }, 1000); // Delay để đảm bảo map đã zoom xong
 
-        toast.success(`🗺️ Đã zoom đến CB-${targetGid} trên bản đồ`, { autoClose: 3000 });
+        toast.success(`🗺️ Đã zoom đến PH-${targetGid} trên bản đồ`, { autoClose: 3000 });
 
       } catch (error) {
         console.error("❌ Error in zoomToFeature:", error);
@@ -244,7 +244,7 @@ const Map = () => {
         });
 
         if (targetGid) {
-          toast.info(`🎯 Đang zoom vào CB-${targetGid}`, { autoClose: 2000 });
+          toast.info(`🎯 Đang zoom vào PH-${targetGid}`, { autoClose: 2000 });
         }
 
       } catch (error) {

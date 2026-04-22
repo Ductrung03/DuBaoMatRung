@@ -152,7 +152,7 @@ const QuanLyNguoiDung = () => {
   // Áp dụng bộ lọc khi thay đổi
   useEffect(() => {
     filterUsers();
-  }, [filters, users]);
+  }, [filters, users, currentUser]);
 
   // Hàm lọc người dùng
   const filterUsers = () => {
@@ -199,21 +199,21 @@ const QuanLyNguoiDung = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
   // Handler cho thay đổi Xã - cascading dropdown (Sơn La: Xã → Tiểu khu → Khoảnh)
   const handleXaChange = async (e) => {
     const { value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       xa: value,
       tieukhu: "",
       khoanh: ""
-    });
+    }));
     setTieukhuList([]);
     setKhoanhList([]);
 
@@ -233,11 +233,11 @@ const QuanLyNguoiDung = () => {
   // Handler cho thay đổi Tiểu khu - cascading dropdown
   const handleTieukhuChange = async (e) => {
     const { value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       tieukhu: value,
       khoanh: ""
-    });
+    }));
     setKhoanhList([]);
 
     if (formData.xa) {
@@ -253,10 +253,10 @@ const QuanLyNguoiDung = () => {
   // Handler cho thay đổi Khoảnh
   const handleKhoanhChange = (e) => {
     const { value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       khoanh: value
-    });
+    }));
   };
 
   const handlePasswordChange = (e) => {
@@ -586,9 +586,74 @@ const QuanLyNguoiDung = () => {
     }
   };
 
-  // Không cho phép admin xóa tài khoản chính mình
-  const canDeleteUser = (user) => {
-    return user.id !== currentUser.id;
+  // Thứ tự ưu tiên role: số càng nhỏ = quyền càng cao
+  const ROLE_HIERARCHY = {
+    'super_admin': 0,  // Toàn quyền tuyệt đối
+    'admin': 1,
+    'Công ty Fis': 1,
+    'Chi cục kiểm lâm': 2,
+    'Hạt kiểm lâm': 3,
+    'Kiểm lâm viên': 4,
+  };
+
+  const getRoleLevel = (roleNames) => {
+    let highest = 99;
+    for (const name of (roleNames || [])) {
+      const level = ROLE_HIERARCHY[name] ?? 99;
+      if (level < highest) highest = level;
+    };
+    return highest;
+  };
+
+  const getCurrentUserRoleNames = () => {
+    if (!currentUser) return [];
+    if (currentUser.roles && Array.isArray(currentUser.roles)) {
+      return currentUser.roles.map(r => typeof r === 'string' ? r : r.name);
+    }
+    // Handle userRoles format returned from /auth/me API
+    if (currentUser.userRoles && Array.isArray(currentUser.userRoles)) {
+      return currentUser.userRoles.map(ur => ur.role?.name).filter(Boolean);
+    }
+    return [];
+  };
+
+  const currentUserLevel = getRoleLevel(getCurrentUserRoleNames());
+
+  // Kiểm tra permission từ cả JWT (permissions[]) lẫn userRoles (từ API /me)
+  const hasUserPermission = (permCode) => {
+    if (currentUser?.permissions?.includes(permCode)) return true;
+    if (currentUser?.userRoles) {
+      return currentUser.userRoles.some(ur =>
+        ur.role?.rolePermissions?.some(rp => rp.permission?.code === permCode)
+      );
+    }
+    return false;
+  };
+
+  // Roles mà user hiện tại được phép gán (chỉ hiện roles có level thấp hơn mình)
+  const assignableRoles = roles.filter(role => {
+    const roleLevel = ROLE_HIERARCHY[role.name] ?? 99;
+    return roleLevel > currentUserLevel;
+  });
+
+  // Kiểm tra có thể EDIT user này không
+  const canManageUser = (targetUser) => {
+    if (targetUser.id === currentUser?.id) return false;
+    const targetRoleNames = (targetUser.roles || []).map(r => typeof r === 'string' ? r : r.name);
+    const targetLevel = getRoleLevel(targetRoleNames);
+    const hasEditPermission = hasUserPermission('user.management.actions.edit');
+    const effectiveLevel = currentUserLevel < 99 ? currentUserLevel : (hasEditPermission ? 98 : 99);
+    return effectiveLevel < targetLevel;
+  };
+
+  // Kiểm tra có thể DELETE user này không
+  const canDeleteUser = (targetUser) => {
+    if (targetUser.id === currentUser?.id) return false;
+    const targetRoleNames = (targetUser.roles || []).map(r => typeof r === 'string' ? r : r.name);
+    const targetLevel = getRoleLevel(targetRoleNames);
+    const hasDeletePermission = hasUserPermission('user.management.actions.delete');
+    const effectiveLevel = currentUserLevel < 99 ? currentUserLevel : (hasDeletePermission ? 98 : 99);
+    return effectiveLevel < targetLevel;
   };
 
   // Lấy tên xã từ value
@@ -602,13 +667,15 @@ const QuanLyNguoiDung = () => {
     <div className="h-full flex flex-col p-3 sm:p-4 lg:p-6 max-h-screen overflow-hidden">
       <div className="flex-none flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-6">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Quản lý người dùng</h2>
-        <button
-          onClick={openAddModal}
-          className="w-full sm:w-auto bg-forest-green-primary text-white py-3 sm:py-2 px-4 rounded-md flex items-center justify-center min-h-[44px]"
-        >
-          <FaUserPlus className="mr-2" />
-          Thêm người dùng
-        </button>
+        {(currentUserLevel <= 3 || hasUserPermission('user.management.actions.create')) && (
+          <button
+            onClick={openAddModal}
+            className="w-full sm:w-auto bg-forest-green-primary text-white py-3 sm:py-2 px-4 rounded-md flex items-center justify-center min-h-[44px]"
+          >
+            <FaUserPlus className="mr-2" />
+            Thêm người dùng
+          </button>
+        )}
       </div>
 
       {/* Filter section */}
@@ -740,22 +807,26 @@ const QuanLyNguoiDung = () => {
                       </td>
                       <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap sticky right-0 bg-white">
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => openEditModal(user)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
-                            title="Chỉnh sửa"
-                            aria-label="Chỉnh sửa người dùng"
-                          >
-                            <FaEdit className="text-base" />
-                          </button>
-                          <button
-                            onClick={() => openPasswordModal(user)}
-                            className="p-2 text-yellow-600 hover:bg-yellow-50 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
-                            title="Đổi mật khẩu"
-                            aria-label="Đổi mật khẩu"
-                          >
-                            <FaKey className="text-base" />
-                          </button>
+                          {canManageUser(user) && (
+                            <button
+                              onClick={() => openEditModal(user)}
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+                              title="Chỉnh sửa"
+                              aria-label="Chỉnh sửa người dùng"
+                            >
+                              <FaEdit className="text-base" />
+                            </button>
+                          )}
+                          {(user.id === currentUser?.id || canManageUser(user)) && (
+                            <button
+                              onClick={() => openPasswordModal(user)}
+                              className="p-2 text-yellow-600 hover:bg-yellow-50 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+                              title="Đổi mật khẩu"
+                              aria-label="Đổi mật khẩu"
+                            >
+                              <FaKey className="text-base" />
+                            </button>
+                          )}
                           {canDeleteUser(user) && (
                             <button
                               onClick={() => handleDeleteUser(user)}
@@ -1209,14 +1280,14 @@ const QuanLyNguoiDung = () => {
                             Vai trò (Roles) *
                           </label>
                           <div className="border border-gray-300 rounded-lg p-3 bg-gray-50 max-h-48 sm:max-h-60 overflow-y-auto role-selection-scroll">
-                            {roles.length === 0 ? (
+                            {assignableRoles.length === 0 ? (
                               <div className="text-center py-4 text-gray-500">
                                 <FaUserTag className="mx-auto text-2xl mb-2 opacity-50" />
                                 <p className="text-sm">Không có vai trò nào</p>
                               </div>
                             ) : (
                               <div className="space-y-2">
-                                {roles.map((role) => {
+                                {assignableRoles.map((role) => {
                                   const isSelected = selectedRoles.includes(role.id);
                                   return (
                                     <div
@@ -1299,19 +1370,19 @@ const QuanLyNguoiDung = () => {
                         <div className="flex items-center justify-between">
                           <h4 className="text-base sm:text-lg font-semibold text-gray-900">Chọn vai trò</h4>
                           <span className="text-xs sm:text-sm text-gray-500">
-                            {selectedRoles.length} / {roles.length} được chọn
+                            {selectedRoles.length} / {assignableRoles.length} được chọn
                           </span>
                         </div>
 
                         <div className="grid grid-cols-1 gap-2 sm:gap-3 max-h-60 sm:max-h-80 overflow-y-auto role-selection-scroll border border-gray-200 rounded-lg p-2 sm:p-3 bg-gray-50">
-                          {roles.length === 0 ? (
+                          {assignableRoles.length === 0 ? (
                             <div className="text-center py-8 text-gray-500">
                               <FaUserTag className="mx-auto text-4xl mb-2 opacity-50" />
                               <p className="font-medium">Không có vai trò nào được tạo</p>
                               <p className="text-sm">Vui lòng tạo vai trò trước khi gán cho người dùng</p>
                             </div>
                           ) : (
-                            roles.map((role) => {
+                            assignableRoles.map((role) => {
                               const isSelected = selectedRoles.includes(role.id);
                               return (
                                 <div

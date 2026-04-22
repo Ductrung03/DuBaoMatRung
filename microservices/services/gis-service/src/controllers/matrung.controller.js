@@ -205,8 +205,8 @@ exports.getMatRung = async (req, res, next) => {
           m.verification_notes,
 
           -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
-          ST_Area(m.geom::geography) as dtich,
-          COALESCE(m.verified_area, 0) as "dtichXM",
+          COALESCE(NULLIF(m.clipped_area, 0), ST_Area(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)::geography)) as dtich,
+          m.verified_area as "dtichXM",
 
           ${hasUsers ? `
           u.full_name as verified_by_name,
@@ -401,7 +401,7 @@ exports.getMatRung = async (req, res, next) => {
         m.verification_notes,
 
         -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
-        ST_Area(m.geom::geography) as dtich,
+        COALESCE(NULLIF(m.clipped_area, 0), ST_Area(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)::geography)) as dtich,
         COALESCE(m.verified_area, 0) as "dtichXM",
 
         ${hasUsers ? `
@@ -523,7 +523,7 @@ exports.getAllMatRung = async (req, res, next) => {
         m.verification_notes,
 
         -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
-        ST_Area(m.geom::geography) as dtich,
+        COALESCE(NULLIF(m.clipped_area, 0), ST_Area(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)::geography)) as dtich,
         COALESCE(m.verified_area, 0) as "dtichXM",
 
         ${hasUsers ? `
@@ -763,7 +763,7 @@ exports.autoForecast = async (req, res, next) => {
         m.verification_notes,
 
         -- ✅ FIX: Tính diện tích từ geometry thay vì dùng field area (có thể = 0)
-        ST_Area(m.geom::geography) as dtich,
+        COALESCE(NULLIF(m.clipped_area, 0), ST_Area(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)::geography)) as dtich,
         COALESCE(m.verified_area, 0) as "dtichXM",
 
         ${hasUsers ? `
@@ -940,7 +940,7 @@ exports.getRecentGeoJson = async (req, res, next) => {
         ST_AsGeoJSON(m.clipped_geom)::json as geometry,
         m.area as original_area,
         m.clipped_area,
-        COALESCE(m.clipped_area, ST_Area(m.geom::geography)) as dtich,
+        COALESCE(NULLIF(m.clipped_area, 0), ST_Area(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)::geography)) as dtich,
         COALESCE(m.verified_area, 0) as "dtichXM",
         m.verified_area,
         m.verification_reason,
@@ -1075,17 +1075,18 @@ exports.getClipProgress = async (req, res, next) => {
     `);
 
     // Get real-time stats from main table
+    // Use last_clipped_at to track processing (not clipped_geom, which stays NULL for non-intersecting records)
     const statsResult = await db.query(`
       SELECT
         COUNT(*) as total,
-        COUNT(clipped_geom) as clipped,
+        COUNT(CASE WHEN last_clipped_at IS NOT NULL THEN 1 END) as processed,
         COUNT(CASE WHEN has_intersection THEN 1 END) as intersected
       FROM son_la_mat_rung
     `);
 
     const stats = statsResult.rows[0];
     const total = parseInt(stats.total);
-    const clipped = parseInt(stats.clipped);
+    const clipped = parseInt(stats.processed);
     const remaining = total - clipped;
     const progress = total > 0 ? ((clipped / total) * 100).toFixed(2) : 0;
 
@@ -1202,6 +1203,145 @@ exports.getStatistics = async (req, res, next) => {
 
   } catch (error) {
     logger.error('Failed to fetch statistics', { error: error.message });
+    next(error);
+  }
+};
+
+// PUT /:gid - Cập nhật trạng thái/dữ liệu xác minh cho một bản ghi (dùng bởi inline table edit)
+exports.updateMatRung = async (req, res, next) => {
+  try {
+    const { gid } = req.params;
+    if (!gid || isNaN(parseInt(gid))) {
+      return res.status(400).json({ success: false, message: 'Invalid gid' });
+    }
+
+    const db = req.app.locals.db;
+    const redis = req.app.locals.redis;
+
+    // Map frontend field names → DB column names
+    const { detection_status, dtichXM, verification_reason, verification_notes } = req.body;
+
+    const setClauses = [];
+    const params = [];
+    let idx = 1;
+
+    if (detection_status !== undefined) { setClauses.push(`detection_status = $${idx++}`); params.push(detection_status); }
+    // dtichXM (frontend) → verified_area (DB)
+    if (dtichXM !== undefined) { setClauses.push(`verified_area = $${idx++}`); params.push(dtichXM || null); }
+    if (verification_reason !== undefined) { setClauses.push(`verification_reason = $${idx++}`); params.push(verification_reason || null); }
+    if (verification_notes !== undefined) { setClauses.push(`verification_notes = $${idx++}`); params.push(verification_notes || null); }
+
+    if (setClauses.length === 0) {
+      return res.status(400).json({ success: false, message: 'No fields to update' });
+    }
+
+    params.push(parseInt(gid));
+    const query = `UPDATE son_la_mat_rung SET ${setClauses.join(', ')} WHERE gid = $${idx} RETURNING gid`;
+    const result = await db.query(query, params);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: `Không tìm thấy PH-${gid}` });
+    }
+
+    // Xóa cache liên quan
+    await redis.clearPattern('matrung:');
+    await redis.clearPattern(`search:id:${gid}:`);
+
+    res.json({ success: true, message: 'Cập nhật thành công', data: { gid: parseInt(gid) } });
+  } catch (error) {
+    logger.error('updateMatRung failed', { error: error.message, gid: req.params.gid });
+    next(error);
+  }
+};
+
+// DELETE /:gid - Xóa một bản ghi (dùng bởi inline table edit)
+exports.deleteMatRung = async (req, res, next) => {
+  try {
+    const { gid } = req.params;
+    if (!gid || isNaN(parseInt(gid))) {
+      return res.status(400).json({ success: false, message: 'Invalid gid' });
+    }
+
+    const db = req.app.locals.db;
+    const redis = req.app.locals.redis;
+
+    const result = await db.query('DELETE FROM son_la_mat_rung WHERE gid = $1 RETURNING gid', [parseInt(gid)]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: `Không tìm thấy PH-${gid}` });
+    }
+
+    await redis.clearPattern('matrung:');
+    await redis.clearPattern(`search:id:${gid}:`);
+
+    res.json({ success: true, message: 'Xóa thành công', data: { gid: parseInt(gid) } });
+  } catch (error) {
+    logger.error('deleteMatRung failed', { error: error.message, gid: req.params.gid });
+    next(error);
+  }
+};
+
+// ── Bảng kê xử lý ảnh viễn thám ──────────────────────────────────────────────
+exports.getBangKeXuLyAnh = async (req, res, next) => {
+  try {
+    const db = req.app.locals.db;
+    const { maxa, ten_xa, page = 1, limit = 200 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    // Tạo bảng nếu chưa tồn tại
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS bang_ke_xu_ly_anh (
+        id SERIAL PRIMARY KEY,
+        maxa TEXT,
+        ten_xa TEXT,
+        start_dau TIMESTAMP,
+        end_dau TIMESTAMP,
+        start_sau TIMESTAMP,
+        end_sau TIMESTAMP,
+        so_lan INTEGER DEFAULT 1,
+        ghi_chu TEXT,
+        ngay_xu_ly TIMESTAMP DEFAULT NOW(),
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await db.query(`ALTER TABLE bang_ke_xu_ly_anh ADD COLUMN IF NOT EXISTS ghi_chu TEXT`);
+
+    const conditions = [];
+    const params = [];
+    let idx = 1;
+
+    if (maxa) { conditions.push(`maxa ILIKE $${idx++}`); params.push(`%${maxa}%`); }
+    if (ten_xa) { conditions.push(`ten_xa ILIKE $${idx++}`); params.push(`%${ten_xa}%`); }
+
+    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    const countResult = await db.query(
+      `SELECT COUNT(*) as total FROM bang_ke_xu_ly_anh ${where}`,
+      params
+    );
+    const total = parseInt(countResult.rows[0].total);
+
+    params.push(parseInt(limit), offset);
+    const dataResult = await db.query(
+      `SELECT id, maxa, ten_xa, start_dau, end_dau, start_sau, end_sau, so_lan, ghi_chu, ngay_xu_ly, created_at
+       FROM bang_ke_xu_ly_anh ${where}
+       ORDER BY ten_xa ASC, so_lan ASC, ngay_xu_ly DESC
+       LIMIT $${idx} OFFSET $${idx + 1}`,
+      params
+    );
+
+    res.json({
+      success: true,
+      data: dataResult.rows,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / parseInt(limit))
+      }
+    });
+  } catch (error) {
+    logger.error('getBangKeXuLyAnh failed', { error: error.message });
     next(error);
   }
 };

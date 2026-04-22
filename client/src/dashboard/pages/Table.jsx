@@ -29,6 +29,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     xacminh: "detection_status",
     DtichXM: "dtichXM", // ✅ FIX: Dùng dtichXM thay vì verified_area
     ngnhan: "verification_reason",
+    ghichu: "verification_notes",
     NguoiXM: "verified_by_name", // ✅ FIX: Đổi thành verified_by_name thay vì verified_by
     NgayXM: "detection_date",
   };
@@ -46,6 +47,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
       xacminh: "Trạng thái",
       DtichXM: "DT xác minh",
       ngnhan: "Nguyên nhân",
+      ghichu: "Ghi chú",
       NguoiXM: "Người XM",
       NgayXM: "Ngày XM",
     };
@@ -72,6 +74,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
       xacminh: ["detection_status", "DETECTION_STATUS"],
       DtichXM: ["dtichXM", "dtich_xm", "verified_area", "VERIFIED_AREA"], // ✅ FIX: Ưu tiên dtichXM
       ngnhan: ["verification_reason", "VERIFICATION_REASON"],
+      ghichu: ["verification_notes", "VERIFICATION_NOTES"],
       NguoiXM: ["verified_by_name", "verified_by_username", "verified_by", "VERIFIED_BY"], // ✅ FIX: Ưu tiên tên thật
       NgayXM: ["detection_date", "DETECTION_DATE"],
     };
@@ -89,7 +92,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
   // ✅ Cột hiển thị theo thứ tự
   const requiredColumns = [
     "loCB", "dtich", "xa", "tk", "khoanh",
-    "X", "Y", "xacminh", "DtichXM", "ngnhan", "NguoiXM", "NgayXM"
+    "X", "Y", "xacminh", "DtichXM", "ngnhan", "ghichu", "NguoiXM", "NgayXM"
   ];
 
   // ✅ Format giá trị hiển thị - FIXED VERSION
@@ -103,11 +106,8 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
     switch (columnKey) {
       case "dtich":
       case "DtichXM":
-        // ✅ FIX: Luôn hiển thị giá trị, nếu null/undefined thì là 0
-        const areaValue = typeof value === "number" ? value : 0;
-        // ✅ FIX: Luôn chia cho 10000 vì dtich/dtichXM luôn là m²
-        // ✅ FIX: Dùng toFixed(1) thay vì toFixed(2) để hiển thị 1 chữ số thập phân
-        return `${(areaValue / 10000).toFixed(1)} ha`;
+        const areaValue = parseFloat(value) || 0;
+        return `${(areaValue / 10000).toFixed(2)} ha`;
 
       case "NgayXM":
         if (value) {
@@ -140,7 +140,7 @@ const Table = ({ data, tableName = "unknown", onRowClick }) => {
         }
 
       case "loCB":
-        return `CB-${value}`;
+        return `PH-${value}`;
 
       case "NguoiXM":
         // ✅ FIX: Hiển thị tên thật thay vì "User ID"

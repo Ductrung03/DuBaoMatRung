@@ -314,4 +314,22 @@ exports.getSonLaKhoanh = async (req, res, next) => {
   }
 };
 
+// Get xa with maxa code from Sơn La - dùng cho tra cứu mã xã
+exports.getSonLaXaWithMaXa = async (req, res, next) => {
+  try {
+    const kyselyDb = req.app.locals.kyselyDb;
+    const adminService = new AdminService(kyselyDb);
+    const results = await adminService.getSonLaXaWithMaXa();
+
+    const data = results.map(r => ({
+      xa: r.xa,
+      maxa: r.maxa
+    }));
+
+    res.json(formatResponse(true, 'Sơn La Xa với mã xã retrieved', data));
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = exports;

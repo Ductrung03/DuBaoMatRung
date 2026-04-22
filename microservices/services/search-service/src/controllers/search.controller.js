@@ -139,11 +139,11 @@ exports.searchMatRung = async (req, res, next) => {
         m.start_dau,
         m.end_sau,
         m.mahuyen,
-        CONCAT('CB-', m.gid) as lo_canbao,
+        CONCAT('PH-', m.gid) as lo_canbao,
         ROUND(ST_X(ST_Centroid(m.geom))::numeric, 6) as x,
         ROUND(ST_Y(ST_Centroid(m.geom))::numeric, 6) as y,
         ST_Area(m.geom::geography) as dtich,
-        COALESCE(m.verified_area, 0) as "dtichXM",
+        m.verified_area as "dtichXM",
         m.verification_reason,
         m.detection_status,
         m.verification_notes,
@@ -345,12 +345,12 @@ exports.searchMatRungById = async (req, res, next) => {
       const cached = await redis.get(cacheKey);
 
       if (cached) {
-        logger.info(`Cache hit for CB-${gid}`);
+        logger.info(`Cache hit for PH-${gid}`);
         return res.json({ ...cached, cached: true });
       }
     }
 
-    logger.info(`Searching for CB-${gid} with radius ${radius}m`);
+    logger.info(`Searching for PH-${gid} with radius ${radius}m`);
 
     // Step 1: Get target feature
     // ✅ FIX: Thêm dtich và dtichXM để tương thích với searchMatRung
@@ -368,7 +368,7 @@ exports.searchMatRungById = async (req, res, next) => {
         m.verification_reason,
         m.verification_notes,
         ST_Area(m.geom::geography) as dtich,
-        COALESCE(m.verified_area, 0) as "dtichXM",
+        m.verified_area as "dtichXM",
         ROUND(ST_X(ST_Centroid(m.geom))::numeric, 6) as x,
         ROUND(ST_Y(ST_Centroid(m.geom))::numeric, 6) as y,
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry,
@@ -385,9 +385,9 @@ exports.searchMatRungById = async (req, res, next) => {
     const targetResult = await db.query(targetQuery, [gid]);
 
     if (targetResult.rows.length === 0) {
-      logger.warn(`CB-${gid} not found in database`);
+      logger.warn(`PH-${gid} not found in database`);
       return res.status(404).json(
-        formatResponse(false, `Không tìm thấy lô CB-${gid} trong cơ sở dữ liệu`)
+        formatResponse(false, `Không tìm thấy lô PH-${gid} trong cơ sở dữ liệu`)
       );
     }
 
@@ -428,7 +428,7 @@ exports.searchMatRungById = async (req, res, next) => {
       [parseFloat(targetRow.bbox_ymax), parseFloat(targetRow.bbox_xmax)]
     ];
 
-    logger.info(`Found CB-${gid} at [${center.lat}, ${center.lng}]`);
+    logger.info(`Found PH-${gid} at [${center.lat}, ${center.lng}]`);
 
     // Step 2: Get surrounding features within radius
     // ✅ FIX: Thêm dtich, dtichXM, x, y để tương thích với searchMatRung
@@ -446,7 +446,7 @@ exports.searchMatRungById = async (req, res, next) => {
         m.verification_reason,
         m.verification_notes,
         ST_Area(m.geom::geography) as dtich,
-        COALESCE(m.verified_area, 0) as "dtichXM",
+        m.verified_area as "dtichXM",
         ROUND(ST_X(ST_Centroid(m.geom))::numeric, 6) as x,
         ROUND(ST_Y(ST_Centroid(m.geom))::numeric, 6) as y,
         ST_AsGeoJSON(ST_Transform(m.geom, 4326)) as geometry,
@@ -493,7 +493,7 @@ exports.searchMatRungById = async (req, res, next) => {
       }
     }));
 
-    logger.info(`Found ${surroundingFeatures.length} features within ${radius}m of CB-${gid}`);
+    logger.info(`Found ${surroundingFeatures.length} features within ${radius}m of PH-${gid}`);
 
     // ✅ Step 2.5: Get admin info for all features
     const allRows = [targetResult.rows[0], ...surroundingResult.rows];
@@ -572,7 +572,7 @@ exports.searchMatRungById = async (req, res, next) => {
 
     const response = formatResponse(
       true,
-      `Tìm thấy CB-${gid} và ${surroundingFeatures.length} khu vực xung quanh`,
+      `Tìm thấy PH-${gid} và ${surroundingFeatures.length} khu vực xung quanh`,
       {
         target_feature: targetFeature,
         geojson: geoJSON,

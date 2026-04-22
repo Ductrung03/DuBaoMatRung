@@ -141,13 +141,18 @@ class RedisManager {
   }
 
   // Clear all keys with pattern
+  // Tìm cả 2 dạng: có và không có service prefix (do một số chỗ set key trực tiếp không qua setWithPattern)
   async clearPattern(pattern) {
     try {
-      const keys = await this.client.keys(`${this.serviceName}:${pattern}*`);
-      if (keys.length > 0) {
-        await this.client.del(...keys);
+      const [keysWithPrefix, keysWithoutPrefix] = await Promise.all([
+        this.client.keys(`${this.serviceName}:${pattern}*`),
+        this.client.keys(`${pattern}*`)
+      ]);
+      const allKeys = [...new Set([...keysWithPrefix, ...keysWithoutPrefix])];
+      if (allKeys.length > 0) {
+        await this.client.del(...allKeys);
       }
-      return keys.length;
+      return allKeys.length;
     } catch (error) {
       this.logger.error('Redis CLEAR PATTERN error', { pattern, error: error.message });
       return 0;

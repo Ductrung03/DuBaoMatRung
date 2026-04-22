@@ -334,8 +334,9 @@ exports.verifyMatRungById = async (req, res, next) => {
     // Get verified user info from auth-service
     const verifiedByUser = await authServiceClient.getSingleUserInfo(userId);
 
-    // Clear cache
+    // Clear cache (cả matrung và search cache liên quan đến gid này)
     await redis.clearPattern('matrung:*');
+    await redis.clearPattern(`search:id:${gid}:*`);
 
     logger.info('Mat rung verified successfully', {
       gid,
@@ -391,6 +392,113 @@ exports.verifyMatRungById = async (req, res, next) => {
       error: error.message,
       gid: req.params.gid
     });
+    next(error);
+  }
+};
+
+// ✅ NEW: Bulk verify from xlsx data
+exports.bulkXlsxVerify = async (req, res, next) => {
+  try {
+    const { records } = req.body;
+
+    const userId = req.headers['x-user-id'];
+
+    if (!userId) {
+      throw new AuthorizationError('User authentication required');
+    }
+
+    if (!records || !Array.isArray(records) || records.length === 0) {
+      throw new ValidationError('records array is required');
+    }
+
+    const db = req.app.locals.db;
+    const redis = req.app.locals.redis;
+
+    logger.info('Bulk xlsx verify started', { count: records.length, userId });
+
+    const successList = [];
+    const failedList = [];
+
+    for (const record of records) {
+      const { gid, verification_reason, verification_notes, verified_area, detection_status } = record;
+
+      if (!gid && gid !== 0) {
+        failedList.push({ gid: gid ?? 'N/A', reason: 'Thiếu mã lô cảnh báo' });
+        continue;
+      }
+
+      const gidInt = parseInt(gid);
+      if (isNaN(gidInt)) {
+        failedList.push({ gid, reason: 'Mã lô không hợp lệ (phải là số)' });
+        continue;
+      }
+
+      try {
+        const check = await db.query('SELECT gid, area FROM son_la_mat_rung WHERE gid = $1', [gidInt]);
+        if (check.rows.length === 0) {
+          failedList.push({ gid: gidInt, reason: `Không tìm thấy PH-${gidInt} trong cơ sở dữ liệu` });
+          continue;
+        }
+
+        const originalArea = check.rows[0].area;
+        const finalVerifiedArea = verified_area != null ? verified_area : originalArea;
+        const finalStatus = detection_status || 'Đã xác minh';
+
+        await db.query(
+          `UPDATE son_la_mat_rung
+           SET detection_status = $1,
+               verified_by = $2,
+               verification_reason = $3,
+               verification_notes = $4,
+               verified_area = $5,
+               detection_date = CURRENT_TIMESTAMP
+           WHERE gid = $6`,
+          [finalStatus, userId, verification_reason || null, verification_notes || null, finalVerifiedArea, gidInt]
+        );
+
+        successList.push({ gid: gidInt });
+      } catch (err) {
+        logger.error('Bulk verify error for gid', { gidInt, error: err.message });
+        failedList.push({ gid: gidInt, reason: err.message });
+      }
+    }
+
+    // Clear cache after bulk update
+    await redis.clearPattern('matrung:*');
+
+    logger.info('Bulk xlsx verify completed', {
+      total: records.length,
+      success: successList.length,
+      failed: failedList.length,
+      userId
+    });
+
+    sendActivityLog({
+      service: 'gis-service',
+      action: 'BULK_XLSX_VERIFY',
+      userId: parseInt(userId),
+      ipAddress: req.ip || req.connection.remoteAddress,
+      details: {
+        total: records.length,
+        success_count: successList.length,
+        failed_count: failedList.length,
+        timestamp: new Date().toISOString()
+      }
+    });
+
+    res.json({
+      success: true,
+      message: `Xác minh hàng loạt: ${successList.length}/${records.length} thành công`,
+      data: {
+        success: successList,
+        failed: failedList,
+        total: records.length,
+        success_count: successList.length,
+        failed_count: failedList.length
+      }
+    });
+
+  } catch (error) {
     next(error);
   }
 };

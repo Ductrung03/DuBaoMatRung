@@ -157,6 +157,42 @@ const FEATURE_PERMISSIONS = {
         module: 'user_management',
         resource: 'user',
         action: 'view'
+      },
+      create: {
+        code: 'user.management.actions.create',
+        name: 'Thêm người dùng',
+        description: 'Hiển thị nút "Thêm người dùng" và mở form tạo mới',
+        ui_element: 'Nút Thêm người dùng, Form tạo mới',
+        module: 'user_management',
+        resource: 'user',
+        action: 'create'
+      },
+      edit: {
+        code: 'user.management.actions.edit',
+        name: 'Sửa thông tin người dùng',
+        description: 'Hiển thị nút "Sửa" và mở form chỉnh sửa thông tin người dùng',
+        ui_element: 'Nút Sửa, Form chỉnh sửa',
+        module: 'user_management',
+        resource: 'user',
+        action: 'edit'
+      },
+      delete: {
+        code: 'user.management.actions.delete',
+        name: 'Xóa người dùng',
+        description: 'Hiển thị nút "Xóa" và thực hiện xóa người dùng',
+        ui_element: 'Nút Xóa',
+        module: 'user_management',
+        resource: 'user',
+        action: 'delete'
+      },
+      change_password: {
+        code: 'user.management.detail.assign_roles',
+        name: 'Gán vai trò cho người dùng',
+        description: 'Gán hoặc gỡ vai trò cho người dùng',
+        ui_element: 'Nút Phân quyền, Modal chọn vai trò',
+        module: 'user_management',
+        resource: 'user',
+        action: 'assign_roles'
       }
     }
   },

@@ -11,33 +11,19 @@ const DuBaoMatRungTuyBien = () => {
   const { isAdmin, user } = useAuth();
   const { setGeoData, setLoading } = useGeoData();
   const adminUnits = useSonLaAdminUnits();
-  const { selectedXa, selectedTieukhu, selectedKhoanh } = adminUnits;
+  const { selectedXa } = adminUnits;
 
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   const [isInputOpen, setInputOpen] = useState(true);
   const [loading, setLoadingState] = useState(false);
 
-  const [kyTruocStart, setKyTruocStart] = useState("");
-  const [kyTruocEnd, setKyTruocEnd] = useState("");
-  const [kySauStart, setKySauStart] = useState("");
-  const [kySauEnd, setKySauEnd] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const handleAnalyze = async () => {
     try {
-      let fromDate = "";
-      let toDate = "";
-
-      if (kyTruocStart && kySauEnd) {
-        fromDate = kyTruocStart;
-        toDate = kySauEnd;
-      } else if (kyTruocStart && kyTruocEnd) {
-        fromDate = kyTruocStart;
-        toDate = kyTruocEnd;
-      } else if (kySauStart && kySauEnd) {
-        fromDate = kySauStart;
-        toDate = kySauEnd;
-      } else {
-        toast.warning("Vui lòng chọn ít nhất một khoảng thời gian (kỳ trước hoặc kỳ sau)");
+      if (!fromDate || !toDate) {
+        toast.warning("Vui lòng nhập ngày bắt đầu và ngày kết thúc");
         return;
       }
 
@@ -51,8 +37,6 @@ const DuBaoMatRungTuyBien = () => {
 
       const params = { fromDate, toDate };
       if (selectedXa) params.xa = selectedXa;
-      if (selectedTieukhu) params.tk = selectedTieukhu;
-      if (selectedKhoanh) params.khoanh = selectedKhoanh;
 
       const response = await api.get('/mat-rung', {
         params,
@@ -134,7 +118,7 @@ const DuBaoMatRungTuyBien = () => {
         className="bg-forest-green-primary text-white py-0.2 px-4 rounded-full text-sm font-medium uppercase tracking-wide text-left shadow-md w-full cursor-pointer"
         onClick={() => setIsForecastOpen(!isForecastOpen)}
       >
-        Phân tích mất rừng tùy biến
+        Giám sát mất rừng tùy biến
       </div>
 
       {isForecastOpen && (
@@ -166,43 +150,13 @@ const DuBaoMatRungTuyBien = () => {
                   />
                 </div>
 
-                {/* Tiểu khu */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2 sm:mb-1 pl-0 sm:pl-4">
-                  <label className="text-sm w-full sm:w-auto">Tiểu khu</label>
-                  <Dropdown
-                    selectedValue={selectedTieukhu}
-                    onValueChange={adminUnits.tieukhu.onChange}
-                    options={adminUnits.tieukhu.list}
-                    placeholder="Chọn tiểu khu"
-                    disabled={adminUnits.tieukhu.loading || adminUnits.tieukhu.disabled}
-                    loading={adminUnits.tieukhu.loading}
-                    className="w-full sm:w-36"
-                    selectClassName="w-full border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                  />
-                </div>
-
-                {/* Khoảnh */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2 pl-0 sm:pl-4">
-                  <label className="text-sm w-full sm:w-auto">Khoảnh</label>
-                  <Dropdown
-                    selectedValue={selectedKhoanh}
-                    onValueChange={adminUnits.khoanh.onChange}
-                    options={adminUnits.khoanh.list}
-                    placeholder="Chọn khoảnh"
-                    disabled={adminUnits.khoanh.loading || adminUnits.khoanh.disabled}
-                    loading={adminUnits.khoanh.loading}
-                    className="w-full sm:w-36"
-                    selectClassName="w-full border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                  />
-                </div>
-
-                <div className="font-medium text-sm mb-1 mt-3">Kỳ trước:</div>
+                <div className="font-medium text-sm mb-1 mt-3">Thời gian:</div>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2 sm:mb-1 pl-0 sm:pl-4">
                   <label className="text-sm w-full sm:w-auto">Ngày bắt đầu</label>
                   <input
                     type="date"
-                    value={kyTruocStart}
-                    onChange={(e) => setKyTruocStart(e.target.value)}
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
                     className="w-full sm:flex-1 border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
@@ -210,27 +164,8 @@ const DuBaoMatRungTuyBien = () => {
                   <label className="text-sm w-full sm:w-auto">Ngày kết thúc</label>
                   <input
                     type="date"
-                    value={kyTruocEnd}
-                    onChange={(e) => setKyTruocEnd(e.target.value)}
-                    className="w-full sm:flex-1 border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                  />
-                </div>
-                <div className="font-medium text-sm mb-1 mt-3">Kỳ sau:</div>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2 sm:mb-1 pl-0 sm:pl-4">
-                  <label className="text-sm w-full sm:w-auto">Ngày bắt đầu</label>
-                  <input
-                    type="date"
-                    value={kySauStart}
-                    onChange={(e) => setKySauStart(e.target.value)}
-                    className="w-full sm:flex-1 border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                  />
-                </div>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2 pl-0 sm:pl-4">
-                  <label className="text-sm w-full sm:w-auto">Ngày kết thúc</label>
-                  <input
-                    type="date"
-                    value={kySauEnd}
-                    onChange={(e) => setKySauEnd(e.target.value)}
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
                     className="w-full sm:flex-1 border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>

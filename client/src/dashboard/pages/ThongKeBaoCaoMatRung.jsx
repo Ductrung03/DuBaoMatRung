@@ -125,7 +125,7 @@ const ThongKeBaoCaoMatRung = () => {
       const isVerified = reportParams.xacMinh === 'true';
       const reportTitle = isVerified
         ? "BẢNG THỐNG KÊ VỊ TRÍ MẤT RỪNG"
-        : "BẢNG THỐNG KÊ PHÁT HIỆN SỚM MẤT RỪNG";
+        : "BẢNG THỐNG KÊ PHÁT HIỆN MẤT RỪNG";
 
       // Tính tổng
       const totalLots = reportData.length;
@@ -138,16 +138,17 @@ const ThongKeBaoCaoMatRung = () => {
       const headerCells = [
         new TableCell({ children: [new Paragraph({ text: "TT", alignment: AlignmentType.CENTER })], width: { size: 5, type: WidthType.PERCENTAGE } }),
         new TableCell({ children: [new Paragraph({ text: "Xã", alignment: AlignmentType.CENTER })], width: { size: 20, type: WidthType.PERCENTAGE } }),
-        new TableCell({ children: [new Paragraph({ text: "Lô cảnh báo", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Lô phát hiện", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
         new TableCell({ children: [new Paragraph({ text: "Tiểu khu", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
         new TableCell({ children: [new Paragraph({ text: "Khoảnh", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }),
-        new TableCell({ children: [new Paragraph({ text: "Tọa độ X", alignment: AlignmentType.CENTER })], width: { size: 13, type: WidthType.PERCENTAGE } }),
-        new TableCell({ children: [new Paragraph({ text: "Tọa độ Y", alignment: AlignmentType.CENTER })], width: { size: 13, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Latitude (X)", alignment: AlignmentType.CENTER })], width: { size: 13, type: WidthType.PERCENTAGE } }),
+        new TableCell({ children: [new Paragraph({ text: "Longitude (Y)", alignment: AlignmentType.CENTER })], width: { size: 13, type: WidthType.PERCENTAGE } }),
         new TableCell({ children: [new Paragraph({ text: "Diện tích (ha)", alignment: AlignmentType.CENTER })], width: { size: 13, type: WidthType.PERCENTAGE } }),
       ];
 
       if (isVerified) {
         headerCells.push(new TableCell({ children: [new Paragraph({ text: "Nguyên nhân", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }));
+        headerCells.push(new TableCell({ children: [new Paragraph({ text: "Ghi chú", alignment: AlignmentType.CENTER })], width: { size: 12, type: WidthType.PERCENTAGE } }));
       }
 
       // Tạo data rows
@@ -155,7 +156,7 @@ const ThongKeBaoCaoMatRung = () => {
         const cells = [
           new TableCell({ children: [new Paragraph({ text: `${idx + 1}`, alignment: AlignmentType.CENTER })] }),
           new TableCell({ children: [new Paragraph({ text: item.properties.xa_name || (item.properties.xa ? convertTcvn3ToUnicode(item.properties.xa) : "") || item.properties.maxa || "", alignment: AlignmentType.CENTER })] }),
-          new TableCell({ children: [new Paragraph({ text: item.properties.lo_canbao || (item.properties.gid ? `CB-${item.properties.gid}` : ""), alignment: AlignmentType.CENTER })] }),
+          new TableCell({ children: [new Paragraph({ text: item.properties.lo_canbao || (item.properties.gid ? `PH-${item.properties.gid}` : ""), alignment: AlignmentType.CENTER })] }),
           new TableCell({ children: [new Paragraph({ text: item.properties.tk || item.properties.tieukhu || "", alignment: AlignmentType.CENTER })] }),
           new TableCell({ children: [new Paragraph({ text: item.properties.khoanh || "", alignment: AlignmentType.CENTER })] }),
           new TableCell({ children: [new Paragraph({ text: item.properties.x ? parseFloat(item.properties.x).toFixed(3) : "", alignment: AlignmentType.CENTER })] }),
@@ -174,7 +175,8 @@ const ThongKeBaoCaoMatRung = () => {
         ];
 
         if (isVerified) {
-          cells.push(new TableCell({ children: [new Paragraph({ text: item.properties.verification_reason || item.properties.nguyennhan || item.properties.verification_notes || "", alignment: AlignmentType.CENTER })] }));
+          cells.push(new TableCell({ children: [new Paragraph({ text: item.properties.verification_reason || item.properties.nguyennhan || "", alignment: AlignmentType.CENTER })] }));
+          cells.push(new TableCell({ children: [new Paragraph({ text: item.properties.verification_notes || "", alignment: AlignmentType.CENTER })] }));
         }
 
         return new TableRow({ children: cells });
@@ -182,10 +184,11 @@ const ThongKeBaoCaoMatRung = () => {
 
       // Tạo total row
       const totalCells = [
-        new TableCell({ children: [new Paragraph({ text: `Tổng ${totalLots} lô`, alignment: AlignmentType.CENTER })], columnSpan: isVerified ? 8 : 7 }),
+        new TableCell({ children: [new Paragraph({ text: `Tổng ${totalLots} lô`, alignment: AlignmentType.CENTER })], columnSpan: 7 }),
         new TableCell({ children: [new Paragraph({ text: totalArea.toFixed(1), alignment: AlignmentType.CENTER })] }),
       ];
       if (isVerified) {
+        totalCells.push(new TableCell({ children: [new Paragraph({ text: "", alignment: AlignmentType.CENTER })] }));
         totalCells.push(new TableCell({ children: [new Paragraph({ text: "", alignment: AlignmentType.CENTER })] }));
       }
 
@@ -219,7 +222,7 @@ const ThongKeBaoCaoMatRung = () => {
 
       const fileName = isVerified
         ? `bao-cao-vi-tri-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.docx`
-        : `bao-cao-phat-hien-som-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.docx`;
+        : `bao-cao-phat-hien-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.docx`;
 
       // Download file
       const url = window.URL.createObjectURL(blob);
@@ -298,7 +301,7 @@ const ThongKeBaoCaoMatRung = () => {
       const isVerified = reportParams.xacMinh === 'true';
       const fileName = isVerified
         ? `bao-cao-vi-tri-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.pdf`
-        : `bao-cao-phat-hien-som-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.pdf`;
+        : `bao-cao-phat-hien-mat-rung-${reportParams.fromDate}-${reportParams.toDate}.pdf`;
 
       pdf.save(fileName);
 
@@ -484,7 +487,7 @@ const ThongKeBaoCaoMatRung = () => {
     const isVerified = reportParams.xacMinh === 'true';
     const reportTitle = isVerified
       ? "BẢNG THỐNG KÊ VỊ TRÍ MẤT RỪNG"
-      : "BẢNG THỐNG KÊ PHÁT HIỆN SỚM MẤT RỪNG";
+      : "BẢNG THỐNG KÊ PHÁT HIỆN MẤT RỪNG";
 
     const totalLots = reportData.length;
     const totalArea = reportData.reduce((sum, item) => {
@@ -606,17 +609,23 @@ const ThongKeBaoCaoMatRung = () => {
               <table className="w-full border border-black text-xs sm:text-sm text-center table-fixed min-w-[800px]">
               <thead>
                 <tr>
-                  <th className="border border-black px-1 sm:px-2 py-1 w-8 sm:w-12">TT</th>
-                  <th className="border border-black px-1 sm:px-2 py-1">Xã</th>
-                  <th className="border border-black px-1 sm:px-2 py-1">Lô cảnh báo</th>
-                  <th className="border border-black px-1 sm:px-2 py-1">Tiểu khu</th>
-                  <th className="border border-black px-1 sm:px-2 py-1">Khoảnh</th>
-                  <th className="border border-black px-1 sm:px-2 py-1">Tọa độ<br />X</th>
-                  <th className="border border-black px-1 sm:px-2 py-1">Tọa độ<br />Y</th>
-                  <th className="border border-black px-1 sm:px-2 py-1">Diện tích (ha)</th>
+                  <th className="border border-black px-1 sm:px-2 py-1 w-8 sm:w-12" rowSpan={2}>TT</th>
+                  <th className="border border-black px-1 sm:px-2 py-1" rowSpan={2}>Xã</th>
+                  <th className="border border-black px-1 sm:px-2 py-1" rowSpan={2}>Lô phát hiện</th>
+                  <th className="border border-black px-1 sm:px-2 py-1" rowSpan={2}>Tiểu khu</th>
+                  <th className="border border-black px-1 sm:px-2 py-1" rowSpan={2}>Khoảnh</th>
+                  <th className="border border-black px-1 sm:px-2 py-1" colSpan={2}>Tọa độ</th>
+                  <th className="border border-black px-1 sm:px-2 py-1" rowSpan={2}>Diện tích (ha)</th>
                   {isVerified && (
-                    <th className="border border-black px-1 sm:px-2 py-1">Nguyên nhân</th>
+                    <th className="border border-black px-1 sm:px-2 py-1" rowSpan={2}>Nguyên nhân</th>
                   )}
+                  {isVerified && (
+                    <th className="border border-black px-1 sm:px-2 py-1" rowSpan={2}>Ghi chú</th>
+                  )}
+                </tr>
+                <tr>
+                  <th className="border border-black px-1 sm:px-2 py-1">Latitude (X)</th>
+                  <th className="border border-black px-1 sm:px-2 py-1">Longitude (Y)</th>
                 </tr>
               </thead>
               <tbody>
@@ -627,7 +636,7 @@ const ThongKeBaoCaoMatRung = () => {
                       {item.properties.xa_name || (item.properties.xa ? convertTcvn3ToUnicode(item.properties.xa) : "") || item.properties.maxa || ""}
                     </td>
                     <td className="border border-black px-1 sm:px-2 py-1">
-                      {item.properties.lo_canbao || (item.properties.gid ? `CB-${item.properties.gid}` : "")}
+                      {item.properties.lo_canbao || (item.properties.gid ? `PH-${item.properties.gid}` : "")}
                     </td>
                     <td className="border border-black px-1 sm:px-2 py-1">
                       {item.properties.tk || item.properties.tieukhu || ""}
@@ -651,19 +660,25 @@ const ThongKeBaoCaoMatRung = () => {
                     </td>
                     {isVerified && (
                       <td className="border border-black px-1 sm:px-2 py-1">
-                        {item.properties.verification_reason || item.properties.nguyennhan || item.properties.verification_notes || ""}
+                        {item.properties.verification_reason || item.properties.nguyennhan || ""}
+                      </td>
+                    )}
+                    {isVerified && (
+                      <td className="border border-black px-1 sm:px-2 py-1">
+                        {item.properties.verification_notes || ""}
                       </td>
                     )}
                   </tr>
                 ))}
 
                 <tr className="font-bold">
-                  <td className="border border-black px-1 sm:px-2 py-1" colSpan={isVerified ? "8" : "7"}>
+                  <td className="border border-black px-1 sm:px-2 py-1" colSpan="7">
                     Tổng {totalLots} lô
                   </td>
                   <td className="border border-black px-1 sm:px-2 py-1">
                     {totalArea.toFixed(1)}
                   </td>
+                  {isVerified && <td className="border border-black px-1 sm:px-2 py-1"></td>}
                   {isVerified && <td className="border border-black px-1 sm:px-2 py-1"></td>}
                 </tr>
               </tbody>
@@ -683,8 +698,8 @@ const ThongKeBaoCaoMatRung = () => {
                     <div className="font-semibold text-blue-600">Xã:</div>
                     <div>{item.properties.xa_name || (item.properties.xa ? convertTcvn3ToUnicode(item.properties.xa) : "") || item.properties.maxa || ""}</div>
 
-                    <div className="font-semibold text-blue-600">Lô cảnh báo:</div>
-                    <div>{item.properties.lo_canbao || (item.properties.gid ? `CB-${item.properties.gid}` : "")}</div>
+                    <div className="font-semibold text-blue-600">Lô phát hiện:</div>
+                    <div>{item.properties.lo_canbao || (item.properties.gid ? `PH-${item.properties.gid}` : "")}</div>
 
                     <div className="font-semibold text-blue-600">Tiểu khu:</div>
                     <div>{item.properties.tk || item.properties.tieukhu || ""}</div>
@@ -692,10 +707,10 @@ const ThongKeBaoCaoMatRung = () => {
                     <div className="font-semibold text-blue-600">Khoảnh:</div>
                     <div>{item.properties.khoanh || ""}</div>
 
-                    <div className="font-semibold text-blue-600">Tọa độ X:</div>
+                    <div className="font-semibold text-blue-600">Latitude (X):</div>
                     <div>{item.properties.x ? parseFloat(item.properties.x).toFixed(3) : ""}</div>
 
-                    <div className="font-semibold text-blue-600">Tọa độ Y:</div>
+                    <div className="font-semibold text-blue-600">Longitude (Y):</div>
                     <div>{item.properties.y ? parseFloat(item.properties.y).toFixed(3) : ""}</div>
 
                     <div className="font-semibold text-blue-600">Diện tích (ha):</div>
@@ -710,7 +725,9 @@ const ThongKeBaoCaoMatRung = () => {
                     {isVerified && (
                       <>
                         <div className="font-semibold text-blue-600">Nguyên nhân:</div>
-                        <div>{item.properties.verification_reason || item.properties.nguyennhan || item.properties.verification_notes || ""}</div>
+                        <div>{item.properties.verification_reason || item.properties.nguyennhan || ""}</div>
+                        <div className="font-semibold text-blue-600">Ghi chú:</div>
+                        <div>{item.properties.verification_notes || ""}</div>
                       </>
                     )}
                   </div>

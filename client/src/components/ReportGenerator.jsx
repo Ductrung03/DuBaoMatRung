@@ -191,7 +191,7 @@ const ReportGenerator = ({ reportData, reportParams }) => {
                   {item.properties.xa_name || (item.properties.xa ? convertTcvn3ToUnicode(item.properties.xa) : "")}
                 </td>
                 <td className="border border-black px-2 py-1">
-                  {item.properties.lo_canbao || (item.properties.gid ? `CB-${item.properties.gid}` : "")}
+                  {item.properties.lo_canbao || (item.properties.gid ? `PH-${item.properties.gid}` : "")}
                 </td>
                 <td className="border border-black px-2 py-1">
                   {item.properties.tk || ""}

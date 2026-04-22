@@ -99,6 +99,10 @@ app.post('/api/import-gee-url', asyncHandler(shapefileController.importFromGeeUr
 // Direct route for GeoJSON URL import with spatial validation
 app.post('/api/import-geojson-url', asyncHandler(shapefileController.importFromGeoJsonUrl));
 
+// Bảng kê xử lý ảnh viễn thám
+const matRungControllerMain = require('./controllers/matrung.controller');
+app.get('/api/bang-ke-xu-ly-anh', asyncHandler(matRungControllerMain.getBangKeXuLyAnh));
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({

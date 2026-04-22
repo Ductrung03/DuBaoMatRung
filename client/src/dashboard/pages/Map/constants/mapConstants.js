@@ -231,7 +231,6 @@ export const PRIORITY_FIELDS_BY_TYPE = {
     "alert_level",
     "days_since",
     "detection_status",
-    "mahuyen",
   ],
   default: [
     "huyen",
@@ -242,7 +241,6 @@ export const PRIORITY_FIELDS_BY_TYPE = {
     "tk",
     "khoanh",
     "churung",
-    "mahuyen",
   ],
 };
 

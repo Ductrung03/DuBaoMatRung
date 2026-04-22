@@ -267,40 +267,6 @@ const BaoCaoDuBaoMatRung = () => {
               </div>
             </div>
 
-            {/* Tiểu khu */}
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-20 flex-shrink-0">Tiểu khu</label>
-              <div className="flex-1 min-w-0 overflow-hidden">
-                <Dropdown
-                  selectedValue={selectedTieukhu}
-                  onValueChange={adminUnits.tieukhu.onChange}
-                  options={adminUnits.tieukhu.list}
-                  placeholder="Chọn tiểu khu"
-                  disabled={adminUnits.tieukhu.loading || adminUnits.tieukhu.disabled}
-                  loading={adminUnits.tieukhu.loading}
-                  className="border border-green-400 rounded-md bg-white"
-                  selectClassName="text-sm py-1"
-                />
-              </div>
-            </div>
-
-            {/* Khoảnh */}
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium w-20 flex-shrink-0">Khoảnh</label>
-              <div className="flex-1 min-w-0 overflow-hidden">
-                <Dropdown
-                  selectedValue={selectedKhoanh}
-                  onValueChange={adminUnits.khoanh.onChange}
-                  options={adminUnits.khoanh.list}
-                  placeholder="Chọn khoảnh"
-                  disabled={adminUnits.khoanh.loading || adminUnits.khoanh.disabled}
-                  loading={adminUnits.khoanh.loading}
-                  className="border border-green-400 rounded-md bg-white"
-                  selectClassName="text-sm py-1"
-                />
-              </div>
-            </div>
-
             {/* ✅ THÊM: Checkbox Xác minh */}
             <div className="flex items-center gap-1">
               <label className="text-sm font-medium w-28">Xác minh</label>

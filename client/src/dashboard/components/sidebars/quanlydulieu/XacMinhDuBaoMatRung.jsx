@@ -8,7 +8,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import config from "../../../../config";
 import Dropdown from "../../../../components/Dropdown";
 import { useIsMobile } from "../../../../hooks/useMediaQuery";
- // Import the generic Dropdown
+import BulkVerificationModal from "./BulkVerificationModal";
 
 const XacMinhDuBaoMatRung = () => {
   const { geoData, setGeoData } = useGeoData();
@@ -29,6 +29,7 @@ const XacMinhDuBaoMatRung = () => {
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
   
   // Form states
   const [formData, setFormData] = useState({
@@ -123,7 +124,7 @@ const XacMinhDuBaoMatRung = () => {
           
         }, 1000);
 
-        toast.success(`✅ Đã tìm thấy CB-${gidToSearch} và load ${sortedFeatures.length} khu vực`, {
+        toast.success(`✅ Đã tìm thấy PH-${gidToSearch} và load ${sortedFeatures.length} khu vực`, {
           autoClose: 3000
         });
 
@@ -138,7 +139,7 @@ const XacMinhDuBaoMatRung = () => {
       let errorMessage = "Có lỗi xảy ra khi tìm kiếm";
       
       if (error.response?.status === 404) {
-        errorMessage = `❌ Không tìm thấy lô CB-${formData.maLoDuBao} trong cơ sở dữ liệu`;
+        errorMessage = `❌ Không tìm thấy lô PH-${formData.maLoDuBao} trong cơ sở dữ liệu`;
       } else if (error.response?.status === 401) {
         errorMessage = "❌ Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
       } else if (error.response?.data?.message) {
@@ -218,6 +219,7 @@ const XacMinhDuBaoMatRung = () => {
                   detection_status: updatedData.detection_status,
                   verification_reason: updatedData.verification_reason,
                   verified_area: updatedData.verified_area,
+                  dtichXM: updatedData.verified_area,  // sync dtichXM với verified_area
                   verification_notes: updatedData.verification_notes,
                   detection_date: updatedData.detection_date,
                   verified_by: updatedData.verified_by,
@@ -235,7 +237,7 @@ const XacMinhDuBaoMatRung = () => {
         }
 
         // Hiển thị thông báo chi tiết
-        let successMessage = `✅ Đã xác minh thành công CB-${gid}!`;
+        let successMessage = `✅ Đã xác minh thành công PH-${gid}!`;
         if (changes && changes.area_changed) {
           successMessage += `\n📏 Diện tích: ${(changes.original_area / 10000).toFixed(2)} ha → ${(changes.new_verified_area / 10000).toFixed(2)} ha`;
         } else if (changes && changes.original_area) {
@@ -315,6 +317,19 @@ const XacMinhDuBaoMatRung = () => {
 
   return (
     <div>
+      {/* Bulk verification modal */}
+      {showBulkModal && (
+        <BulkVerificationModal
+          onClose={() => setShowBulkModal(false)}
+          onDone={() => {
+            setShowBulkModal(false);
+            setTimeout(() => {
+              window.dispatchEvent(new CustomEvent("refreshTable", { detail: {} }));
+            }, 500);
+          }}
+        />
+      )}
+
       {/* Loading overlay */}
       {(loading || searchLoading) && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[9999]">
@@ -327,8 +342,8 @@ const XacMinhDuBaoMatRung = () => {
                 </div>
                 <div className="text-sm text-gray-600">
                   {searchLoading 
-                    ? `Đang tìm CB-${formData.maLoDuBao} trong cơ sở dữ liệu...`
-                    : `Đang lưu xác minh cho CB-${selectedRecord?.properties?.gid}...`
+                    ? `Đang tìm PH-${formData.maLoDuBao} trong cơ sở dữ liệu...`
+                    : `Đang lưu xác minh cho PH-${selectedRecord?.properties?.gid}...`
                   }
                 </div>
               </div>
@@ -344,6 +359,15 @@ const XacMinhDuBaoMatRung = () => {
       >
         Xác minh phân tích mất rừng
       </div>
+
+      {/* Nút xác minh hàng loạt */}
+      <button
+        onClick={() => setShowBulkModal(true)}
+        className="w-full mt-2 flex items-center justify-center gap-2 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-800 font-semibold py-2.5 px-4 rounded-lg border-2 border-emerald-400 hover:border-emerald-500 transition-all shadow-sm hover:shadow text-sm"
+      >
+        <span className="text-base">📥</span>
+        <span>Nhập xác minh từ file Excel</span>
+      </button>
 
       {isForecastOpen && (
         <div className="flex flex-col gap-2 px-1 sm:px-2 pt-3">

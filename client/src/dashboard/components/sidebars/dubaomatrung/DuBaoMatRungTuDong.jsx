@@ -155,7 +155,7 @@ const DuBaoMatRungTuDong = () => {
         onClick={() => setIsForecastOpen(!isForecastOpen)}
       >
         <div className="flex items-center justify-between">
-          <span>Phân tích mất rừng tự động</span>
+          <span>Giám sát mất rừng tự động</span>
           <span className={`transform transition-transform ${isForecastOpen ? 'rotate-180' : ''}`}>
             ▼
           </span>

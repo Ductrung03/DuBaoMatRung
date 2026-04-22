@@ -84,9 +84,6 @@ const Sidebar = () => {
           <FeatureGuard key="xacMinh" featureCode="data_management.verification">
             <XacMinhDuBaoMatRung />
           </FeatureGuard>,
-          <FeatureGuard key="capNhat" featureCode="data_management.data_update">
-            <CapNhatDuLieu onGeoDataLoaded={setGeoData} />
-          </FeatureGuard>
         ];
       case "baocao":
         // Trang báo cáo không cần FeatureGuard ở sidebar vì toàn trang đã được bảo vệ bởi PermissionProtectedRoute
@@ -149,7 +146,7 @@ const Sidebar = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="grid grid-cols-2 gap-2 mb-4 sticky top-0 bg-white pb-2 z-10">
+        <div className="grid grid-cols-3 gap-2 mb-4 sticky top-0 bg-white pb-2 z-10">
           <button
             onClick={() => setActiveTab(0)}
             className={`py-2.5 px-3 rounded-lg text-xs font-medium transition-colors ${activeTab === 0
@@ -177,15 +174,6 @@ const Sidebar = () => {
           >
             ✅ Xác minh
           </button>
-          <button
-            onClick={() => setActiveTab(3)}
-            className={`py-2.5 px-3 rounded-lg text-xs font-medium transition-colors ${activeTab === 3
-              ? 'bg-forest-green-primary text-white shadow-md'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-          >
-            📊 Cập nhật
-          </button>
         </div>
 
         {/* Tab Content - Show only active tab */}
@@ -203,11 +191,6 @@ const Sidebar = () => {
           {activeTab === 2 && (
             <FeatureGuard featureCode="data_management.verification">
               <XacMinhDuBaoMatRung />
-            </FeatureGuard>
-          )}
-          {activeTab === 3 && (
-            <FeatureGuard featureCode="data_management.data_update">
-              <CapNhatDuLieu onGeoDataLoaded={setGeoData} />
             </FeatureGuard>
           )}
         </div>

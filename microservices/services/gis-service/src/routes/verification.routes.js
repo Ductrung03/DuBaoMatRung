@@ -197,3 +197,5 @@ router.post('/batch-verify', asyncHandler(verificationController.batchVerify));
 router.post('/mat-rung/:gid/verify', asyncHandler(verificationController.verifyMatRungById));
 
 module.exports = router;
+
+router.post('/bulk-xlsx-verify', asyncHandler(verificationController.bulkXlsxVerify));

@@ -8,7 +8,7 @@ import { useIsMobile } from "../../../../hooks/useMediaQuery";
 
 const TraCuuAnhVeTinh = () => {
   const adminUnits = useSonLaAdminUnits();
-  const { selectedXa, selectedTieukhu, selectedKhoanh } = adminUnits;
+  const { selectedXa } = adminUnits;
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   const [loading, setLoading] = useState(false);
   const isMobile = useIsMobile();
@@ -57,39 +57,6 @@ const TraCuuAnhVeTinh = () => {
               </div>
             </div>
 
-            {/* Tiểu khu */}
-            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
-              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Tiểu khu</label>
-              <div className={isMobile ? 'w-full' : 'w-36'}>
-                <Dropdown
-                  selectedValue={selectedTieukhu}
-                  onValueChange={adminUnits.tieukhu.onChange}
-                  options={adminUnits.tieukhu.list}
-                  placeholder="Chọn tiểu khu"
-                  disabled={adminUnits.tieukhu.loading || adminUnits.tieukhu.disabled}
-                  loading={adminUnits.tieukhu.loading}
-                  className={isMobile ? 'w-full' : ''}
-                  selectClassName="w-full border border-green-400 rounded-md py-2 px-3 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                />
-              </div>
-            </div>
-
-            {/* Khoảnh */}
-            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-1'}`}>
-              <label className={`text-sm font-medium ${isMobile ? '' : 'w-40'}`}>Khoảnh</label>
-              <div className={isMobile ? 'w-full' : 'w-36'}>
-                <Dropdown
-                  selectedValue={selectedKhoanh}
-                  onValueChange={adminUnits.khoanh.onChange}
-                  options={adminUnits.khoanh.list}
-                  placeholder="Chọn khoảnh"
-                  disabled={adminUnits.khoanh.loading || adminUnits.khoanh.disabled}
-                  loading={adminUnits.khoanh.loading}
-                  className={isMobile ? 'w-full' : ''}
-                  selectClassName="w-full border border-green-400 rounded-md py-2 px-3 pr-8 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                />
-              </div>
-            </div>
           </div>
 
           <button

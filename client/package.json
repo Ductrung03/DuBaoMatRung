@@ -42,7 +42,8 @@
     "react-window": "^1.8.11",
     "react-window-infinite-loader": "^1.0.10",
     "recharts": "^2.15.2",
-    "vietnamese-conversion": "^2.0.0"
+    "vietnamese-conversion": "^2.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

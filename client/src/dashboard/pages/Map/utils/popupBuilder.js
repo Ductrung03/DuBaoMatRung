@@ -69,8 +69,13 @@ const processFieldValue = (field, value, layerType) => {
   }
 
   if (field === "dtich" && value !== null) {
-    processedValue = `${parseFloat(value).toFixed(2)} ha`;
+    processedValue = `${(parseFloat(value) / 10000).toFixed(2)} ha`;
     label = "Diện tích";
+  }
+
+  if (field === "dtichXM" && value !== null) {
+    processedValue = `${(parseFloat(value) / 10000).toFixed(2)} ha`;
+    label = "Diện tích xác minh";
   }
 
   // Xử lý các trường đặc biệt
@@ -149,7 +154,7 @@ const buildInfoTable = (feature, layerType) => {
       !priorityFields.includes(key) &&
       !key.includes("geom") &&
       !key.startsWith("_") &&
-      !["x", "y", "x_vn2000", "y_vn2000", "gid", "layer_type"].includes(key) &&
+      !["x", "y", "x_vn2000", "y_vn2000", "gid", "layer_type", "mahuyen", "dtichXM", "dtich_xm", "verified_area", "verified_by", "verified_by_name", "verified_by_username", "verification_reason", "verification_notes", "detection_date"].includes(key) &&
       value !== null &&
       value !== undefined &&
       String(value).trim() !== ""
@@ -199,13 +204,12 @@ export const buildMatRungPopup = (feature) => {
   const matRungFields = [
     "huyen",
     "xa",
-    "area",
+    "dtich",
     "start_dau",
     "end_sau",
     "tk",
     "khoanh",
     "churung",
-    "mahuyen",
   ];
 
   matRungFields.forEach((field) => {
@@ -227,6 +231,17 @@ export const buildMatRungPopup = (feature) => {
       <tr>
         <th>Trạng thái xác minh</th>
         <td>${props.detection_status}</td>
+      </tr>
+    `;
+  }
+
+  // Thêm diện tích xác minh nếu đã xác minh và có giá trị
+  const dtichXMValue = props.dtichXM ?? props.dtich_xm ?? props.verified_area;
+  if (dtichXMValue !== null && dtichXMValue !== undefined && parseFloat(dtichXMValue) > 0) {
+    popupContent += `
+      <tr>
+        <th>Diện tích xác minh</th>
+        <td>${(parseFloat(dtichXMValue) / 10000).toFixed(2)} ha</td>
       </tr>
     `;
   }
@@ -256,7 +271,6 @@ export const buildDeforestationAlertsPopup = (feature) => {
     "alert_level",
     "days_since",
     "detection_status",
-    "mahuyen",
   ];
 
   alertFields.forEach((field) => {
