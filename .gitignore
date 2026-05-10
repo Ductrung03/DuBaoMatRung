@@ -110,6 +110,10 @@ SonLa_HienTrangRung/
 SonLa_HienTrangRung.rar
 *.rar
 
+# Excel/spreadsheet files at root (mẫu báo cáo, không cần track)
+/*.xlsx
+/*.xls
+
 # OS artifact
 nul
 

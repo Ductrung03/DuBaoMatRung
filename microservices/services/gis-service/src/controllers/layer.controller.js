@@ -206,7 +206,7 @@ exports.getLayerDataByPath = async (req, res, next) => {
             `;
 
             if (days) {
-              query += ` AND start_dau::date >= CURRENT_DATE - INTERVAL '${parseInt(days)} days'`;
+              query += ` AND end_sau::date >= CURRENT_DATE - INTERVAL '${parseInt(days)} days'`;
             }
 
             query += ' ORDER BY start_dau DESC LIMIT 5000';
@@ -265,7 +265,7 @@ exports.getLayerDataByPath = async (req, res, next) => {
             has_intersection
           FROM ${tableName}
           WHERE geom IS NOT NULL
-            AND has_intersection = true
+            AND has_intersection IS NOT FALSE
         `;
 
         if (days) {
@@ -465,6 +465,61 @@ exports.getLayerDataByPath = async (req, res, next) => {
       }
     } else if (alreadyHasAdminInfo) {
       logger.info('Skipping post-query scope filter - already filtered via spatial query', { count: result.rows.length });
+    }
+
+    // Enrich so_lan, end_dau, start_sau từ bang_ke_xu_ly_anh
+    // Match theo xa name + khoảng ngày: mat_rung.start_dau nằm trong [bk.start_dau, bk.end_sau]
+    if (layerName === 'deforestation-alerts' && result.rows.length > 0) {
+      try {
+        const xaNames = [...new Set(result.rows.map(r => r.xa).filter(Boolean))];
+        if (xaNames.length > 0) {
+          const bangKeResult = await db.query(
+            'SELECT ten_xa, so_lan, start_dau, end_dau, start_sau, end_sau FROM bang_ke_xu_ly_anh WHERE ten_xa = ANY($1) ORDER BY so_lan ASC',
+            [xaNames]
+          );
+
+          // Group theo xa
+          const bangKeByXa = {};
+          bangKeResult.rows.forEach(r => {
+            if (!bangKeByXa[r.ten_xa]) bangKeByXa[r.ten_xa] = [];
+            bangKeByXa[r.ten_xa].push(r);
+          });
+
+          result.rows = result.rows.map(row => {
+            const bangKeList = bangKeByXa[row.xa];
+            if (!bangKeList || bangKeList.length === 0) return row;
+
+            const rowStart = new Date(row.start_dau);
+
+            // Tìm bang_ke bao hàm start_dau của mat_rung (lấy so_lan nhỏ nhất khớp)
+            let matched = bangKeList.find(bk => {
+              const bkStart = new Date(bk.start_dau);
+              const bkEnd = new Date(bk.end_sau);
+              return rowStart >= bkStart && rowStart <= bkEnd;
+            });
+
+            // Fallback: start_dau gần nhất
+            if (!matched) {
+              matched = bangKeList.reduce((prev, curr) => {
+                const prevDiff = Math.abs(new Date(prev.start_dau) - rowStart);
+                const currDiff = Math.abs(new Date(curr.start_dau) - rowStart);
+                return currDiff < prevDiff ? curr : prev;
+              });
+            }
+
+            return {
+              ...row,
+              so_lan: matched.so_lan ?? null,
+              end_dau: matched.end_dau || row.end_dau || null,
+              start_sau: matched.start_sau || row.start_sau || null,
+            };
+          });
+
+          logger.info(`so_lan enriched by date-match: ${Object.keys(bangKeByXa).length} xa in bang_ke_xu_ly_anh`);
+        }
+      } catch (bangKeErr) {
+        logger.warn('Failed to enrich so_lan from bang_ke_xu_ly_anh:', bangKeErr.message);
+      }
     }
 
     const features = result.rows.map(row => {

@@ -919,15 +919,15 @@ function buildGeoJSON(rows, extraProps = {}) {
 exports.getRecentGeoJson = async (req, res, next) => {
   try {
     const db = req.app.locals.db;
-    const { bbox, days = 7, status = 'Chưa xác minh' } = req.query;
+    const { bbox, days = 365 } = req.query;
 
     let bboxFilter = '';
-    let params = [days];
+    let params = [];
 
     // Parse bbox if provided: minX,minY,maxX,maxY
     if (bbox) {
       const [minX, minY, maxX, maxY] = bbox.split(',').map(Number);
-      bboxFilter = `AND clipped_geom && ST_MakeEnvelope($2, $3, $4, $5, 4326)`;
+      bboxFilter = `AND COALESCE(m.clipped_geom, m.geom) && ST_MakeEnvelope($1, $2, $3, $4, 4326)`;
       params.push(minX, minY, maxX, maxY);
     }
 
@@ -937,7 +937,7 @@ exports.getRecentGeoJson = async (req, res, next) => {
     const query = `
       SELECT
         m.gid,
-        ST_AsGeoJSON(m.clipped_geom)::json as geometry,
+        ST_AsGeoJSON(ST_Transform(COALESCE(m.clipped_geom, m.geom), 4326))::json as geometry,
         m.area as original_area,
         m.clipped_area,
         COALESCE(NULLIF(m.clipped_area, 0), ST_Area(ST_Transform(ST_MakeValid(COALESCE(m.clipped_geom, m.geom)), 4326)::geography)) as dtich,
@@ -977,12 +977,9 @@ exports.getRecentGeoJson = async (req, res, next) => {
         ST_Transform(r.geom, 4326)
       )
       ` : ''}
-      WHERE m.clipped_geom IS NOT NULL
-        AND m.has_intersection = true
-        AND (
-          m.detection_status = $1
-          OR m.created_at >= NOW() - INTERVAL '${days} days'
-        )
+      WHERE m.geom IS NOT NULL
+        AND m.has_intersection IS NOT FALSE
+        AND m.end_sau::date >= CURRENT_DATE - INTERVAL '${parseInt(days)} days'
         ${bboxFilter}
       ORDER BY m.created_at DESC
       LIMIT 1000
@@ -1033,7 +1030,6 @@ exports.getRecentGeoJson = async (req, res, next) => {
       count: result.rows.length,
       bbox: bbox || 'all',
       days,
-      status,
       query_time: `${queryTime}ms`
     });
 

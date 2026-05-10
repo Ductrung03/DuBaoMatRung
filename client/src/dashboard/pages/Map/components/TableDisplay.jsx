@@ -38,36 +38,67 @@ const TableDisplay = ({
   const handleExportExcel = () => {
     if (!geoData?.features?.length) return;
 
+    const fmtDate = (v) => v ? new Date(v).toLocaleDateString("vi-VN") : "";
+    const fmtHa   = (v) => { const n = parseFloat(v)||0; return n > 0 ? parseFloat((n/10000).toFixed(2)) : 0; };
+
+    // Header row 1 (groups) + row 2 (sub-headers)
+    const header1 = ["Lô phát hiện","Số lần","Thời gian xử lý ảnh","","","","Diện tích (ha)","Xã","Tiểu khu","Khoảnh","Tọa độ","","Trạng thái xác minh","Diện tích xác minh (ha)","Nguyên nhân","Người xác minh","Ngày xác minh","Ghi chú"];
+    const header2 = ["","","Kỳ đầu","","Kỳ sau","","","","","","Latitude (X)","Longitude (Y)","","","","","",""];
+
     const rows = geoData.features.map((f) => {
       const p = f.properties;
-      const dtich = parseFloat(p.dtich) || 0;
-      const dtichXM = parseFloat(p.dtichXM ?? p.verified_area) || 0;
-      return {
-        "Lô PH": p.gid ? `PH-${p.gid}` : "",
-        "Diện tích (ha)": dtich > 0 ? parseFloat((dtich / 10000).toFixed(2)) : 0,
-        "Xã": p.xa || "",
-        "Tiểu khu": p.tk || "",
-        "Khoảnh": p.khoanh || "",
-        "Tọa độ X": p.x ?? p.x_coordinate ?? "",
-        "Tọa độ Y": p.y ?? p.y_coordinate ?? "",
-        "Trạng thái XM": p.detection_status || "Chưa xác minh",
-        "DT xác minh (ha)": dtichXM > 0 ? parseFloat((dtichXM / 10000).toFixed(2)) : 0,
-        "Nguyên nhân": p.verification_reason || "",
-        "Ghi chú": p.verification_notes || "",
-        "Người XM": p.verified_by_name || "",
-        "Ngày XM": p.detection_date ? new Date(p.detection_date).toLocaleDateString("vi-VN") : "",
-      };
+      return [
+        p.gid ? `PH-${p.gid}` : "",
+        p.so_lan ?? "",
+        fmtDate(p.start_dau),
+        fmtDate(p.end_dau),
+        fmtDate(p.start_sau),
+        fmtDate(p.end_sau),
+        fmtHa(p.dtich),
+        p.xa || "",
+        p.tk || "",
+        p.khoanh || "",
+        parseFloat(p.x_coordinate ?? p.x ?? "") || "",
+        parseFloat(p.y_coordinate ?? p.y ?? "") || "",
+        p.detection_status || "Chưa xác minh",
+        fmtHa(p.dtichXM ?? p.verified_area),
+        p.verification_reason || "",
+        p.verified_by_name || "",
+        fmtDate(p.detection_date),
+        p.verification_notes || "",
+      ];
     });
 
-    const ws = XLSX.utils.json_to_sheet(rows);
+    const ws = XLSX.utils.aoa_to_sheet([header1, header2, ...rows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "DuLieu");
 
+    // Merge cells cho header nhóm
+    ws["!merges"] = [
+      { s:{r:0,c:0}, e:{r:1,c:0} },   // Lô phát hiện
+      { s:{r:0,c:1}, e:{r:1,c:1} },   // Số lần
+      { s:{r:0,c:2}, e:{r:0,c:5} },   // Thời gian xử lý ảnh
+      { s:{r:1,c:2}, e:{r:1,c:3} },   // Kỳ đầu
+      { s:{r:1,c:4}, e:{r:1,c:5} },   // Kỳ sau
+      { s:{r:0,c:6}, e:{r:1,c:6} },   // Diện tích (ha)
+      { s:{r:0,c:7}, e:{r:1,c:7} },   // Xã
+      { s:{r:0,c:8}, e:{r:1,c:8} },   // Tiểu khu
+      { s:{r:0,c:9}, e:{r:1,c:9} },   // Khoảnh
+      { s:{r:0,c:10}, e:{r:0,c:11} }, // Tọa độ
+      { s:{r:0,c:12}, e:{r:1,c:12} }, // Trạng thái xác minh
+      { s:{r:0,c:13}, e:{r:1,c:13} }, // Diện tích xác minh
+      { s:{r:0,c:14}, e:{r:1,c:14} }, // Nguyên nhân
+      { s:{r:0,c:15}, e:{r:1,c:15} }, // Người xác minh
+      { s:{r:0,c:16}, e:{r:1,c:16} }, // Ngày xác minh
+      { s:{r:0,c:17}, e:{r:1,c:17} }, // Ghi chú
+    ];
+
     // Column widths
     ws["!cols"] = [
-      { wch: 10 }, { wch: 14 }, { wch: 20 }, { wch: 10 }, { wch: 10 },
-      { wch: 14 }, { wch: 14 }, { wch: 18 }, { wch: 16 }, { wch: 25 },
-      { wch: 25 }, { wch: 18 }, { wch: 12 },
+      { wch: 12 }, { wch: 8 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 14 },
+      { wch: 12 }, { wch: 20 }, { wch: 10 }, { wch: 10 },
+      { wch: 14 }, { wch: 14 }, { wch: 18 }, { wch: 16 },
+      { wch: 25 }, { wch: 25 }, { wch: 18 }, { wch: 12 },
     ];
 
     const today = new Date().toISOString().split("T")[0];

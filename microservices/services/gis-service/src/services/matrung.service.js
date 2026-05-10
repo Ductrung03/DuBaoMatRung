@@ -160,6 +160,69 @@ class MatRungService {
   }
 
   /**
+   * Enrich rows with so_lan, end_dau, start_sau from bang_ke_xu_ly_anh
+   * Match by xa name + date range: mat_rung.start_dau phải nằm trong [bk.start_dau, bk.end_sau]
+   * Nếu nhiều bản ghi cùng khớp (dữ liệu bị trùng), lấy so_lan nhỏ nhất (lần đầu tiên khớp)
+   */
+  async enrichWithSoLan(rows) {
+    if (!rows || rows.length === 0) return rows;
+
+    try {
+      const xaNames = [...new Set(rows.map(r => r.xa).filter(Boolean))];
+      if (xaNames.length === 0) return rows;
+
+      // Lấy tất cả bang_ke records cho các xã, sắp xếp so_lan tăng dần
+      const result = await this.db
+        .selectFrom('bang_ke_xu_ly_anh')
+        .select(['ten_xa', 'so_lan', 'start_dau', 'end_dau', 'start_sau', 'end_sau'])
+        .where('ten_xa', 'in', xaNames)
+        .orderBy('so_lan', 'asc')
+        .execute();
+
+      // Group theo xa: { 'Xã Chiềng Mai': [{ so_lan:1, ... }, { so_lan:2, ... }] }
+      const bangKeByXa = {};
+      result.forEach(r => {
+        if (!bangKeByXa[r.ten_xa]) bangKeByXa[r.ten_xa] = [];
+        bangKeByXa[r.ten_xa].push(r);
+      });
+
+      return rows.map(row => {
+        const bangKeList = bangKeByXa[row.xa];
+        if (!bangKeList || bangKeList.length === 0) return row;
+
+        const rowStart = new Date(row.start_dau);
+
+        // Tìm bang_ke có khoảng ngày bao hàm start_dau của mat_rung
+        // Lấy bản ghi đầu tiên khớp (so_lan nhỏ nhất) để đảm bảo đúng lần
+        let matched = bangKeList.find(bk => {
+          const bkStart = new Date(bk.start_dau);
+          const bkEnd = new Date(bk.end_sau);
+          return rowStart >= bkStart && rowStart <= bkEnd;
+        });
+
+        // Fallback: nếu không khớp ngày chính xác, lấy bản ghi có start_dau gần nhất
+        if (!matched) {
+          matched = bangKeList.reduce((prev, curr) => {
+            const prevDiff = Math.abs(new Date(prev.start_dau) - rowStart);
+            const currDiff = Math.abs(new Date(curr.start_dau) - rowStart);
+            return currDiff < prevDiff ? curr : prev;
+          });
+        }
+
+        return {
+          ...row,
+          so_lan: matched.so_lan ?? null,
+          end_dau: matched.end_dau || row.end_dau || null,
+          start_sau: matched.start_sau || row.start_sau || null,
+        };
+      });
+    } catch (error) {
+      logger.warn('Failed to enrich with bang_ke info:', error.message);
+      return rows;
+    }
+  }
+
+  /**
    * Check if a table exists in the database (can be in different database/schema)
    */
   async tableExists(tableName, schemaName = 'public', databaseName = null) {
@@ -341,6 +404,7 @@ class MatRungService {
         }
         logger.info(`Post-filter: ${enrichedResult.length}/${beforeFilter} records after exact match filter`);
 
+        enrichedResult = await this.enrichWithSoLan(enrichedResult);
         return enrichedResult;
 
       } catch (error) {
@@ -416,6 +480,7 @@ class MatRungService {
         logger.info(`getMatRung (12mo default): Filtered out ${beforeFilter - result.length} records without xa`);
       }
 
+      result = await this.enrichWithSoLan(result);
       return result;
     }
 
@@ -489,6 +554,7 @@ class MatRungService {
       logger.info(`getMatRung (date filter): Filtered out ${beforeFilter - result.length} records without xa`);
     }
 
+    result = await this.enrichWithSoLan(result);
     return result;
   }
 
@@ -561,6 +627,7 @@ class MatRungService {
       logger.info(`getAllMatRung: Filtered out ${beforeFilter - result.length} records without xa`);
     }
 
+    result = await this.enrichWithSoLan(result);
     return result;
   }
 
@@ -692,6 +759,8 @@ class MatRungService {
       logger.info(`Filtered out ${beforeFilter - result.length} records without xa (not in sonla_hientrangrung)`);
     }
 
+    result = await this.enrichWithSoLan(result);
+
     const queryTime = Date.now() - startTime;
 
     logger.info(`Auto forecast query completed in ${queryTime}ms, found ${result.length} records`);
@@ -794,6 +863,8 @@ class MatRungService {
     if (beforeFilter > result.length) {
       logger.info(`getMatRungWithSpatialFilter: Filtered out ${beforeFilter - result.length} records without xa`);
     }
+
+    result = await this.enrichWithSoLan(result);
 
     return result;
   }

@@ -8,34 +8,70 @@ import { FaEdit, FaTrash, FaSave, FaTimes } from "react-icons/fa";
 import config from "../../config";
 import { convertTcvn3ToUnicode } from "../../utils/fontConverter";
 
-const ROW_HEIGHT = 45;
-const HEADER_HEIGHT = 48;
+const ROW_HEIGHT = 42;
+const HEADER_HEIGHT = 72; // single flex row spanning 2 visual tiers
 const MAX_TABLE_HEIGHT = typeof window !== 'undefined' ? Math.min(window.innerHeight * 0.6, 600) : 600;
 
 // ── Pure constants ngoài component ──────────────────────────────────────────
 const COLUMN_MAPPING = {
-  loCB: "gid", dtich: "dtich", xa: "xa", tk: "tk", khoanh: "khoanh",
-  X: "x", Y: "y", xacminh: "detection_status", DtichXM: "dtichXM",
+  loPH: "gid", soLan: "so_lan",
+  kyDauBD: "start_dau", kyDauKT: "end_dau",
+  kySauBD: "start_sau", kySauKT: "end_sau",
+  dtich: "dtich", xa: "xa", tk: "tk", khoanh: "khoanh",
+  X: "x_coordinate", Y: "y_coordinate",
+  xacminh: "detection_status", DtichXM: "dtichXM",
   ngnhan: "verification_reason", ghichu: "verification_notes",
   NguoiXM: "verified_by_name", NgayXM: "detection_date",
 };
 
 const REQUIRED_COLUMNS = [
-  "loCB","dtich","xa","tk","khoanh","X","Y",
-  "xacminh","DtichXM","ngnhan","ghichu","NguoiXM","NgayXM"
+  "loPH","soLan","kyDauBD","kyDauKT","kySauBD","kySauKT",
+  "dtich","xa","tk","khoanh","X","Y",
+  "xacminh","DtichXM","ngnhan","NguoiXM","NgayXM","ghichu"
 ];
 
 const COLUMN_FLEX = {
-  loCB:"0.8", dtich:"1.2", DtichXM:"1.2", xa:"1.5", tk:"1", khoanh:"1",
-  X:"1.1", Y:"1.1", xacminh:"1.3", ngnhan:"1.6", ghichu:"1.6",
-  NguoiXM:"1.3", NgayXM:"1.2",
+  loPH:"0.85", soLan:"0.55",
+  kyDauBD:"1.2", kyDauKT:"1.2", kySauBD:"1.2", kySauKT:"1.2",
+  dtich:"1.0", xa:"1.5", tk:"0.85", khoanh:"0.75",
+  X:"1.1", Y:"1.1",
+  xacminh:"1.5", DtichXM:"1.2",
+  ngnhan:"1.6", NguoiXM:"1.3", NgayXM:"1.1", ghichu:"1.6",
 };
 
 const COLUMN_DISPLAY = {
-  loCB:"Lô CB", dtich:"Diện tích", xa:"Xã", tk:"Tiểu khu", khoanh:"Khoảnh",
-  X:"X", Y:"Y", xacminh:"Trạng thái", DtichXM:"DT xác minh",
-  ngnhan:"Nguyên nhân", ghichu:"Ghi chú", NguoiXM:"Người XM", NgayXM:"Ngày XM",
+  loPH:"Lô phát hiện", soLan:"Số lần",
+  kyDauBD:"KĐ Bắt đầu", kyDauKT:"KĐ Kết thúc",
+  kySauBD:"KS Bắt đầu", kySauKT:"KS Kết thúc",
+  dtich:"Diện tích (ha)", xa:"Xã", tk:"Tiểu khu", khoanh:"Khoảnh",
+  X:"X", Y:"Y",
+  xacminh:"Trạng thái xác minh", DtichXM:"Diện tích XM (ha)",
+  ngnhan:"Nguyên nhân", NguoiXM:"Người xác minh", NgayXM:"Ngày xác minh", ghichu:"Ghi chú",
 };
+
+// Cấu trúc header 2 tầng theo đúng form Excel mẫu
+const HEADER_GROUPS = [
+  { label: "Lô PH",                cols: ["loPH"],                        rowspan: true },
+  { label: "Số lần",               cols: ["soLan"],                       rowspan: true },
+  { label: "Thời gian xử lý ảnh",  cols: ["kyDauBD","kyDauKT","kySauBD","kySauKT"], subGroups: [
+    { label: "Kỳ đầu",  cols: ["kyDauBD","kyDauKT"] },
+    { label: "Kỳ sau",  cols: ["kySauBD","kySauKT"] },
+  ]},
+  { label: "Diện tích",            cols: ["dtich"],                       rowspan: true },
+  { label: "Xã",                   cols: ["xa"],                          rowspan: true },
+  { label: "Tiểu khu",             cols: ["tk"],                          rowspan: true },
+  { label: "Khoảnh",               cols: ["khoanh"],                      rowspan: true },
+  { label: "Tọa độ",               cols: ["X","Y"], subGroups: [
+    { label: "Latitude (X)", cols: ["X"] },
+    { label: "Longitude (Y)", cols: ["Y"] },
+  ]},
+  { label: "Trạng thái",           cols: ["xacminh"],                     rowspan: true },
+  { label: "DT xác minh",          cols: ["DtichXM"],                     rowspan: true },
+  { label: "Nguyên nhân",          cols: ["ngnhan"],                      rowspan: true },
+  { label: "Ghi chú",              cols: ["ghichu"],                      rowspan: true },
+  { label: "Người XM",             cols: ["NguoiXM"],                     rowspan: true },
+  { label: "Ngày XM",              cols: ["NgayXM"],                      rowspan: true },
+];
 
 const ACTIONS_FLEX = "1.2";
 const EDITABLE_COLS = ["detection_status","dtichXM","verification_reason","verification_notes"];
@@ -45,10 +81,18 @@ function getActualValue(row, columnKey) {
   const col = COLUMN_MAPPING[columnKey];
   if (col && row[col] !== undefined) return row[col];
   const fallbacks = {
-    loCB:["gid","GID","id"], dtich:["dtich","DTICH","area"],
+    loPH:["gid","GID","id"],
+    soLan:["so_lan"],
+    kyDauBD:["start_dau"],
+    kyDauKT:["end_dau"],
+    kySauBD:["start_sau"],
+    kySauKT:["end_sau"],
+    dtich:["dtich","DTICH","area"],
     xa:["xa","XA","xa_name"], tk:["tk","TK","tieukhu"],
-    khoanh:["khoanh","KHOANH"], X:["x_coordinate","X","x","longitude"],
-    Y:["y_coordinate","Y","y","latitude"], xacminh:["detection_status"],
+    khoanh:["khoanh","KHOANH"],
+    X:["x_coordinate","X","x","longitude"],
+    Y:["y_coordinate","Y","y","latitude"],
+    xacminh:["detection_status"],
     DtichXM:["dtichXM","dtich_xm","verified_area"],
     ngnhan:["verification_reason"], ghichu:["verification_notes"],
     NguoiXM:["verified_by_name","verified_by_username","verified_by"],
@@ -60,11 +104,21 @@ function getActualValue(row, columnKey) {
   return null;
 }
 
+const DATE_COLS = ["kyDauBD","kyDauKT","kySauBD","kySauKT","NgayXM"];
+
+function formatDate(value) {
+  if (!value) return "-";
+  try { return new Date(value).toLocaleDateString("vi-VN"); } catch { return value; }
+}
+
 function formatValue(columnKey, row) {
   const value = getActualValue(row, columnKey);
-  const optional = ["DtichXM","ngnhan","ghichu","NguoiXM","NgayXM"];
+  const optional = ["soLan","kyDauBD","kyDauKT","kySauBD","kySauKT","DtichXM","ngnhan","ghichu","NguoiXM","NgayXM"];
   if (value === null || value === undefined) return optional.includes(columnKey) ? "-" : "NULL";
 
+  if (columnKey === "loPH") return `PH-${value}`;
+  if (columnKey === "soLan") return value;
+  if (DATE_COLS.includes(columnKey)) return formatDate(value);
   if (columnKey === "dtich") return `${((parseFloat(value)||0)/10000).toFixed(2)} ha`;
   if (columnKey === "DtichXM") {
     const n = parseFloat(value);
@@ -76,9 +130,6 @@ function formatValue(columnKey, row) {
   }
   if ((columnKey === "xa" || columnKey === "tk" || columnKey === "khoanh") && value) {
     try { return convertTcvn3ToUnicode(value.toString()) || value; } catch { return value; }
-  }
-  if (columnKey === "NgayXM" && value) {
-    try { return new Date(value).toLocaleDateString("vi-VN"); } catch { return value; }
   }
   if (columnKey === "xacminh") {
     const m = { positive:"✅ Xác nhận", negative:"❌ Phủ nhận", pending:"⏳ Chờ xử lý", unknown:"❓ Không rõ" };
@@ -100,7 +151,7 @@ const Row = ({ index, style, data: d }) => {
   const row = rows[index];
   if (!row) return null;
 
-  const gid = getActualValue(row, "loCB");
+  const gid = getActualValue(row, "loPH");
   const isTarget = targetGid && gid && gid.toString() === targetGid.toString();
 
   let bg;
@@ -120,14 +171,15 @@ const Row = ({ index, style, data: d }) => {
         const display = formatValue(colKey, row);
         const isNull  = getActualValue(row, colKey) === null;
         const colName = COLUMN_MAPPING[colKey];
-        const isTargetCell = isTarget && colKey === "loCB";
+        const isTargetCell = isTarget && colKey === "loPH";
 
         return (
           <div
             key={ci}
-            style={{ flex:`${COLUMN_FLEX[colKey]||"1"} 1 0`, padding:"0.5rem",
-              fontSize:"0.8rem", overflow:"hidden", textOverflow:"ellipsis",
-              whiteSpace:"nowrap", borderRight:"1px solid #f3f4f6" }}
+            style={{ flex:`${COLUMN_FLEX[colKey]||"1"} 1 0`, padding:"0.35rem 0.5rem",
+              fontSize:"0.78rem", overflow:"hidden", textOverflow:"ellipsis",
+              whiteSpace:"nowrap", borderRight:"1px solid #f3f4f6",
+              display:"flex", alignItems:"center" }}
           >
             {editRowIndex === index && EDITABLE_COLS.includes(colName) ? (
               colName === "detection_status" ? (
@@ -156,10 +208,20 @@ const Row = ({ index, style, data: d }) => {
                     border:"1px solid #d1d5db", borderRadius:"0.25rem" }}
                 />
               )
+            ) : colKey === "soLan" && display !== "-" ? (
+              <span style={{
+                display:"inline-flex", alignItems:"center", justifyContent:"center",
+                width:"1.5rem", height:"1.5rem", borderRadius:"50%", color:"white",
+                fontSize:"0.75rem", fontWeight:"bold",
+                backgroundColor: display == 1 ? "#16a34a" : display == 2 ? "#ca8a04" : "#ea580c"
+              }}>
+                {display}
+              </span>
             ) : (
               <span
                 className={`${isTargetCell?"text-red-700 font-bold":""} ${isNull?"text-gray-400 italic":""}`}
-                title={display}
+                title={typeof display === "string" ? display : String(display)}
+                style={{ overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}
               >
                 {isTargetCell ? `🎯 ${display}` : display}
               </span>
@@ -263,7 +325,7 @@ const TableVirtualized = ({ data, tableName = "unknown", onRowClick }) => {
     try {
       setLoading(true);
       const row = rows[idx];
-      const gid = getActualValue(row, "loCB");
+      const gid = getActualValue(row, "loPH");
       const response = await axios.put(
         `${config.API_BASE_URL}/mat-rung/${gid}`, ed,
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
@@ -285,7 +347,7 @@ const TableVirtualized = ({ data, tableName = "unknown", onRowClick }) => {
     if (!confirm("Bạn có chắc muốn xóa bản ghi này?")) return;
     try {
       setLoading(true);
-      const gid = getActualValue(row, "loCB");
+      const gid = getActualValue(row, "loPH");
       const response = await axios.delete(
         `${config.API_BASE_URL}/mat-rung/${gid}`,
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
@@ -325,23 +387,92 @@ const TableVirtualized = ({ data, tableName = "unknown", onRowClick }) => {
       <div style={{ backgroundColor:"white", borderRadius:"0.75rem",
         boxShadow:"0 10px 15px -3px rgba(0,0,0,0.1)", border:"1px solid #e5e7eb", overflow:"hidden" }}>
 
-        {/* Header */}
-        <div style={{ display:"flex", alignItems:"center",
-          background:"linear-gradient(to right, #027e02, #15803d)", color:"white",
-          fontSize:"0.7rem", fontWeight:"bold", textTransform:"uppercase", height:`${HEADER_HEIGHT}px` }}>
-          {REQUIRED_COLUMNS.map((colKey, i) => (
-            <div key={i} style={{ flex:`${COLUMN_FLEX[colKey]||"1"} 1 0`, padding:"0.75rem 0.5rem",
-              borderRight:"1px solid #16a34a", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
-              {COLUMN_DISPLAY[colKey] || colKey}
+        {/* Header 2 tầng đúng chuẩn Excel mẫu */}
+        {(() => {
+          const bg = "linear-gradient(to right, #027e02, #15803d)";
+          const border = "1px solid #16a34a";
+          const fs = screenWidth < 640 ? "0.58rem" : "0.64rem";
+          const fsSmall = screenWidth < 640 ? "0.52rem" : "0.58rem";
+          const baseCell = (flex, children, extra = {}) => (
+            <div style={{
+              flex:`${flex} 1 0`, display:"flex", alignItems:"center", justifyContent:"center",
+              textAlign:"center", padding:"0 0.2rem", borderRight:border,
+              overflow:"hidden", fontSize:fs, fontWeight:"bold",
+              whiteSpace:"normal", wordBreak:"break-word", lineHeight:"1.2",
+              ...extra
+            }}>{children}</div>
+          );
+
+          const timeFlex  = ["kyDauBD","kyDauKT","kySauBD","kySauKT"].reduce((s,c)=>s+parseFloat(COLUMN_FLEX[c]||1),0);
+          const kyDauFlex = ["kyDauBD","kyDauKT"].reduce((s,c)=>s+parseFloat(COLUMN_FLEX[c]||1),0);
+          const kySauFlex = ["kySauBD","kySauKT"].reduce((s,c)=>s+parseFloat(COLUMN_FLEX[c]||1),0);
+          const coordFlex = ["X","Y"].reduce((s,c)=>s+parseFloat(COLUMN_FLEX[c]||1),0);
+          const GROUP_COLS = ["kyDauBD","kyDauKT","kySauBD","kySauKT","X","Y"];
+
+          return (
+            <div style={{
+              background:bg, color:"white", fontWeight:"bold", userSelect:"none",
+              display:"flex", alignItems:"stretch", height:"72px"
+            }}>
+              {REQUIRED_COLUMNS.map((colKey) => {
+                // Cột đơn: span cả 2 hàng (height 100%)
+                if (!GROUP_COLS.includes(colKey)) {
+                  return baseCell(parseFloat(COLUMN_FLEX[colKey]||1), COLUMN_DISPLAY[colKey]||colKey, { key:colKey, height:"100%" });
+                }
+
+                // Nhóm "Thời gian xử lý ảnh"
+                if (colKey === "kyDauBD") {
+                  return (
+                    <div key="tg" style={{ flex:`${timeFlex} 1 0`, display:"flex", flexDirection:"column", borderRight:border }}>
+                      <div style={{ height:"42px", display:"flex", alignItems:"center", justifyContent:"center",
+                        borderBottom:border, fontSize:fs, fontWeight:"bold", textAlign:"center", padding:"0 0.2rem" }}>
+                        Thời gian xử lý ảnh
+                      </div>
+                      <div style={{ height:"30px", display:"flex" }}>
+                        <div style={{ flex:`${kyDauFlex} 1 0`, display:"flex", alignItems:"center", justifyContent:"center",
+                          borderRight:border, fontSize:fsSmall, fontWeight:"bold", backgroundColor:"rgba(0,0,0,0.18)" }}>
+                          Kỳ đầu
+                        </div>
+                        <div style={{ flex:`${kySauFlex} 1 0`, display:"flex", alignItems:"center", justifyContent:"center",
+                          fontSize:fsSmall, fontWeight:"bold", backgroundColor:"rgba(0,0,0,0.18)" }}>
+                          Kỳ sau
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                // Nhóm "Tọa độ"
+                if (colKey === "X") {
+                  return (
+                    <div key="cg" style={{ flex:`${coordFlex} 1 0`, display:"flex", flexDirection:"column", borderRight:border }}>
+                      <div style={{ height:"42px", display:"flex", alignItems:"center", justifyContent:"center",
+                        borderBottom:border, fontSize:fs, fontWeight:"bold" }}>
+                        Tọa độ
+                      </div>
+                      <div style={{ height:"30px", display:"flex" }}>
+                        <div style={{ flex:`${parseFloat(COLUMN_FLEX["X"]||1)} 1 0`, display:"flex", alignItems:"center",
+                          justifyContent:"center", borderRight:border, fontSize:fsSmall, fontWeight:"bold",
+                          backgroundColor:"rgba(0,0,0,0.12)", textAlign:"center", padding:"0 0.1rem" }}>
+                          Lat (X)
+                        </div>
+                        <div style={{ flex:`${parseFloat(COLUMN_FLEX["Y"]||1)} 1 0`, display:"flex", alignItems:"center",
+                          justifyContent:"center", fontSize:fsSmall, fontWeight:"bold",
+                          backgroundColor:"rgba(0,0,0,0.12)", textAlign:"center", padding:"0 0.1rem" }}>
+                          Lon (Y)
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                // Các cột con trong nhóm (bỏ qua vì đã render trong nhóm)
+                return null;
+              })}
+              {isAdmin() && baseCell(parseFloat(ACTIONS_FLEX), screenWidth<640?"TT":"Thao tác", { key:"act", height:"100%" })}
             </div>
-          ))}
-          {isAdmin() && (
-            <div style={{ flex:`${ACTIONS_FLEX} 1 0`, textAlign:"center",
-              fontSize:screenWidth<640?"0.65rem":"0.7rem" }}>
-              {screenWidth < 640 ? "TT" : "Thao tác"}
-            </div>
-          )}
-        </div>
+          );
+        })()}
 
         {/* Virtualized rows */}
         <List

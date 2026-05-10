@@ -36,6 +36,7 @@ function buildGeoJSON(rows, extraProps = {}) {
       geometry: JSON.parse(row.geometry),
       properties: {
         gid: row.gid,
+        so_lan: row.so_lan ?? null,
         start_sau: row.start_sau,
         area: row.area,
         start_dau: row.start_dau,

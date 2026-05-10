@@ -295,62 +295,21 @@ exports.importShapefile = async (req, res, next) => {
         // ✅ Build insert query với ST_Transform nếu cần chuyển đổi hệ tọa độ
         let insertQuery;
         if (detectedSRID !== 4326) {
-          // Cần transform từ SRID gốc về WGS84 (4326)
           insertQuery = `
             INSERT INTO son_la_mat_rung (
-              geom,
-              area,
-              start_dau,
-              end_sau,
-              mahuyen,
-              detection_status
+              geom, area, start_dau, end_dau, start_sau, end_sau, mahuyen, detection_status
             ) VALUES (
-              ST_Multi(
-                ST_CollectionExtract(
-                  ST_Buffer(
-                    ST_MakeValid(
-                      ST_Transform(
-                        ST_SetSRID(ST_GeomFromGeoJSON($1), ${detectedSRID}),
-                        4326
-                      )
-                    ),
-                    0
-                  ),
-                  3
-                )
-              ),
-              $2,
-              $3,
-              $4,
-              $5,
-              'Chưa xác minh'
+              ST_Multi(ST_CollectionExtract(ST_Buffer(ST_MakeValid(ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON($1), ${detectedSRID}), 4326)), 0), 3)),
+              $2, $3, $4, $5, $6, $7, 'Chưa xác minh'
             )
           `;
         } else {
-          // Dữ liệu đã là WGS84
           insertQuery = `
             INSERT INTO son_la_mat_rung (
-              geom,
-              area,
-              start_dau,
-              end_sau,
-              mahuyen,
-              detection_status
+              geom, area, start_dau, end_dau, start_sau, end_sau, mahuyen, detection_status
             ) VALUES (
-              ST_Multi(
-                ST_CollectionExtract(
-                  ST_Buffer(
-                    ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)),
-                    0
-                  ),
-                  3
-                )
-              ),
-              $2,
-              $3,
-              $4,
-              $5,
-              'Chưa xác minh'
+              ST_Multi(ST_CollectionExtract(ST_Buffer(ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)), 0), 3)),
+              $2, $3, $4, $5, $6, $7, 'Chưa xác minh'
             )
           `;
         }
@@ -359,6 +318,8 @@ exports.importShapefile = async (req, res, next) => {
           JSON.stringify(geometry),
           props.area || 0,
           props.start_dau || new Date().toISOString(),
+          props.end_dau || null,
+          props.start_sau || null,
           props.end_sau || new Date().toISOString(),
           props.mahuyen || '01'
         ]);
@@ -578,60 +539,20 @@ exports.importFromGeeUrl = async (req, res, next) => {
             // Cần transform từ SRID gốc về WGS84 (4326)
             insertQuery = `
               INSERT INTO son_la_mat_rung (
-                geom,
-                area,
-                start_dau,
-                end_sau,
-                mahuyen,
-                detection_status
+                geom, area, start_dau, end_dau, start_sau, end_sau, mahuyen, detection_status
               ) VALUES (
-                ST_Multi(
-                  ST_CollectionExtract(
-                    ST_Buffer(
-                      ST_MakeValid(
-                        ST_Transform(
-                          ST_SetSRID(ST_GeomFromGeoJSON($1), ${detectedSRID}),
-                          4326
-                        )
-                      ),
-                      0
-                    ),
-                    3
-                  )
-                ),
-                $2,
-                $3,
-                $4,
-                $5,
-                'Chưa xác minh'
+                ST_Multi(ST_CollectionExtract(ST_Buffer(ST_MakeValid(ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON($1), ${detectedSRID}), 4326)), 0), 3)),
+                $2, $3, $4, $5, $6, $7, 'Chưa xác minh'
               )
               RETURNING gid
             `;
           } else {
-            // Dữ liệu đã là WGS84
             insertQuery = `
               INSERT INTO son_la_mat_rung (
-                geom,
-                area,
-                start_dau,
-                end_sau,
-                mahuyen,
-                detection_status
+                geom, area, start_dau, end_dau, start_sau, end_sau, mahuyen, detection_status
               ) VALUES (
-                ST_Multi(
-                  ST_CollectionExtract(
-                    ST_Buffer(
-                      ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)),
-                      0
-                    ),
-                    3
-                  )
-                ),
-                $2,
-                $3,
-                $4,
-                $5,
-                'Chưa xác minh'
+                ST_Multi(ST_CollectionExtract(ST_Buffer(ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)), 0), 3)),
+                $2, $3, $4, $5, $6, $7, 'Chưa xác minh'
               )
               RETURNING gid
             `;
@@ -641,6 +562,8 @@ exports.importFromGeeUrl = async (req, res, next) => {
             JSON.stringify(geometry),
             props.area || props.areaHa || 0,
             props.start_dau || props.startDate || new Date().toISOString(),
+            props.end_dau || null,
+            props.start_sau || null,
             props.end_sau || props.endDate || new Date().toISOString(),
             props.mahuyen || props.districtCode || '01'
           ]);
@@ -702,7 +625,7 @@ exports.importFromGeeUrl = async (req, res, next) => {
             clipped_geom = geom,
             clipped_area = ST_Area(ST_MakeValid(geom)::geography)
         WHERE created_at >= NOW() - INTERVAL '2 minutes'
-          AND has_intersection IS NULL
+          AND has_intersection IS NOT TRUE
       `);
       logger.info('Updated has_intersection/clipped_geom for GEE imported records');
     } catch (updateErr) {
@@ -934,7 +857,7 @@ exports.importFromGeeUrl = async (req, res, next) => {
 // Import from GeoJSON URL with spatial intersection validation
 exports.importFromGeoJsonUrl = async (req, res, next) => {
   try {
-    const { jsonUrl } = req.body;
+    const { jsonUrl, startDau, endDau, startSau, endSau } = req.body;
 
     if (!jsonUrl) {
       throw new ValidationError('jsonUrl is required');
@@ -944,7 +867,15 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
     const redis = req.app.locals.redis;
     const adminDb = req.app.locals.adminDb; // Connection to admin_db
 
-    logger.info('Downloading GeoJSON from URL', { url: jsonUrl });
+    // Ngày từ form UI (áp dụng cho tất cả features trong batch này)
+    const batchDates = {
+      start_dau: startDau || null,
+      end_dau: endDau || null,
+      start_sau: startSau || null,
+      end_sau: endSau || null,
+    };
+
+    logger.info('Downloading GeoJSON from URL', { url: jsonUrl, batchDates });
 
     // Download GeoJSON file
     let response;
@@ -1144,27 +1075,10 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
             // Insert into son_la_mat_rung (assuming WGS84 / EPSG:4326)
             const insertQuery = `
               INSERT INTO son_la_mat_rung (
-                geom,
-                area,
-                start_dau,
-                end_sau,
-                mahuyen,
-                detection_status
+                geom, area, start_dau, end_dau, start_sau, end_sau, mahuyen, detection_status
               ) VALUES (
-                ST_Multi(
-                  ST_CollectionExtract(
-                    ST_Buffer(
-                      ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)),
-                      0
-                    ),
-                    3
-                  )
-                ),
-                $2,
-                $3,
-                $4,
-                $5,
-                'Chưa xác minh'
+                ST_Multi(ST_CollectionExtract(ST_Buffer(ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)), 0), 3)),
+                $2, $3, $4, $5, $6, $7, 'Chưa xác minh'
               )
               RETURNING gid
             `;
@@ -1172,8 +1086,10 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
             const result = await db.query(insertQuery, [
               JSON.stringify(geometry),
               props.area || props.areaHa || 0,
-              props.start_dau || props.startDate || new Date().toISOString(),
-              props.end_sau || props.endDate || new Date().toISOString(),
+              batchDates.start_dau || props.start_dau || props.startDate || new Date().toISOString(),
+              batchDates.end_dau || props.end_dau || null,
+              batchDates.start_sau || props.start_sau || null,
+              batchDates.end_sau || props.end_sau || props.endDate || new Date().toISOString(),
               props.mahuyen || props.districtCode || '01'
             ]);
 
@@ -1215,7 +1131,7 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
               clipped_geom = geom,
               clipped_area = ST_Area(ST_MakeValid(geom)::geography)
           WHERE created_at >= NOW() - INTERVAL '2 minutes'
-            AND has_intersection IS NULL
+            AND has_intersection IS NOT TRUE
         `);
         logger.info('Updated has_intersection/clipped_geom for newly imported records');
       } catch (updateErr) {
@@ -1317,11 +1233,12 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
       // ── Ghi nhận bảng kê xử lý ảnh viễn thám ──
       try {
         const firstProps = validFeatures[0]?.properties || {};
+        // Ưu tiên batchDates (từ form UI), fallback về feature props
         const dates = {
-          start_dau: firstProps.start_dau || firstProps.startDate || null,
-          end_dau: firstProps.end_dau || null,
-          start_sau: firstProps.start_sau || null,
-          end_sau: firstProps.end_sau || firstProps.endDate || null
+          start_dau: batchDates.start_dau || firstProps.start_dau || firstProps.startDate || null,
+          end_dau: batchDates.end_dau || firstProps.end_dau || null,
+          start_sau: batchDates.start_sau || firstProps.start_sau || null,
+          end_sau: batchDates.end_sau || firstProps.end_sau || firstProps.endDate || null
         };
         const uniqueXaNames = [...new Set(filteredEnrichedRows.map(r => r.xa).filter(Boolean))];
         if (uniqueXaNames.length > 0) {
@@ -1338,9 +1255,33 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
         logger.warn('Failed to track bang ke xu ly anh (GeoJSON)', { error: tkErr.message });
       }
 
+      // Enrich filteredEnrichedRows với so_lan từ bang_ke để trả về đúng ngay sau import
+      const soLanByXa = {};
+      try {
+        const allXas = [...new Set(filteredEnrichedRows.map(r => r.xa).filter(Boolean))];
+        if (allXas.length > 0) {
+          const bkRows = await db.query(
+            'SELECT ten_xa, so_lan, start_dau, end_dau, start_sau, end_sau FROM bang_ke_xu_ly_anh WHERE ten_xa = ANY($1) ORDER BY so_lan ASC',
+            [allXas]
+          );
+          bkRows.rows.forEach(r => {
+            if (!soLanByXa[r.ten_xa]) soLanByXa[r.ten_xa] = [];
+            soLanByXa[r.ten_xa].push(r);
+          });
+        }
+      } catch (slErr) {
+        logger.warn('Failed to fetch so_lan for import response:', slErr.message);
+      }
+
       const geojsonData = {
         type: 'FeatureCollection',
-        features: filteredEnrichedRows.map(row => ({
+        features: filteredEnrichedRows.map(row => {
+          const bangKeList = soLanByXa[row.xa] || [];
+          const rowStart = new Date(row.start_dau);
+          let bk = bangKeList.find(b => rowStart >= new Date(b.start_dau) && rowStart <= new Date(b.end_sau))
+            || bangKeList[bangKeList.length - 1]
+            || {};
+          return {
           type: 'Feature',
           geometry: row.geometry,
           properties: {
@@ -1348,7 +1289,10 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
             area: row.area,
             dtich: row.dtich,
             dtichXM: row.dtichXM,
+            so_lan: bk.so_lan ?? null,
             start_dau: row.start_dau,
+            end_dau: bk.end_dau || row.end_dau || null,
+            start_sau: bk.start_sau || row.start_sau || null,
             end_sau: row.end_sau,
             mahuyen: row.mahuyen,
             huyen: row.mahuyen,
@@ -1369,7 +1313,8 @@ exports.importFromGeoJsonUrl = async (req, res, next) => {
             verified_by_username: null,
             created_at: row.created_at
           }
-        }))
+          };
+        })
       };
 
       res.json({

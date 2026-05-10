@@ -92,7 +92,7 @@ export const GeoDataProvider = ({ children }) => {
 
           // ✅ SPECIAL: Cho deforestationAlerts, thêm param để chỉ lấy 3 tháng
           if (layer.key === 'deforestationAlerts') {
-            endpoint += '?days=90'; // 3 tháng = 90 ngày
+            endpoint += '?days=365'; // 12 tháng
           }
 
           const response = await api.get(endpoint, {
@@ -134,13 +134,13 @@ export const GeoDataProvider = ({ children }) => {
 
             // ✅ CẬP NHẬT: Nếu là deforestationAlerts, cũng cập nhật vào geoData để hiển thị trong table
             if (layer.key === 'deforestationAlerts') {
-              // ✅ CHỈ SET NẾU CÓ DỮ LIỆU
               if (layerData.features && layerData.features.length > 0) {
                 setGeoData(layerData);
                 deforestationAlertsLoaded = true;
-                // Log đã tắt để tránh spam console
+                return { success: true, layer: layer.key };
               } else {
-                console.warn('⚠️ deforestationAlerts loaded but has no features');
+                // Treat empty features as failure so fallback loadDefaultMatRungData() is triggered
+                return { success: false, layer: layer.key };
               }
             }
 
@@ -262,15 +262,37 @@ export const GeoDataProvider = ({ children }) => {
     }
   };
 
-  // ✅ AUTO LOAD KHI COMPONENT MOUNT
+  // ✅ AUTO LOAD KHI CÓ TOKEN (đăng nhập hoặc reload trang)
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return; // Chưa đăng nhập - không load
 
-    // Delay nhỏ để đảm bảo UI đã render
     const timer = setTimeout(() => {
       loadAllDefaultLayers();
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(timer);
+  }, []); // Chỉ chạy 1 lần khi mount
+
+  // ✅ Reload data sau khi user đăng nhập (token xuất hiện trong localStorage)
+  useEffect(() => {
+    let lastToken = localStorage.getItem('token');
+
+    const checkInterval = setInterval(() => {
+      const currentToken = localStorage.getItem('token');
+      if (currentToken && !lastToken) {
+        // Token vừa xuất hiện - user vừa đăng nhập
+        lastToken = currentToken;
+        loadAllDefaultLayers();
+      } else if (!currentToken && lastToken) {
+        // Token bị xóa - user đăng xuất
+        lastToken = null;
+        setGeoData(null);
+      }
+      lastToken = currentToken;
+    }, 1000);
+
+    return () => clearInterval(checkInterval);
   }, []); // Chỉ chạy 1 lần khi mount
 
   // Enhanced layer data update với viewport metadata
@@ -383,7 +405,7 @@ export const GeoDataProvider = ({ children }) => {
 
         // Special handling cho deforestationAlerts
         if (layerKey === 'deforestationAlerts') {
-          endpoint += '?days=365'; // 1 năm cho load riêng lẻ
+          endpoint += '?days=365';
         }
 
         const response = await api.get(endpoint, {
