@@ -1,0 +1,65 @@
+# Version control
+.git
+.gitignore
+
+# Node modules (rebuilt inside container)
+node_modules
+**/node_modules
+npm-debug.log*
+
+# Logs
+logs
+*.log
+**/logs/*.log
+
+# Build artifacts (frontend built inside Docker)
+client/dist
+
+# Environment files (injected at runtime, not baked into images)
+.env
+.env.local
+.env.docker
+.env.example
+microservices/.env
+microservices/.env.template
+# Client env files — VITE_API_URL set via Docker build ARG instead
+client/.env
+client/.env.local
+client/.env.production
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+
+# Temp files
+tmp
+*.tmp
+*.bak
+
+# MapServer tmp files
+mapserver/tmp/*
+!mapserver/tmp/.gitkeep
+
+# Database dumps (large, mounted as volumes)
+# database/schemas are mounted via volume in docker-compose
+
+# PM2
+ecosystem.config.js
+
+# Deploy scripts (not needed in container)
+prepare-deploy.ps1
+setup-server.ps1
+
+# Docs
+docs
+*.md
+!docker/README.md
+
+# Test files
+**/*.test.js
+**/*.spec.js
+jest.config.js

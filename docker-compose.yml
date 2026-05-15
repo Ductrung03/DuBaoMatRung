@@ -1,0 +1,349 @@
+services:
+  # =========================================================
+  # INFRASTRUCTURE
+  # =========================================================
+
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: dubao_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-DuBaoMatRung2025SecurePass}
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db:/docker-entrypoint-initdb.d:ro
+      - ./database/schemas:/db-schemas:ro
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - dubao_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: dubao_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dubao_net
+
+  mongodb:
+    image: mongo:6-jammy
+    container_name: dubao_mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "${MONGODB_PORT:-27017}:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--quiet"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - dubao_net
+
+  # =========================================================
+  # MICROSERVICES
+  # =========================================================
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.auth-service
+    container_name: dubao_auth
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD:-DuBaoMatRung2025SecurePass}@postgres:5432/auth_db?schema=public
+      JWT_SECRET: ${JWT_SECRET:-dubaomatrung_jwt_secret_production_key_2025_secure_random_string}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-dubaomatrung_refresh_jwt_secret_production_key_2025_secure_random_string}
+      REFRESH_TOKEN_EXPIRES_IN: ${REFRESH_TOKEN_EXPIRES_IN:-30d}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - dubao_net
+
+  user-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.node-service
+      args:
+        SERVICE_NAME: user-service
+        SERVICE_PORT: 3002
+    container_name: dubao_user
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3002
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-DuBaoMatRung2025SecurePass}
+      DB_NAME: auth_db
+      DB_NAME_AUTH: auth_db
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3002/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - dubao_net
+
+  gis-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.gis-service
+    container_name: dubao_gis
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3003
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-DuBaoMatRung2025SecurePass}
+      DB_NAME: gis_db
+      DB_NAME_GIS: gis_db
+      UPLOAD_DIR: /app/uploads
+      MAX_FILE_SIZE: 52428800
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - gis_uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3003/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - dubao_net
+
+  report-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.node-service
+      args:
+        SERVICE_NAME: report-service
+        SERVICE_PORT: 3004
+    container_name: dubao_report
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3004
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-DuBaoMatRung2025SecurePass}
+      DB_NAME: gis_db
+      DB_NAME_GIS: gis_db
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3004/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - dubao_net
+
+  admin-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.node-service
+      args:
+        SERVICE_NAME: admin-service
+        SERVICE_PORT: 3005
+    container_name: dubao_admin
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3005
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-DuBaoMatRung2025SecurePass}
+      DB_NAME: admin_db
+      DB_NAME_ADMIN: admin_db
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3005/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - dubao_net
+
+  search-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.node-service
+      args:
+        SERVICE_NAME: search-service
+        SERVICE_PORT: 3006
+    container_name: dubao_search
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3006
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-DuBaoMatRung2025SecurePass}
+      DB_NAME: gis_db
+      DB_NAME_GIS: gis_db
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3006/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - dubao_net
+
+  mapserver-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mapserver-service
+    container_name: dubao_mapserver
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3008
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DB_HOST: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-DuBaoMatRung2025SecurePass}
+      DB_USER: postgres
+      MAPSERV_BIN: /usr/bin/mapserv
+      MS_CONFIG_FILE: /mapserver/mapserver.conf
+    volumes:
+      - mapserver_tmp:/mapserver/tmp
+      - mapserver_logs:/mapserver/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3008/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - dubao_net
+
+  # =========================================================
+  # API GATEWAY + FRONTEND
+  # =========================================================
+
+  gateway:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.gateway
+    container_name: dubao_gateway
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+      JWT_SECRET: ${JWT_SECRET:-dubaomatrung_jwt_secret_production_key_2025_secure_random_string}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-dubaomatrung_refresh_jwt_secret_production_key_2025_secure_random_string}
+      AUTH_SERVICE_URL: http://auth-service:3001
+      USER_SERVICE_URL: http://user-service:3002
+      GIS_SERVICE_URL: http://gis-service:3003
+      REPORT_SERVICE_URL: http://report-service:3004
+      ADMIN_SERVICE_URL: http://admin-service:3005
+      SEARCH_SERVICE_URL: http://search-service:3006
+      MAPSERVER_SERVICE_URL: http://mapserver-service:3008
+      MONGODB_URI: mongodb://mongodb:27017/gateway_logs
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      gis-service:
+        condition: service_healthy
+      admin-service:
+        condition: service_healthy
+      mapserver-service:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - dubao_net
+
+# =========================================================
+# VOLUMES & NETWORKS
+# =========================================================
+
+volumes:
+  postgres_data:
+  redis_data:
+  mongodb_data:
+  gis_uploads:
+  mapserver_tmp:
+  mapserver_logs:
+
+networks:
+  dubao_net:
+    driver: bridge

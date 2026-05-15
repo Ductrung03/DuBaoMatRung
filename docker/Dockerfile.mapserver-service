@@ -1,0 +1,52 @@
+FROM node:18-bookworm-slim
+
+WORKDIR /app
+
+# Install MapServer binary + envsubst (from gettext-base) + wget
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    gettext-base \
+    mapserver-bin \
+    && rm -rf /var/lib/apt/lists/*
+
+# Verify mapserv is available
+RUN mapserv -v 2>&1 | head -1 || echo "mapserv installed"
+
+# Create mapserver runtime directories
+RUN mkdir -p /mapserver/mapfiles /mapserver/tmp /mapserver/logs
+
+# Copy workspace package.json files for npm workspace dep resolution
+COPY microservices/package.json microservices/package-lock.json* microservices/
+COPY microservices/shared/package.json microservices/shared/
+COPY microservices/gateway/package.json microservices/gateway/
+COPY microservices/services/auth-service/package.json microservices/services/auth-service/
+COPY microservices/services/user-service/package.json microservices/services/user-service/
+COPY microservices/services/gis-service/package.json microservices/services/gis-service/
+COPY microservices/services/report-service/package.json microservices/services/report-service/
+COPY microservices/services/admin-service/package.json microservices/services/admin-service/
+COPY microservices/services/search-service/package.json microservices/services/search-service/
+COPY microservices/services/mapserver-service/package.json microservices/services/mapserver-service/
+
+# Install at workspace level
+RUN cd microservices && npm install --omit=dev --ignore-scripts 2>/dev/null || \
+    cd microservices && npm install --omit=dev
+
+# Copy shared source
+COPY microservices/shared/ microservices/shared/
+
+# Copy mapserver-service source
+COPY microservices/services/mapserver-service/ microservices/services/mapserver-service/
+
+# Copy mapserver config and mapfile template
+COPY docker/mapserver.conf /mapserver/mapserver.conf
+COPY docker/mapfiles/sonla-docker.map.template /mapserver/mapfiles/sonla-docker.map.template
+
+# Copy and enable entrypoint
+COPY docker/mapserver-entrypoint.sh /usr/local/bin/mapserver-entrypoint.sh
+RUN chmod +x /usr/local/bin/mapserver-entrypoint.sh
+
+WORKDIR /app/microservices/services/mapserver-service
+
+EXPOSE 3008
+
+ENTRYPOINT ["/usr/local/bin/mapserver-entrypoint.sh"]

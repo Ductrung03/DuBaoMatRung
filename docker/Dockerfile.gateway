@@ -1,0 +1,58 @@
+# =========================================================
+# Stage 1: Build React frontend
+# =========================================================
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /app/client
+
+COPY client/package.json client/package-lock.json* ./
+RUN npm ci --prefer-offline 2>/dev/null || npm install
+
+COPY client/ ./
+
+# VITE_API_URL="" → config.js uses relative URLs (works on any host/port)
+ENV VITE_API_URL=""
+RUN npm run build
+
+# =========================================================
+# Stage 2: API Gateway (with workspace-level npm install)
+# =========================================================
+FROM node:18-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache wget
+
+# Copy workspace package.json files (needed for npm workspaces to resolve shared deps)
+COPY microservices/package.json microservices/package-lock.json* microservices/
+COPY microservices/shared/package.json microservices/shared/
+COPY microservices/gateway/package.json microservices/gateway/
+COPY microservices/services/auth-service/package.json microservices/services/auth-service/
+COPY microservices/services/user-service/package.json microservices/services/user-service/
+COPY microservices/services/gis-service/package.json microservices/services/gis-service/
+COPY microservices/services/report-service/package.json microservices/services/report-service/
+COPY microservices/services/admin-service/package.json microservices/services/admin-service/
+COPY microservices/services/search-service/package.json microservices/services/search-service/
+COPY microservices/services/mapserver-service/package.json microservices/services/mapserver-service/
+
+# Install at workspace level — hoists all deps to microservices/node_modules/
+# so shared/ source files can resolve pg, winston, ioredis, etc.
+RUN cd microservices && npm install --omit=dev --ignore-scripts 2>/dev/null || \
+    cd microservices && npm install --omit=dev
+
+# Copy shared source
+COPY microservices/shared/ microservices/shared/
+
+# Copy gateway source
+COPY microservices/gateway/ microservices/gateway/
+
+# Copy built frontend:
+# gateway/src/__dirname = /app/microservices/gateway/src
+# frontendDistPath = path.join(__dirname, '../../../client/dist') = /app/client/dist
+COPY --from=frontend-builder /app/client/dist client/dist
+
+WORKDIR /app/microservices/gateway
+
+EXPOSE 3000
+
+CMD ["node", "src/index.js"]

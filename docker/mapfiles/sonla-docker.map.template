@@ -1,0 +1,231 @@
+MAP
+  NAME "SonLa_GIS_Docker"
+  STATUS ON
+  SIZE 800 600
+  EXTENT 103.5 20.5 104.8 22.0
+  UNITS DD
+  SHAPEPATH "/mapserver/tmp"
+  IMAGECOLOR 255 255 255
+
+  CONFIG "CPL_DEBUG" "OFF"
+
+  OUTPUTFORMAT
+    NAME "png"
+    DRIVER AGG/PNG
+    MIMETYPE "image/png"
+    IMAGEMODE RGBA
+    EXTENSION "png"
+    FORMATOPTION "GAMMA=0.75"
+    FORMATOPTION "INTERLACE=OFF"
+    FORMATOPTION "QUANTIZE_FORCE=OFF"
+    FORMATOPTION "QUANTIZE_COLORS=256"
+  END
+
+  WEB
+    METADATA
+      "wms_title"           "Son La GIS Services"
+      "wms_onlineresource"  "http://localhost:3008/wms?"
+      "wms_srs"             "EPSG:4326 EPSG:3857"
+      "wms_enable_request"  "*"
+      "wms_feature_info_mime_type" "text/html"
+      "wms_allow_getmap_without_styles" "true"
+      "wfs_title"           "Son La WFS Service"
+      "wfs_onlineresource"  "http://localhost:3008/wms?"
+      "wfs_srs"             "EPSG:4326 EPSG:3857"
+      "wfs_enable_request"  "*"
+      "ows_enable_request"  "*"
+    END
+    IMAGEPATH "/mapserver/tmp/"
+    IMAGEURL "/tmp/"
+  END
+
+  PROJECTION
+    "init=epsg:4326"
+  END
+
+  #=============================================================================
+  # LAYER: Hiện Trạng Rừng
+  #=============================================================================
+  LAYER
+    NAME "hientrangrung"
+    TYPE POLYGON
+    STATUS ON
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=${DB_HOST} port=5432 dbname=admin_db user=${DB_USER} password=${DB_PASSWORD}"
+
+    DATA "geom FROM (SELECT gid, geom, ldlr_23, xa, tk, khoanh FROM sonla_hientrangrung_new WHERE geom && !BOX!) AS subquery USING UNIQUE gid USING SRID=4326"
+
+    PROCESSING "CLOSE_CONNECTION=DEFER"
+    PROCESSING "LABEL_NO_CLIP=ON"
+    PROCESSING "POLYLINE_NO_CLIP=ON"
+    PROCESSING "SIMPLIFY=5.0"
+    PROCESSING "SIMPLIFY_PRESERVE_TOPOLOGY=TRUE"
+    PROCESSING "DONT_DRAW_EMPTY_LABELS=ON"
+    PROCESSING "RENDERMODE=ALL_MATCHING_CLASSES"
+
+    MAXSCALEDENOM 2000000
+    MINSCALEDENOM 50
+
+    METADATA
+      "wms_title"             "Hiện Trạng Rừng"
+      "wms_srs"               "EPSG:4326 EPSG:3857"
+      "wms_extent"            "103.5 20.5 104.8 22.0"
+      "gml_include_items"     "gid,ldlr_23,xa,tk,khoanh"
+      "gml_featureid"         "gid"
+    END
+
+    PROJECTION
+      "init=epsg:4326"
+    END
+
+    CLASSITEM "ldlr_23"
+
+    CLASS
+      NAME "Rừng giàu (HG1/HG2/HGD/RTG)"
+      EXPRESSION (('[ldlr_23]' = 'HG1') OR ('[ldlr_23]' = 'HG2') OR ('[ldlr_23]' = 'HGD') OR ('[ldlr_23]' = 'RTG'))
+      STYLE
+        COLOR 0 130 0
+        OPACITY 85
+      END
+    END
+
+    CLASS
+      NAME "Rừng nghèo/khác (RTN/RTK)"
+      EXPRESSION (('[ldlr_23]' = 'RTN') OR ('[ldlr_23]' = 'RTK'))
+      STYLE
+        COLOR 120 160 50
+        OPACITY 80
+      END
+    END
+
+    CLASS
+      NAME "Trồng xen (TXG/TXN/TXK)"
+      EXPRESSION (('[ldlr_23]' = 'TXG') OR ('[ldlr_23]' = 'TXN') OR ('[ldlr_23]' = 'TXK'))
+      STYLE
+        COLOR 160 250 160
+        OPACITY 75
+      END
+    END
+
+    CLASS
+      NAME "Lúa khác (LKG/LKN/LKK/LKP)"
+      EXPRESSION (('[ldlr_23]' = 'LKG') OR ('[ldlr_23]' = 'LKN') OR ('[ldlr_23]' = 'LKK') OR ('[ldlr_23]' = 'LKP'))
+      STYLE
+        COLOR 240 200 50
+        OPACITY 70
+      END
+    END
+
+    CLASS
+      NAME "Đất trống (DT1/DT2/DTR)"
+      EXPRESSION (('[ldlr_23]' = 'DT1') OR ('[ldlr_23]' = 'DT1D') OR ('[ldlr_23]' = 'DT2') OR ('[ldlr_23]' = 'DT2D') OR ('[ldlr_23]' = 'DTR') OR ('[ldlr_23]' = 'DTRD'))
+      STYLE
+        COLOR 255 200 150
+        OPACITY 70
+      END
+    END
+
+    CLASS
+      NAME "Đất nông nghiệp (DNN/NND)"
+      EXPRESSION (('[ldlr_23]' = 'DNN') OR ('[ldlr_23]' = 'NND'))
+      STYLE
+        COLOR 255 252 220
+        OPACITY 65
+      END
+    END
+
+    CLASS
+      NAME "Đất khác (DKH)"
+      EXPRESSION ('[ldlr_23]' = 'DKH')
+      STYLE
+        COLOR 240 240 240
+        OPACITY 60
+      END
+    END
+
+    CLASS
+      NAME "Loại khác"
+      STYLE
+        COLOR 220 220 220
+        OPACITY 55
+      END
+    END
+
+    TOLERANCE 5
+    TOLERANCEUNITS pixels
+  END
+
+  #=============================================================================
+  # LAYER: Mất Rừng (Đã Xác Minh)
+  #=============================================================================
+  LAYER
+    NAME "matrung_verified"
+    TYPE POLYGON
+    STATUS ON
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=${DB_HOST} port=5432 dbname=gis_db user=${DB_USER} password=${DB_PASSWORD}"
+
+    DATA "clipped_geom FROM (
+      SELECT
+        gid,
+        clipped_geom,
+        detection_status,
+        clipped_area,
+        created_at,
+        verified_by
+      FROM son_la_mat_rung
+      WHERE clipped_geom IS NOT NULL
+        AND has_intersection = true
+        AND detection_status IN ('Đã xác minh', 'Đã xử lý')
+        AND clipped_geom && !BOX!
+    ) AS subquery USING UNIQUE gid USING SRID=4326"
+
+    PROCESSING "CLOSE_CONNECTION=DEFER"
+    PROCESSING "SIMPLIFY=2.0"
+    PROCESSING "SIMPLIFY_PRESERVE_TOPOLOGY=TRUE"
+
+    MAXSCALEDENOM 500000
+    MINSCALEDENOM 10
+
+    METADATA
+      "wms_title"             "Mất Rừng (Đã Xác Minh)"
+      "wms_srs"               "EPSG:4326 EPSG:3857"
+      "wms_extent"            "103.5 20.5 104.8 22.0"
+      "gml_include_items"     "gid,detection_status,clipped_area,created_at"
+      "gml_featureid"         "gid"
+      "wms_feature_info_mime_type" "text/html"
+    END
+
+    PROJECTION
+      "init=epsg:4326"
+    END
+
+    CLASSITEM "detection_status"
+
+    CLASS
+      NAME "Đã xác minh"
+      EXPRESSION "Đã xác minh"
+      STYLE
+        COLOR 255 140 0
+        OPACITY 85
+        OUTLINECOLOR 200 80 0
+        WIDTH 1.5
+      END
+    END
+
+    CLASS
+      NAME "Đã xử lý"
+      EXPRESSION "Đã xử lý"
+      STYLE
+        COLOR 150 150 150
+        OPACITY 60
+        OUTLINECOLOR 100 100 100
+        WIDTH 1
+      END
+    END
+
+    TOLERANCE 5
+    TOLERANCEUNITS pixels
+  END
+
+END

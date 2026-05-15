@@ -1,12 +1,10 @@
+// Use VITE_API_URL env var if set, otherwise use relative URL (works with Docker + direct deploy)
+const _apiBase = import.meta.env.VITE_API_URL || '';
+
 const config = {
-  // Gateway URL - Always use production server since we're deployed
-  API_URL: "http://103.56.160.66:3000",
-
-  // API Base URL (for axios calls) - All requests go through Gateway
-  API_BASE_URL: "http://103.56.160.66:3000/api",
-
-  // MapServer URL - Direct to MapServer service
-  MAPSERVER_URL: "http://103.56.160.66:3007/wms"
+  API_URL: _apiBase,
+  API_BASE_URL: `${_apiBase}/api`,
+  MAPSERVER_URL: `${_apiBase}/api/mapserver/wms`
 };
 
 // Log để debug

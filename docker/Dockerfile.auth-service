@@ -1,0 +1,38 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# openssl required by Prisma on Alpine
+RUN apk add --no-cache wget openssl openssl-dev
+
+# Copy workspace package.json files for npm workspace dep resolution
+COPY microservices/package.json microservices/package-lock.json* microservices/
+COPY microservices/shared/package.json microservices/shared/
+COPY microservices/gateway/package.json microservices/gateway/
+COPY microservices/services/auth-service/package.json microservices/services/auth-service/
+COPY microservices/services/user-service/package.json microservices/services/user-service/
+COPY microservices/services/gis-service/package.json microservices/services/gis-service/
+COPY microservices/services/report-service/package.json microservices/services/report-service/
+COPY microservices/services/admin-service/package.json microservices/services/admin-service/
+COPY microservices/services/search-service/package.json microservices/services/search-service/
+COPY microservices/services/mapserver-service/package.json microservices/services/mapserver-service/
+
+# Install at workspace level (hoists all deps to microservices/node_modules/)
+RUN cd microservices && npm install --ignore-scripts 2>/dev/null || \
+    cd microservices && npm install
+
+# Copy shared source
+COPY microservices/shared/ microservices/shared/
+
+# Copy auth-service (includes prisma/ directory)
+COPY microservices/services/auth-service/ microservices/services/auth-service/
+
+# Generate Prisma client
+RUN cd microservices/services/auth-service && npx prisma generate
+
+WORKDIR /app/microservices/services/auth-service
+
+EXPOSE 3001
+
+# DATABASE_URL injected at runtime via env
+CMD ["node", "src/index.js"]
