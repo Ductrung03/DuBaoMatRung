@@ -44,8 +44,8 @@ tmp
 mapserver/tmp/*
 !mapserver/tmp/.gitkeep
 
-# Database dumps (large, mounted as volumes)
-# database/schemas are mounted via volume in docker-compose
+# Database dumps — mounted as volume in docker-compose, not baked into images
+database/
 
 # PM2
 ecosystem.config.js

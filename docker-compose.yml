@@ -264,8 +264,9 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       DB_HOST: postgres
-      DB_PASSWORD: ${DB_PASSWORD:-DuBaoMatRung2025SecurePass}
+      DB_PORT: 5432
       DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-DuBaoMatRung2025SecurePass}
       MAPSERV_BIN: /usr/bin/mapserv
       MS_CONFIG_FILE: /mapserver/mapserver.conf
     volumes:

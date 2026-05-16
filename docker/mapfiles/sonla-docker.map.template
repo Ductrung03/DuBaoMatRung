@@ -51,7 +51,7 @@ MAP
     TYPE POLYGON
     STATUS ON
     CONNECTIONTYPE POSTGIS
-    CONNECTION "host=${DB_HOST} port=5432 dbname=admin_db user=${DB_USER} password=${DB_PASSWORD}"
+    CONNECTION "host=${DB_HOST} port=${DB_PORT} dbname=admin_db user=${DB_USER} password=${DB_PASSWORD}"
 
     DATA "geom FROM (SELECT gid, geom, ldlr_23, xa, tk, khoanh FROM sonla_hientrangrung_new WHERE geom && !BOX!) AS subquery USING UNIQUE gid USING SRID=4326"
 
@@ -163,7 +163,7 @@ MAP
     TYPE POLYGON
     STATUS ON
     CONNECTIONTYPE POSTGIS
-    CONNECTION "host=${DB_HOST} port=5432 dbname=gis_db user=${DB_USER} password=${DB_PASSWORD}"
+    CONNECTION "host=${DB_HOST} port=${DB_PORT} dbname=gis_db user=${DB_USER} password=${DB_PASSWORD}"
 
     DATA "clipped_geom FROM (
       SELECT
