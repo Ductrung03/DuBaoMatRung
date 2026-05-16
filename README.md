@@ -4,650 +4,389 @@ Hệ thống giám sát và dự báo mất rừng theo kiến trúc microservic
 
 ---
 
-## Mục Lục
+## Mục lục
 
-1. [Yêu Cầu Hệ Thống](#1-yêu-cầu-hệ-thống)
-2. [Cài Đặt Môi Trường](#2-cài-đặt-môi-trường)
-3. [Cấu Hình Database](#3-cấu-hình-database)
-4. [Cấu Hình MapServer](#4-cấu-hình-mapserver)
-5. [Cấu Hình Biến Môi Trường](#5-cấu-hình-biến-môi-trường)
-6. [Cài Dependencies](#6-cài-dependencies)
-7. [Chạy Ứng Dụng](#7-chạy-ứng-dụng)
-8. [Triển Khai Production (Windows Server)](#8-triển-khai-production-windows-server)
-9. [Import Dữ Liệu GIS](#9-import-dữ-liệu-gis)
-10. [Kiến Trúc Hệ Thống](#10-kiến-trúc-hệ-thống)
-11. [Cấu Trúc Dự Án](#11-cấu-trúc-dự-án)
-12. [Troubleshooting](#12-troubleshooting)
+1. [Chạy bằng Docker (Khuyến nghị)](#1-chạy-bằng-docker-khuyến-nghị)
+2. [Chạy thủ công (Development)](#2-chạy-thủ-công-development)
+3. [Cấu hình môi trường](#3-cấu-hình-môi-trường)
+4. [Kiến trúc hệ thống](#4-kiến-trúc-hệ-thống)
+5. [Quản lý Docker](#5-quản-lý-docker)
+6. [Database](#6-database)
+7. [Test & kiểm tra](#7-test--kiểm-tra)
+8. [Troubleshooting](#8-troubleshooting)
+9. [Deploy lên server mới](#9-deploy-lên-server-mới)
 
 ---
 
-## 1. Yêu Cầu Hệ Thống
+## 1. Chạy bằng Docker (Khuyến nghị)
 
-| Phần mềm | Phiên bản tối thiểu | Ghi chú |
-|---|---|---|
-| Node.js | 18.x trở lên | [nodejs.org](https://nodejs.org/) |
-| PostgreSQL | 15.x trở lên + PostGIS | [postgresql.org](https://www.postgresql.org/) |
-| Redis | 6.x trở lên | [redis.io](https://redis.io/) |
-| MS4W (MapServer for Windows) | 4.x trở lên | [ms4w.com](https://ms4w.com/) — cần cho hiển thị WMS tile |
-| PM2 | latest | `npm install -g pm2` (production) |
-| Git | latest | |
+### Yêu cầu
 
-> **Lưu ý:** MapServer (MS4W) là **bắt buộc** để hiển thị các lớp bản đồ (ranh giới xã, tiểu khu khoảnh, hiện trạng rừng). Nếu không cài, mapserver-service sẽ báo lỗi khi gọi WMS.
+| Phần mềm | Phiên bản tối thiểu | Kiểm tra |
+|----------|---------------------|----------|
+| Docker | 24.0+ | `docker --version` |
+| Docker Compose | v2.20+ | `docker compose version` |
+| RAM | 4 GB (khuyến nghị 8 GB) | |
+| Disk trống | 10 GB | |
 
----
+> **Windows**: Dùng Docker Desktop hoặc WSL2 + Docker Engine.
 
-## 2. Cài Đặt Môi Trường
-
-### 2.1 Node.js
+### Bước 1: Chuẩn bị cấu hình
 
 ```bash
-# Kiểm tra phiên bản
-node --version   # phải >= 18.x
-npm --version
+cp .env.docker .env
 ```
 
-### 2.2 PostgreSQL + PostGIS
+Mở `.env` và kiểm tra — **các giá trị mặc định chạy được ngay** cho môi trường dev/test. Production thì đổi `DB_PASSWORD`, `JWT_SECRET`, `REFRESH_TOKEN_SECRET` (xem [mục 3](#3-cấu-hình-môi-trường)).
 
-**Windows (khuyến nghị):**
-1. Tải PostgreSQL từ [postgresql.org/download/windows](https://www.postgresql.org/download/windows/)
-2. Trong quá trình cài, chọn **Stack Builder** → cài **PostGIS**
-3. Hoặc sau khi cài: mở Stack Builder → chọn server → Spatial Extensions → PostGIS
-
-**Linux (Ubuntu/Debian):**
-```bash
-sudo apt install postgresql-15 postgresql-15-postgis-3
-```
-
-### 2.3 Redis
-
-**Windows:**
-```powershell
-# Cách 1: Dùng Memurai (Redis-compatible for Windows)
-# Tải từ: https://www.memurai.com/
-
-# Cách 2: Redis port cho Windows
-# https://github.com/tporadowski/redis/releases
-```
-
-**Linux:**
-```bash
-sudo apt install redis-server
-sudo systemctl enable redis-server
-sudo systemctl start redis-server
-```
-
-### 2.4 MS4W — MapServer for Windows
-
-MS4W là gói cài đặt all-in-one cho MapServer trên Windows (bao gồm MapServer, GDAL, PROJ).
-
-1. Tải MS4W từ: **https://ms4w.com/download.html** → chọn bản mới nhất (`ms4w-*.zip`)
-2. Giải nén vào thư mục **`C:\ms4w\`** (bắt buộc dùng đúng đường dẫn này)
-3. Kiểm tra:
-   ```powershell
-   C:\ms4w\Apache\cgi-bin\mapserv.exe -v
-   # Phải in ra: MapServer version X.X.X ...
-   ```
-
-> **Quan trọng:** Đường dẫn `C:\ms4w\` là mặc định được dùng trong toàn bộ config. Nếu cài ở chỗ khác, phải cập nhật biến môi trường `MAPSERV_BIN`, `PROJ_LIB`, `GDAL_DATA` trong file `.env`.
-
-**Linux (Ubuntu):**
-```bash
-sudo apt install mapserver-bin libmapserver-dev
-which mapserv   # thường là /usr/bin/mapserv
-```
-
-### 2.5 PM2 (chỉ cần cho production)
+### Bước 2: Build và khởi động
 
 ```bash
-npm install -g pm2
+docker compose up -d --build
 ```
 
----
+Lần đầu build mất **5–15 phút** (tải Node.js, cài npm, build React frontend, tải MapServer binary).
 
-## 3. Cấu Hình Database
-
-### 3.1 Tạo databases
-
-Mở psql hoặc pgAdmin, chạy:
-
-```sql
--- Tạo 3 databases
-CREATE DATABASE auth_db;
-CREATE DATABASE gis_db;
-CREATE DATABASE admin_db;
-```
-
-### 3.2 Bật PostGIS extension
-
-```sql
--- Kết nối vào từng database và bật PostGIS
-\c gis_db
-CREATE EXTENSION IF NOT EXISTS postgis;
-CREATE EXTENSION IF NOT EXISTS postgis_topology;
-
-\c admin_db
-CREATE EXTENSION IF NOT EXISTS postgis;
-CREATE EXTENSION IF NOT EXISTS postgis_topology;
-
--- auth_db không cần PostGIS (dùng Prisma ORM)
-```
-
-### 3.3 Restore cấu trúc bảng từ schema
+Theo dõi tiến trình:
 
 ```bash
-# Windows (chạy trong PowerShell hoặc cmd, thêm password vào biến môi trường)
-set PGPASSWORD=your_password
-
-psql -U postgres -d auth_db  -f database/schemas/auth_db.sql
-psql -U postgres -d admin_db -f database/schemas/admin_db.sql
-psql -U postgres -d gis_db   -f database/schemas/gis_db.sql
+docker compose logs -f
 ```
 
-> **Lưu ý:** Các file schema trong `database/schemas/` chứa cấu trúc bảng, indexes, functions, triggers — **không có dữ liệu thực**. Dữ liệu không gian (lớp rừng, tiểu khu) cần import riêng từ shapefile (xem [mục 9](#9-import-dữ-liệu-gis)).
-
-### 3.4 Migrate Prisma (auth_db)
+### Bước 3: Kiểm tra sẵn sàng
 
 ```bash
-cd microservices/services/auth-service
-
-# Generate Prisma client
-npm run prisma:generate
-
-# Chạy migrations (tạo bảng)
-npm run prisma:migrate
-
-# Seed dữ liệu mặc định (roles, permissions, admin user)
-npm run prisma:seed
+docker compose ps
 ```
 
-Tài khoản admin mặc định sau khi seed:
-- **Username:** `admin`
-- **Password:** `Admin@123456`
-
-> Đổi mật khẩu sau khi đăng nhập lần đầu!
-
----
-
-## 4. Cấu Hình MapServer
-
-MapServer được dùng để render các lớp bản đồ GIS dưới dạng WMS tile (ranh giới xã, tiểu khu khoảnh, hiện trạng rừng).
-
-### 4.1 Cập nhật mapserver-windows.conf
-
-File `mapserver/mapserver-windows.conf` đã có sẵn trong repo. Kiểm tra đường dẫn đúng với máy chủ của bạn:
-
-```conf
-CONFIG
-  ENV
-    MS_MAP_PATTERN ".*"
-    PROJ_DATA "C:/ms4w/share/proj"
-    PROJ_LIB "C:/ms4w/share/proj"
-    CURL_CA_BUNDLE "C:/ms4w/Apache/conf/ca-bundle/cacert.pem"
-    MS_TEMPPATH "C:/DuBaoMatRung/mapserver/tmp/"
-    MS_ERRORFILE "stderr"
-    MS_DEBUGLEVEL "0"
-  END
-
-  MAPS
-    sonla "C:/DuBaoMatRung/mapserver/mapfiles/sonla-windows-optimized.map"
-    sonla_opt "C:/DuBaoMatRung/mapserver/mapfiles/sonla-windows-optimized.map"
-  END
-END
-```
-
-> Nếu project được đặt ở đường dẫn khác (không phải `C:/DuBaoMatRung/`), cập nhật tất cả các path trong file này.
-
-### 4.2 Cập nhật mật khẩu database trong mapfile
-
-Mapfile kết nối trực tiếp tới PostgreSQL. Mở file `mapserver/mapfiles/sonla-windows-optimized.map` và cập nhật **tất cả** dòng `CONNECTION`:
-
-```
-# Tìm tất cả dòng có dạng:
-CONNECTION "host=localhost port=5432 dbname=admin_db user=postgres password=4"
-
-# Đổi password=4 thành password thực của postgres:
-CONNECTION "host=localhost port=5432 dbname=admin_db user=postgres password=YOUR_POSTGRES_PASSWORD"
-```
-
-Có thể dùng PowerShell để thay toàn bộ:
-```powershell
-(Get-Content "mapserver\mapfiles\sonla-windows-optimized.map") `
-  -replace 'password=4', 'password=YOUR_POSTGRES_PASSWORD' |
-  Set-Content "mapserver\mapfiles\sonla-windows-optimized.map"
-```
-
-### 4.3 Tạo thư mục tmp
-
-```powershell
-New-Item -ItemType Directory -Force -Path "C:\DuBaoMatRung\mapserver\tmp"
-New-Item -ItemType Directory -Force -Path "C:\DuBaoMatRung\mapserver\logs"
-```
-
-### 4.4 Kiểm tra MapServer hoạt động
-
-```powershell
-# Test mapserv binary
-C:\ms4w\Apache\cgi-bin\mapserv.exe -v
-
-# Test với mapfile (phải in ra XML GetCapabilities nếu đúng)
-$env:QUERY_STRING = "SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0"
-$env:MS_MAPFILE = "C:\DuBaoMatRung\mapserver\mapfiles\sonla-windows-optimized.map"
-$env:MAPSERVER_CONFIG_FILE = "C:\DuBaoMatRung\mapserver\mapserver-windows.conf"
-& "C:\ms4w\Apache\cgi-bin\mapserv.exe"
-```
-
----
-
-## 5. Cấu Hình Biến Môi Trường
-
-### 5.1 Tạo file .env
-
-```bash
-cp microservices/.env.example microservices/.env
-```
-
-> Nếu không có file `.env.example`, tạo file `microservices/.env` với nội dung sau:
-
-### 5.2 Nội dung file `microservices/.env`
-
-```env
-NODE_ENV=production
-
-# Database
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=your_postgres_password
-
-DB_NAME=admin_db
-DB_NAME_AUTH=auth_db
-DB_NAME_GIS=gis_db
-DB_NAME_ADMIN=admin_db
-
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=
-
-# JWT
-JWT_SECRET=your_very_long_random_secret_key_here_min_32_chars
-JWT_EXPIRES_IN=7d
-REFRESH_TOKEN_SECRET=another_very_long_random_secret_here_min_32_chars
-
-# Services (localhost cho server deployment)
-AUTH_SERVICE_URL=http://localhost:3001
-USER_SERVICE_URL=http://localhost:3002
-GIS_SERVICE_URL=http://localhost:3003
-REPORT_SERVICE_URL=http://localhost:3004
-ADMIN_SERVICE_URL=http://localhost:3005
-SEARCH_SERVICE_URL=http://localhost:3006
-MAPSERVER_SERVICE_URL=http://localhost:3007
-
-# Ports
-GATEWAY_PORT=3000
-AUTH_SERVICE_PORT=3001
-USER_SERVICE_PORT=3002
-GIS_SERVICE_PORT=3003
-REPORT_SERVICE_PORT=3004
-ADMIN_SERVICE_PORT=3005
-SEARCH_SERVICE_PORT=3006
-MAPSERVER_SERVICE_PORT=3007
-
-# MapServer (bắt buộc nếu dùng GIS layer)
-MAPSERV_BIN=C:\ms4w\Apache\cgi-bin\mapserv.exe
-MAPFILE_PATH=C:\DuBaoMatRung\mapserver\mapfiles\sonla-windows-optimized.map
-MS_CONFIG_FILE=C:\DuBaoMatRung\mapserver\mapserver-windows.conf
-
-# PROJ / GDAL (đi kèm MS4W, chỉnh nếu cài ở chỗ khác)
-PROJ_LIB=C:\ms4w\share\proj
-GDAL_DATA=C:\ms4w\gdaldata
-```
-
-> **Bảo mật:** Thay đổi `JWT_SECRET` và `REFRESH_TOKEN_SECRET` thành chuỗi ngẫu nhiên dài (>= 32 ký tự) trước khi chạy production.
-
-### 5.3 Cấu hình Prisma (auth-service)
-
-File `microservices/services/auth-service/.env`:
-```env
-DATABASE_URL="postgresql://postgres:your_postgres_password@localhost:5432/auth_db?schema=public"
-```
-
----
-
-## 6. Cài Dependencies
-
-```bash
-# Từ thư mục gốc dự án
-cd microservices
-npm run install:all
-
-# Cài frontend
-cd ../client && npm install
-```
-
----
-
-## 7. Chạy Ứng Dụng
-
-### 7.1 Development
-
-```bash
-# Từ thư mục gốc — chạy tất cả
-npm run dev
-
-# Hoặc chạy riêng
-npm run dev:backend   # Tất cả microservices
-npm run dev:frontend  # React + Vite (port 5173)
-```
-
-### 7.2 Truy cập
-
-| URL | Mô tả |
-|---|---|
-| `http://localhost:5173` | Frontend (development) |
-| `http://localhost:3000` | API Gateway |
-| `http://localhost:3000/api-docs` | Swagger UI |
-| `http://localhost:3007/wms?SERVICE=WMS&REQUEST=GetCapabilities` | MapServer WMS |
-
-### 7.3 Kiểm tra services đang chạy
+Tất cả containers phải ở trạng thái **healthy** (mất khoảng 1–3 phút sau khi `up`).
 
 ```bash
 curl http://localhost:3000/health
-curl http://localhost:3003/health  # GIS Service
-curl http://localhost:3007/health  # MapServer Service
-curl http://localhost:3001/health  # Auth Service
+# Kết quả: {"status":"ok",...}
 ```
+
+### Bước 4: Truy cập
+
+| URL | Mô tả |
+|-----|-------|
+| `http://localhost:3000` | Web Application |
+| `http://localhost:3000/api-docs` | Swagger API Docs |
+| `http://localhost:3000/health` | Health check |
 
 ---
 
-## 8. Triển Khai Production (Windows Server)
+## 2. Chạy thủ công (Development)
 
-### 8.1 Build frontend
+Dùng khi cần debug code, hot-reload.
 
-```bash
-cd client
-npm run build
-# Output: client/dist/
-```
+### Yêu cầu
 
-### 8.2 Khởi động với PM2
+- Node.js 18+, npm 9+
+- PostgreSQL 15+ với PostGIS
+- Redis 7+
+- MapServer (MS4W trên Windows)
 
-```bash
-cd microservices
-pm2 start ecosystem.config.js
-
-# Lưu config để tự khởi động khi reboot
-pm2 save
-pm2 startup
-```
-
-### 8.3 Quản lý PM2
-
-```powershell
-# Xem status tất cả services
-pm2 status
-
-# Xem logs
-pm2 logs
-pm2 logs gis-service --lines 50
-pm2 logs mapserver-service --lines 50
-
-# Restart
-pm2 restart all
-pm2 restart gis-service
-
-# Stop
-pm2 stop all
-```
-
-### 8.4 Nginx (tuỳ chọn — serve frontend + proxy API)
-
-Cài Nginx: [nginx.org/en/download.html](https://nginx.org/en/download.html)
-
-Cấu hình `C:\nginx\conf\nginx.conf`:
-```nginx
-http {
-    upstream api {
-        server localhost:3000;
-    }
-
-    server {
-        listen 80;
-        server_name your-domain.com;
-
-        # Frontend (built React app)
-        location / {
-            root C:/DuBaoMatRung/client/dist;
-            try_files $uri $uri/ /index.html;
-        }
-
-        # API Proxy
-        location /api/ {
-            proxy_pass http://api/api/;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_read_timeout 300s;
-        }
-    }
-}
-```
-
-### 8.5 Flush Redis cache (khi cần)
-
-```bash
-redis-cli FLUSHDB
-
-# Hoặc chỉ xóa cache của ứng dụng
-redis-cli KEYS "layer:*" | xargs redis-cli DEL
-redis-cli KEYS "matrung:*" | xargs redis-cli DEL
-```
-
----
-
-## 9. Import Dữ Liệu GIS
-
-Dữ liệu không gian (lớp rừng, ranh giới xã, tiểu khu khoảnh) cần được import vào `admin_db`. Hệ thống hỗ trợ 3 cách:
-
-### Cách 1: Qua UI (khuyến nghị)
-
-1. Đăng nhập với tài khoản **Admin** hoặc **Công ty Fis**
-2. Vào **Quản lý dữ liệu** → **Tải lên shapefile**
-3. Upload file `.zip` chứa shapefile (`.shp`, `.dbf`, `.shx`, `.prj`)
-4. Chọn bảng đích và tiến hành import
-
-### Cách 2: Qua API
-
-```bash
-# Import từ shapefile ZIP
-POST /api/gis/shapefile/import
-Content-Type: multipart/form-data
-# Body: file=<shapefile.zip>, tableName=<tên bảng>
-
-# Import từ GeoJSON URL
-POST /api/gis/shapefile/import-geojson-url
-Content-Type: application/json
-# Body: { "url": "...", "tableName": "..." }
-```
-
-### Cách 3: Dùng ogr2ogr (command line)
-
-```bash
-# ogr2ogr đi kèm MS4W tại C:\ms4w\tools\ogr2ogr.exe
-C:\ms4w\tools\ogr2ogr.exe -f PostgreSQL ^
-  PG:"host=localhost port=5432 dbname=admin_db user=postgres password=YOUR_PASSWORD" ^
-  your_shapefile.shp ^
-  -nln sonla_rgx -overwrite -lco GEOMETRY_NAME=geom -lco FID=gid
-```
-
-### Các bảng cần có trong `admin_db`
-
-| Bảng | Mô tả | Dùng cho |
-|---|---|---|
-| `sonla_hientrangrung_new` | Hiện trạng rừng Sơn La | Layer hiển thị rừng |
-| `sonla_tkkl` | Tiểu khu, khoảnh, lô | Lọc và phân tích theo tiểu khu |
-| `sonla_rgx` | Ranh giới xã | Lọc theo đơn vị hành chính |
-
-### Dữ liệu mất rừng (`gis_db`)
-
-Bảng `son_la_mat_rung` trong `gis_db` chứa kết quả phân tích ảnh viễn thám. Import từ kết quả xử lý ảnh hoặc từ file Excel/shapefile:
-
-```bash
-# Cột quan trọng:
-# - geom: geometry polygon (SRID 4326)
-# - end_sau: ngày phát hiện mất rừng
-# - dien_tich_ha: diện tích (hectare)
-# - has_intersection: boolean, có giao với ranh giới xã/tiểu khu không
-# - tinh, huyen, xa: tên địa danh hành chính
-```
-
----
-
-## 10. Kiến Trúc Hệ Thống
-
-```
-┌──────────────────────────────────┐
-│   Browser / Client               │
-│   React 19 + Vite (port 5173)    │
-│   Leaflet Map + TailwindCSS      │
-└─────────────┬────────────────────┘
-              │ HTTP/REST
-┌─────────────▼────────────────────────────────────┐
-│            API Gateway (port 3000)               │
-│  - JWT Authentication & validation               │
-│  - User context injection (x-user-* headers)     │
-│  - Rate limiting + CORS                          │
-│  - Request proxy đến các microservices           │
-└──────┬───────────────────────────────────────────┘
-       │
-       ├─► Auth Service      (3001)  Prisma ORM   ──► auth_db
-       ├─► User Service      (3002)  Kysely       ──► auth_db
-       ├─► GIS Service       (3003)  Kysely/pg    ──► gis_db + admin_db
-       ├─► Report Service    (3004)  Kysely       ──► gis_db
-       ├─► Admin Service     (3005)  Kysely       ──► admin_db
-       ├─► Search Service    (3006)  Kysely       ──► gis_db + admin_db
-       └─► MapServer Service (3007)  WMS proxy    ──► mapserv.exe → admin_db
-                                                      (via PostGIS connection
-                                                       trong mapfile)
-```
-
-### MapServer Flow
-
-```
-Frontend (Leaflet WMS layer)
-  → GET /api/mapserver/wms?SERVICE=WMS&...
-  → Gateway proxy → mapserver-service (3007)
-  → mapserver-service spawn mapserv.exe
-  → mapserv.exe đọc mapfile → query admin_db qua PostGIS
-  → trả về PNG tile
-```
-
-### RBAC (Phân Quyền)
-
-Format permission: `{module}.{resource}.{action}`
-
-| Role | Mô tả | Phạm vi dữ liệu |
-|---|---|---|
-| Admin | Quản trị toàn hệ thống | Toàn quốc |
-| Công ty Fis | Quản lý dữ liệu | Toàn tỉnh |
-| Chi cục kiểm lâm | Xem và xác minh | Toàn tỉnh |
-| LanhDao | Xem báo cáo | Toàn tỉnh |
-| Kiểm lâm địa bàn | Xác minh thực địa | Theo xã/tiểu khu |
-
----
-
-## 11. Cấu Trúc Dự Án
-
-```
-DuBaoMatRung/
-├── client/                         # Frontend React 19 + Vite
-│   ├── src/
-│   │   ├── dashboard/
-│   │   │   ├── contexts/           # GeoDataContext, AuthContext, ...
-│   │   │   ├── pages/              # QuanLyDuLieu, Map, DuBaoMatRung, ...
-│   │   │   └── components/         # Shared UI components
-│   │   ├── services/               # API clients (axios)
-│   │   └── config.js               # API endpoints
-│   ├── public/
-│   └── vite.config.js
-│
-├── microservices/
-│   ├── gateway/                    # API Gateway (Express)
-│   ├── services/
-│   │   ├── auth-service/           # Authentication + RBAC (Prisma)
-│   │   │   └── prisma/
-│   │   │       ├── schema.prisma   # Data model
-│   │   │       └── seed.js         # Initial data seeder
-│   │   ├── gis-service/            # GIS data, shapefile, mất rừng
-│   │   ├── user-service/           # User management
-│   │   ├── report-service/         # Báo cáo thống kê
-│   │   ├── admin-service/          # Admin functions
-│   │   ├── search-service/         # Tìm kiếm
-│   │   └── mapserver-service/      # WMS proxy → gọi mapserv.exe
-│   ├── shared/                     # Thư viện dùng chung
-│   │   ├── database/               # PostgreSQL connection pool
-│   │   ├── redis/                  # Redis client
-│   │   ├── logger/                 # Winston logger
-│   │   ├── errors/                 # Custom error classes
-│   │   ├── middleware/             # Auth, validation, error handler
-│   │   └── utils/                  # Helpers, font converter, ...
-│   └── .env                        # Biến môi trường (KHÔNG commit)
-│
-├── mapserver/                      # MapServer configuration
-│   ├── mapfiles/                   # Map definition files
-│   │   ├── sonla-windows-optimized.map   # Mapfile chính (Windows)
-│   │   └── sonla.map                     # Mapfile Linux
-│   ├── mapserver-windows.conf      # Config cho Windows (MS4W)
-│   ├── mapserver.conf              # Config cho Linux
-│   ├── tmp/                        # MapServer temp files (tự tạo)
-│   └── logs/                       # MapServer logs (tự tạo)
-│
-├── database/
-│   └── schemas/                    # Schema-only SQL dumps
-│       ├── auth_db.sql             # Users, roles, permissions
-│       ├── gis_db.sql              # Mất rừng, bang_ke_xu_ly_anh
-│       └── admin_db.sql            # Lớp GIS (sonla_tkkl, sonla_rgx, ...)
-│
-├── docs/
-│   ├── QUICKSTART.md
-│   ├── DEPLOY_WINDOWS_SERVER.md
-│   └── QUICK_START_DEPLOY.md
-│
-├── ecosystem.config.js             # PM2 config (tất cả services)
-├── CLAUDE.md                       # Coding conventions, architecture
-└── README.md                       # File này
-```
-
----
-
-## 12. Troubleshooting
-
-### Lỗi kết nối database
-
-```powershell
-# Kiểm tra PostgreSQL đang chạy (Windows)
-Get-Service postgresql*
-Start-Service postgresql-x64-17
-
-# Test kết nối
-psql -U postgres -h localhost -c "SELECT version();"
-```
-
-### Lỗi PostGIS extension
+### Bước 1: Tạo databases và import dữ liệu
 
 ```sql
--- Phải chạy trong database cần dùng
-CREATE EXTENSION IF NOT EXISTS postgis;
--- Kiểm tra
-SELECT PostGIS_version();
+-- Chạy trong psql
+CREATE DATABASE auth_db;
+CREATE DATABASE gis_db;
+CREATE DATABASE admin_db;
+
+\c gis_db
+CREATE EXTENSION postgis;
+CREATE EXTENSION postgis_topology;
+
+\c admin_db
+CREATE EXTENSION postgis;
+CREATE EXTENSION postgres_fdw;
 ```
 
-### Lỗi Prisma
+```bash
+psql -U postgres -d auth_db  < database/schemas/auth_db.sql
+psql -U postgres -d gis_db   < database/schemas/gis_db.sql
+psql -U postgres -d admin_db < database/schemas/admin_db.sql
+```
+
+### Bước 2: Cấu hình môi trường
+
+```bash
+cp microservices/.env.template microservices/.env
+```
+
+Chỉnh `microservices/.env` với thông tin PostgreSQL local, Redis local.
+
+### Bước 3: Generate Prisma client
 
 ```bash
 cd microservices/services/auth-service
-npx prisma generate       # Regenerate client
-npx prisma migrate deploy  # Apply pending migrations
+npm install
+npx prisma generate
+cd ../../..
+```
+
+### Bước 4: Cài dependencies và chạy
+
+```bash
+cd microservices && npm install && cd ..
+cd client && npm install && cd ..
+
+# Chạy backend + frontend cùng lúc
+npm run dev
+```
+
+Frontend dev: `http://localhost:5173`  
+Backend: `http://localhost:3000`
+
+---
+
+## 3. Cấu hình môi trường
+
+### File `.env` dùng với Docker
+
+```env
+# Môi trường
+NODE_ENV=production
+LOG_LEVEL=info
+APP_PORT=3000
+
+# URL frontend (thay IP thực tế khi deploy server xa)
+FRONTEND_URL=http://localhost:3000
+
+# Database — ĐỔI TRONG PRODUCTION
+DB_PASSWORD=DuBaoMatRung2025SecurePass
+
+# JWT Secrets — ĐỔI THÀNH CHUỖI NGẪU NHIÊN TRONG PRODUCTION
+JWT_SECRET=dubaomatrung_jwt_secret_production_key_2025_secure_random_string
+JWT_EXPIRES_IN=7d
+REFRESH_TOKEN_SECRET=dubaomatrung_refresh_jwt_secret_production_key_2025_secure_random_string
+REFRESH_TOKEN_EXPIRES_IN=30d
+
+# Ports expose ra host (thay nếu bị conflict)
+POSTGRES_PORT=5432
+REDIS_PORT=6379
+MONGODB_PORT=27017
+```
+
+### Tạo JWT Secret mạnh cho production
+
+```bash
+# Linux/macOS/WSL
+openssl rand -base64 64
+
+# Node.js (chạy ở bất kỳ đâu)
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+
+---
+
+## 4. Kiến trúc hệ thống
+
+```
+┌────────────────────────────────────────────────────────┐
+│                    Docker Network                      │
+│                                                        │
+│  ┌─────────────────────────────────────────────────┐  │
+│  │          gateway:3000                           │◄─┼── Port 3000 (public)
+│  │  - Serve React frontend (SPA)                   │  │
+│  │  - Proxy API → microservices                    │  │
+│  │  - JWT auth, rate limit, CORS, Swagger          │  │
+│  └──────────────────────┬──────────────────────────┘  │
+│                         │ HTTP proxy                   │
+│  ┌──────────────────────▼──────────────────────────┐  │
+│  │               Microservices                     │  │
+│  │  auth:3001       user:3002    gis:3003           │  │
+│  │  report:3004     admin:3005   search:3006        │  │
+│  │  mapserver:3008                                 │  │
+│  └──────────────────────┬──────────────────────────┘  │
+│                         │                             │
+│  ┌──────────────────────▼──────────────────────────┐  │
+│  │  postgres:5432   redis:6379   mongodb:27017      │  │
+│  └─────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────┘
+```
+
+### Services và Databases
+
+| Service | Port | Database | Mô tả |
+|---------|------|----------|-------|
+| gateway | 3000 | — | API Gateway + Frontend React |
+| auth-service | 3001 | auth_db | Đăng nhập, JWT, RBAC |
+| user-service | 3002 | auth_db | Quản lý tài khoản |
+| gis-service | 3003 | gis_db | Dữ liệu GIS, shapefile, PostGIS |
+| report-service | 3004 | gis_db | Xuất báo cáo DOCX/PDF |
+| admin-service | 3005 | admin_db | Danh mục hành chính, dropdown |
+| search-service | 3006 | gis_db | Tìm kiếm, lọc mất rừng |
+| mapserver-service | 3008 | admin_db + gis_db | WMS/WFS qua MapServer |
+| postgres | 5432 | — | PostgreSQL 15 + PostGIS 3.4 |
+| redis | 6379 | — | Cache tile WMS |
+| mongodb | 27017 | — | Log gateway (không bắt buộc) |
+
+---
+
+## 5. Quản lý Docker
+
+### Lệnh thường dùng
+
+```bash
+# Trạng thái containers
+docker compose ps
+
+# Logs realtime
+docker compose logs -f                 # tất cả
+docker compose logs -f gateway         # chỉ gateway
+docker compose logs --tail=100 gis-service
+
+# Restart một service
+docker compose restart gateway
+
+# Vào shell trong container
+docker compose exec gateway sh
+docker compose exec postgres psql -U postgres
+
+# Dừng (giữ data)
+docker compose down
+
+# Dừng và XÓA TOÀN BỘ DATA
+docker compose down -v
+```
+
+### Rebuild sau khi thay đổi code
+
+```bash
+# Rebuild service cụ thể (nhanh)
+docker compose build gateway && docker compose up -d gateway
+
+# Rebuild tất cả từ đầu
+docker compose build --no-cache && docker compose up -d
+```
+
+---
+
+## 6. Database
+
+### Backup
+
+```bash
+# Backup từng database
+docker compose exec postgres pg_dump -U postgres auth_db  > backup/auth_db_$(date +%Y%m%d).sql
+docker compose exec postgres pg_dump -U postgres gis_db   > backup/gis_db_$(date +%Y%m%d).sql
+docker compose exec postgres pg_dump -U postgres admin_db > backup/admin_db_$(date +%Y%m%d).sql
+```
+
+### Restore
+
+```bash
+cat backup/auth_db_20260516.sql | docker compose exec -T postgres psql -U postgres -d auth_db
+cat backup/gis_db_20260516.sql  | docker compose exec -T postgres psql -U postgres -d gis_db
+```
+
+### Kết nối trực tiếp
+
+```bash
+# Vào psql trong container
+docker compose exec postgres psql -U postgres -d gis_db
+
+# Từ host (nếu port 5432 được expose)
+psql -h localhost -U postgres -d auth_db
+```
+
+### Reset database
+
+```bash
+docker compose down
+docker volume rm dubaomatrung_postgres_data
+docker compose up -d
+```
+
+---
+
+## 7. Test & kiểm tra
+
+### Test tự động
+
+```bash
+bash docker-test.sh
+# Hoặc server khác:
+bash docker-test.sh http://192.168.1.100:3000
+```
+
+Kiểm tra: gateway health, frontend, auth login/JWT, GIS, admin, search, MapServer WMS, báo cáo, container health.
+
+### Test thủ công
+
+```bash
+# Health check
+curl http://localhost:3000/health
+
+# Đăng nhập lấy token
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"Admin@123456"}'
+
+# Dữ liệu mất rừng (public)
+curl http://localhost:3000/api/mat-rung
+
+# WMS GetCapabilities
+curl "http://localhost:3000/api/mapserver/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0"
+
+# Dropdown tỉnh
+curl http://localhost:3000/api/dropdown/tinh
+```
+
+---
+
+## 8. Troubleshooting
+
+### Containers không healthy
+
+```bash
+# Xem log chi tiết
+docker compose logs --tail=50 <service-name>
+
+# auth-service không kết nối được DB
+docker compose logs auth-service
+# Thường gặp: postgres chưa ready → services tự restart sau vài giây, chờ thêm
+```
+
+### Database trống — không có dữ liệu
+
+```bash
+# Kiểm tra init scripts có chạy không
+docker compose logs postgres | grep -E "init-db|Restore|restored|ERROR"
+```
+
+Nếu không thấy log restore → import thủ công:
+
+```bash
+cat database/schemas/auth_db.sql  | docker compose exec -T postgres psql -U postgres -d auth_db
+cat database/schemas/gis_db.sql   | docker compose exec -T postgres psql -U postgres -d gis_db
+cat database/schemas/admin_db.sql | docker compose exec -T postgres psql -U postgres -d admin_db
+```
+
+### MapServer lỗi WMS
+
+```bash
+# Kiểm tra mapserv binary
+docker compose exec mapserver-service mapserv -v
+
+# Kiểm tra mapfile đã generate
+docker compose exec mapserver-service cat /mapserver/mapfiles/sonla-docker.map | head -5
+
+# Kiểm tra kết nối DB từ mapserver
+docker compose exec mapserver-service wget -qO- http://localhost:3008/health
+```
+
+### Frontend hiện trang trắng
+
+```bash
+# Kiểm tra dist có tồn tại
+docker compose exec gateway ls /app/client/dist/
+
+# Rebuild gateway (bao gồm rebuild frontend)
+docker compose build gateway && docker compose up -d gateway
 ```
 
 ### Port bị chiếm
@@ -655,117 +394,202 @@ npx prisma migrate deploy  # Apply pending migrations
 ```bash
 # Windows
 netstat -ano | findstr :3000
-taskkill /PID <pid> /F
+
+# Linux
+lsof -i :3000
+
+# Đổi port
+echo "APP_PORT=3001" >> .env
+docker compose up -d gateway
 ```
 
-### Redis không kết nối được
+### Disk đầy
 
 ```bash
-redis-cli ping  # phải trả về PONG
-net start Redis  # Windows
+docker system prune -f          # Xóa containers, networks không dùng
+docker image prune -a -f        # Xóa images cũ
+docker volume prune -f          # Xóa volumes không dùng (cẩn thận!)
 ```
 
-### MapServer không hoạt động
-
-```powershell
-# 1. Kiểm tra binary tồn tại
-Test-Path "C:\ms4w\Apache\cgi-bin\mapserv.exe"
-
-# 2. Kiểm tra version
-C:\ms4w\Apache\cgi-bin\mapserv.exe -v
-
-# 3. Xem logs của mapserver-service
-pm2 logs mapserver-service --lines 100
-
-# 4. Kiểm tra health endpoint
-curl http://localhost:3007/health
-```
-
-Lỗi thường gặp với MapServer:
-
-| Lỗi | Nguyên nhân | Cách sửa |
-|---|---|---|
-| `Failed to spawn MapServer` | `MAPSERV_BIN` sai hoặc MS4W chưa cài | Kiểm tra đường dẫn trong `.env` |
-| `msLoadMap(): Unable to open mapfile` | `MAPFILE_PATH` sai | Kiểm tra path trong `.env` |
-| `Unable to connect to PostgreSQL` | Sai password trong mapfile | Sửa `CONNECTION` trong mapfile |
-| `Unable to load PROJ` | `PROJ_LIB` chưa set | Set `PROJ_LIB=C:\ms4w\share\proj` trong `.env` |
-| MapServer service `errored` trong PM2 | Port 3007 bị chiếm | `netstat -ano | findstr :3007` |
-
-### Data không hiển thị trên bản đồ khi vào trang
-
-Nguyên nhân thường gặp:
-1. **Redis cache cũ** — flush cache: `redis-cli FLUSHDB`
-2. **Chưa có dữ liệu** trong bảng `son_la_mat_rung` của `gis_db`
-3. **Chưa import dữ liệu GIS** vào `admin_db` (bảng `sonla_tkkl`, `sonla_rgx`, `sonla_hientrangrung_new`)
-4. **MapServer service lỗi** — kiểm tra `pm2 logs mapserver-service`
-
-### GIS Service lỗi 500
+### Reset hoàn toàn
 
 ```bash
-pm2 logs gis-service --lines 50
-# Kiểm tra kết nối tới cả gis_db VÀ admin_db
-```
-
-### Kiểm tra tất cả services
-
-```bash
-pm2 status
-# Tất cả services phải có status: online
-
-curl http://localhost:3000/health
-curl http://localhost:3003/health
-curl http://localhost:3007/health
-curl http://localhost:3001/health
+docker compose down -v
+docker compose build --no-cache
+docker compose up -d
 ```
 
 ---
 
-## Database Schemas
+## 9. Deploy lên server mới
 
-File schema trong `database/schemas/` được export từ PostgreSQL (schema-only, không có dữ liệu):
+### Yêu cầu server
 
-| File | Database | Nội dung |
-|---|---|---|
-| `auth_db.sql` | auth_db | Users, Roles, Permissions, UserRoles, RolePermissions, RoleDataScopes |
-| `gis_db.sql` | gis_db | son_la_mat_rung, bang_ke_xu_ly_anh, functions, triggers |
-| `admin_db.sql` | admin_db | sonla_hientrangrung_new, sonla_tkkl, sonla_rgx + spatial indexes |
+- OS: Ubuntu 22.04+ / Debian 12+ / Windows Server 2022+
+- Docker 24+ và Docker Compose v2+
+- RAM 4 GB+, Disk 20 GB+
+- Port 3000 mở từ internet (hoặc port khác)
+
+### Các bước
+
+**1. Cài Docker (Ubuntu/Debian)**
+
+```bash
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+# Logout và login lại để có quyền docker
+```
+
+**2. Copy project**
+
+```bash
+# Qua SCP
+scp -r /c/DuBaoMatRung user@server:/opt/dubaomatrung
+
+# Hoặc git clone (nếu có repo)
+git clone <repo-url> /opt/dubaomatrung
+```
+
+**3. Cấu hình production**
+
+```bash
+cd /opt/dubaomatrung
+cp .env.docker .env
+nano .env
+```
+
+Cập nhật trong `.env`:
+
+```env
+NODE_ENV=production
+APP_PORT=3000
+FRONTEND_URL=http://<IP_SERVER>:3000
+
+DB_PASSWORD=<mat_khau_manh>
+JWT_SECRET=<64_ky_tu_ngau_nhien>
+REFRESH_TOKEN_SECRET=<64_ky_tu_ngau_nhien_khac>
+```
+
+**4. Khởi động**
+
+```bash
+docker compose up -d --build
+```
+
+**5. Kiểm tra**
+
+```bash
+bash docker-test.sh http://<IP_SERVER>:3000
+```
+
+### Tự khởi động khi server reboot (Linux systemd)
+
+```bash
+sudo tee /etc/systemd/system/dubaomatrung.service > /dev/null << 'EOF'
+[Unit]
+Description=DuBaoMatRung
+After=docker.service
+Requires=docker.service
+
+[Service]
+WorkingDirectory=/opt/dubaomatrung
+ExecStart=/usr/bin/docker compose up
+ExecStop=/usr/bin/docker compose down
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable dubaomatrung
+sudo systemctl start dubaomatrung
+```
+
+### Nginx reverse proxy (port 80/443)
+
+```nginx
+server {
+    listen 80;
+    server_name dubaomatrung.example.com;
+
+    client_max_body_size 50m;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+    }
+}
+```
 
 ---
 
-## Monitoring (Production)
+## Cấu trúc thư mục
 
-```powershell
-# Real-time status
-pm2 monit
-
-# Log theo service
-pm2 logs gis-service
-pm2 logs gateway
-pm2 logs auth-service
-pm2 logs mapserver-service
-
-# Restart sau khi cập nhật code
-pm2 restart gis-service
-pm2 restart all
+```
+DuBaoMatRung/
+├── client/                     # React 19 + Vite frontend
+│   └── src/
+│       ├── components/         # UI components
+│       ├── pages/              # Route pages
+│       ├── services/api.js     # Axios API client
+│       └── config.js           # API URL (tự động dùng relative URL với Docker)
+│
+├── microservices/
+│   ├── gateway/                # API Gateway (port 3000)
+│   ├── services/
+│   │   ├── auth-service/       # JWT + RBAC, Prisma ORM (port 3001)
+│   │   ├── user-service/       # Quản lý user (port 3002)
+│   │   ├── gis-service/        # GIS + PostGIS + shapefile (port 3003)
+│   │   ├── report-service/     # Xuất DOCX/PDF (port 3004)
+│   │   ├── admin-service/      # Danh mục hành chính (port 3005)
+│   │   ├── search-service/     # Tìm kiếm (port 3006)
+│   │   └── mapserver-service/  # WMS/WFS proxy → mapserv (port 3008)
+│   └── shared/                 # Logger, DB pool, Redis, errors
+│
+├── database/
+│   └── schemas/                # SQL dumps: auth_db.sql, gis_db.sql, admin_db.sql
+│
+├── mapserver/
+│   └── mapfiles/               # MapServer .map files (Windows + Docker versions)
+│
+├── docker/                     # Docker build files
+│   ├── Dockerfile.gateway      # Multi-stage: build React → gateway
+│   ├── Dockerfile.auth-service # Node + Prisma generate
+│   ├── Dockerfile.gis-service  # Node slim (Debian)
+│   ├── Dockerfile.mapserver-service  # Node + mapserv binary via apt
+│   ├── Dockerfile.node-service # Generic: user/report/admin/search
+│   ├── init-db/                # PostgreSQL init scripts
+│   │   ├── 01-create-databases.sh   # Tạo 3 DB + PostGIS extension
+│   │   └── 02-restore-databases.sh  # Import SQL dumps
+│   ├── mapfiles/
+│   │   └── sonla-docker.map.template  # Linux mapfile với ${DB_HOST} envsubst
+│   ├── mapserver.conf
+│   └── mapserver-entrypoint.sh # Generate mapfile từ env, khởi động Node
+│
+├── docker-compose.yml          # Orchestration 11 containers
+├── .env.docker                 # Template cấu hình Docker
+├── .dockerignore
+├── docker-start.sh             # Script khởi động với health check tự động
+└── docker-test.sh              # Script test đầy đủ mọi endpoints
 ```
 
 ---
 
 ## Tech Stack
 
-| Layer | Công nghệ |
-|---|---|
-| Frontend | React 19, Vite, TailwindCSS, Leaflet, react-window |
-| API Gateway | Express.js, http-proxy-middleware |
-| Microservices | Node.js, Express.js |
-| Auth ORM | Prisma (auth_db) |
-| GIS ORM | Kysely + node-postgres (pg) |
-| Database | PostgreSQL 15+ + PostGIS |
-| Cache | Redis |
-| Process Manager | PM2 |
-| GIS Server | MapServer (WMS) — via MS4W trên Windows |
-| Shapefile | pure-JavaScript shapefile parser |
-
----
-
-*Xem [CLAUDE.md](CLAUDE.md) để biết chi tiết kiến trúc, conventions, và hướng dẫn development đầy đủ.*
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 19, Vite, TailwindCSS, Leaflet (WMS tiles) |
+| API Gateway | Express.js, http-proxy-middleware, JWT middleware |
+| Auth | JWT, bcrypt, Prisma ORM, RBAC |
+| GIS | Express.js, Kysely, PostGIS, shapefile parser |
+| Mapping | MapServer 7 (WMS/WFS binary), Leaflet |
+| Database | PostgreSQL 15 + PostGIS 3.4 |
+| Cache | Redis 7 (tile cache) |
+| Logging | Winston (files + console), MongoDB (gateway logs) |
+| Container | Docker 24, Docker Compose v2 |
