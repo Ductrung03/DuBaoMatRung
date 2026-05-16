@@ -7,8 +7,8 @@
     "start": "node src/index.js",
     "dev": "npx nodemon src/index.js",
     "test": "jest",
-    "prisma:generate": "npx prisma generate",
-    "prisma:migrate": "npx prisma migrate dev",
+    "prisma:generate": "npx prisma@5.22.0 generate",
+    "prisma:migrate": "npx prisma@5.22.0 migrate dev",
     "prisma:seed": "node prisma/seed-feature-based.js"
   },
   "prisma": {
