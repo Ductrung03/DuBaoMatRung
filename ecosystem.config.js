@@ -1,6 +1,9 @@
 // PM2 Ecosystem Configuration
 // Deploy all microservices on Windows Server
 
+const DB_PASSWORD = process.env.DB_PASSWORD || 'DuBaoMatRung2025SecurePass';
+const JWT_SECRET = process.env.JWT_SECRET || 'dubaomatrung_secret_key_change_this_in_production';
+
 module.exports = {
   apps: [
     // Gateway - API Gateway & Routing
@@ -13,7 +16,7 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
-        JWT_SECRET: 'dubaomatrung_secret_key_change_this_in_production',
+        JWT_SECRET,
         REFRESH_TOKEN_SECRET: 'dubaomatrung_refresh_jwt_secret_production_key_2025_secure_random_string',
         // Service URLs
         AUTH_SERVICE_URL: 'http://localhost:3001',
@@ -42,13 +45,13 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3001,
-        DATABASE_URL: 'postgresql://postgres:4@localhost:5432/auth_db?schema=public',
+        DATABASE_URL: `postgresql://postgres:${DB_PASSWORD}@localhost:5432/auth_db?schema=public`,
         DB_HOST: 'localhost',
         DB_PORT: 5432,
         DB_USER: 'postgres',
-        DB_PASSWORD: '4',
+        DB_PASSWORD,
         DB_NAME: 'auth_db',
-        JWT_SECRET: 'dubaomatrung_secret_key_change_this_in_production'
+        JWT_SECRET
       },
       error_file: './logs/auth-error.log',
       out_file: './logs/auth-out.log',
@@ -71,9 +74,9 @@ module.exports = {
         DB_HOST: 'localhost',
         DB_PORT: 5432,
         DB_USER: 'postgres',
-        DB_PASSWORD: '4',
+        DB_PASSWORD,
         DB_NAME: 'auth_db',
-        JWT_SECRET: 'dubaomatrung_secret_key_change_this_in_production',
+        JWT_SECRET,
         REDIS_HOST: 'localhost',
         REDIS_PORT: 6379
       },
@@ -98,9 +101,9 @@ module.exports = {
         DB_HOST: 'localhost',
         DB_PORT: 5432,
         DB_USER: 'postgres',
-        DB_PASSWORD: '4',
+        DB_PASSWORD,
         DB_NAME: 'gis_db',
-        JWT_SECRET: 'dubaomatrung_secret_key_change_this_in_production',
+        JWT_SECRET,
         REDIS_HOST: 'localhost',
         REDIS_PORT: 6379,
         MAX_FILE_SIZE: '50mb',
@@ -127,9 +130,9 @@ module.exports = {
         DB_HOST: 'localhost',
         DB_PORT: 5432,
         DB_USER: 'postgres',
-        DB_PASSWORD: '4',
+        DB_PASSWORD,
         DB_NAME: 'gis_db',
-        JWT_SECRET: 'dubaomatrung_secret_key_change_this_in_production',
+        JWT_SECRET,
         REDIS_HOST: 'localhost',
         REDIS_PORT: 6379
       },
@@ -154,9 +157,9 @@ module.exports = {
         DB_HOST: 'localhost',
         DB_PORT: 5432,
         DB_USER: 'postgres',
-        DB_PASSWORD: '4',
+        DB_PASSWORD,
         DB_NAME: 'admin_db',
-        JWT_SECRET: 'dubaomatrung_secret_key_change_this_in_production',
+        JWT_SECRET,
         REDIS_HOST: 'localhost',
         REDIS_PORT: 6379
       },
@@ -181,9 +184,9 @@ module.exports = {
         DB_HOST: 'localhost',
         DB_PORT: 5432,
         DB_USER: 'postgres',
-        DB_PASSWORD: '4',
+        DB_PASSWORD,
         DB_NAME: 'gis_db',
-        JWT_SECRET: 'dubaomatrung_secret_key_change_this_in_production',
+        JWT_SECRET,
         REDIS_HOST: 'localhost',
         REDIS_PORT: 6379,
         SEARCH_RESULT_LIMIT: 100

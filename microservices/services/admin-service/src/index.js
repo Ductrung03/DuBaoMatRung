@@ -56,7 +56,7 @@ const startServer = async () => {
       host: process.env.DB_HOST || 'localhost',
       port: process.env.DB_PORT || 5432,
       user: process.env.DB_USER || 'postgres',
-      password: '4', // Hardcoded correct password
+      password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME || 'admin_db'
     });
 
@@ -68,8 +68,8 @@ const startServer = async () => {
 
     await dbManager.initialize();
 
-    // Initialize Kysely Query Builder with hardcoded password
-    const adminDbUrl = `postgresql://postgres:4@localhost:5432/admin_db`;
+    // Initialize Kysely Query Builder with the Docker/runtime database settings.
+    const adminDbUrl = `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME || 'admin_db'}`;
     kyselyDb = createKyselyAdminDb(adminDbUrl);
     logger.info('Kysely Query Builder initialized for admin_db');
 

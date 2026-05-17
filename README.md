@@ -324,7 +324,7 @@ curl http://localhost:3000/health
 # Đăng nhập lấy token
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"Admin@123456"}'
+  -d '{"username":"admin","password":"Admin@123"}'
 
 # Dữ liệu mất rừng (public)
 curl http://localhost:3000/api/mat-rung

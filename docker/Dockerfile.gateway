@@ -37,8 +37,7 @@ COPY microservices/services/mapserver-service/package.json microservices/service
 
 # Install at workspace level — hoists all deps to microservices/node_modules/
 # so shared/ source files can resolve pg, winston, ioredis, etc.
-RUN cd microservices && npm install --omit=dev --ignore-scripts 2>/dev/null || \
-    cd microservices && npm install --omit=dev
+RUN cd microservices && (npm install --omit=dev --ignore-scripts || npm install --omit=dev)
 
 # Copy shared source
 COPY microservices/shared/ microservices/shared/

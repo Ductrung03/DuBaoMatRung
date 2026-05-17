@@ -24,8 +24,7 @@ COPY microservices/services/search-service/package.json microservices/services/s
 COPY microservices/services/mapserver-service/package.json microservices/services/mapserver-service/
 
 # Install at workspace level (hoists all deps to microservices/node_modules/)
-RUN cd microservices && npm install --omit=dev --ignore-scripts 2>/dev/null || \
-    cd microservices && npm install --omit=dev
+RUN cd microservices && (npm install --omit=dev --ignore-scripts || npm install --omit=dev)
 
 # Copy shared source
 COPY microservices/shared/ microservices/shared/
