@@ -139,8 +139,6 @@ microservices/database/
 # Mapserver mapfiles
 mapserver/mapfiles/
 
-# Mapserver service middleware (if generated)
-microservices/services/mapserver-service/src/middleware/
 
 # Package lock files (microservices)
 microservices/package-lock.json
