@@ -42,6 +42,8 @@ Mở `.env` và kiểm tra — **các giá trị mặc định chạy được n
 ### Bước 2: Build và khởi động
 
 ```bash
+# Disable intern postgresql and redis if needed
+# sudo systemctl stop redis-server postgresql@18-main postgresql
 docker compose up -d --build
 ```
 
