@@ -56,11 +56,14 @@ coverage/
 .aider*
 
 # AI agent
-.claude
-.gemini
-.qodo
-.specify
-specs
+# VIET DUNG NGUYEN: NOTE: AI agent prompts should exist as well
+#   because we will need to refer back to them for future reference
+#   and documentation. Therefore, no need to ignore these files.
+# .claude
+# .gemini
+# .qodo
+# .specify
+# specs
 
 # Docker
 .env
@@ -140,6 +143,15 @@ microservices/database/
 mapserver/mapfiles/
 
 
+# VIET DUNG NGUYEN: NOTE: package-lock.json files can be
+#   tracked, that's fine!
 # Package lock files (microservices)
-microservices/package-lock.json
-microservices/node_modules/.package-lock.json
+# microservices/package-lock.json
+# microservices/node_modules/.package-lock.json
+
+# VIET DUNG NGUYEN: NOTE: For each system, all node_modules
+#   are different (for each system) and should not be tracked.
+**/node_modules
+
+
+
