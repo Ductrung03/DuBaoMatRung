@@ -64,6 +64,21 @@ services:
   # MICROSERVICES
   # =========================================================
 
+  db-seed:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.auth-service
+    container_name: dubao_db_seed
+    restart: "no"
+    command: ["node", "prisma/seed-feature-based.js"]
+    environment:
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD:-DuBaoMatRung2025SecurePass}@postgres:5432/auth_db?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dubao_net
+
   auth-service:
     build:
       context: .

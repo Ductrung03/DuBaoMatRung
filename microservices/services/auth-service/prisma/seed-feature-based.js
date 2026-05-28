@@ -206,7 +206,7 @@ async function main() {
 
   // Super Admin
   const superAdminRole = createdRoles.find(r => r.name === 'super_admin');
-  const hashedPassword = await bcrypt.hash('Admin@123', 10);
+  const hashedPassword = await bcrypt.hash('Admin@1234', 10);
 
   const adminUser = await prisma.user.upsert({
     where: { username: 'admin' },
