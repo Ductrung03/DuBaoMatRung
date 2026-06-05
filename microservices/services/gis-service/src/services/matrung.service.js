@@ -727,8 +727,12 @@ class MatRungService {
       // ✅ FIX: Only show records within forest boundary (clipped)
       .where('m.has_intersection', '=', true)
       .where('m.clipped_geom', 'is not', null)
-      .where(sql`m.start_dau::date`, '>=', sql`${fromDate}::date`)
-      .where(sql`m.start_dau::date`, '<=', sql`${toDate}::date`)
+      .where(sql`(
+        (m.start_dau::date >= ${fromDate}::date AND m.start_dau::date <= ${toDate}::date)
+        OR
+        (m.start_sau IS NOT NULL AND m.start_sau::date >= ${fromDate}::date AND m.start_sau::date <= ${toDate}::date)
+      )`)
+      .orderBy('m.start_sau', 'desc')
       .orderBy('m.start_dau', 'desc')
       .orderBy('m.gid', 'desc')
       .limit(5000);

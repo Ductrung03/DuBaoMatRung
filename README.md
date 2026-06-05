@@ -45,6 +45,14 @@ Mở `.env` và kiểm tra — **các giá trị mặc định chạy được n
 # Disable intern postgresql and redis if needed
 # sudo systemctl stop redis-server postgresql@18-main postgresql
 docker compose up -d --build
+
+# Nếu gặp lỗi build mapserver-service, thử:
+docker compose down
+docker compose build --no-cache --progress=plain mapserver-service
+docker compose up -d
+
+# Seed first (if not seeded already in Docker compose yml)
+docker compose exec -T auth-service npm run prisma:seed
 ```
 
 Lần đầu build mất **5–15 phút** (tải Node.js, cài npm, build React frontend, tải MapServer binary).
