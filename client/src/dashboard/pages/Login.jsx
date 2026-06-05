@@ -43,7 +43,7 @@ const Login = () => {
             Đăng nhập hệ thống
           </h2>
           <p className="mt-2 text-xs sm:text-sm text-gray-600">
-            Hệ thống phát hiện sớm mất rừng tỉnh Sơn La
+            Hệ thống giám sát mất rừng tỉnh Sơn La
           </p>
         </div>
 

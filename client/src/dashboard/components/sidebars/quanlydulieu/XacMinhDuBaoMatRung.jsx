@@ -168,9 +168,9 @@ const XacMinhDuBaoMatRung = () => {
 
     // Validate diện tích nếu có nhập
     if (formData.dienTichThucTe && formData.dienTichThucTe.trim()) {
-      const dienTich = parseFloat(formData.dienTichThucTe);
+      const dienTich = parseFloat(formData.dienTichThucTe.replace(',', '.'));
       if (isNaN(dienTich) || dienTich <= 0) {
-        toast.error("Diện tích thực tế phải là số hợp lệ và lớn hơn 0");
+        toast.error("Diện tích thực tế phải là số hợp lệ và lớn hơn 0 (dùng dấu chấm, vd: 1.42)");
         return;
       }
     }
@@ -185,7 +185,7 @@ const XacMinhDuBaoMatRung = () => {
         verification_reason: formData.nguyenNhan,
         verification_notes: formData.ghiChu || null,
         verified_area: formData.dienTichThucTe && formData.dienTichThucTe.trim()
-          ? parseFloat(formData.dienTichThucTe) * 10000 // ha → m²
+          ? parseFloat(formData.dienTichThucTe.replace(',', '.')) * 10000 // ha → m²
           : null,
         detection_date: formData.ngayXacMinh || null
       };
@@ -453,9 +453,9 @@ const XacMinhDuBaoMatRung = () => {
               </label>
               <div className={`relative ${isMobile ? 'w-full' : 'w-36'}`}>
                 <input
-                  type="number"
-                  step="0.01"
-                  min="0"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="vd: 1.42"
                   value={formData.dienTichThucTe}
                   onChange={(e) => handleInputChange('dienTichThucTe', e.target.value)}
                   className="w-full border border-green-400 rounded-md py-2 px-3 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"

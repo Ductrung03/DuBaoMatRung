@@ -19,32 +19,32 @@ function normalizeHeader(str) {
     .replace(/\s+/g, " ");
 }
 
-// Tự động tìm dòng header (tìm dòng đầu tiên có cột "Lô cảnh báo" / "TT" / "GID")
+// Tự động tìm dòng header - yêu cầu có cột "Lô cảnh báo" / "GID" + ít nhất 1 cột khác
 function findHeaderRowIndex(rawData) {
   for (let i = 0; i < Math.min(rawData.length, 20); i++) {
     const row = rawData[i];
     if (!Array.isArray(row)) continue;
     const normalized = row.map((c) => normalizeHeader(String(c ?? "")));
-    // Coi là header nếu có ít nhất 2 cột nhận diện được
-    let matchCount = 0;
+    const hasGidCol = normalized.some(
+      (cell) => cell === "gid" || cell === "lo canh bao" || cell === "lo cb" || cell.includes("lo canh bao")
+    );
+    if (!hasGidCol) continue;
+    let otherCount = 0;
     for (const cell of normalized) {
       if (
         cell === "tt" ||
-        cell === "gid" ||
-        cell.includes("lo canh bao") ||
-        cell.includes("lo cb") ||
-        cell.includes("xac minh") ||
         cell.includes("nguyen nhan") ||
         cell.includes("dien tich") ||
         cell.includes("tieu khu") ||
-        cell.includes("khoanh")
+        cell.includes("khoanh") ||
+        cell.includes("xac minh")
       ) {
-        matchCount++;
+        otherCount++;
       }
     }
-    if (matchCount >= 2) return i;
+    if (otherCount >= 1) return i;
   }
-  return 0; // fallback dòng đầu
+  return 0;
 }
 
 // Parse GID từ "PH-12345", "PH12345", "CB-12345", "CB12345", hoặc số thuần
@@ -73,6 +73,9 @@ const COLUMN_MAP = {
   "x": "x",
   "toa do y": "y",
   "y": "y",
+  "dien tich xac minh (ha)": "dientich",
+  "dien tich xac minh": "dientich",
+  "dien tich (ha)": "dientich",
   "dien tich": "dientich",
   "dt (ha)": "dientich",
   "dt": "dientich",
@@ -85,11 +88,13 @@ const COLUMN_MAP = {
 
 function mapHeader(raw) {
   const normalized = normalizeHeader(raw);
+  if (!normalized) return null;
   // Tìm exact match trước
   if (COLUMN_MAP[normalized]) return COLUMN_MAP[normalized];
-  // Tìm partial match
-  for (const key of Object.keys(COLUMN_MAP)) {
-    if (normalized.includes(key) || key.includes(normalized)) {
+  // Partial match: chỉ dùng normalized.includes(key) để tránh "xa" khớp "xac minh"
+  const sortedKeys = Object.keys(COLUMN_MAP).sort((a, b) => b.length - a.length);
+  for (const key of sortedKeys) {
+    if (key.length >= 4 && normalized.includes(key)) {
       return COLUMN_MAP[key];
     }
   }
@@ -157,10 +162,14 @@ const BulkVerificationModal = ({ onClose, onDone }) => {
           const obj = { _row: headerRowIdx + idx + 2 }; // row number in xlsx
           headers.forEach((h, i) => {
             if (h.mapped) {
-              // GID: bỏ prefix "CB-"
-              obj[h.mapped] = h.mapped === "gid"
-                ? parseGidValue(row[i])
-                : (row[i] !== undefined ? row[i] : "");
+              let cellVal = row[i] !== undefined ? row[i] : "";
+              if (h.mapped === "gid") {
+                cellVal = parseGidValue(cellVal);
+              } else if (h.mapped === "dientich") {
+                // Normalize: số từ Excel hoặc chuỗi "1,42" → "1.42"
+                cellVal = cellVal !== "" ? String(cellVal).replace(',', '.') : "";
+              }
+              obj[h.mapped] = cellVal;
             }
             obj[`_raw_${i}`] = row[i];
           });
@@ -197,10 +206,10 @@ const BulkVerificationModal = ({ onClose, onDone }) => {
         gid: row.gid,
         verification_reason: row.nguyen_nhan || null,
         verification_notes: row.chu_y || null,
-        // dientich trong xlsx là ha, convert sang m²
+        // dientich từ xlsx là ha → convert sang m²
         verified_area:
-          row.dientich && !isNaN(parseFloat(row.dientich))
-            ? parseFloat(row.dientich) * 10000
+          row.dientich && !isNaN(parseFloat(String(row.dientich).replace(',', '.')))
+            ? parseFloat(String(row.dientich).replace(',', '.')) * 10000
             : null,
         detection_status: row.xac_minh || "Đã xác minh",
       }));
@@ -425,7 +434,11 @@ const BulkVerificationModal = ({ onClose, onDone }) => {
                                 : "text-gray-700"
                             }`}
                           >
-                            {row[k] !== undefined && row[k] !== "" ? String(row[k]) : (
+                            {row[k] !== undefined && row[k] !== "" ? (
+                              k === "dientich"
+                                ? `${row[k]} ha`
+                                : String(row[k])
+                            ) : (
                               <span className="text-gray-300 italic">—</span>
                             )}
                           </td>
