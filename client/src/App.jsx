@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./dashboard/pages/Login";
 import MainLayout from "./dashboard/layout/MainLayout";
 import QuanLyDuLieu from "./dashboard/pages/QuanLyDuLieu";
-import ThongKeBaoCaoMatRung from "./dashboard/pages/ThongKeBaoCaoMatRung";
 import { GeoDataProvider } from "./dashboard/contexts/GeoDataContext";
 import PhatHienMatRung from "./dashboard/pages/PhatHienMatRung";
 import { ReportProvider } from "./dashboard/contexts/ReportContext";
@@ -18,8 +17,16 @@ import "react-toastify/dist/ReactToastify.css";
 import Map from "./dashboard/pages/Map";
 import DuBaoMatRung from "./dashboard/pages/DuBaoMatRung";
 import Dashboard from "./dashboard/pages/Dashboard";
+import MonitoringWorkspace from "./dashboard/monitoring/MonitoringWorkspace";
+import MonitoringReports from "./dashboard/monitoring/MonitoringReports";
+import { useLocation } from 'react-router-dom';
 
 import { PermissionProvider } from "./dashboard/contexts/PermissionContext";
+
+function MonitoringRoute() {
+  const location = useLocation();
+  return new URLSearchParams(location.search).get('tool') === 'imagery' ? <PhatHienMatRung /> : <MonitoringWorkspace />;
+}
 
 function App() {
   return (
@@ -62,7 +69,7 @@ function App() {
                       element={
                         <PermissionProtectedRoute requiredPermission="detection">
                           <ErrorBoundary>
-                            <PhatHienMatRung />
+                            <MonitoringRoute />
                           </ErrorBoundary>
                         </PermissionProtectedRoute>
                       }
@@ -71,7 +78,7 @@ function App() {
                       path="baocao"
                       element={
                         <PermissionProtectedRoute requiredPermission="reports">
-                          <ThongKeBaoCaoMatRung />
+                          <MonitoringReports />
                         </PermissionProtectedRoute>
                       }
                     />

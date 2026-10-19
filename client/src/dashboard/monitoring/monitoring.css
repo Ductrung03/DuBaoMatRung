@@ -1,0 +1,74 @@
+/* GIS workspace: green reference palette, compact controls, no decorative motion. */
+.monitor-workspace, .monitor-report-layout { --monitor-bg:#10291c; --monitor-panel:#122e20; --monitor-line:#2b513b; --monitor-text:#e6f4eb; --monitor-muted:#b4d2bf; color:var(--monitor-text); background:var(--monitor-bg); height:100%; min-height:0; display:grid; grid-template-columns:300px minmax(0,1fr); font-size:13px; }
+.monitor-workspace.has-detail { grid-template-columns:300px minmax(0,1fr) 340px; }
+.monitor-workspace button, .monitor-report-layout button { display:inline-flex; align-items:center; justify-content:center; gap:6px; border:1px solid #467658; border-radius:4px; color:#e6f4eb; background:#17462e; padding:7px 10px; font-size:12px; white-space:nowrap; }
+.monitor-workspace button:hover, .monitor-report-layout button:hover { background:#21653f; }
+.monitor-workspace button:disabled, .monitor-report-layout button:disabled { opacity:.5; cursor:not-allowed; }
+.monitor-workspace :focus-visible, .monitor-report-layout :focus-visible { outline:2px solid #8ce7b4; outline-offset:2px; }
+.monitor-sidebar { min-height:0; overflow-y:auto; border-right:1px solid var(--monitor-line); background:var(--monitor-panel); }
+.monitor-sidebar section { padding:16px; border-bottom:1px solid var(--monitor-line); }
+.monitor-sidebar h2 { display:flex; align-items:center; gap:8px; color:#76e3a3; font-size:12px; font-weight:750; margin:0 0 14px; }
+.monitor-sidebar a { display:block; color:#b1ecc7; padding:8px 0; text-decoration:underline; }
+.monitor-caption { font-size:11px; color:var(--monitor-muted); margin:8px 0; line-height:1.6; }
+.monitor-chart { height:170px; margin:6px 0; }
+.monitor-ranking { padding:0; list-style:none; }
+.monitor-ranking li { display:flex; justify-content:space-between; gap:8px; padding:6px 0; font-size:11px; border-bottom:1px solid var(--monitor-line); }
+.monitor-ranking strong { font-variant-numeric:tabular-nums; white-space:nowrap; }
+.monitor-metrics { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.monitor-metrics dt { color:var(--monitor-muted); font-size:11px; }
+.monitor-metrics dd { font-size:23px; font-weight:700; font-variant-numeric:tabular-nums; }
+.monitor-input { display:flex; flex-direction:column; gap:5px; margin:10px 0; font-size:12px; }
+.monitor-input span { color:#c9e2d1; }
+.monitor-input select, .monitor-input input, .monitor-search input { min-width:0; width:100%; background:#0a2015; color:#e6f4eb; border:1px solid #487359; border-radius:4px; padding:8px; color-scheme:dark; }
+.monitor-input input::placeholder, .monitor-search input::placeholder { color:#aac8b5; }
+.monitor-check { display:flex; align-items:center; gap:9px; padding:9px 0; }
+.monitor-check input { accent-color:#36c67b; }
+.monitor-sidebar details { padding-top:10px; }
+.monitor-sidebar summary { cursor:pointer; }
+.monitor-legend { display:flex; gap:8px; align-items:center; margin:9px 0; font-size:12px; }
+.monitor-legend i { display:inline-block; width:12px; height:12px; border-radius:2px; }
+.monitor-center { display:grid; grid-template-rows:minmax(250px,60%) minmax(0,1fr); min-width:0; min-height:0; }
+.monitor-map-wrap { position:relative; min-height:0; }
+.monitor-map { width:100%; height:100%; background:#091c13; z-index:0; }
+.monitor-map-message { position:absolute; z-index:1; top:12px; left:50px; right:12px; background:#163c28; color:#f0fff4; border:1px solid #69ac80; padding:14px; box-shadow:0 2px 8px #10291c55; }
+.monitor-map-message button { margin-left:12px; }
+.monitor-error { color:#ffd0d0; background:#542222; border:1px solid #b76c6c; padding:12px; }
+.monitor-table-section { display:flex; flex-direction:column; min-width:0; min-height:0; border-top:1px solid var(--monitor-line); }
+.monitor-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:10px 12px; border-bottom:1px solid var(--monitor-line); }
+.monitor-toolbar h2, .monitor-toolbar h1 { color:#a9efc4; font-size:12px; font-weight:700; margin-right:auto; }
+.monitor-search { display:flex; align-items:center; gap:5px; min-width:160px; max-width:290px; flex:1; }
+.monitor-table-section > .monitor-caption { margin:5px 12px; }
+.monitor-table-scroll { min-height:0; overflow:auto; flex:1; }
+.monitor-workspace table, .monitor-report-layout table { border-collapse:collapse; width:100%; font-size:12px; }
+.monitor-workspace th { position:sticky; top:0; background:#0b2116; color:#a7edc1; }
+.monitor-workspace td, .monitor-workspace th { border:1px solid #31563e; padding:10px 12px; white-space:nowrap; text-align:left; }
+.monitor-workspace td { font-variant-numeric:tabular-nums; }
+.monitor-workspace tr.is-selected { background:#225e3c; }
+.monitor-workspace button.monitor-row-link { border:0; background:none; padding:0; color:#a2f7c2; text-decoration:underline; }
+.monitor-pagination { display:flex; align-items:center; justify-content:flex-end; gap:12px; padding:8px 12px; }
+.monitor-empty { color:var(--monitor-muted); padding:14px 0; line-height:1.6; }
+.monitor-detail { min-height:0; display:flex; flex-direction:column; background:var(--monitor-panel); border-left:1px solid var(--monitor-line); }
+.monitor-detail > header { display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid var(--monitor-line); }
+.monitor-detail h2 { font-weight:700; }
+.monitor-detail-scroll { overflow:auto; padding:16px; }
+.monitor-detail section { padding:12px; margin-bottom:16px; border:1px solid var(--monitor-line); background:#0c2418; border-radius:6px; }
+.monitor-detail h3 { color:#9cecb9; font-size:11px; font-weight:700; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--monitor-line); }
+.monitor-fields > div { display:grid; grid-template-columns:110px minmax(0,1fr); gap:8px; padding:6px 0; }
+.monitor-fields dt { color:var(--monitor-muted); font-size:11px; }
+.monitor-fields dd { font-size:12px; overflow-wrap:anywhere; }
+.monitor-images { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.monitor-images figure { min-width:0; border:1px solid var(--monitor-line); }
+.monitor-images figcaption { font-size:11px; padding:6px; text-align:center; }
+.monitor-images img { width:100%; height:140px; object-fit:contain; }
+.monitor-images p { min-height:100px; display:grid; place-items:center; color:var(--monitor-muted); font-size:11px; }
+.monitor-report-main { min-width:0; overflow:auto; padding:18px; }
+.monitor-report-main > .monitor-toolbar { padding:0 0 16px; }
+.monitor-report-chart { margin:20px 0; border:1px solid var(--monitor-line); padding:12px; }
+.monitor-report-document { padding:24px; margin-top:20px; color:#182e20; background:#fff; overflow-wrap:anywhere; }
+.monitor-report-document h2 { font-size:18px; font-weight:700; text-align:center; margin-bottom:16px; }
+.monitor-report-document p { margin:12px 0; font-size:13px; }
+.monitor-report-table { overflow-x:auto; }
+.monitor-report-document td, .monitor-report-document th { padding:9px; border:1px solid #a3b4a9; text-align:left; }
+.monitor-report-document th { background:#edf3ef; color:#183c28; }
+@media (max-width:1279px) { .monitor-workspace, .monitor-report-layout { grid-template-columns:260px minmax(0,1fr); } .monitor-workspace.has-detail { grid-template-columns:260px minmax(0,1fr); } .monitor-detail { position:absolute; top:0; right:0; bottom:0; width:340px; max-width:90vw; z-index:20; box-shadow:-8px 0 20px #07170c66; } }
+@media (max-width:767px) { .monitor-workspace, .monitor-report-layout, .monitor-workspace.has-detail { display:flex; flex-direction:column; overflow:auto; } .monitor-sidebar { flex:none; max-height:45dvh; border-right:0; border-bottom:1px solid var(--monitor-line); } .monitor-center { flex:none; height:75dvh; min-height:560px; grid-template-rows:50% 50%; } .monitor-detail { position:fixed; top:80px; z-index:60; } .monitor-report-main { overflow:visible; flex:none; padding:12px; } .monitor-report-document { padding:12px; } }

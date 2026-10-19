@@ -13,6 +13,7 @@ import FeatureGuard from "../../components/FeatureGuard";
 import { useIsMobile, useIsMobileOrTablet } from "../../hooks/useMediaQuery";
 import { useAuth } from "../contexts/AuthContext";
 import { FaHome, FaChartLine, FaDatabase, FaFileAlt, FaSatellite, FaUsers, FaUserShield, FaChevronDown, FaChevronRight } from "react-icons/fa";
+import { navigationItems as mainNavigation } from './navigation';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -48,12 +49,8 @@ const Sidebar = () => {
   // Navigation config cho mobile
   const navigationItems = [
     { path: '/dashboard', label: 'Trang chủ', icon: FaHome, pageKey: null },
-    { path: '/dashboard/dubaomatrung', label: 'Giám sát mất rừng', icon: FaChartLine, pageKey: 'forecast' },
-    { path: '/dashboard/quanlydulieu', label: 'Tra cứu dữ liệu', icon: FaDatabase, pageKey: 'data_management' },
-    { path: '/dashboard/baocao', label: 'Báo cáo', icon: FaFileAlt, pageKey: 'reports' },
-    { path: '/dashboard/phathienmatrung', label: 'Xử lý ảnh viễn thám', icon: FaSatellite, pageKey: 'detection' },
-    { path: '/dashboard/quanlynguoidung', label: 'Quản lý người dùng', icon: FaUsers, pageKey: 'user_management' },
-    { path: '/dashboard/quanlyrole', label: 'Quản lý phân quyền', icon: FaUserShield, pageKey: 'role_management' },
+    ...mainNavigation,
+    { path: '/dashboard/dubaomatrung', label: 'Dự báo tự động / Tùy chỉnh', icon: FaChartLine, pageKey: 'forecast' },
   ];
 
   // Filter navigation items based on permissions

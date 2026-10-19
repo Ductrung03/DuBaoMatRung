@@ -361,7 +361,7 @@ app.use('/api/hanhchinh',
 
 // Search Service
 app.use('/api/search',
-  authMiddleware.optionalAuth, // ✅ FIX: Use optionalAuth to allow public access but support user scope
+  authMiddleware.authenticate, // Reports and monitoring contain scoped operational data.
   createProxy(logger, {
     target: process.env.SEARCH_SERVICE_URL || 'http://localhost:3006',
     pathRewrite: (path, req) => '/api/search' + path,

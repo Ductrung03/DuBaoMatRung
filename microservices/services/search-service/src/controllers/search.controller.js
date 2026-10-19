@@ -17,7 +17,7 @@ exports.searchMatRung = async (req, res, next) => {
     // Check if user is Admin or LanhDao (skip enforcement)
     // Note: Roles might be "Admin,User" string
     const userRoles = userRolesStr.split(',');
-    const isRestricted = !userRoles.includes('Admin') && !userRoles.includes('LanhDao');
+    const isRestricted = !userRoles.some(role => ['Admin', 'LanhDao', 'admin', 'super_admin'].includes(role));
 
     let forcedXa = null;
 
@@ -25,15 +25,27 @@ exports.searchMatRung = async (req, res, next) => {
       if (req.headers['x-user-xa']) forcedXa = decodeURIComponent(req.headers['x-user-xa']);
     }
 
+    // Fail closed: a restricted account without an assigned commune must not
+    // turn an unfiltered report into a province-wide data download.
+    if (isRestricted && !forcedXa) {
+      return res.status(403).json(formatResponse(false, 'Tài khoản chưa được cấp phạm vi xã. Vui lòng liên hệ quản trị viên.', null));
+    }
+    const forcedTk = isRestricted && req.headers['x-user-tieukhu'] ? decodeURIComponent(req.headers['x-user-tieukhu']) : '';
+    const forcedKhoanh = isRestricted && req.headers['x-user-khoanh'] ? decodeURIComponent(req.headers['x-user-khoanh']) : '';
+    const parsedLimit = Number(limit);
+    if (!Number.isInteger(parsedLimit) || parsedLimit < 0) {
+      return res.status(400).json(formatResponse(false, 'limit phải là số nguyên không âm', null));
+    }
+
     // Effective filters
     const effectiveXa = forcedXa || xa;
+    const cacheKey = `search:vfis-v1:${JSON.stringify([q || '', status || '', fromDate || '', toDate || '', huyen || '', effectiveXa || '', xacMinh || '', parsedLimit, isRestricted, forcedTk, forcedKhoanh])}`;
 
     const db = req.app.locals.db;
     const redis = req.app.locals.redis; // Có thể undefined nếu Redis bị disable
 
     // ✅ Kiểm tra Redis có available không
     if (redis) {
-      const cacheKey = `search:${q || ''}:${status || ''}:${fromDate || ''}:${toDate || ''}:${huyen || ''}:${effectiveXa || ''}:${xacMinh || ''}:role:${isRestricted ? 'restricted' : 'admin'}`;
       const cached = await redis.get(cacheKey);
 
       if (cached) {
@@ -129,7 +141,6 @@ exports.searchMatRung = async (req, res, next) => {
     // ✅ Tính diện tích từ geometry thay vì dùng field area (vì area = 0)
     // ✅ FIX: Dùng lowercase cho aliases hoặc quote chúng để tránh PostgreSQL auto-lowercase
     // ✅ FIX: Nếu limit=0 thì không giới hạn (dùng cho báo cáo)
-    const parsedLimit = parseInt(limit);
     const limitClause = parsedLimit > 0 ? `LIMIT $${paramIndex}` : '';
 
     query = `
@@ -147,6 +158,24 @@ exports.searchMatRung = async (req, res, next) => {
         m.verification_reason,
         m.detection_status,
         m.verification_notes,
+        jsonb_build_object(
+          'verified_by', to_jsonb(m)->'verified_by',
+          'verified_by_name', to_jsonb(m)->'verified_by_name',
+          'verified_at', to_jsonb(m)->'verified_at',
+          'updated_at', to_jsonb(m)->'updated_at',
+          'updated_by', to_jsonb(m)->'updated_by',
+          'updated_by_name', to_jsonb(m)->'updated_by_name',
+          'image_date', to_jsonb(m)->'image_date',
+          'acquisition_date', to_jsonb(m)->'acquisition_date',
+          'management_unit', to_jsonb(m)->'management_unit',
+          'village', to_jsonb(m)->'village',
+          'forest_origin', to_jsonb(m)->'forest_origin',
+          'forest_function', to_jsonb(m)->'forest_function',
+          'forest_type', to_jsonb(m)->'forest_type',
+          'forest_owner', to_jsonb(m)->'forest_owner',
+          'before_image_url', to_jsonb(m)->'before_image_url',
+          'after_image_url', to_jsonb(m)->'after_image_url'
+        ) as detail_metadata,
         ST_AsGeoJSON(m.geom) as geometry,
         ST_AsText(ST_Centroid(m.geom)) as centroid_wkt
       FROM son_la_mat_rung m
@@ -254,6 +283,7 @@ exports.searchMatRung = async (req, res, next) => {
         type: 'Feature',
         geometry: JSON.parse(row.geometry),
         properties: {
+          ...(row.detail_metadata || {}),
           gid: row.gid,
           area: row.area,
           start_dau: row.start_dau,
@@ -281,6 +311,8 @@ exports.searchMatRung = async (req, res, next) => {
     if (effectiveXa) {
       features = features.filter(f => f.properties.xa_name === effectiveXa);
     }
+    if (forcedTk) features = features.filter(f => String(f.properties.tk ?? '') === forcedTk);
+    if (forcedKhoanh) features = features.filter(f => String(f.properties.khoanh ?? '') === forcedKhoanh);
     // Note: search params use 'huyen', 'xa', but properties map filtering.
     // 'req.query.xa' is mapped to 'effectiveXa'.
     // If user filtered by 'tk' or 'khoanh' (not currently in search params but good practice)
@@ -299,7 +331,6 @@ exports.searchMatRung = async (req, res, next) => {
     // ✅ Cache lâu hơn nếu không có search query động (nếu Redis available)
     if (redis) {
       const cacheTime = q ? 60 : 300; // 1 min nếu có search, 5 min nếu filter tĩnh
-      const cacheKey = `search:${q || ''}:${status || ''}:${fromDate || ''}:${toDate || ''}:${huyen || ''}:${xa || ''}:${xacMinh || ''}`;
       await redis.set(cacheKey, response, cacheTime);
     }
 

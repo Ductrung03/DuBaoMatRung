@@ -10,6 +10,7 @@ const MainLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const isMobileOrTablet = useIsMobileOrTablet();
   const location = useLocation();
+  const isWorkspace = (location.pathname.startsWith('/dashboard/phathienmatrung') && new URLSearchParams(location.search).get('tool') !== 'imagery') || location.pathname === '/dashboard/baocao';
 
   // Close sidebar when navigating on mobile/tablet
   useEffect(() => {
@@ -19,9 +20,9 @@ const MainLayout = () => {
   }, [location.pathname, isMobileOrTablet]);
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-[100dvh]">
       <ClipProgressBanner />
-      <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <Header onMenuClick={isWorkspace ? undefined : () => setIsSidebarOpen(!isSidebarOpen)} />
 
       <div className="flex flex-1 overflow-hidden relative">
         {/* Overlay for mobile/tablet */}
@@ -34,7 +35,7 @@ const MainLayout = () => {
         )}
 
         {/* Sidebar - drawer on mobile/tablet, fixed on desktop */}
-        <aside
+        {!isWorkspace && <aside
           className={`
             fixed lg:relative z-50 lg:z-auto
             w-80 lg:w-96
@@ -57,10 +58,10 @@ const MainLayout = () => {
           )}
 
           <Sidebar />
-        </aside>
+        </aside>}
 
         {/* Main content */}
-        <main className="flex-1 overflow-hidden bg-gray-50">
+        <main className="flex-1 min-w-0 overflow-hidden bg-gray-50">
           <Outlet />
         </main>
       </div>
