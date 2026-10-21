@@ -6,6 +6,7 @@ import {
   FaEdit,
   FaTrash,
   FaUserPlus,
+  FaUsers,
   FaKey,
   FaFilter,
   FaUser,
@@ -665,17 +666,22 @@ const QuanLyNguoiDung = () => {
 
   return (
     <div className="h-full flex flex-col p-3 sm:p-4 lg:p-6 max-h-screen overflow-hidden">
-      <div className="flex-none flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Quản lý người dùng</h2>
+      <div className="flex-none bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center">
+          <div className="bg-green-100 rounded-lg p-2 sm:p-3 mr-3 sm:mr-4"><FaUsers className="text-xl sm:text-2xl text-green-600" aria-hidden="true"/></div>
+          <div><h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Quản lý người dùng</h1><p className="text-sm sm:text-base text-gray-600 mt-1">Quản lý tài khoản người dùng hệ thống</p></div>
+        </div>
         {(currentUserLevel <= 3 || hasUserPermission('user.management.actions.create')) && (
           <button
             onClick={openAddModal}
-            className="w-full sm:w-auto bg-forest-green-primary text-white py-3 sm:py-2 px-4 rounded-md flex items-center justify-center min-h-[44px]"
+            className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold py-3 sm:py-2 px-4 rounded-lg flex items-center justify-center transition-colors shadow-sm min-h-[44px]"
           >
             <FaUserPlus className="mr-2" />
             Thêm người dùng
           </button>
         )}
+        </div>
       </div>
 
       {/* Filter section */}

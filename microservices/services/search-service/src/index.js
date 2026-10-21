@@ -57,9 +57,10 @@ const startServer = async () => {
   // await redisManager.initialize(); // Disabled
 
   app.locals.db = dbManager;
+  app.locals.redis = new (require('./result-cache'))();
   // app.locals.redis = redisManager; // Disabled
 
-  const server = app.listen(PORT, '0.0.0.0', () => {
+  const server = app.listen(PORT, process.env.BIND_HOST || '127.0.0.1', () => {
     logger.info(`Search Service running on port ${PORT}`);
   });
 

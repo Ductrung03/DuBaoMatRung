@@ -1,5 +1,5 @@
 // client/src/dashboard/pages/TableVirtualized.jsx
-import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { FixedSizeList as List } from "react-window";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -255,15 +255,24 @@ const Row = ({ index, style, data: d }) => {
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
-const TableVirtualized = ({ data, tableName = "unknown", onRowClick }) => {
+const TableVirtualized = ({ data, onRowClick, fillHeight = false }) => {
   const { isAdmin } = useAuth();
   const [editRowIndex, setEditRowIndex] = useState(-1);
   const [editData, setEditData]         = useState({});
   const [loading, setLoading]           = useState(false);
   const [selectedRow, setSelectedRow]   = useState(null);
-  const [highlightedRow, setHighlightedRow] = useState(null);
-  const [targetGid, setTargetGid]       = useState(null);
+  const [highlightedRow] = useState(null);
+  const [targetGid]       = useState(null);
   const listRef  = useRef(null);
+  const scrollRef=useRef(null);
+  const [bodyHeight,setBodyHeight]=useState(ROW_HEIGHT*3);
+  useEffect(()=>{
+    if(!fillHeight||!scrollRef.current)return;
+    const node=scrollRef.current;
+    const measure=()=>setBodyHeight(Math.max(1,node.clientHeight-62));
+    const observer=new ResizeObserver(measure);observer.observe(node);measure();
+    return()=>observer.disconnect();
+  },[fillHeight,data?.length]);
   const isAdminUser = isAdmin();
   const TOTAL_WIDTH = getTotalWidth(isAdminUser);
 
@@ -362,8 +371,8 @@ const TableVirtualized = ({ data, tableName = "unknown", onRowClick }) => {
   // ── Header 2 tầng ──────────────────────────────────────────────────────────
   const hBg     = "linear-gradient(to right, #027e02, #15803d)";
   const hBorder = "1px solid rgba(255,255,255,0.25)";
-  const fs      = "0.64rem";
-  const fsSmall = "0.58rem";
+  const fs      = "12px";
+  const fsSmall = fs;
 
   // Helper: ô header đơn (chiếm cả 2 hàng)
   const hCell = (key, label, extra = {}) => (
@@ -371,8 +380,8 @@ const TableVirtualized = ({ data, tableName = "unknown", onRowClick }) => {
       width: `${COLUMN_WIDTH[key] || 80}px`, flexShrink: 0,
       display:"flex", alignItems:"center", justifyContent:"center",
       textAlign:"center", padding:"0 4px", borderRight: hBorder,
-      fontSize: fs, fontWeight:"bold", color:"white",
-      whiteSpace:"normal", wordBreak:"break-word", lineHeight:1.2,
+      fontSize: fs, fontWeight:500, color:"white",
+      whiteSpace:"nowrap", wordBreak:"normal", lineHeight:"20px",
       boxSizing:"border-box", ...extra
     }}>{label}</div>
   );
@@ -385,7 +394,7 @@ const TableVirtualized = ({ data, tableName = "unknown", onRowClick }) => {
     }}>
       {/* hàng 1 */}
       <div style={{ flex:"0 0 50%", display:"flex", alignItems:"center", justifyContent:"center",
-        fontSize: fs, fontWeight:"bold", color:"white",
+        fontSize: fs, fontWeight:500, color:"white", whiteSpace:"nowrap", lineHeight:"20px",
         borderBottom: hBorder, padding:"0 4px", textAlign:"center" }}>
         {topLabel}
       </div>
@@ -395,7 +404,7 @@ const TableVirtualized = ({ data, tableName = "unknown", onRowClick }) => {
           <div key={subKey} style={{
             width:`${COLUMN_WIDTH[subKey]}px`, flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center",
-            fontSize: fsSmall, fontWeight:"bold", color:"white",
+            fontSize: fsSmall, fontWeight:500, color:"white", whiteSpace:"nowrap", lineHeight:"20px",
             borderRight: i < subCols.length - 1 ? hBorder : "none",
             backgroundColor:"rgba(0,0,0,0.15)",
             padding:"0 2px", textAlign:"center", boxSizing:"border-box"
@@ -409,14 +418,15 @@ const TableVirtualized = ({ data, tableName = "unknown", onRowClick }) => {
   const coordTotalW = COLUMN_WIDTH.X + COLUMN_WIDTH.Y;
 
   return (
-    <div style={{ width:"100%", backgroundColor:"white", borderRadius:"0.75rem",
-      boxShadow:"0 10px 15px -3px rgba(0,0,0,0.1)", border:"1px solid #e5e7eb", overflow:"hidden" }}>
+    <div className="virtual-table-card" style={{ width:"100%", backgroundColor:"white", borderRadius:"0.75rem",
+      boxShadow:"0 10px 15px -3px rgba(0,0,0,0.1)", border:"1px solid #e5e7eb", overflow:"hidden",
+      ...(fillHeight?{height:'100%',minHeight:0,display:'flex',flexDirection:'column'}:{}) }}>
 
       {/* Scroll ngang bọc cả header + body để chúng luôn cuộn cùng nhau */}
-      <div style={{ overflowX:"auto", overflowY:"hidden" }}>
+      <div ref={scrollRef} className="virtual-table-horizontal-scroll" style={{ overflowX:"auto", overflowY:"hidden",...(fillHeight?{flex:'1 1 0%',minHeight:0}:{}) }}>
 
         {/* ── Header ── */}
-        <div style={{
+        <div className="virtual-table-header" style={{
           width:`${TOTAL_WIDTH}px`, display:"flex", alignItems:"stretch",
           height:"62px", background: hBg, userSelect:"none", flexShrink:0
         }}>
@@ -443,7 +453,7 @@ const TableVirtualized = ({ data, tableName = "unknown", onRowClick }) => {
             <div style={{
               width:`${ACTIONS_WIDTH}px`, flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center",
-              fontSize: fs, fontWeight:"bold", color:"white"
+              fontSize: fs, fontWeight:500, color:"white", whiteSpace:"nowrap", lineHeight:"20px"
             }}>Thao tác</div>
           )}
         </div>
@@ -451,7 +461,8 @@ const TableVirtualized = ({ data, tableName = "unknown", onRowClick }) => {
         {/* ── Body (react-window) ── */}
         <List
           ref={listRef}
-          height={Math.min(data.length * ROW_HEIGHT, MAX_TABLE_HEIGHT)}
+          height={fillHeight?bodyHeight:Math.min(data.length * ROW_HEIGHT, MAX_TABLE_HEIGHT)}
+          className="virtual-table-rows"
           itemCount={data.length}
           itemSize={ROW_HEIGHT}
           itemData={itemData}
@@ -462,12 +473,9 @@ const TableVirtualized = ({ data, tableName = "unknown", onRowClick }) => {
         </List>
       </div>
 
-      {/* Footer */}
-      <div style={{ padding:"10px 16px", backgroundColor:"#f9fafb", borderTop:"1px solid #e5e7eb",
-        display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:"0.875rem" }}>
-        <span>📊 Tổng số bản ghi: <strong style={{ color:"#027e02" }}>{data.length}</strong></span>
-        {editRowIndex !== -1 && <span style={{ color:"#f59e0b" }}>✏️ Đang chỉnh sửa hàng #{editRowIndex + 1}</span>}
-      </div>
+      {editRowIndex !== -1 && <div role="status" style={{ padding:"10px 16px", backgroundColor:"#f9fafb", borderTop:"1px solid #e5e7eb", fontSize:"0.875rem", flexShrink:0, color:"#f59e0b" }}>
+        ✏️ Đang chỉnh sửa hàng #{editRowIndex + 1}
+      </div>}
     </div>
   );
 };

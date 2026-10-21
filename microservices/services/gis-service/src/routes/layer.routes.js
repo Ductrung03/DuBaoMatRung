@@ -3,6 +3,13 @@ const express = require('express');
 const router = express.Router();
 const layerController = require('../controllers/layer.controller');
 const { asyncHandler } = require('../../../../shared/errors');
+router.use(require('../../../../shared/current-access').currentAccess);
+router.use((req,res,next)=>{
+  const name=req.path.split('/').filter(Boolean).at(-1)||req.query.layer;
+  const allowed=['bounds','hientrangrung','ranhgioixa','tieukukhoanh','matrung','deforestation-alerts','forest-status','commune-boundaries','sub-compartments','sonla_hientrangrung','sonla_hientrangrung_new','sonla_rgx','sonla_tkkl','son_la_mat_rung'];
+  if(name&&!allowed.includes(name))return res.status(400).json({success:false,message:'Lớp dữ liệu không hợp lệ'});
+  next();
+});
 
 /**
  * @swagger

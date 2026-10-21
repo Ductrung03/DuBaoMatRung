@@ -15,6 +15,7 @@
     "build:backend": "cd microservices && docker-compose build",
     "build:frontend": "cd client && npm run build",
     "test": "npm run test --workspaces",
+    "test:vfis": "node --test client/src/dashboard/monitoring/monitoring-data.test.mjs microservices/services/search-service/test/vfis-search.test.cjs",
     "lint": "npm run lint --workspaces",
     "clean": "npm run clean:backend && npm run clean:frontend",
     "clean:backend": "cd microservices && docker-compose down -v",

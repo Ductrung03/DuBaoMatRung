@@ -1,15 +1,16 @@
 // client/src/dashboard/components/MapLayerLegend.jsx
 // ⚡ OPTIMIZED: Memoized legend to prevent unnecessary re-creations
-import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
+import { FOREST_COLOR_CODES, forestColorHidden } from '../maps/forest-color-visibility';
 
-const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
+const MapLayerLegend = ({ mapLayers, colorLayers = null, toggleLayerVisibility, mountTarget = null, title = 'Lớp bản đồ',collapsibleForest=false }) => {
   const map = useMap();
   const controlRef = useRef(null);
   // Start collapsed on mobile for better UX
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [isExpanded, setIsExpanded] = useState(!isMobile);
+  const [isExpanded, setIsExpanded] = useState(Boolean(mountTarget) || !isMobile);
 
   // ⚡ Extract only visibility state to minimize re-renders
   const hientrangVisible = useMemo(() =>
@@ -20,6 +21,7 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
     mapLayers?.matrung_verified?.visible !== false,
     [mapLayers?.matrung_verified?.visible]
   );
+  const matrungUnverifiedVisible=mapLayers?.matrung_unverified?.visible!==false;
 
   // Listen for window resize to detect mobile/desktop
   useEffect(() => {
@@ -27,24 +29,24 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
       // Auto-collapse on mobile, auto-expand on desktop
-      if (mobile && isExpanded) {
+      if (mobile && isExpanded && !mountTarget) {
         setIsExpanded(false);
       }
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isExpanded]);
+   }, [isExpanded, mountTarget]);
 
   // Main effect for Leaflet control
   useEffect(() => {
     // Remove existing control
     if (controlRef.current) {
-      map.removeControl(controlRef.current);
+      controlRef.current.remove();
     }
 
     const container = L.DomUtil.create("div");
-    container.className = "leaflet-control leaflet-bar";
+    container.className = mountTarget ? "original-layer-control" : "leaflet-control leaflet-bar";
 
     // Prevent map drag when interacting with legend
     L.DomEvent.disableClickPropagation(container);
@@ -62,14 +64,15 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
       return `
       <div class="map-layer-legend" style="
         background: white;
-        border: 2px solid rgba(0,0,0,0.2);
+        border: ${mountTarget ? 'none' : '2px solid rgba(0,0,0,0.2)'};
         border-radius: 8px;
-        box-shadow: 0 3px 14px rgba(0,0,0,0.4);
-        padding: ${legendPadding};
+        box-shadow: ${mountTarget ? 'none' : '0 3px 14px rgba(0,0,0,0.4)'};
+        padding: ${mountTarget ? '0' : legendPadding};
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-size: ${fontSize};
-        max-width: ${legendMaxWidth};
-        min-width: ${legendWidth};
+        max-width: ${mountTarget ? '100%' : legendMaxWidth};
+        min-width: ${mountTarget ? '0' : legendWidth};
+        ${mountTarget ? 'width: 100%;' : ''}
       ">
         <!-- Header -->
         <div style="
@@ -88,7 +91,7 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
               <rect x="3" y="14" width="7" height="7" rx="1" fill="#FF9800" opacity="0.7"/>
               <rect x="14" y="14" width="7" height="7" rx="1" fill="#E91E63" opacity="0.7"/>
             </svg>
-            <span style="font-weight: 700; color: #333; font-size: 14px;">Lớp bản đồ</span>
+            <span style="font-weight: 700; color: #333; font-size: 14px;">${title}</span>
           </div>
           <svg id="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" style="
             transform: rotate(${isExpanded ? '0' : '-90'}deg);
@@ -101,9 +104,9 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
 
         <!-- Content -->
         <div id="legend-content" style="
-          display: ${isExpanded ? 'block' : 'none'};
-          max-height: ${maxContentHeight};
-          overflow-y: auto;
+          display: ${isExpanded||collapsibleForest ? 'block' : 'none'};
+          max-height: ${mountTarget ? 'none' : maxContentHeight};
+          overflow-y: ${mountTarget ? 'visible' : 'auto'};
           overflow-x: hidden;
         ">
           ${createLayerSections()}
@@ -139,10 +142,10 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
               user-select: none;
               flex: 1;
             ">
-              🌳 Hiện Trạng Rừng (127k đa giác)
+              🌳 Hiện Trạng Rừng
             </label>
           </div>
-          <div style="padding: 8px 12px 4px 28px; font-size: 10px; line-height: 1.6; max-height: 300px; overflow-y: auto;">
+          <div style="padding: 8px 12px 4px 28px; font-size: 10px; line-height: 1.6; max-height: ${mountTarget?'none':'300px'}; overflow-y: ${mountTarget?'visible':'auto'};">
             <div style="font-weight: 700; color: #005000; margin-bottom: 6px; font-size: 11px; border-bottom: 2px solid #4CAF50; padding-bottom: 3px;">🌲 Rừng giàu</div>
             <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
               <div style="width: 18px; height: 13px; background: rgb(0, 130, 0); border: 1.5px solid rgb(0, 80, 0); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
@@ -251,7 +254,7 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
           <div style="padding: 8px 12px 4px 28px; font-size: 10px; line-height: 1.6;">
             <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
               <div style="width: 18px; height: 13px; background: rgb(255, 140, 0); border: 1.5px solid rgb(200, 80, 0); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
-              <span style="color: #444; font-size: 10px; font-weight: 500;">Đã xác minh (clipped)</span>
+              <span style="color: #444; font-size: 10px; font-weight: 500;">${mountTarget ? 'Đã xác minh' : 'Đã xác minh (clipped)'}</span>
             </div>
             <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 3px; padding-left: 8px;">
               <div style="width: 18px; height: 13px; background: rgb(150, 150, 150); border: 1.5px solid rgb(100, 100, 100); border-radius: 2px; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
@@ -272,10 +275,10 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
             background: #ffebee;
             border-radius: 6px;
           ">
-            <div style="width: 16px; height: 16px; background: #ef5350; border-radius: 3px; flex-shrink: 0;"></div>
-            <span style="font-weight: 600; color: #c62828; font-size: 13px;">🔴 Mất Rừng (Chưa xác minh)</span>
+            <input type="checkbox" id="layer-matrung_unverified" ${matrungUnverifiedVisible?'checked':''} style="width:16px;height:16px;cursor:pointer;accent-color:#ef5350;">
+            <label for="layer-matrung_unverified" style="font-weight: 600; color: #c62828; font-size: 13px;cursor:pointer;">🔴 Mất Rừng (Chưa xác minh)</label>
           </div>
-          <div style="padding: 4px 12px 0 28px; font-size: 10px; color: #888;">
+          <div ${mountTarget ? 'hidden' : ''} style="padding: 4px 12px 0 28px; font-size: 10px; color: #888;">
             Real-time GeoJSON data
           </div>
         </div>
@@ -286,6 +289,21 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
 
   // Update HTML
   container.innerHTML = createLegendHTML();
+  // Add individual controls to the original swatch rows without replacing template 1.
+  if(colorLayers)container.querySelectorAll('.legend-layer span').forEach(span=>{
+    const text=span.textContent.trim(),code=text.match(/- ([A-Z0-9]+)$/)?.[1];
+    const forest=Boolean(code&&FOREST_COLOR_CODES[code]);
+    const kind=text.startsWith('Đã xác minh')?'verified':text==='Đã xử lý'?'processed':null;
+    if(!forest&&!kind)return;
+    const row=span.parentElement,swatch=row.firstElementChild,button=document.createElement('button');
+    const visible=forest?!forestColorHidden(colorLayers,code):!colorLayers.hiddenAlertKinds?.includes(kind);
+    button.type='button';button.id=forest?`forest-color-${code}`:`alert-color-${kind}`;button.className='legend-color-toggle';
+    button.setAttribute('aria-label',text);button.setAttribute('aria-pressed',String(visible));button.title=`${visible?'Tắt':'Bật'} ${text}`;
+    button.disabled=forest?!hientrangVisible||!Array.isArray(colorLayers.forestTypeCatalog):!matrungVerifiedVisible;
+    button.style.cssText=swatch.style.cssText;
+    button.addEventListener('click',()=>toggleLayerVisibility?.(forest?`forest-color:${code}`:`alert-color:${kind}`));
+    row.replaceChild(button,swatch);span.style.cursor='pointer';span.addEventListener('click',()=>button.click());
+  });
 
   // Setup event listeners
   const setupEventListeners = () => {
@@ -306,7 +324,8 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
       'layer-ranhgioixa': 'ranhgioixa',
       'layer-tieukukhoanh': 'tieukukhoanh',
       'layer-hientrangrung': 'hientrangrung',
-      'layer-matrung_verified': 'matrung_verified'
+      'layer-matrung_verified': 'matrung_verified',
+      'layer-matrung_unverified': 'matrung_unverified'
     };
 
     Object.entries(layerMapping).forEach(([checkboxId, layerKey]) => {
@@ -324,6 +343,15 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
 
   setupEventListeners();
 
+  // Reuse the original main legend HTML outside the map; do not redesign it.
+  if (mountTarget) {
+    const host = typeof mountTarget==='string'?document.querySelector(mountTarget):mountTarget;
+    if (host) host.appendChild(container);
+    const mounted = { remove: () => container.remove() };
+    controlRef.current = mounted;
+    return () => { mounted.remove(); if (controlRef.current === mounted) controlRef.current = null; };
+  }
+
   // Create Leaflet control
   const CustomControl = L.Control.extend({
     onAdd: () => container,
@@ -336,12 +364,12 @@ const MapLayerLegend = ({ mapLayers, toggleLayerVisibility }) => {
 
   return () => {
     if (controlRef.current) {
-      map.removeControl(controlRef.current);
+      controlRef.current.remove();
       controlRef.current = null;
     }
   };
   // ⚡ OPTIMIZED: Only re-create when visibility actually changes, not on every mapLayers update
-}, [map, hientrangVisible, matrungVerifiedVisible, toggleLayerVisibility, isExpanded, isMobile]);
+}, [map, hientrangVisible, matrungVerifiedVisible, matrungUnverifiedVisible, toggleLayerVisibility, isExpanded, isMobile, mountTarget, title, colorLayers,collapsibleForest]);
 
 return null;
 };

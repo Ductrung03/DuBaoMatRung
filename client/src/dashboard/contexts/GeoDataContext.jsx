@@ -1,9 +1,13 @@
 // client/src/dashboard/contexts/GeoDataContext.jsx - AUTO LOAD ALL LAYERS
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback } from "react";
+import { useLocation } from 'react-router-dom';
 import api from "../../services/api"; // ✅ FIX: Use authenticated api instead of raw axios
-import config from "../../config";
 import { toast } from "react-toastify";
 import { convertTcvn3ToUnicode } from "../../utils/fontConverter";
+import { loadAlertCollection, alertIdentity, alertSnapshot, subscribeAlerts } from '../maps/alert-source';
+import { useAuth } from './AuthContext';
+import { EMPTY_FILTERS } from '../monitoring/monitoring-data';
+import { freshMapPresentation,shouldResetMapWork } from '../maps/page-map-state';
 
 const GeoDataContext = createContext();
 
@@ -18,8 +22,41 @@ export const MAPSERVER_LAYERS = {
 export const WMS_BASE_URL = '/api/mapserver';
 
 export const GeoDataProvider = ({ children }) => {
-  const [geoData, setGeoData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  useAuth(); // Re-render immediately on login/profile/scope changes.
+  const accessIdentity=alertIdentity();
+  const {pathname}=useLocation();
+  const pageAction=useMemo(()=>({pathname}),[pathname]);
+  const currentPageAction=useRef(pageAction),previousPath=useRef(pathname);
+  const isMapActionCurrent=useCallback(()=>currentPageAction.current===pageAction&&alertIdentity()===accessIdentity,[pageAction,accessIdentity]);
+  const [geoData, commitGeoData] = useState(null);
+  const geoRevision=useRef(0);
+  const setSourceData=useCallback(next=>{geoRevision.current++;commitGeoData(previous=>{const data=typeof next==='function'?next(previous):next;return data?{...data,accessIdentity:alertIdentity()}:null;});},[]);
+  const setGeoData=useCallback(next=>{if(isMapActionCurrent())setSourceData(next);},[isMapActionCurrent,setSourceData]);
+  const [selectedMapRow,setSelectedMapRow]=useState(null);
+  const previousIdentity=useRef(accessIdentity);
+  useEffect(()=>{
+    if(previousIdentity.current!==accessIdentity){previousIdentity.current=accessIdentity;setSourceData(null);setSelectedMapRow(null);setMapFilters({...EMPTY_FILTERS});}
+    let lastData,lastAccessKey=alertSnapshot().accessKey;
+    const sync=()=>{const state=alertSnapshot();if(lastAccessKey&&lastAccessKey!==state.accessKey)setMapFilters({...EMPTY_FILTERS});lastAccessKey=state.accessKey;if(state.data!==lastData){lastData=state.data;setSelectedMapRow(null);setSourceData(state.data?.data||null);const total=state.data?.data?.features?.length||0;setPagination({page:1,limit:total||100,total,totalPages:total?1:0,hasNext:false,hasPrev:false});}};
+    sync();return subscribeAlerts(sync);
+  },[accessIdentity,setSourceData]);
+  const [mapFilters,setMapFilters]=useState({...EMPTY_FILTERS});
+  const [mapPresentation,setMapPresentation]=useState({base:'satellite',layers:{forest:true,boundaries:true,alerts:true,opacity:0.75}});
+  const [loading, commitLoading] = useState(false);
+  const setLoading=useCallback(next=>{if(isMapActionCurrent())commitLoading(next);},[isMapActionCurrent]);
+  const [mapViewReset,setMapViewReset]=useState(0);
+  useLayoutEffect(()=>{
+    currentPageAction.current=pageAction;
+    const reset=shouldResetMapWork(previousPath.current,pathname);previousPath.current=pathname;
+    if(!reset)return;
+    setSelectedMapRow(null);setMapFilters({...EMPTY_FILTERS});
+    setMapPresentation(freshMapPresentation);
+    const baseline=alertSnapshot().data?.data||null;
+    setSourceData(baseline);commitLoading(false);
+    const total=baseline?.features?.length||0;
+    setPagination({page:1,limit:total||100,total,totalPages:total?1:0,hasNext:false,hasPrev:false});
+    setMapViewReset(value=>value+1);
+  },[pathname,pageAction,setSourceData]);
 
   // ⚡ Pagination state for Mat Rung data
   const [pagination, setPagination] = useState({
@@ -71,12 +108,13 @@ export const GeoDataProvider = ({ children }) => {
 
   // ✅ HÀM CẬP NHẬT: Auto load chỉ GeoJSON layers (WMS layers tự động hiển thị)
   // ⚡ OPTIMIZED: Parallel loading for faster initial load (5-10s → 2-3s)
-  const loadAllDefaultLayers = async () => {
+  const loadAllDefaultLayers = async (force=false) => {
+    const requestToken=localStorage.getItem('token'),revision=geoRevision.current;
     try {
 
       // Chỉ load các GeoJSON layers - WMS layers không cần load data
       const geojsonLayers = Object.entries(mapLayers)
-        .filter(([key, layer]) => layer.layerType === 'geojson')
+        .filter(([, layer]) => layer.layerType === 'geojson')
         .map(([key, layer]) => ({ key, name: layer.name }));
 
       // ✅ TRACK: Kiểm tra xem deforestationAlerts có load thành công không
@@ -87,21 +125,8 @@ export const GeoDataProvider = ({ children }) => {
         try {
           setLayerLoading(layer.key, true);
 
-          // Use relative path to work with Vite proxy
-          let endpoint = `/layer-data/${mapLayers[layer.key].endpoint}`;
-
-          // ✅ SPECIAL: Cho deforestationAlerts, thêm param để chỉ lấy 3 tháng
-          if (layer.key === 'deforestationAlerts') {
-            endpoint += '?days=365'; // 12 tháng
-          }
-
-          const response = await api.get(endpoint, {
-            headers: {
-              'Accept': 'application/json',
-              'Cache-Control': 'max-age=0'
-            },
-            timeout: 300000 // 5 phút timeout
-          });
+          const response = await loadAlertCollection({force});
+          if(localStorage.getItem('token')!==requestToken||geoRevision.current!==revision)return {success:false,cancelled:true};
 
           // ✅ API returns { success, data: { type, features } }
           if (response.data && response.data.data && response.data.data.features) {
@@ -136,6 +161,7 @@ export const GeoDataProvider = ({ children }) => {
             if (layer.key === 'deforestationAlerts') {
               if (layerData.features && layerData.features.length > 0) {
                 setGeoData(layerData);
+                setPagination({page:1,limit:processedFeatures.length,total:processedFeatures.length,totalPages:1,hasNext:false,hasPrev:false});
                 deforestationAlertsLoaded = true;
                 return { success: true, layer: layer.key };
               } else {
@@ -160,6 +186,7 @@ export const GeoDataProvider = ({ children }) => {
 
       // ⚡ Đợi tất cả layers load xong (parallel)
       const results = await Promise.allSettled(loadPromises);
+      if(localStorage.getItem('token')!==requestToken||geoRevision.current!==revision)return;
 
       // Check if deforestationAlerts loaded successfully
       const deforestationResult = results.find(r =>
@@ -186,15 +213,13 @@ export const GeoDataProvider = ({ children }) => {
 
   // ✅ Load dữ liệu mặc định từ endpoint geojson/recent (clipped geometry)
   const loadDefaultMatRungData = async (page = 1, limit = 100) => {
+    void page; // The shared collection is complete; pagination never narrows its scope.
+    const requestToken=localStorage.getItem('token'),revision=geoRevision.current;
     try {
       setLoading(true);
 
-      const response = await api.get(`/mat-rung/geojson/recent`, {
-        params: {
-          days: 365,
-          limit
-        }
-      });
+      const response = await loadAlertCollection();
+      if(localStorage.getItem('token')!==requestToken||geoRevision.current!==revision)return;
 
       if (response.data && response.data.success && response.data.data) {
         // ✅ Apply font conversion to all text fields
@@ -231,6 +256,7 @@ export const GeoDataProvider = ({ children }) => {
         }
 
         setGeoData(matRungData);
+        setPagination({page:1,limit:processedFeatures.length,total:processedFeatures.length,totalPages:1,hasNext:false,hasPrev:false});
 
       } else {
         console.warn('⚠️ No mat_rung data in response:', response.data);
@@ -262,13 +288,14 @@ export const GeoDataProvider = ({ children }) => {
     }
   };
 
+  const currentDefaultLoader=useRef(loadAllDefaultLayers);currentDefaultLoader.current=loadAllDefaultLayers;
   // ✅ AUTO LOAD KHI CÓ TOKEN (đăng nhập hoặc reload trang)
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return; // Chưa đăng nhập - không load
 
     const timer = setTimeout(() => {
-      loadAllDefaultLayers();
+      currentDefaultLoader.current();
     }, 500);
 
     return () => clearTimeout(timer);
@@ -280,20 +307,25 @@ export const GeoDataProvider = ({ children }) => {
 
     const checkInterval = setInterval(() => {
       const currentToken = localStorage.getItem('token');
-      if (currentToken && !lastToken) {
+      if (currentToken && currentToken!==lastToken) {
         // Token vừa xuất hiện - user vừa đăng nhập
         lastToken = currentToken;
-        loadAllDefaultLayers();
+        setSourceData(null);
+        setMapFilters({...EMPTY_FILTERS});
+        setMapLayers(previous=>Object.fromEntries(Object.entries(previous).map(([key,layer])=>[key,{...layer,data:null}])));
+        currentDefaultLoader.current();
       } else if (!currentToken && lastToken) {
         // Token bị xóa - user đăng xuất
         lastToken = null;
-        setGeoData(null);
+        setSourceData(null);
+        setMapFilters({...EMPTY_FILTERS});
+        setMapLayers(previous=>Object.fromEntries(Object.entries(previous).map(([key,layer])=>[key,{...layer,data:null}])));
       }
       lastToken = currentToken;
     }, 1000);
 
     return () => clearInterval(checkInterval);
-  }, []); // Chỉ chạy 1 lần khi mount
+  }, [setSourceData]);
 
   // Enhanced layer data update với viewport metadata
   const updateLayerData = (layerName, data) => {
@@ -369,7 +401,7 @@ export const GeoDataProvider = ({ children }) => {
 
   // ✅ HÀM MỚI: Refresh dữ liệu mặc định
   const refreshDefaultData = () => {
-    loadAllDefaultLayers();
+    loadAllDefaultLayers(true);
   };
 
   // ✅ HÀM CẬP NHẬT: Load layer riêng lẻ - xử lý đúng WMS vs GeoJSON
@@ -401,20 +433,7 @@ export const GeoDataProvider = ({ children }) => {
         toast.info(`🔄 Đang tải ${layer.name}...`, { autoClose: 2000 });
 
         const startTime = Date.now();
-        let endpoint = `/layer-data/${layer.endpoint}`;
-
-        // Special handling cho deforestationAlerts
-        if (layerKey === 'deforestationAlerts') {
-          endpoint += '?days=365';
-        }
-
-        const response = await api.get(endpoint, {
-          headers: {
-            'Accept': 'application/json',
-            'Cache-Control': 'max-age=0'
-          },
-          timeout: 180000 // 3 minutes timeout
-        });
+        const response = await loadAlertCollection({force:true});
 
         const loadTime = ((Date.now() - startTime) / 1000).toFixed(1);
 
@@ -454,6 +473,7 @@ export const GeoDataProvider = ({ children }) => {
 
   // ✅ HÀM MỚI: Load dữ liệu dự báo tự động
   const loadAutoForecastData = async (year, month, period) => {
+    const requestIdentity=alertIdentity(),requestAccess=alertSnapshot().accessKey;
     try {
       setLoading(true);
 
@@ -496,6 +516,7 @@ export const GeoDataProvider = ({ children }) => {
         timeout: 60000 // 1 phút timeout
       });
 
+      if(!isMapActionCurrent()||requestIdentity!==alertIdentity()||requestAccess!==alertSnapshot().accessKey)return {success:false,cancelled:true,message:'Trang, phiên hoặc địa bàn đã thay đổi; bỏ kết quả cũ.'};
       if (response.data.success && response.data.data) {
         // ✅ FIX: Backend convert không hoạt động đúng, cần convert ở frontend
         // Apply font conversion giống như loadDefaultMatRungData
@@ -648,8 +669,10 @@ export const GeoDataProvider = ({ children }) => {
   // ✅ EXPORT CÁC HÀM MỚI trong GeoDataContext.Provider value
   return (
     <GeoDataContext.Provider value={{
-      geoData,
+      geoData:geoData?.accessIdentity===accessIdentity?geoData:null,
+      sourceAccess:alertSnapshot().data?.access,
       setGeoData,
+       mapFilters,setMapFilters,mapPresentation,setMapPresentation,selectedMapRow,setSelectedMapRow,mapViewReset,isMapActionCurrent,
       loading,
       setLoading,
       mapLayers,

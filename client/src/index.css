@@ -65,3 +65,97 @@
 .password-input-container input {
   padding-right: 40px !important;
 }
+/* VFIS identity: compact two-row header shared by desktop and mobile. */
+.vfis-header { flex:none; position:relative; z-index:40; color:#f1fff5; background:#07532c; border-bottom:1px solid #217d4c; }
+:root { --vfis-primary:#07532c; --vfis-surface:#fff; --vfis-text:#172b20; --vfis-border:#d9e2dd; }
+.vfis-app { color:var(--vfis-text); background:var(--vfis-surface); --vfis-heading-font:ui-sans-serif,system-ui,sans-serif; --vfis-heading-size:12px; --vfis-heading-height:24px; --vfis-heading-line:20px; }
+.vfis-app main { background:var(--vfis-surface); }
+/* Section headings follow the forecast page's compact green pill.
+   Report documents retain their own printable template typography. */
+.vfis-app :is(main, aside) :is(h1, h2, h3):not(.monitor-report-document *),
+.vfis-app .map-control-section > summary,
+.vfis-app .bg-forest-green-primary.rounded-full.uppercase {
+  background:var(--vfis-primary);
+  color:#fff;
+  font-family:var(--vfis-heading-font);
+  font-size:var(--vfis-heading-size);
+  font-weight:500;
+  line-height:var(--vfis-heading-line);
+  letter-spacing:0.35px;
+  text-transform:uppercase;
+  text-align:left;
+  padding:0 12px;
+  border-radius:9999px;
+  box-shadow:0 0 #0000, 0 0 #0000, 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  max-width:100%;
+  height:var(--vfis-heading-height);
+  min-height:var(--vfis-heading-height);
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+  word-break:normal;
+  overflow-wrap:normal;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+}
+.vfis-app :is(main,aside) :is(h1,h2,h3):not(.monitor-report-document *)::-webkit-scrollbar { display:none; }
+.vfis-app :is(main,aside) :is(h1,h2,h3):not(.monitor-report-document *) > svg { flex:none; width:14px; height:14px; }
+.vfis-app table th:not(.monitor-report-document *) { font-family:var(--vfis-heading-font); font-size:var(--vfis-heading-size); font-weight:500; line-height:var(--vfis-heading-line); white-space:nowrap; word-break:normal; overflow-wrap:normal; height:32px; padding:6px 12px; box-sizing:border-box; }
+/* Panel actions match the original forecast "Phân tích" button. */
+.vfis-app :is(aside, .monitor-sidebar, .map-control-panel, .lookup-filter-panel) button:not(.monitor-row-link) {
+  background:#c3e8c3;
+  color:#172b20;
+  border:0;
+  border-radius:9999px;
+  padding:8px 12px;
+  min-height:44px;
+  font-family:ui-sans-serif, system-ui, sans-serif;
+  font-size:16px;
+  font-weight:500;
+  line-height:24px;
+  text-align:center;
+  transition:background-color .2s, box-shadow .2s;
+}
+.vfis-app :is(aside, .monitor-sidebar, .map-control-panel, .lookup-filter-panel) button:not(.monitor-row-link):hover:not(:disabled) {
+  background:#bbf7d0;
+  box-shadow:0 4px 6px -1px rgb(0 0 0 / .1),0 2px 4px -2px rgb(0 0 0 / .1);
+}
+.vfis-app :is(aside, .monitor-sidebar, .map-control-panel, .lookup-filter-panel) button:disabled { opacity:.5; cursor:not-allowed; }
+@media(min-width:640px) {
+  .vfis-app :is(aside, .monitor-sidebar, .map-control-panel, .lookup-filter-panel) button:not(.monitor-row-link) { padding:4px 12px; min-height:0; }
+}
+.vfis-app .bg-forest-green-primary,.vfis-app .bg-blue-600 { background-color:var(--vfis-primary); }
+.vfis-app .text-forest-green-primary { color:var(--vfis-primary); }
+.vfis-app .border-forest-green-primary { border-color:var(--vfis-primary); }
+.vfis-brand-row { display:flex; align-items:center; gap:14px; min-height:49px; padding:5px 18px; }
+.vfis-brand { display:flex; align-items:center; gap:9px; flex:none; }
+.vfis-brand img { width:36px; height:36px; object-fit:contain; border-radius:3px; }
+.vfis-brand strong { font-size:24px; font-weight:800; letter-spacing:1px; }
+.vfis-brand-row h1 { border-left:1px solid #72ae88; padding-left:14px; font-weight:700; font-size:16px; white-space:nowrap; min-width:0; overflow-x:auto; scrollbar-width:none; }
+.vfis-account { margin-left:auto; position:relative; display:flex; flex-direction:column; align-items:flex-end; }
+.vfis-organization { font-size:10px; font-weight:700; }
+.vfis-account-button { display:flex; align-items:center; gap:10px; text-align:right; }
+.vfis-account-button b { font-size:12px; }
+.vfis-account-button small { display:block; font-size:10px; color:#d6f1df; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.vfis-avatar { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:#eaf8ee; color:#176b3c; overflow:hidden; }
+.vfis-avatar img { width:100%; height:100%; object-fit:cover; }
+.vfis-account-menu { position:absolute; right:0; top:100%; min-width:230px; margin-top:8px; background:#fff; color:#173422; border:1px solid #8cae97; border-radius:5px; box-shadow:0 8px 24px #17342233; }
+.vfis-account-menu p { padding:12px; border-bottom:1px solid #d9e7dd; font-size:12px; }
+.vfis-account-menu button { display:flex; align-items:center; gap:8px; width:100%; padding:12px; text-align:left; font-size:13px; }
+.vfis-account-menu button:hover { background:#eaf5ed; }
+.vfis-navigation { display:flex; flex-wrap:wrap; align-items:stretch; gap:10px; min-height:31px; padding:0 18px; background:#064727; overflow:visible; }
+.vfis-navigation-group { position:relative; }
+.vfis-navigation-group > summary { display:flex; align-items:center; gap:8px; padding:7px 12px; border-bottom:3px solid transparent; cursor:pointer; font-weight:600; font-size:12px; white-space:nowrap; list-style:none; }
+.vfis-navigation-group > summary::-webkit-details-marker { display:none; }
+.vfis-navigation-group > summary:hover { background:#14663a; }
+.vfis-navigation-group.is-active > summary { background:#176b38; border-bottom-color:#b5e864; }
+.vfis-subnavigation { position:absolute; top:100%; left:0; min-width:240px; background:#064727; border:1px solid #217d4c; box-shadow:0 6px 18px #0005; z-index:50; }
+@media(max-width:767px) { .vfis-navigation-group > summary { padding:8px; font-size:11px; } .vfis-subnavigation { left:auto; right:0; min-width:220px; max-width:calc(100vw - 12px); } }
+.vfis-navigation a { display:flex; align-items:center; gap:8px; padding:7px 12px; white-space:nowrap; font-weight:600; font-size:12px; border-bottom:3px solid transparent; }
+.vfis-navigation a:hover { background:#14663a; }
+.vfis-navigation a.is-active { background:#176b38; border-bottom-color:#b5e864; }
+.vfis-header :focus-visible { outline:2px solid #d2f59b; outline-offset:-2px; }
+@media (max-width:767px) { .vfis-brand-row { gap:8px; padding:6px 10px; } .vfis-brand-row h1 { font-size:11px; padding-left:8px; } .vfis-brand strong { font-size:19px; } .vfis-brand img { width:29px; height:29px; } .vfis-organization { display:none; } .vfis-account-button small { display:none; } .vfis-account-button b { max-width:65px; display:block; overflow:hidden; text-overflow:ellipsis; } .vfis-navigation { padding:0 6px; gap:2px; } .vfis-navigation a { font-size:11px; padding:8px; } }

@@ -1,0 +1,8 @@
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+function fixture(){let version='1';const calls=[];const context={module:{exports:{}},process,require(name){if(name==='pg')return {Pool:class{async query(sql){calls.push(sql);return {rows:[{source:'forest',count:'10',version:'1'}]};}}};return require(name);}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../src/search-revision.js'),'utf8'),context);const req={searchActor:{id:1,roles:['User'],permissions:['detection.view'],province:false,xa:'A'},searchScopeWkt:'scope-a',app:{locals:{db:{async query(sql){calls.push(sql);return {rows:[{count:'3',version,last_gid:'3'}]};}}}}};return {req,calls,read:()=>context.module.exports.readRevision(req,{revision:'units1'}),change:()=>version='2',module:context.module.exports};}
+test('revision response contains no geometry; access changes independently invalidate an actor map session',async()=>{
+ const f=fixture(),a=await f.read();assert.equal(a.revision.length,64);assert.equal(a.accessKey.length,64);assert.ok(!JSON.stringify(a).includes('scope-a'));const b=await f.read();assert.equal(a.revision,b.revision);assert.equal(a.accessKey,b.accessKey);f.req.searchScopeWkt='scope-b';const c=await f.read();assert.notEqual(a.accessKey,c.accessKey);assert.equal(a.revision,c.revision);f.change();assert.notEqual((await f.read()).revision,a.revision);assert.ok(f.calls.every(sql=>sql.startsWith('SELECT')));
+});
+test('revision refuses requests that have not passed current identity/scope middleware',async()=>{
+ const f=fixture();delete f.req.searchActor;await assert.rejects(f.read(),/Chưa xác thực/);assert.equal(f.calls.length,0);
+});

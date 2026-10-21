@@ -13,11 +13,12 @@ import FeatureGuard from "../../components/FeatureGuard";
 import { useIsMobile, useIsMobileOrTablet } from "../../hooks/useMediaQuery";
 import { useAuth } from "../contexts/AuthContext";
 import { FaHome, FaChartLine, FaDatabase, FaFileAlt, FaSatellite, FaUsers, FaUserShield, FaChevronDown, FaChevronRight } from "react-icons/fa";
+import { navigationItems as mainNavigation, canOpenPage, isNavigationActive } from './navigation';
+import SidebarMapControls from '../maps/SidebarMapControls';
 
 const Sidebar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
-  const [, setGeoData] = useState(null);
   const isMobile = useIsMobile();
   const isMobileOrTablet = useIsMobileOrTablet();
   const [activeTab, setActiveTab] = useState(0);
@@ -30,6 +31,7 @@ const Sidebar = () => {
 
   // Kiểm tra quyền truy cập page
   const hasPagePermission = (pageKey) => {
+    if(['monitoring','surveillance'].includes(pageKey))return canOpenPage(user,isAdmin(),pageKey);
     if (isAdmin()) return true;
     if (!user || !user.permissions) return false;
     const pagePermissionPrefixes = {
@@ -47,13 +49,7 @@ const Sidebar = () => {
 
   // Navigation config cho mobile
   const navigationItems = [
-    { path: '/dashboard', label: 'Trang chủ', icon: FaHome, pageKey: null },
-    { path: '/dashboard/dubaomatrung', label: 'Giám sát mất rừng', icon: FaChartLine, pageKey: 'forecast' },
-    { path: '/dashboard/quanlydulieu', label: 'Tra cứu dữ liệu', icon: FaDatabase, pageKey: 'data_management' },
-    { path: '/dashboard/baocao', label: 'Báo cáo', icon: FaFileAlt, pageKey: 'reports' },
-    { path: '/dashboard/phathienmatrung', label: 'Xử lý ảnh viễn thám', icon: FaSatellite, pageKey: 'detection' },
-    { path: '/dashboard/quanlynguoidung', label: 'Quản lý người dùng', icon: FaUsers, pageKey: 'user_management' },
-    { path: '/dashboard/quanlyrole', label: 'Quản lý phân quyền', icon: FaUserShield, pageKey: 'role_management' },
+    ...mainNavigation.flatMap(item=>item.children?item.children.map(child=>({...child,icon:item.icon})):item),
   ];
 
   // Filter navigation items based on permissions
@@ -100,7 +96,7 @@ const Sidebar = () => {
   // Special mobile layout for QuanLyDuLieu page
   if (rootPath === "quanlydulieu" && isMobile) {
     return (
-      <div className="p-3 flex flex-col h-full overflow-y-auto">
+      <div className="map-page-sidebar p-3 flex flex-col h-full overflow-y-auto">
         {/* Mobile Navigation Menu - Same as other pages */}
         <div className="mb-4">
           <button
@@ -119,8 +115,7 @@ const Sidebar = () => {
             <nav className="space-y-1 bg-gray-50 rounded-lg p-2 border border-gray-200 mb-3">
               {visibleNavigationItems.map((item) => {
                 const IconComponent = item.icon;
-                const isActive = currentPath === item.path ||
-                  (item.path !== '/dashboard' && currentPath.startsWith(item.path));
+                const isActive = isNavigationActive(item,currentPath);
 
                 return (
                   <Link
@@ -194,6 +189,7 @@ const Sidebar = () => {
             </FeatureGuard>
           )}
         </div>
+        <SidebarMapControls />
       </div>
     );
   }
@@ -201,7 +197,7 @@ const Sidebar = () => {
   // Desktop: Original vertical stack for all pages
   // Mobile/Tablet: Show navigation links first, then page-specific content
   return (
-    <div className="p-4 flex flex-col gap-4 h-full overflow-y-auto">
+    <div className={`${['dubaomatrung','quanlydulieu'].includes(rootPath)?'map-page-sidebar ':''}p-4 flex flex-col gap-4 h-full overflow-y-auto`}>
       {/* Mobile Navigation Menu - Only show on mobile/tablet */}
       {isMobileOrTablet && (
         <div className="mb-4">
@@ -223,8 +219,7 @@ const Sidebar = () => {
             <nav className="space-y-1 bg-gray-50 rounded-lg p-2 border border-gray-200">
               {visibleNavigationItems.map((item) => {
                 const IconComponent = item.icon;
-                const isActive = currentPath === item.path ||
-                  (item.path !== '/dashboard' && currentPath.startsWith(item.path));
+                const isActive = isNavigationActive(item,currentPath);
 
                 return (
                   <Link
@@ -254,11 +249,8 @@ const Sidebar = () => {
       )}
 
       {/* Page-specific sidebar content */}
-      {Array.isArray(getComponentByPath()) ? (
-        getComponentByPath().map((component) => component)
-      ) : (
-        getComponentByPath()
-      )}
+      {getComponentByPath()}
+      {['dubaomatrung','quanlydulieu'].includes(rootPath)&&<SidebarMapControls />}
     </div>
   );
 };

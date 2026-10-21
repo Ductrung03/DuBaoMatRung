@@ -5,13 +5,12 @@ import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 import { useGeoData } from "../../../contexts/GeoDataContext";
 import { useAuth } from "../../../contexts/AuthContext";
-import config from "../../../../config";
 import Dropdown from "../../../../components/Dropdown";
 import { useIsMobile } from "../../../../hooks/useMediaQuery";
 import BulkVerificationModal from "./BulkVerificationModal";
 
 const XacMinhDuBaoMatRung = () => {
-  const { geoData, setGeoData } = useGeoData();
+  const { geoData, setGeoData,isMapActionCurrent } = useGeoData();
   const { user } = useAuth();
   const isMobile = useIsMobile();
   
@@ -67,6 +66,7 @@ const XacMinhDuBaoMatRung = () => {
         }
       );
 
+      if(!isMapActionCurrent())return;
       if (response.data.success) {
         const { target_feature, geojson, center, bbox } = response.data.data;
 
@@ -100,6 +100,7 @@ const XacMinhDuBaoMatRung = () => {
 
         // ✅ FIX: Zoom map đến target feature với delay
         setTimeout(() => {
+          if(!isMapActionCurrent())return;
           const zoomEvent = new CustomEvent('zoomToFeature', {
             detail: { 
               feature: target_feature,
@@ -114,6 +115,7 @@ const XacMinhDuBaoMatRung = () => {
 
         // ✅ FIX: Highlight row trong table với delay
         setTimeout(() => {
+          if(!isMapActionCurrent())return;
           const tableEvent = new CustomEvent('highlightTableRow', {
             detail: { 
               feature: target_feature,
@@ -134,6 +136,7 @@ const XacMinhDuBaoMatRung = () => {
       }
 
     } catch (error) {
+      if(!isMapActionCurrent())return;
       console.error("❌ Lỗi tìm kiếm:", error);
       
       let errorMessage = "Có lỗi xảy ra khi tìm kiếm";

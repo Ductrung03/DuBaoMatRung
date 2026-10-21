@@ -9,7 +9,7 @@ const MatRungService = require('../services/matrung.service');
 const logger = createLogger('matrung-controller-kysely');
 
 // ✅ FIX: Danh sách roles có toàn quyền xem dữ liệu (không cần filter theo khu vực)
-const ADMIN_ROLES = ['Công ty Fis', 'Chi cục kiểm lâm', 'Admin', 'LanhDao'];
+const ADMIN_ROLES = ['Công ty Fis', 'Chi cục kiểm lâm', 'Admin', 'LanhDao', 'super_admin', 'admin'];
 
 // Mapping huyện
 const HUYEN_MAPPING = {
@@ -92,7 +92,7 @@ exports.getMatRung = async (req, res, next) => {
       limit = 1000
     } = req.query;
 
-    const kyselyDb = req.app.locals.kyselyDb;
+    const kyselyDb = require('../db/scoped-kysely')(req);
     const redis = req.app.locals.redis;
 
     // ✅ FIX: Đọc user scope từ headers
@@ -115,7 +115,7 @@ exports.getMatRung = async (req, res, next) => {
     }
 
     // Build cache key với user scope
-    const cacheKey = `matrung:kysely:${userScopeKey}:${JSON.stringify(req.query)}`;
+    const cacheKey = `matrung:vfis-t10:${userScopeKey}:${JSON.stringify(req.query)}`;
 
     // Try cache first
     const cached = await redis.get(cacheKey);
@@ -236,7 +236,7 @@ exports.getAllMatRung = async (req, res, next) => {
   try {
     const { limit = 1000, months = 3 } = req.query;
 
-    const kyselyDb = req.app.locals.kyselyDb;
+    const kyselyDb = require('../db/scoped-kysely')(req);
     const redis = req.app.locals.redis;
 
     // ✅ FIX: Đọc user scope từ headers
@@ -258,7 +258,7 @@ exports.getAllMatRung = async (req, res, next) => {
       userScopeKey = 'noscope';
     }
 
-    const cacheKey = `matrung:kysely:all:${userScopeKey}:${months}:${limit}`;
+    const cacheKey = `matrung:vfis-t10:all:${userScopeKey}:${months}:${limit}`;
 
     // Try cache
     const cached = await redis.get(cacheKey);
@@ -315,10 +315,10 @@ exports.getAllMatRung = async (req, res, next) => {
 // Get statistics - KYSELY VERSION
 exports.getStats = async (req, res, next) => {
   try {
-    const kyselyDb = req.app.locals.kyselyDb;
+    const kyselyDb = require('../db/scoped-kysely')(req);
     const redis = req.app.locals.redis;
 
-    const cacheKey = 'matrung:kysely:stats';
+    const cacheKey = `matrung:vfis-t10:stats:${req.searchActor?.province?'province':JSON.stringify(req.searchActor)}`;
 
     // Try cache
     const cached = await redis.get(cacheKey);
@@ -367,13 +367,13 @@ exports.forecastPreview = async (req, res, next) => {
       throw new ValidationError('Missing required parameters: year, month, period, fromDate, toDate');
     }
 
-    const kyselyDb = req.app.locals.kyselyDb;
+    const kyselyDb = require('../db/scoped-kysely')(req);
     const redis = req.app.locals.redis;
 
     logger.info('Forecast preview request', { year, month, period, fromDate, toDate });
 
     // Check cache first
-    const cacheKey = `forecast:kysely:preview:${fromDate}:${toDate}`;
+    const cacheKey = `forecast:vfis-t10:preview:${fromDate}:${toDate}:${req.searchActor?.province?'province':JSON.stringify(req.searchActor)}`;
     const cached = await redis.get(cacheKey);
     if (cached) {
       logger.info('Forecast preview cache hit');
@@ -424,7 +424,7 @@ exports.autoForecast = async (req, res, next) => {
       throw new ValidationError('Missing required parameters: year, month, period, fromDate, toDate');
     }
 
-    const kyselyDb = req.app.locals.kyselyDb;
+    const kyselyDb = require('../db/scoped-kysely')(req);
 
     // ✅ FIX: Đọc user scope từ headers
     const userRolesStr = req.headers['x-user-roles'] ? decodeURIComponent(req.headers['x-user-roles']) : '';

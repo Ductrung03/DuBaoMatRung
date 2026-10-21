@@ -3,6 +3,10 @@ const express = require('express');
 const router = express.Router();
 const verificationController = require('../controllers/verification.controller');
 const { asyncHandler } = require('../../../../shared/errors');
+router.use(require('../../../../shared/current-access').currentAccess);
+const access=require('../middleware/alert-access');
+router.use(access.verification);
+router.param('gid',access.param);
 
 /**
  * @swagger

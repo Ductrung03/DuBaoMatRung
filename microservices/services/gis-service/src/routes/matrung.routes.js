@@ -6,6 +6,10 @@ const matRungController = require('../controllers/matrung.controller.kysely');
 // ✅ NEW: Import standard controller for new endpoints
 const matRungControllerStd = require('../controllers/matrung.controller');
 const { asyncHandler } = require('../../../../shared/errors');
+router.use(require('../../../../shared/current-access').currentAccess);
+const access=require('../middleware/alert-access');
+router.param('gid',access.param);
+router.use((req,res,next)=>{try{if(['PUT','DELETE','PATCH'].includes(req.method))access.permission(req,'data_management.data_update');if(req.method==='POST'&&['/forecast-preview','/auto-forecast'].includes(req.path)){const actor=req.searchActor;if(!actor.permissions.some(p=>['forecast.auto','forecast.custom'].includes(p))&&!actor.roles.some(r=>['admin','super_admin','Admin'].includes(r)))return res.status(403).json({success:false,message:'Không có quyền dự báo'});}next();}catch(error){next(error);}});
 
 /**
  * @swagger

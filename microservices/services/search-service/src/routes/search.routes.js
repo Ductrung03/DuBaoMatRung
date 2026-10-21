@@ -3,6 +3,12 @@ const express = require('express');
 const router = express.Router();
 const searchController = require('../controllers/search.controller');
 const { asyncHandler } = require('../../../../shared/errors');
+const {currentAccess}=require('../middleware/current-access');
+router.use(currentAccess);
+router.get('/revision',require('../search-revision').readRevisionRoute);
+router.get('/alerts/:id/profile',require('../controllers/profile.controller').readProfile);
+router.get('/forest-types',require('../controllers/profile.controller').forestTypes);
+router.get('/layers/:name',require('../controllers/layer.controller').readLayer);
 
 /**
  * @swagger
