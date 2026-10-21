@@ -10,14 +10,17 @@ exports.searchMatRung = async (req, res, next) => {
   let adminDb = null;
 
   try {
-    const { q, status, fromDate, toDate, limit = 100, huyen, xa, xacMinh } = req.query;
+    const { q, status, fromDate, toDate, limit = 100, huyen, xa, xacMinh, includeForestFunctions } = req.query;
+    if (includeForestFunctions !== undefined && !['true', 'false'].includes(includeForestFunctions)) {
+      return res.status(400).json(formatResponse(false, 'includeForestFunctions phải là true hoặc false', null));
+    }
 
     // ✅ SCOPE ENFORCEMENT
     const userRolesStr = req.headers['x-user-roles'] ? decodeURIComponent(req.headers['x-user-roles']) : '';
     // Check if user is Admin or LanhDao (skip enforcement)
     // Note: Roles might be "Admin,User" string
     const userRoles = userRolesStr.split(',');
-    const isRestricted = !userRoles.includes('Admin') && !userRoles.includes('LanhDao');
+    const isRestricted = req.searchActor ? !req.searchActor.province : !userRoles.some(role => ['Admin', 'LanhDao', 'admin', 'super_admin'].includes(role));
 
     let forcedXa = null;
 
@@ -25,15 +28,35 @@ exports.searchMatRung = async (req, res, next) => {
       if (req.headers['x-user-xa']) forcedXa = decodeURIComponent(req.headers['x-user-xa']);
     }
 
+    // Fail closed: a restricted account without an assigned commune must not
+    // turn an unfiltered report into a province-wide data download.
+    if (isRestricted && !forcedXa) {
+      return res.status(403).json(formatResponse(false, 'Tài khoản chưa được cấp phạm vi xã. Vui lòng liên hệ quản trị viên.', null));
+    }
+    const forcedTk = isRestricted && req.headers['x-user-tieukhu'] ? decodeURIComponent(req.headers['x-user-tieukhu']) : '';
+    const forcedKhoanh = isRestricted && req.headers['x-user-khoanh'] ? decodeURIComponent(req.headers['x-user-khoanh']) : '';
+    const parsedLimit = Number(limit);
+    if (!/^\d+$/.test(String(limit)) || !Number.isSafeInteger(parsedLimit) || parsedLimit < 0) {
+      return res.status(400).json(formatResponse(false, 'limit phải là số nguyên không âm', null));
+    }
+
     // Effective filters
     const effectiveXa = forcedXa || xa;
+    for(const [key,input]of Object.entries({q,status,fromDate,toDate,huyen,xa,xacMinh}))if(input!==undefined&&(typeof input!=='string'||input.length>200))return res.status(400).json(formatResponse(false,`Điều kiện ${key} không hợp lệ`,null));
+    for(const date of [fromDate,toDate])if(date&&(!/^\d{4}-\d{2}-\d{2}$/.test(date)||Number.isNaN(Date.parse(date))||new Date(date).toISOString().slice(0,10)!==date))return res.status(400).json(formatResponse(false,'Ngày truy vấn không hợp lệ',null));
+    if(fromDate&&toDate&&fromDate>toDate)return res.status(400).json(formatResponse(false,'Khoảng ngày bị đảo ngược',null));
+    let cacheKey = `search:vfis-forest-functions-types-v2:${JSON.stringify([q || '', status || '', fromDate || '', toDate || '', huyen || '', effectiveXa || '', xacMinh || '', parsedLimit, isRestricted, forcedTk, forcedKhoanh, includeForestFunctions === 'true'])}`;
 
+    // Current identity/scope already verified by middleware, before any cache read.
+    const assignments=req.searchActor?await require('../management-units').readAssignments():null;
+    if(assignments)cacheKey+=':assignments:'+assignments.revision;
     const db = req.app.locals.db;
     const redis = req.app.locals.redis; // Có thể undefined nếu Redis bị disable
+    const revision=req.searchActor?await require('../search-revision').readRevision(req,assignments):null;
+    if(revision)cacheKey+=':revision:'+JSON.stringify(revision);
 
     // ✅ Kiểm tra Redis có available không
     if (redis) {
-      const cacheKey = `search:${q || ''}:${status || ''}:${fromDate || ''}:${toDate || ''}:${huyen || ''}:${effectiveXa || ''}:${xacMinh || ''}:role:${isRestricted ? 'restricted' : 'admin'}`;
       const cached = await redis.get(cacheKey);
 
       if (cached) {
@@ -57,6 +80,9 @@ exports.searchMatRung = async (req, res, next) => {
     if (status === 'true' || xacMinh === 'true') {
       whereClause += ` AND m.detection_status = $${paramIndex++}`;
       params.push('Đã xác minh');
+    }
+    else if(status && status!=='false'){
+      whereClause+=` AND m.detection_status = $${paramIndex++}`;params.push(status);
     }
 
     // ✅ FIX: Dùng end_sau thay vì detection_date vì detection_date đều NULL
@@ -82,7 +108,7 @@ exports.searchMatRung = async (req, res, next) => {
         port: process.env.DB_PORT || 5433,
         user: process.env.DB_USER || 'postgres',
         password: process.env.DB_PASSWORD,
-        database: 'admin_db',
+        database: process.env.ADMIN_DB_NAME || 'admin_db',
         max: 5,
         idleTimeoutMillis: 5000
       });
@@ -93,7 +119,7 @@ exports.searchMatRung = async (req, res, next) => {
       let spatialParamIndex = 1;
 
       if (huyen) {
-        spatialWhereClause += ` WHERE r.huyen = $${spatialParamIndex++}`;
+        spatialWhereClause += ` WHERE to_jsonb(r)->>'huyen' = $${spatialParamIndex++}`;
         spatialParams.push(huyen);
       }
 
@@ -114,22 +140,21 @@ exports.searchMatRung = async (req, res, next) => {
 
       if (!spatialResult.rows[0] || !spatialResult.rows[0].union_geom_wkt) {
         logger.warn('No matching admin boundaries found', { huyen, xa: effectiveXa });
-        return res.json(formatResponse(true, 'No data found', {
+        return res.json({...formatResponse(true, 'No data found', {
           type: 'FeatureCollection',
           features: []
-        }));
+        }),...(revision||{})});
       }
 
       // Now query mat_rung with spatial intersection using WKT
-      whereClause += ` AND ST_Intersects(m.geom, ST_GeomFromText($${paramIndex++}, 4326))`;
-      params.push(spatialResult.rows[0].union_geom_wkt);
+      whereClause += ` AND ${isRestricted?'ST_CoveredBy':'ST_Intersects'}(m.geom, ST_GeomFromText($${paramIndex++}, 4326))`;
+      params.push(req.searchScopeWkt||spatialResult.rows[0].union_geom_wkt);
     }
 
     // ✅ OPTIMIZED: Query với tất cả thông tin cần thiết
     // ✅ Tính diện tích từ geometry thay vì dùng field area (vì area = 0)
     // ✅ FIX: Dùng lowercase cho aliases hoặc quote chúng để tránh PostgreSQL auto-lowercase
     // ✅ FIX: Nếu limit=0 thì không giới hạn (dùng cho báo cáo)
-    const parsedLimit = parseInt(limit);
     const limitClause = parsedLimit > 0 ? `LIMIT $${paramIndex}` : '';
 
     query = `
@@ -137,6 +162,7 @@ exports.searchMatRung = async (req, res, next) => {
         m.gid,
         m.area,
         m.start_dau,
+        m.end_dau,m.start_sau,
         m.end_sau,
         m.mahuyen,
         CONCAT('PH-', m.gid) as lo_canbao,
@@ -147,9 +173,35 @@ exports.searchMatRung = async (req, res, next) => {
         m.verification_reason,
         m.detection_status,
         m.verification_notes,
+        jsonb_build_object(
+          'verified_by', metadata.value->'verified_by',
+          'verified_by_name', metadata.value->'verified_by_name',
+          'verified_at', metadata.value->'verified_at',
+          'updated_at', metadata.value->'updated_at',
+          'updated_by', metadata.value->'updated_by',
+          'updated_by_name', metadata.value->'updated_by_name',
+           'detection_date', metadata.value->'detection_date',
+           'image_date', metadata.value->'image_date',
+          'acquisition_date', metadata.value->'acquisition_date',
+          'management_unit', metadata.value->'management_unit',
+          'village', metadata.value->'village',
+          'forest_origin', metadata.value->'forest_origin',
+          'forest_function', metadata.value->'forest_function',
+          'forest_type', metadata.value->'forest_type',
+          'forest_owner', metadata.value->'forest_owner',
+          'before_image_url', metadata.value->'before_image_url',
+          'after_image_url', metadata.value->'after_image_url',
+          'before_image_date',metadata.value->'before_image_date','after_image_date',metadata.value->'after_image_date'
+        ) as detail_metadata,
         ST_AsGeoJSON(m.geom) as geometry,
         ST_AsText(ST_Centroid(m.geom)) as centroid_wkt
       FROM son_la_mat_rung m
+      CROSS JOIN LATERAL (SELECT jsonb_build_object(
+        'verified_by',m.verified_by,'verified_at',m.verified_at,
+        'updated_at',m.updated_at,'updated_by',m.updated_by,'detection_date',m.detection_date,
+        'before_image_url',m.before_image_url,'after_image_url',m.after_image_url,
+        'before_image_date',m.before_image_date,'after_image_date',m.after_image_date
+      ) AS value OFFSET 0) metadata
       ${whereClause}
       ORDER BY m.gid DESC
       ${limitClause}
@@ -165,10 +217,10 @@ exports.searchMatRung = async (req, res, next) => {
 
     // ✅ OPTIMIZED: Get admin info for all results
     if (result.rows.length === 0) {
-      return res.json(formatResponse(true, 'No data found', {
+      return res.json({...formatResponse(true, 'No data found', {
         type: 'FeatureCollection',
         features: []
-      }));
+      }),...(revision||{})});
     }
 
     // Connect to admin_db for admin info lookup (if not already connected)
@@ -179,7 +231,7 @@ exports.searchMatRung = async (req, res, next) => {
         port: process.env.DB_PORT || 5433,
         user: process.env.DB_USER || 'postgres',
         password: process.env.DB_PASSWORD,
-        database: 'admin_db',
+        database: process.env.ADMIN_DB_NAME || 'admin_db',
         max: 5,
         idleTimeoutMillis: 5000,
         connectionTimeoutMillis: 10000
@@ -198,7 +250,7 @@ exports.searchMatRung = async (req, res, next) => {
         // Tạo temporary table với centroids
         // ✅ FIX: JOIN với sonla_tkkl để lấy xa, tieukhu, khoanh
         // ✅ FIX: Fallback to sonla_rgx if sonla_tkkl misses
-        const BATCH_SIZE = 100;
+        const BATCH_SIZE = 1000;
 
         for (let i = 0; i < centroids.length; i += BATCH_SIZE) {
           const batchCentroids = centroids.slice(i, i + BATCH_SIZE);
@@ -225,12 +277,15 @@ exports.searchMatRung = async (req, res, next) => {
           // ✅ FIX: Data trong sonla_tkkl đã là Unicode, KHÔNG cần convert
           adminResult.rows.forEach(row => {
             if (row.centroid_key) {
-              adminInfoMap[row.centroid_key] = {
+              const info = {
                 huyen_name: null,
                 xa_name: row.xa,
                 tk: row.tieukhu,
                 khoanh: row.khoanh
               };
+              const previous=adminInfoMap[row.centroid_key];
+              if(!previous)adminInfoMap[row.centroid_key]=info;
+              else for(const key of ['xa_name','tk','khoanh'])if(previous[key]!==info[key])previous[key]=null;
             }
           });
         }
@@ -254,9 +309,11 @@ exports.searchMatRung = async (req, res, next) => {
         type: 'Feature',
         geometry: JSON.parse(row.geometry),
         properties: {
+          ...(row.detail_metadata || {}),
           gid: row.gid,
           area: row.area,
           start_dau: row.start_dau,
+          end_dau:row.end_dau,start_sau:row.start_sau,
           end_sau: row.end_sau,
           mahuyen: row.mahuyen,
           xa: adminInfo.xa_name,
@@ -276,10 +333,21 @@ exports.searchMatRung = async (req, res, next) => {
         }
       };
     });
+    if(assignments)require('../management-units').attachManagementUnits(features,assignments.rows);
+    if(req.resolveSearchNames){
+      const ids=[...new Set(features.flatMap(f=>[f.properties.verified_by,f.properties.updated_by]).filter(Number.isInteger))];
+      const names=await req.resolveSearchNames(ids),lookup=new Map(names.map(n=>[n.id,n.full_name]));
+      for(const feature of features){const p=feature.properties;p.verified_by_name=p.verified_by_name||lookup.get(p.verified_by)||null;p.updated_by_name=p.updated_by_name||lookup.get(p.updated_by)||null;}
+    }
 
     // ✅ FIX: Post-filter to remove boundary overlaps
-    if (effectiveXa) {
+    if (effectiveXa && !req.searchScopeWkt) {
       features = features.filter(f => f.properties.xa_name === effectiveXa);
+    }
+    if (forcedTk && !req.searchScopeWkt) features = features.filter(f => String(f.properties.tk ?? '') === forcedTk);
+    if (forcedKhoanh && !req.searchScopeWkt) features = features.filter(f => String(f.properties.khoanh ?? '') === forcedKhoanh);
+    if (includeForestFunctions === 'true') {
+      await require('../forest-functions').attachForestFunctions(features, adminDb);
     }
     // Note: search params use 'huyen', 'xa', but properties map filtering.
     // 'req.query.xa' is mapped to 'effectiveXa'.
@@ -295,11 +363,11 @@ exports.searchMatRung = async (req, res, next) => {
     };
 
     const response = formatResponse(true, `Found ${features.length} results`, geoJSON);
+    if(revision){response.revision=revision.revision;response.accessKey=revision.accessKey;response.access=revision.access;}
 
     // ✅ Cache lâu hơn nếu không có search query động (nếu Redis available)
     if (redis) {
       const cacheTime = q ? 60 : 300; // 1 min nếu có search, 5 min nếu filter tĩnh
-      const cacheKey = `search:${q || ''}:${status || ''}:${fromDate || ''}:${toDate || ''}:${huyen || ''}:${xa || ''}:${xacMinh || ''}`;
       await redis.set(cacheKey, response, cacheTime);
     }
 
@@ -328,10 +396,10 @@ exports.searchMatRungById = async (req, res, next) => {
     const { radius = 5000 } = req.query; // Default 5km radius
 
     const db = req.app.locals.db;
-    const redis = req.app.locals.redis; // Có thể undefined
+    const redis = req.searchActor ? null : req.app.locals.redis; // Detail is always fresh for authenticated scoped reads.
 
     // Validate ID
-    if (!id || isNaN(parseInt(id))) {
+    if (!id || !/^\d+$/.test(id) || !Number.isSafeInteger(Number(id)) || !Number.isFinite(Number(radius)) || Number(radius)<0 || Number(radius)>50000) {
       return res.status(400).json(
         formatResponse(false, 'Invalid GID parameter')
       );
@@ -341,7 +409,7 @@ exports.searchMatRungById = async (req, res, next) => {
 
     // ✅ Check cache nếu Redis available
     if (redis) {
-      const cacheKey = `search:id:${gid}:radius:${radius}`;
+      const cacheKey = `search:t10:id:${gid}:radius:${radius}:scope:${JSON.stringify(req.searchActor||{})}`;
       const cached = await redis.get(cacheKey);
 
       if (cached) {
@@ -380,9 +448,10 @@ exports.searchMatRungById = async (req, res, next) => {
         ST_YMax(ST_Envelope(ST_Transform(m.geom, 4326))) as bbox_ymax
       FROM son_la_mat_rung m
       WHERE m.gid = $1 AND m.geom IS NOT NULL
+      AND ($2::text IS NULL OR ST_CoveredBy(m.geom,ST_GeomFromText($2,4326)))
     `;
 
-    const targetResult = await db.query(targetQuery, [gid]);
+    const targetResult = await db.query(targetQuery, [gid,req.searchScopeWkt||null]);
 
     if (targetResult.rows.length === 0) {
       logger.warn(`PH-${gid} not found in database`);
@@ -457,6 +526,7 @@ exports.searchMatRungById = async (req, res, next) => {
       FROM son_la_mat_rung m
       WHERE m.gid != $1
         AND m.geom IS NOT NULL
+        AND ($3::text IS NULL OR ST_CoveredBy(m.geom,ST_GeomFromText($3,4326)))
         AND ST_DWithin(
           ST_Transform(m.geom, 3857),
           (SELECT ST_Transform(geom, 3857) FROM son_la_mat_rung WHERE gid = $1),
@@ -466,7 +536,7 @@ exports.searchMatRungById = async (req, res, next) => {
       LIMIT 50
     `;
 
-    const surroundingResult = await db.query(surroundingQuery, [gid, parseFloat(radius)]);
+    const surroundingResult = await db.query(surroundingQuery, [gid, parseFloat(radius),req.searchScopeWkt||null]);
 
     // ✅ FIX: Thêm dtich, dtichXM, x, y vào surroundingFeatures
     const surroundingFeatures = surroundingResult.rows.map(row => ({
@@ -505,7 +575,7 @@ exports.searchMatRungById = async (req, res, next) => {
         port: process.env.DB_PORT || 5433,
         user: process.env.DB_USER || 'postgres',
         password: process.env.DB_PASSWORD,
-        database: 'admin_db',
+        database: process.env.ADMIN_DB_NAME || 'admin_db',
         max: 5,
         idleTimeoutMillis: 5000
       });
@@ -585,7 +655,7 @@ exports.searchMatRungById = async (req, res, next) => {
 
     // Cache for 5 minutes (nếu Redis available)
     if (redis) {
-      const cacheKey = `search:id:${gid}:radius:${radius}`;
+      const cacheKey = `search:t10:id:${gid}:radius:${radius}:scope:${JSON.stringify(req.searchActor||{})}`;
       await redis.set(cacheKey, response, 300);
     }
 

@@ -920,6 +920,7 @@ exports.getRecentGeoJson = async (req, res, next) => {
   try {
     const db = req.app.locals.db;
     const { bbox, days = 365 } = req.query;
+    if(!/^\d+$/.test(String(days))||Number(days)>36500)throw new ValidationError('Invalid days');
 
     let bboxFilter = '';
     let params = [];
@@ -927,9 +928,12 @@ exports.getRecentGeoJson = async (req, res, next) => {
     // Parse bbox if provided: minX,minY,maxX,maxY
     if (bbox) {
       const [minX, minY, maxX, maxY] = bbox.split(',').map(Number);
+      if(bbox.split(',').length!==4||[minX,minY,maxX,maxY].some(n=>!Number.isFinite(n))||minX>=maxX||minY>=maxY||minX<-180||maxX>180||minY<-90||maxY>90)throw new ValidationError('Invalid bbox');
       bboxFilter = `AND COALESCE(m.clipped_geom, m.geom) && ST_MakeEnvelope($1, $2, $3, $4, 4326)`;
       params.push(minX, minY, maxX, maxY);
     }
+
+    if(req.searchScopeWkt){params.push(req.searchScopeWkt);bboxFilter+=` AND ST_CoveredBy(m.geom,ST_GeomFromText($${params.length},4326))`;}
 
     // Check if laocai_rg3lr table exists
     const hasRg3lr = await tableExists(db, 'laocai_rg3lr');
@@ -1034,7 +1038,7 @@ exports.getRecentGeoJson = async (req, res, next) => {
     });
 
     // Set cache-control: 30 seconds for real-time data
-    res.set('Cache-Control', 'public, max-age=30');
+    res.set('Cache-Control', 'private, no-store');
     res.json({
       success: true,
       data: geojson,
@@ -1078,7 +1082,8 @@ exports.getClipProgress = async (req, res, next) => {
         COUNT(CASE WHEN last_clipped_at IS NOT NULL THEN 1 END) as processed,
         COUNT(CASE WHEN has_intersection THEN 1 END) as intersected
       FROM son_la_mat_rung
-    `);
+      WHERE ($1::text IS NULL OR ST_CoveredBy(geom,ST_GeomFromText($1,4326)))
+    `,[req.searchScopeWkt||null]);
 
     const stats = statsResult.rows[0];
     const total = parseInt(stats.total);
@@ -1139,7 +1144,7 @@ exports.getStatistics = async (req, res, next) => {
         COUNT(*) as total,
         COUNT(clipped_geom) as clipped,
         COUNT(CASE WHEN has_intersection THEN 1 END) as has_intersection,
-        COUNT(CASE WHEN detection_status = 'Chưa xác minh' THEN 1 END) as unverified,
+        COUNT(CASE WHEN detection_status IN ('Chưa xác minh','Mới phát hiện','Đang xác minh') THEN 1 END) as unverified,
         COUNT(CASE WHEN detection_status = 'Đã xác minh' THEN 1 END) as verified,
         COUNT(CASE WHEN detection_status = 'Đã xử lý' THEN 1 END) as processed,
         COALESCE(SUM(area), 0) as total_original_area,
@@ -1149,7 +1154,8 @@ exports.getStatistics = async (req, res, next) => {
         MAX(created_at) as newest_record,
         MAX(last_clipped_at) as last_clip_time
       FROM son_la_mat_rung
-    `);
+      WHERE ($1::text IS NULL OR ST_CoveredBy(geom,ST_GeomFromText($1,4326)))
+    `,[req.searchScopeWkt||null]);
 
     const queryTime = Date.now() - startTime;
 
@@ -1223,7 +1229,7 @@ exports.updateMatRung = async (req, res, next) => {
 
     if (detection_status !== undefined) { setClauses.push(`detection_status = $${idx++}`); params.push(detection_status); }
     // dtichXM (frontend) → verified_area (DB)
-    if (dtichXM !== undefined) { setClauses.push(`verified_area = $${idx++}`); params.push(dtichXM || null); }
+    if (dtichXM !== undefined) { setClauses.push(`verified_area = $${idx++}`); params.push(dtichXM === '' ? null : dtichXM); }
     if (verification_reason !== undefined) { setClauses.push(`verification_reason = $${idx++}`); params.push(verification_reason || null); }
     if (verification_notes !== undefined) { setClauses.push(`verification_notes = $${idx++}`); params.push(verification_notes || null); }
 
@@ -1232,7 +1238,7 @@ exports.updateMatRung = async (req, res, next) => {
     }
 
     params.push(parseInt(gid));
-    const query = `UPDATE son_la_mat_rung SET ${setClauses.join(', ')} WHERE gid = $${idx} RETURNING gid`;
+    const query = `UPDATE son_la_mat_rung SET ${setClauses.join(', ')}, updated_at=NOW() WHERE gid = $${idx} RETURNING gid`;
     const result = await db.query(query, params);
 
     if (result.rows.length === 0) {

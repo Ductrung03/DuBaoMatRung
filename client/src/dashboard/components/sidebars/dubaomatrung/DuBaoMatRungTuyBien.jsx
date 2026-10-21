@@ -1,15 +1,14 @@
 import React, { useState } from "react";
-import { useAuth } from "../../../contexts/AuthContext";
 import { useGeoData } from "../../../contexts/GeoDataContext";
 import api from "../../../../services/api";
 import { toast } from "react-toastify";
 import { useSonLaAdminUnits } from "../../../hooks/useSonLaAdminUnits";
 import Dropdown from "../../../../components/Dropdown";
 import { convertTcvn3ToUnicode } from "../../../../utils/fontConverter";
+import {alertIdentity,alertSnapshot} from '../../../maps/alert-source';
 
 const DuBaoMatRungTuyBien = () => {
-  const { isAdmin, user } = useAuth();
-  const { setGeoData, setLoading } = useGeoData();
+  const { setGeoData, setLoading,isMapActionCurrent } = useGeoData();
   const adminUnits = useSonLaAdminUnits();
   const { selectedXa } = adminUnits;
 
@@ -21,6 +20,7 @@ const DuBaoMatRungTuyBien = () => {
   const [toDate, setToDate] = useState("");
 
   const handleAnalyze = async () => {
+    const requestIdentity=alertIdentity(),requestAccess=alertSnapshot().accessKey;
     try {
       if (!fromDate || !toDate) {
         toast.warning("Vui lòng nhập ngày bắt đầu và ngày kết thúc");
@@ -31,6 +31,7 @@ const DuBaoMatRungTuyBien = () => {
         toast.warning("Vui lòng chọn xã");
         return;
       }
+      if(fromDate>toDate){toast.warning('Ngày bắt đầu phải trước hoặc bằng ngày kết thúc');return;}
 
       setLoading(true);
       setLoadingState(true);
@@ -44,6 +45,7 @@ const DuBaoMatRungTuyBien = () => {
       });
 
       const data = response.data;
+      if(!isMapActionCurrent()||requestIdentity!==alertIdentity()||requestAccess!==alertSnapshot().accessKey)return;
 
       if (!data.success) {
         toast.error(data.message || "Lỗi từ backend");
@@ -87,6 +89,7 @@ const DuBaoMatRungTuyBien = () => {
       );
 
       setTimeout(() => {
+        if(!isMapActionCurrent())return;
         const mapElement = document.querySelector('.leaflet-container');
         if (mapElement) {
           mapElement.scrollIntoView({
@@ -95,6 +98,7 @@ const DuBaoMatRungTuyBien = () => {
           });
 
           setTimeout(() => {
+            if(!isMapActionCurrent())return;
             window.scrollBy({
               top: 100,
               behavior: 'smooth'
@@ -104,6 +108,7 @@ const DuBaoMatRungTuyBien = () => {
       }, 300);
 
     } catch (err) {
+      if(!isMapActionCurrent())return;
       console.error("❌ Lỗi dự báo tùy biến:", err);
       toast.error(`Lỗi khi thực hiện phân tích: ${err.message}`);
     } finally {
@@ -156,6 +161,7 @@ const DuBaoMatRungTuyBien = () => {
                   <input
                     type="date"
                     value={fromDate}
+                    max={toDate||undefined}
                     onChange={(e) => setFromDate(e.target.value)}
                     className="w-full sm:flex-1 border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
@@ -165,6 +171,7 @@ const DuBaoMatRungTuyBien = () => {
                   <input
                     type="date"
                     value={toDate}
+                    min={fromDate||undefined}
                     onChange={(e) => setToDate(e.target.value)}
                     className="w-full sm:flex-1 border border-green-400 rounded-md py-1.5 sm:py-0.5 px-2 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   />

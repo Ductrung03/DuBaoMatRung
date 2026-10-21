@@ -50,7 +50,7 @@ exports.verifyMatRung = async (req, res, next) => {
         verification_reason = $3,
         verification_notes = $4,
         verified_area = $5,
-        detection_date = CURRENT_TIMESTAMP
+        detection_date = CURRENT_TIMESTAMP, updated_at=NOW()
       WHERE gid = $6
       RETURNING *
     `;
@@ -187,7 +187,7 @@ exports.batchVerify = async (req, res, next) => {
         verified_by = $2,
         verification_reason = $3,
         verification_notes = $4,
-        detection_date = CURRENT_TIMESTAMP
+        detection_date = CURRENT_TIMESTAMP, updated_at=NOW()
       WHERE gid = ANY($5::int[])
       RETURNING gid
     `;
@@ -292,7 +292,7 @@ exports.verifyMatRungById = async (req, res, next) => {
     }
 
     // Determine verified area (use provided value or keep original area)
-    const finalVerifiedArea = verified_area || currentRecord.original_area;
+    const finalVerifiedArea = verified_area ?? currentRecord.original_area;
     const areaChanged = verified_area && verified_area !== currentRecord.original_area;
 
     // Determine detection date (use provided value or current timestamp)
@@ -307,7 +307,7 @@ exports.verifyMatRungById = async (req, res, next) => {
         verification_reason = $2,
         verification_notes = $3,
         verified_area = $4,
-        detection_date = $5
+        detection_date = $5, updated_at=NOW()
       WHERE gid = $6
       RETURNING
         gid,
@@ -451,7 +451,7 @@ exports.bulkXlsxVerify = async (req, res, next) => {
                verification_reason = $3,
                verification_notes = $4,
                verified_area = $5,
-               detection_date = CURRENT_TIMESTAMP
+                detection_date = CURRENT_TIMESTAMP, updated_at=NOW()
            WHERE gid = $6`,
           [finalStatus, userId, verification_reason || null, verification_notes || null, finalVerifiedArea, gidInt]
         );

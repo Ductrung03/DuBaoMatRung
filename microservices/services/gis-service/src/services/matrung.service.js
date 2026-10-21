@@ -17,7 +17,7 @@ function getAdminDbPool() {
       port: parseInt(process.env.DB_PORT) || 5432,
       user: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASSWORD,
-      database: 'admin_db',
+      database: process.env.ADMIN_DB_NAME || 'admin_db',
       max: 10,
       min: 2,
       idleTimeoutMillis: 60000,

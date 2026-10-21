@@ -37,7 +37,7 @@ app.use(helmet({
       // Allow images from self and same host on port 3000 (gateway) to avoid NotSameOrigin blocks
       imgSrc: ["'self'", "data:", "https:", "http://103.56.160.66:3000"],
       // Allow connecting to gateway and earth engine
-      connectSrc: ["'self'", "http://103.56.160.66:3000", "https://earthengine.googleapis.com"],
+      connectSrc: ["'self'", "http://103.56.160.66:3000", "https://earthengine.googleapis.com", "https://sentinel.arcgis.com", "https://landsat2.arcgis.com"],
       // IMPORTANT: Disable upgrade-insecure-requests for HTTP deployment
       upgradeInsecureRequests: null
     }
@@ -361,11 +361,12 @@ app.use('/api/hanhchinh',
 
 // Search Service
 app.use('/api/search',
-  authMiddleware.optionalAuth, // ✅ FIX: Use optionalAuth to allow public access but support user scope
+  authMiddleware.authenticate, // Reports and monitoring contain scoped operational data.
   createProxy(logger, {
     target: process.env.SEARCH_SERVICE_URL || 'http://localhost:3006',
     pathRewrite: (path, req) => '/api/search' + path,
     serviceName: 'Search',
+    timeout: 120000, // Full scoped collections include read-only forest polygon intersections.
     forwardUserHeaders: true // ✅ FIX: Forward user headers
   })
 );
@@ -451,7 +452,7 @@ connectMongoDB()
     logger.warn('MongoDB connection failed, logging service will not be available:', error.message);
   });
 
-const server = app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, process.env.BIND_HOST || '0.0.0.0', () => {
   logger.info(`API Gateway running on port ${PORT}`);
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
   logger.info('Services configured:', {

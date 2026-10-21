@@ -1,5 +1,5 @@
 // client/src/dashboard/components/sidebars/dubaomatrung/DuBaoMatRungTuDong.jsx - ENHANCED VERSION
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import { toast } from "react-toastify";
 import { useGeoData } from "../../../contexts/GeoDataContext";
@@ -9,17 +9,14 @@ import Dropdown from "../../../../components/Dropdown";
 const DuBaoMatRungTuDong = () => {
   const { 
     loadAutoForecastData, 
-    getAutoForecastPreview, 
     resetToDefaultData,
-    loading 
+    loading,isMapActionCurrent
   } = useGeoData();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = useState("01");
   const [selectedPeriod, setSelectedPeriod] = useState("Trước ngày 15");
   const [isForecastOpen, setIsForecastOpen] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [, setPreviewData] = useState(null);
-  const [, setShowPreview] = useState(false);
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
@@ -32,6 +29,7 @@ const DuBaoMatRungTuDong = () => {
 
   // ✅ HÀM XỬ LÝ DỰ BÁO TỰ ĐỘNG - Updated to use Context
   const handleAutomaticForecast = async () => {
+    if(!/^\d{4}$/.test(selectedYear)||!/^(0[1-9]|1[0-2])$/.test(selectedMonth)||!['Trước ngày 15','Sau ngày 15'].includes(selectedPeriod)){toast.warning('Vui lòng chọn đầy đủ năm, tháng và kỳ');return;}
     try {
       setIsProcessing(true);
       
@@ -47,6 +45,7 @@ const DuBaoMatRungTuDong = () => {
 
       // ✅ SỬ DỤNG CONTEXT FUNCTION thay vì gọi API trực tiếp
       const result = await loadAutoForecastData(selectedYear, selectedMonth, selectedPeriod);
+      if(!isMapActionCurrent()||result.cancelled)return;
       
       if (result.success) {
         const count = result.data.features?.length || 0;
@@ -59,6 +58,7 @@ const DuBaoMatRungTuDong = () => {
 
         // ✅ Tự động scroll xuống để user thấy bảng dữ liệu
         setTimeout(() => {
+          if(!isMapActionCurrent())return;
           const mapElement = document.querySelector('.leaflet-container');
           if (mapElement) {
             mapElement.scrollIntoView({
@@ -68,6 +68,7 @@ const DuBaoMatRungTuDong = () => {
 
             // Scroll thêm một chút để thấy cả table
             setTimeout(() => {
+              if(!isMapActionCurrent())return;
               window.scrollBy({
                 top: 100,
                 behavior: 'smooth'
@@ -81,6 +82,7 @@ const DuBaoMatRungTuDong = () => {
       }
 
     } catch (error) {
+      if(!isMapActionCurrent())return;
       console.error('❌ Lỗi dự báo tự động:', error);
       toast.error(`❌ Lỗi khi thực hiện phân tích: ${error.message}`);
     } finally {
@@ -92,18 +94,15 @@ const DuBaoMatRungTuDong = () => {
   const handleResetToDefault = async () => {
     try {
       setIsProcessing(true);
-      toast.info("🔄 Đang khôi phục dữ liệu mặc định...");
       
       const result = await resetToDefaultData();
+      if(!isMapActionCurrent())return;
       
-      if (result.success) {
-        toast.success("✅ Đã khôi phục dữ liệu mặc định (3 tháng gần nhất)");
-        setPreviewData(null);
-        setShowPreview(false);
-      } else {
+      if (!result.success) {
         toast.error("❌ Lỗi khi khôi phục dữ liệu mặc định");
       }
     } catch (error) {
+      if(!isMapActionCurrent())return;
       console.error("❌ Error resetting:", error);
       toast.error("❌ Lỗi khi khôi phục dữ liệu");
     } finally {
@@ -111,34 +110,6 @@ const DuBaoMatRungTuDong = () => {
     }
   };
 
-  // ✅ HÀM LẤY PREVIEW DATA
-  const handleGetPreview = async () => {
-    try {
-      const result = await getAutoForecastPreview(selectedYear, selectedMonth, selectedPeriod);
-      
-      if (result.success && result.data) {
-        setPreviewData(result.data);
-        setShowPreview(true);
-        toast.success(`📊 Preview: ${result.data.total_features} khu vực (${result.data.total_area_ha} ha)`);
-      } else {
-        toast.warning("⚠️ Không thể lấy thông tin preview");
-      }
-    } catch (error) {
-      console.error("❌ Error getting preview:", error);
-      toast.error("❌ Lỗi khi lấy thông tin preview");
-    }
-  };
-
-  // ✅ AUTO PREVIEW khi thay đổi parameters
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (isForecastOpen) {
-        handleGetPreview();
-      }
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, [selectedYear, selectedMonth, selectedPeriod, isForecastOpen]);
 
   // ✅ LẤY THÔNG TIN DỮ LIỆU HIỆN TẠI
 

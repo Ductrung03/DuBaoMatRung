@@ -9,7 +9,7 @@ class TileCacheMiddleware {
     this.hits = 0;
     this.misses = 0;
     this.errors = 0;
-    this.prefix = process.env.TILE_CACHE_PREFIX || 'mapserver:tile:';
+    this.prefix = process.env.TILE_CACHE_PREFIX || 'mapserver:tile:vfis-t10:';
   }
 
   async initialize() {

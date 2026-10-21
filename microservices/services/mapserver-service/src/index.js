@@ -43,7 +43,7 @@ const MAPSERV_BIN = process.env.MAPSERV_BIN ||
 
 const MAPFILE_PATH = process.env.MAPFILE_PATH
   ? path.resolve(process.env.MAPFILE_PATH)
-  : path.join(__dirname, '../../../..', 'mapserver/mapfiles/sonla-ultra-optimized.map');
+  : path.join(__dirname, '../../../..', process.platform==='win32'?'mapserver/mapfiles/sonla-windows-optimized.map':'mapserver/mapfiles/sonla-ultra-optimized.map');
 
 // MapServer config file - Auto detect Windows
 const MS_CONFIG_FILE = process.env.MS_CONFIG_FILE ||
@@ -107,7 +107,9 @@ const handleMapServerRequest = async (req, res) => {
 
   try {
     // Build query string from request
-    const queryParams = new URLSearchParams(req.query);
+    let queryParams;
+    try { queryParams = require('./forest-type-filter').applyForestTypeFilter(req.query); }
+    catch(error) { return res.status(400).json({success:false,message:error.message}); }
     const queryString = queryParams.toString();
 
     logger.info('Executing MapServer', {
@@ -134,26 +136,29 @@ const handleMapServerRequest = async (req, res) => {
 
     // Spawn MapServer process
     const mapserv = spawn(MAPSERV_BIN, [], {
+      windowsHide: true,
       env: env,
       stdio: ['ignore', 'pipe', 'pipe']
     });
 
     let output = Buffer.alloc(0);
     let headers = '';
+    let headerBuffer=Buffer.alloc(0);
     let headersParsed = false;
     let contentType = 'image/png';
 
     mapserv.stdout.on('data', (data) => {
       if (!headersParsed) {
-        const dataStr = data.toString();
-        const headerEndIndex = dataStr.indexOf('\r\n\r\n');
+        headerBuffer=Buffer.concat([headerBuffer,data]);
+        let headerEndIndex = headerBuffer.indexOf('\r\n\r\n'),separatorLength=4;
+        if(headerEndIndex<0){headerEndIndex=headerBuffer.indexOf('\n\n');separatorLength=2;}
 
         if (headerEndIndex !== -1) {
-          headers += dataStr.substring(0, headerEndIndex);
+          headers = headerBuffer.subarray(0,headerEndIndex).toString('ascii');
           headersParsed = true;
 
           // Parse and set headers
-          headers.split('\r\n').forEach(header => {
+          headers.split(/\r?\n/).forEach(header => {
             const colonIndex = header.indexOf(':');
             if (colonIndex > 0) {
               const key = header.substring(0, colonIndex).trim();
@@ -168,10 +173,11 @@ const handleMapServerRequest = async (req, res) => {
           });
 
           // Add remaining data to output
-          const remainingData = Buffer.from(dataStr.substring(headerEndIndex + 4));
+          const remainingData = headerBuffer.subarray(headerEndIndex + separatorLength);
           output = Buffer.concat([output, remainingData]);
+          headerBuffer=Buffer.alloc(0);
         } else {
-          headers += dataStr;
+          if(headerBuffer.length>65536){mapserv.kill();if(!res.headersSent)res.status(502).send('Invalid CGI headers');}
         }
       } else {
         output = Buffer.concat([output, data]);

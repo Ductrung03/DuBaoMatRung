@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./dashboard/pages/Login";
 import MainLayout from "./dashboard/layout/MainLayout";
 import QuanLyDuLieu from "./dashboard/pages/QuanLyDuLieu";
-import ThongKeBaoCaoMatRung from "./dashboard/pages/ThongKeBaoCaoMatRung";
 import { GeoDataProvider } from "./dashboard/contexts/GeoDataContext";
 import PhatHienMatRung from "./dashboard/pages/PhatHienMatRung";
 import { ReportProvider } from "./dashboard/contexts/ReportContext";
@@ -17,7 +16,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Map from "./dashboard/pages/Map";
 import DuBaoMatRung from "./dashboard/pages/DuBaoMatRung";
-import Dashboard from "./dashboard/pages/Dashboard";
+import MonitoringWorkspace from "./dashboard/monitoring/MonitoringWorkspace";
+import MonitoringReports from "./dashboard/monitoring/MonitoringReports";
 
 import { PermissionProvider } from "./dashboard/contexts/PermissionContext";
 
@@ -40,7 +40,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   >
-                    <Route path="" element={<Dashboard />} />
+                    <Route path="" element={<PermissionProtectedRoute requiredPermission="data_management.forecast_search"><MonitoringWorkspace /></PermissionProtectedRoute>} />
                     <Route
                       path="dubaomatrung/*"
                       element={
@@ -60,18 +60,16 @@ function App() {
                     <Route
                       path="phathienmatrung/*"
                       element={
-                        <PermissionProtectedRoute requiredPermission="detection">
                           <ErrorBoundary>
-                            <PhatHienMatRung />
+                            <PermissionProtectedRoute requiredPermission="detection"><PhatHienMatRung /></PermissionProtectedRoute>
                           </ErrorBoundary>
-                        </PermissionProtectedRoute>
                       }
                     />
                     <Route
                       path="baocao"
                       element={
                         <PermissionProtectedRoute requiredPermission="reports">
-                          <ThongKeBaoCaoMatRung />
+                          <MonitoringReports />
                         </PermissionProtectedRoute>
                       }
                     />

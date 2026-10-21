@@ -6,6 +6,7 @@ import LoadingOverlay from "./LoadingOverlay";
 import PaginationControls from "../../../components/PaginationControls"; // ⚡ Pagination
 import { useGeoData } from "../../../contexts/GeoDataContext"; // ⚡ Access pagination state
 import { FaFileExcel, FaFileCode } from "react-icons/fa";
+import { statusOf } from '../../../monitoring/monitoring-data';
 
 const TableDisplay = ({
   loading,
@@ -26,8 +27,7 @@ const TableDisplay = ({
     if (!geoData?.features) return [];
     if (!filterVerified && !filterUnverified) return geoData.features;
     return geoData.features.filter(f => {
-      const status = f.properties?.detection_status;
-      const isVerified = status === 'verified' || status === 'Đã xác minh';
+      const isVerified = statusOf(f.properties||{}) === 'verified';
       if (filterVerified && filterUnverified) return true;
       if (filterVerified) return isVerified;
       if (filterUnverified) return !isVerified;
@@ -39,13 +39,13 @@ const TableDisplay = ({
     if (!geoData?.features?.length) return;
 
     const fmtDate = (v) => v ? new Date(v).toLocaleDateString("vi-VN") : "";
-    const fmtHa   = (v) => { const n = parseFloat(v)||0; return n > 0 ? parseFloat((n/10000).toFixed(2)) : 0; };
+    const fmtHa = v=>{if(v===null||v===undefined||v==='')return null;const n=Number(v);return Number.isFinite(n)?n/10000:null;};
 
     // Header row 1 (groups) + row 2 (sub-headers)
     const header1 = ["Lô phát hiện","Số lần","Thời gian xử lý ảnh","","","","Diện tích (ha)","Xã","Tiểu khu","Khoảnh","Tọa độ","","Trạng thái xác minh","Diện tích xác minh (ha)","Nguyên nhân","Người xác minh","Ngày xác minh","Ghi chú"];
-    const header2 = ["","","Kỳ đầu","","Kỳ sau","","","","","","Latitude (X)","Longitude (Y)","","","","","",""];
+    const header2 = ["","","Kỳ đầu","","Kỳ sau","","","","","","Longitude (X)","Latitude (Y)","","","","","",""];
 
-    const rows = geoData.features.map((f) => {
+    const rows = filteredFeatures.map((f) => {
       const p = f.properties;
       return [
         p.gid ? `PH-${p.gid}` : "",
@@ -107,7 +107,16 @@ const TableDisplay = ({
 
   const handleExportGeoJSON = () => {
     if (!geoData?.features?.length) return;
-    const blob = new Blob([JSON.stringify(geoData, null, 2)], { type: "application/geo+json" });
+    const fmtDate=v=>v?new Date(v).toLocaleDateString('vi-VN'):'';
+    const fmtHa=v=>{if(v===null||v===undefined||v==='')return null;const n=Number(v);return Number.isFinite(n)?n/10000:null;};
+    // Keep the existing production export aliases and all original metadata.
+    const exported={...geoData,features:filteredFeatures.map(f=>{const p=f.properties||{};return {...f,properties:{...p,
+      ma_lo:p.gid?`PH-${p.gid}`:'',gid:p.gid??'',xa:p.xa||'',tieu_khu:p.tk||'',khoanh:p.khoanh||'',
+      dien_tich_ha:fmtHa(p.dtich),ky_dau_tu:fmtDate(p.start_dau),ky_dau_den:fmtDate(p.end_dau),ky_sau_tu:fmtDate(p.start_sau),ky_sau_den:fmtDate(p.end_sau),so_lan:p.so_lan??'',
+      toa_do_x:p.x_coordinate??p.x??null,toa_do_y:p.y_coordinate??p.y??null,trang_thai:p.detection_status||'Chưa xác định',
+      dien_tich_xac_minh_ha:fmtHa(p.dtichXM??p.verified_area),nguyen_nhan:p.verification_reason||'',nguoi_xac_minh:p.verified_by_name||'',ngay_xac_minh:fmtDate(p.detection_date),ghi_chu:p.verification_notes||''
+    }};})};
+    const blob = new Blob([JSON.stringify(exported, null, 2)], { type: "application/geo+json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     const today = new Date().toISOString().split("T")[0];
@@ -120,37 +129,25 @@ const TableDisplay = ({
   };
   // ✅ REMOVED: Không còn kiểm tra trang nào nữa - Hiển thị table cho TẤT CẢ trang
 
-  // Hiển thị loading
-  if (loading) {
-    return (
-      <div className="text-center text-green-700 font-semibold p-3 bg-white rounded-md shadow">
-        <div className="animate-spin inline-block w-6 h-6 border-4 border-green-500 border-t-transparent rounded-full mr-2"></div>
-        Đang tải dữ liệu... Vui lòng đợi trong giây lát
-      </div>
-    );
-  }
-
   // Hiển thị bảng dữ liệu khi có dữ liệu
-  if (geoData?.features?.length > 0) {
+  if (Array.isArray(geoData?.features)) {
     return (
-      <div className="relative">
+      <div className="lookup-table-panel relative" aria-busy={loading}>
         {/* Loading overlay cho bảng dữ liệu */}
         {loadingDetails && <LoadingOverlay message={loadingMessage} />}
 
-        <div className="bg-blue-50 p-3 rounded-md mb-3 border-l-4 border-blue-400">
+        <div className="lookup-table-toolbar bg-blue-50 p-3 rounded-md mb-3 border-l-4 border-blue-400" role="region" aria-label="Kết quả, xuất dữ liệu và bộ lọc xác minh">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <p className="text-blue-800 text-sm">
-                🔍 <strong>Hiển thị bảng dữ liệu:</strong> {geoData.features.length} khu vực mất rừng
-              </p>
-              <p className="text-blue-600 text-xs mt-1">
-                💡 <strong>Lưu ý:</strong> Nhấp vào một dòng trong bảng để xem vị trí chính xác trên bản đồ
+                {loading&&!geoData.features.length?'Đang tải dữ liệu…':<>🔍 <strong>Hiển thị bảng dữ liệu:</strong> {filteredFeatures.length} khu vực mất rừng</>}
               </p>
             </div>
-            <div className="flex flex-col gap-2 flex-shrink-0">
+            <div className="table-export-actions">
               <div className="flex gap-2">
                 <button
                   onClick={handleExportExcel}
+                  disabled={loading||!filteredFeatures.length}
                   className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium py-1.5 px-3 rounded shadow transition-colors"
                   title="Xuất tệp Excel"
                 >
@@ -159,6 +156,7 @@ const TableDisplay = ({
                 </button>
                 <button
                   onClick={handleExportGeoJSON}
+                  disabled={loading||!filteredFeatures.length}
                   className="flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium py-1.5 px-3 rounded shadow transition-colors"
                   title="Xuất tệp GeoJSON"
                 >
@@ -190,11 +188,14 @@ const TableDisplay = ({
           </div>
         </div>
 
-        <Table
+        <div className="lookup-table-data">
+        {filteredFeatures.length?<Table
           data={filteredFeatures.map((f) => f.properties)}
           onRowClick={onRowClick}
           tableName="mat_rung"
-        />
+          fillHeight
+        />:!loading&&<p className="monitor-empty">Không có bản ghi phù hợp với bộ lọc.</p>}
+        </div>
 
         {/* ⚡ Pagination controls */}
         <PaginationControls

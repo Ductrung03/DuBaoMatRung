@@ -15,7 +15,9 @@ const layerMapping = {
 };
 
 // ✅ FIX: Danh sách roles có toàn quyền xem dữ liệu (không cần filter theo khu vực)
-const ADMIN_ROLES = ['Công ty Fis', 'Chi cục kiểm lâm', 'Admin', 'LanhDao'];
+const ADMIN_ROLES = ['Công ty Fis', 'Chi cục kiểm lâm', 'Admin', 'LanhDao', 'super_admin', 'admin'];
+// WKT comes only from current-access's database lookup, never request headers.
+const scopeSql=req=>req.searchScopeWkt?` AND ST_CoveredBy(geom,ST_GeomFromText('${req.searchScopeWkt.replace(/'/g,"''")}',4326))`:'';
 
 // Get layer data by path parameter (new endpoint for frontend)
 exports.getLayerDataByPath = async (req, res, next) => {
@@ -61,7 +63,7 @@ exports.getLayerDataByPath = async (req, res, next) => {
       userScope = 'noscope';  // Restricted user không có scope - cache riêng (sẽ trả về empty)
     }
 
-    const cacheKey = `layer:${layerName}:${format}:${days || 'all'}:${userScope}`;
+    const cacheKey = `layer:vfis-t10:${layerName}:${format}:${days || 'all'}:${userScope}`;
 
     // ✅ FIX: Nếu restricted user không có scope, trả về empty ngay (không cần query DB)
     if (userScope === 'noscope') {
@@ -137,7 +139,7 @@ exports.getLayerDataByPath = async (req, res, next) => {
             port: process.env.DB_PORT || 5432,
             user: process.env.DB_USER || 'postgres',
             password: process.env.DB_PASSWORD,
-            database: 'admin_db',
+            database: process.env.ADMIN_DB_NAME || 'admin_db',
             max: 5,
             idleTimeoutMillis: 10000,
             connectionTimeoutMillis: 10000
@@ -201,7 +203,7 @@ exports.getLayerDataByPath = async (req, res, next) => {
                 ST_Y(ST_Transform(ST_Centroid(COALESCE(clipped_geom, geom)), 4326)) as y,
                 ST_AsGeoJSON(ST_Transform(COALESCE(clipped_geom, geom), 4326)) as geometry
               FROM ${tableName}
-              WHERE geom IS NOT NULL
+              WHERE geom IS NOT NULL ${scopeSql(req)}
                 AND ST_Intersects(geom, ST_GeomFromText('${unionGeomWKT}', 4326))
             `;
 
@@ -264,7 +266,7 @@ exports.getLayerDataByPath = async (req, res, next) => {
             ST_AsGeoJSON(ST_Transform(COALESCE(clipped_geom, geom), 4326)) as geometry,
             has_intersection
           FROM ${tableName}
-          WHERE geom IS NOT NULL
+          WHERE geom IS NOT NULL ${scopeSql(req)}
             AND has_intersection IS NOT FALSE
         `;
 
@@ -282,7 +284,7 @@ exports.getLayerDataByPath = async (req, res, next) => {
           gid,
           ST_AsGeoJSON(ST_Transform(geom, 4326)) as geometry
         FROM ${tableName}
-        WHERE geom IS NOT NULL
+        WHERE geom IS NOT NULL ${scopeSql(req)}
         LIMIT 10000
       `;
     }
@@ -306,7 +308,7 @@ exports.getLayerDataByPath = async (req, res, next) => {
           port: process.env.DB_PORT || 5432,
           user: process.env.DB_USER || 'postgres',
           password: process.env.DB_PASSWORD,
-          database: 'admin_db',
+          database: process.env.ADMIN_DB_NAME || 'admin_db',
           max: 10,
           idleTimeoutMillis: 30000,
           connectionTimeoutMillis: 15000,
@@ -392,7 +394,7 @@ exports.getLayerDataByPath = async (req, res, next) => {
               port: process.env.DB_PORT || 5433,
               user: process.env.DB_USER || 'postgres',
               password: process.env.DB_PASSWORD,
-              database: 'auth_db',
+              database: process.env.AUTH_DB_NAME || 'auth_db',
               max: 3,
               idleTimeoutMillis: 3000
             });
@@ -574,7 +576,7 @@ exports.getLayerData = async (req, res, next) => {
     const db = req.app.locals.db;
     const redis = req.app.locals.redis;
 
-    const cacheKey = `layer:${layer}:${format}`;
+    const cacheKey = `layer:vfis-t10:${layer}:${format}:${JSON.stringify(req.searchActor)}`;
 
     // Try cache
     const cached = await redis.get(cacheKey);
@@ -615,7 +617,7 @@ exports.getLayerData = async (req, res, next) => {
         gid,
         ST_AsGeoJSON(ST_Transform(geom, 4326)) as geometry
       FROM ${tableName}
-      WHERE geom IS NOT NULL
+      WHERE geom IS NOT NULL ${scopeSql(req)}
       LIMIT 10000
     `;
 
@@ -658,7 +660,7 @@ exports.getLayerBounds = async (req, res, next) => {
     const db = req.app.locals.db;
     const redis = req.app.locals.redis;
 
-    const cacheKey = `layer:bounds:${layer}`;
+    const cacheKey = `layer:vfis-t10:bounds:${layer}:${JSON.stringify(req.searchActor)}`;
 
     // Try cache
     const cached = await redis.get(cacheKey);
@@ -693,7 +695,7 @@ exports.getLayerBounds = async (req, res, next) => {
         ST_XMax(ST_Extent(ST_Transform(geom, 4326))) as maxx,
         ST_YMax(ST_Extent(ST_Transform(geom, 4326))) as maxy
       FROM ${tableName}
-      WHERE geom IS NOT NULL
+      WHERE geom IS NOT NULL ${scopeSql(req)}
     `;
 
     const result = await db.query(query);
